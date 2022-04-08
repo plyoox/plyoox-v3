@@ -1,0 +1,4 @@
+lib/
+venv/
+.env/
+.idea/

@@ -1,0 +1,53 @@
+id: "ID"
+roles: "Rollen"
+guild: "Server"
+timestamp: "Zeitstempel"
+user: "User"
+nick: "Nickname"
+yes: "Ja"
+no: "Nein"
+created_at: "Erstellt am"
+name: "Name"
+guild_only: "Dieser Command kann nur auf einem Server verwendet werden."
+no_roles: "Keine Rollen"
+
+user_info:
+  joined_at: "Beigetreten am"
+  joined:
+    postion_no_member: "Auf dieser Position ist kein Mitglied."
+    number_to_high: "Der Server hat nicht so viele Mitglieder."
+    title: "Beitrittsinformationen"
+    position: "Position"
+    days_since: "Tage seit Beitritt"
+  about:
+    user_information: "User Informationen"
+    public_badges: "Öffentliche Abzeichen"
+    account: "Account"
+    no_nick: "Kein Nickname"
+    no_flags: "Keine Abzeichen"
+    server_avatar: "Server Avatar"
+    no_server_avatar: "Kein Server Avatar"
+    member_verification: "Regeln akzeptiert"
+    premium_subscriber: "Boostet Server"
+    bot: "Bot"
+guild_info:
+  about:
+    title: "Serverinformationen"
+    members: "Mitglieder"
+    general_information: "Allgemeine Informationen"
+    owner: "Besitzer"
+    emojis: "Emojis"
+    stickers: "Stickers"
+    no_emojis: "Keine anzeigbaren Emojis"
+    more_infos: "Weitere Informationen"
+    premium_level: "Boost-Level"
+    vanity_url: "Custom Invite"
+    no_vanity_url: "Kein Custom Invite"
+    features: "Discord Features"
+    no_features: "Keine zusätzlichen Discord-Features"
+    file_size_limit: "Maximale Dateigröße"
+  today_joined: "In den letzten 24 Stunden sind {members} Mitglieder auf den Server gejoint."
+  members: "Der Server hat {members} Mitglieder."
+
+
+

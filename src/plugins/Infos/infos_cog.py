@@ -1,22 +1,42 @@
-import discord.app_commands as cmds
-from discord import Interaction, Embed
-from discord.ext.commands import Cog
+import discord
+from discord import app_commands, utils, ui
+from discord.ext import commands
 
 from main import Plyoox
-from plugins.Infos.guild_infos import GuildInfo
-from plugins.Infos.user_infos import UserInfo
+from plugins.Infos.guild_commands import GuildCommands
+from plugins.Infos.user_commands import UserCommands
+from translation import _
 from utils import colors
 
 
-class Infos(Cog):
+class Infos(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
-    guild_info_commands = GuildInfo()
-    user_info_commands = UserInfo()
+    guild_info_commands = GuildCommands()
+    user_info_commands = UserCommands()
 
-    @cmds.command(name="bot", description="Shows information about the bot")
-    async def bot(self, interaction: Interaction):
-        embed = Embed(color=colors.DISCORD_DEFAULT)
+    @app_commands.command(name="bot", description="Shows information about the bot")
+    async def bot(self, interaction: discord.Interaction):
+        """Shows basic information about the bot."""
+        lc = interaction.locale
 
-        await interaction.response.send_message("Zesz")
+        embed = discord.Embed(color=colors.DISCORD_DEFAULT, title=_(lc, "infos.bot.title"))
+        embed.add_field(name=_(lc, "infos.bot.coder"), value=f"> JohannesIBK#9220", inline=False)
+        embed.add_field(name=_(lc, "infos.bot.guild_count"), value=f"> {len(self.bot.guilds)}", inline=False)
+        embed.add_field(
+            name=_(lc, "infos.bot.uptime"), value=f"> {utils.format_dt(self.bot.startTime, 'R')}", inline=False
+        )
+
+        view = ui.View()
+        view.add_item(ui.Button(label="GitHub", url="https://github.com/plyoox/plyoox-v3"))
+        view.add_item(ui.Button(label="Dashboard", url="https://plyoox.net"))
+        view.add_item(ui.Button(label="Support", url="https://discord.gg/5qPPvQe"))
+        view.add_item(
+            ui.Button(
+                label="Invite",
+                url=utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(275146828846)),
+            )
+        )
+
+        await interaction.response.send_message(embeds=[embed], view=view)

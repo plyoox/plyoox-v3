@@ -1,5 +1,5 @@
-from discord.app_commands import AppCommandError
+from discord import app_commands
 
 
-class GuildOnly(AppCommandError):
+class GuildOnly(app_commands.AppCommandError):
     pass

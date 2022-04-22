@@ -2,10 +2,12 @@ import asyncio
 import logging
 import os
 import traceback
+from datetime import datetime
 
 import asyncpg
-from discord import Intents, AllowedMentions, Status, Activity, ActivityType, Message, Object
-from discord.ext.commands import Bot
+import discord
+from discord import utils
+from discord.ext import commands
 
 from lib.extensions.command_tree import CommandTree
 from src.cache import CacheManager
@@ -13,20 +15,19 @@ from src.cache import CacheManager
 logger = logging.getLogger(__name__)
 
 
-plugins = ["plugins.Infos"]
+plugins = ["plugins.Infos", "plugins.Leveling"]
 
 
-class Plyoox(Bot):
+class Plyoox(commands.Bot):
     db: asyncpg.Pool = None
     cache: CacheManager
-    test_guild = Object(820727787085234246)
+    test_guild = discord.Object(505438986672537620)
+    startTime: datetime
 
     def __init__(self):
-        intents = Intents(bans=True, guild_messages=True, guilds=True, members=True)
+        intents = discord.Intents(bans=True, guild_messages=True, guilds=True, members=True)
 
-        allowed_mentions = AllowedMentions(
-            everyone=False, users=True, roles=False, replied_user=True
-        )
+        allowed_mentions = discord.AllowedMentions(everyone=False, users=True, roles=False, replied_user=True)
 
         super().__init__(
             intents=intents,
@@ -46,9 +47,11 @@ class Plyoox(Bot):
         print("Ready")
         print(self.user.id)
 
-        # await self.tree.sync(guild=Object(820727787085234246))
+        self.startTime = utils.utcnow()
 
-    async def on_message(self, message: Message, /) -> None:
+        # await self.tree.sync(guild=self.test_guild)
+
+    async def on_message(self, message: discord.Message) -> None:
         pass
 
     async def _create_db_pool(self) -> None:
@@ -60,6 +63,8 @@ class Plyoox(Bot):
                 host=os.getenv("DATABASE_HOST"),
                 port=5432,
             )
+            self.cache = CacheManager(self.db)
+
         except asyncpg.ConnectionDoesNotExistError:
             logger.error(f"Could not connect to the database: {traceback.format_exc()}")
             exit(-1)
@@ -69,8 +74,8 @@ class Plyoox(Bot):
             if not self.is_ready():
                 await asyncio.sleep(30)
 
-            activity = Activity(name="plyoox.net | /help", type=ActivityType.listening)
-            status = Status.online
+            activity = discord.Activity(name="plyoox.net | /help", type=discord.ActivityType.listening)
+            status = discord.Status.online
 
             await self.change_presence(status=status, activity=activity)
             await asyncio.sleep(60 * 60 * 12)  # 12 hours

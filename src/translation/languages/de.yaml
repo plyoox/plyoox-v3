@@ -48,6 +48,17 @@ guild_info:
     file_size_limit: "Maximale Dateigröße"
   today_joined: "In den letzten 24 Stunden sind {members} Mitglieder auf den Server gejoint."
   members: "Der Server hat {members} Mitglieder."
-
-
-
+infos:
+  bot:
+    title: "Informationen über den Bot"
+    coder: "Entwickler"
+    guild_count: "Server-Anzahl"
+    uptime: "Zuletzt gestartet"
+level:
+  rank:
+    no_data: "Der User hat derzeit keine XP. Versuche es erneut, nachdem der User etwas geschrieben hat."
+    level: "Derzeitiges Level"
+    xp: "Derzeitige XP"
+  level_roles:
+    title: "Verfügbare Level-Rollen"
+    no_roles: "Der Server hat keine Level-Rollen"

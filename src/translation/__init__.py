@@ -1,1 +1,1 @@
-from src.translation.languages import get_key, interaction_send, _
+from src.translation.languages import _

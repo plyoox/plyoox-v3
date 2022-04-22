@@ -1,12 +1,12 @@
 import os
 
+import discord
 import yaml
-from discord import Interaction, Locale
 
 _languages = dict()
 
 
-def _flatten_dict(_dict: dict[str, str | dict]):
+def _flatten_dict(_dict: dict[str, str | dict]) -> dict:
     result = {}
 
     for _key, _value in _dict.items():
@@ -33,27 +33,26 @@ def _load_languages():
                 _languages[file.replace(".yaml", "")] = language_data
 
 
-def _(locale: Locale, key: str | bool, **kwargs):
-    locale = "de" if locale == Locale.german else "en"
+def _(locale: discord.Locale, key: str | bool, **kwargs):
+    """Returns the message for the given locale. Currently, only german and english are available.
+    If the user has a language that is not available it will fall back to english."""
+    locale = "de" if locale == discord.Locale.german else "en"
 
     return get_key(locale, key, **kwargs)
 
 
 def get_key(language: str, key: str, **kwargs: dict[str, ...]):
+    """Returns the localized message for a key. If the key is not available, a placeholder is returned."""
     lang: dict = _languages.get(language)
     message: str = lang.get(key)
 
-    if message:
+    if message is not None:
         try:
             return message.format(**kwargs)
         except KeyError:
             pass
 
     return f"{language}.{key}"
-
-
-async def interaction_send(interaction: Interaction, key: str, ephemeral=True):
-    await interaction.response.send_message(_(interaction.locale, key), ephemeral=ephemeral)
 
 
 _load_languages()

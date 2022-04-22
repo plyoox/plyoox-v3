@@ -1,39 +1,43 @@
-import discord.app_commands as cmds
-from discord import Interaction, Embed, utils
+from __future__ import annotations
+
+import discord
+from discord import app_commands
 
 from lib import checks
-from plugins.Infos.user_infos import UserInfo
+from plugins.Infos.user_commands import UserCommands
 from translation import _
 from utils import colors
 
 
-class GuildInfo(cmds.Group):
+class GuildCommands(app_commands.Group):
     def __init__(self):
         super().__init__(
             name="guild-info",
             description="Provides information about a guild or guild specific information.",
         )
 
-    async def interaction_check(self, interaction: Interaction) -> bool:
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        """This ensures that the commands cannot be run in dms."""
         return checks.guild_only_check(interaction)
 
-    @cmds.command(
+    @app_commands.command(
         name="about",
         description="Displays general information about the current guild.",
     )
-    async def about(self, interaction: Interaction):
+    async def about(self, interaction: discord.Interaction):
+        """This command shows basic information about the current guild."""
         lc = interaction.locale
         guild = interaction.guild
         roles = guild.roles
 
-        embed = Embed(title=_(lc, "guild_info.about.title"), color=colors.DISCORD_DEFAULT)
+        embed = discord.Embed(title=_(lc, "guild_info.about.title"), color=colors.DISCORD_DEFAULT)
         embed.set_thumbnail(url=guild.icon)
         embed.add_field(
             name=_(lc, "guild_info.about.general_information"),
             value=f"> __{_(lc, 'name')}:__ {guild.name}\n"
             f"> __{_(lc, 'id')}:__ {guild.id}\n"
             f"> __{_(lc, 'guild_info.about.owner')}:__ {guild.owner}\n"
-            f"> __{_(lc, 'created_at')}:__ {utils.format_dt(guild.created_at)}",
+            f"> __{_(lc, 'created_at')}:__ {discord.utils.format_dt(guild.created_at)}",
             inline=False,
         )
         embed.add_field(
@@ -44,12 +48,12 @@ class GuildInfo(cmds.Group):
 
         embed.add_field(
             name=_(lc, "roles"),
-            value=f"> {UserInfo._format_roles(roles) or _(lc, 'no_roles')}",
+            value=f"> {UserCommands._format_roles(roles) or _(lc, 'no_roles')}",
             inline=False,
         )
         embed.add_field(
             name=_(lc, "guild_info.about.more_infos"),
-            value=f"> __{_(lc, 'guild_info.about.premium_level')}:__ {guild.premium_tier} ({guild.premium_subscription_count})\n"
+            value=f"> __{_(lc, 'guild_info.about.premium_level')}:__ {guild.premium_tier} ({guild.premium_subscription_count})\n "
             f"> __{_(lc, 'guild_info.about.vanity_url')}:__ {guild.vanity_url or _(lc, 'guild_info.about.no_vanity_url')}\n"
             f"> __{_(lc, 'guild_info.about.emojis')}:__ {len(guild.emojis)}/{guild.emoji_limit}\n"
             f"> __{_(lc, 'guild_info.about.stickers')}:__ {len(guild.stickers)}/{guild.sticker_limit}",
@@ -63,11 +67,15 @@ class GuildInfo(cmds.Group):
 
         await interaction.response.send_message(embeds=[embed])
 
-    @cmds.command(
+    @app_commands.command(
         name="today-joined",
         description="Shows how many members joined in the last 24 hours.",
     )
-    async def today_joined(self, interaction: Interaction):
+    async def today_joined(self, interaction: discord.Interaction):
+        """Shows the amount of members that have joined in the last 24 hours. This does
+        not include members that already left. This means, that this number does not represent
+        an exact count on how many members the server gained or joined.
+        """
         guild = interaction.guild
         lc = interaction.locale
 
@@ -75,22 +83,23 @@ class GuildInfo(cmds.Group):
             [
                 member.id
                 for member in guild.members
-                if (utils.utcnow() - member.joined_at).total_seconds() <= 86400
+                if (discord.utils.utcnow() - member.joined_at).total_seconds() <= 86400
             ]
         )
-        embed = Embed(
+        embed = discord.Embed(
             description=_(lc, "guild_info.today_joined", members=joined),
             color=colors.DISCORD_DEFAULT,
         )
 
         await interaction.response.send_message(embeds=[embed])
 
-    @cmds.command(name="members", description="Shows how many members are currently in the guild.")
-    async def members(self, interaction: Interaction):
+    @app_commands.command(name="members", description="Shows how many members are currently in the guild.")
+    async def members(self, interaction: discord.Interaction):
+        """Returns the member count for the current guild."""
         guild = interaction.guild
         lc = interaction.locale
 
-        embed = Embed(
+        embed = discord.Embed(
             color=colors.DISCORD_DEFAULT,
             description=_(lc, "guild_info.members", members=guild.member_count),
         )

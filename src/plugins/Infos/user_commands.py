@@ -1,29 +1,31 @@
+from __future__ import annotations
+
 import datetime
 from typing import Optional
 
-import discord.app_commands as cmds
-from discord import Interaction, Member, Embed, utils, Role, PublicUserFlags
+import discord
+from discord import utils, app_commands
 
-from lib import checks
-from src.translation import interaction_send, _
+from lib import checks, send_helper
+from src.translation import _
 from utils import emojis, colors
 
 
-class UserInfo(cmds.Group):
+class UserCommands(app_commands.Group):
     def __init__(self):
-        super().__init__(
-            name="user-info", description="Provides information about a guild member or user."
-        )
+        super().__init__(name="user-info", description="Provides information about a guild member or user.")
 
-    joined_group = cmds.Group(
-        name="joined", description="Provides join information about a member."
-    )
+    joined_group = app_commands.Group(name="joined", description="Provides join information about a member.")
 
-    async def interaction_check(self, interaction: Interaction) -> bool:
-        return await checks.guild_only_check(interaction)
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        """This ensures that the commands cannot be run in dms."""
+        return checks.guild_only_check(interaction)
 
     @staticmethod
-    def _format_roles(roles: list[Role], /) -> str | None:
+    def _format_roles(roles: list[discord.Role], /) -> str | None:
+        """Converts a list of roles to a string of mentions. If the result is longer than 1024 characters
+        (limit of embed field) "..." is added to the end.
+        """
         if len(roles) == 1:
             return None
 
@@ -40,36 +42,15 @@ class UserInfo(cmds.Group):
         return " ".join(result)
 
     @staticmethod
-    def sort(list_user: Member):
+    def sort(list_user: discord.Member):
+        """Basic sort function, based on when a member joined the guild."""
         return list_user.joined_at
 
     @staticmethod
-    async def _send_joined_response(
-        interaction: Interaction, member: Member, position: int
-    ) -> None:
-        locale = interaction.locale
-
-        embed = Embed(title=_(locale, "user_info.joined.title"), color=colors.DISCORD_DEFAULT)
-        embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
-        embed.add_field(
-            name=_(locale, "user_info.joined.position"), value=f"> `{position}`", inline=False
-        )
-        embed.add_field(
-            name=_(locale, "user_info.joined.days_since"),
-            value=f"> `{(datetime.datetime.now(tz=datetime.timezone.utc) - member.joined_at).days}`",
-            inline=False,
-        )
-        embed.add_field(
-            name=_(locale, "user_info.joined_at"),
-            value=f"> {utils.format_dt(member.joined_at)}",
-            inline=False,
-        )
-
-        await interaction.response.send_message(embeds=[embed])
-
-    @staticmethod
-    def _get_badges(flags: PublicUserFlags):
+    def _get_badges(flags: discord.PublicUserFlags):
+        """Returns a list of the public flags a user has."""
         flag_list = []
+
         if flags.staff:
             flag_list.append(emojis.staff)
         if flags.partner:
@@ -93,11 +74,33 @@ class UserInfo(cmds.Group):
 
         return flag_list
 
+    @staticmethod
+    async def _send_joined_response(interaction: discord.Interaction, member: discord.Member, position: int) -> None:
+        """Shortcut to send the response for the joined command."""
+        locale = interaction.locale
+
+        embed = discord.Embed(title=_(locale, "user_info.joined.title"), color=colors.DISCORD_DEFAULT)
+        embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
+        embed.add_field(name=_(locale, "user_info.joined.position"), value=f"> `{position}`", inline=False)
+        embed.add_field(
+            name=_(locale, "user_info.joined.days_since"),
+            value=f"> `{(datetime.datetime.now(tz=datetime.timezone.utc) - member.joined_at).days}`",
+            inline=False,
+        )
+        embed.add_field(
+            name=_(locale, "user_info.joined_at"),
+            value=f"> {discord.utils.format_dt(member.joined_at)}",
+            inline=False,
+        )
+
+        await interaction.response.send_message(embeds=[embed])
+
     @joined_group.command(name="position", description="Shows the user on a join position")
-    @cmds.describe(position="Join position on the guild")
-    async def join_position(self, interaction: Interaction, position: cmds.Range[int, 1]):
+    @app_commands.describe(position="Join position on the guild")
+    async def join_position(self, interaction: discord.Interaction, position: app_commands.Range[int, 1]):
+        """Provides join information based on the join position."""
         if interaction.guild.member_count is not None and position > interaction.guild.member_count:
-            return interaction_send(interaction, "user_info.joined.number_to_high")
+            return send_helper.interaction_send(interaction, "user_info.joined.number_to_high")
 
         members = [member for member in interaction.guild.members]
         members.sort(key=self.sort)
@@ -105,15 +108,16 @@ class UserInfo(cmds.Group):
         try:
             member = members[position - 1]
         except KeyError:
-            return interaction_send(interaction, "user_info.joined.postion_no_member")
+            return send_helper.interaction_send(interaction, "user_info.joined.postion_no_member")
 
         await self._send_joined_response(interaction, member, position)
 
-    @joined_group.command(
-        name="member", description="Shows join information about a specific member."
-    )
-    @cmds.describe(member="The member you want the join position from.")
-    async def join_member(self, interaction: Interaction, member: Optional[Member]):
+    @joined_group.command(name="member", description="Shows join information about a specific member.")
+    @app_commands.describe(member="The member you want the join position from.")
+    async def join_member(self, interaction: discord.Interaction, member: Optional[discord.Member]):
+        """Provides join information based on the member. If no member is provided, the user that executed
+        the command will be used.
+        """
         current_member = member or interaction.user
 
         members = [member for member in interaction.guild.members]
@@ -122,18 +126,22 @@ class UserInfo(cmds.Group):
 
         await self._send_joined_response(interaction, current_member, position)
 
-    @cmds.command(name="about", description="Shows information's about a Discord member.")
-    @cmds.describe(member="The member you want the information about.")
-    async def about(self, interaction: Interaction, member: Optional[Member]):
+    @app_commands.command(name="about", description="Shows information's about a Discord member.")
+    @app_commands.describe(member="The member you want the information about.")
+    async def about(self, interaction: discord.Interaction, member: Optional[discord.Member]):
+        """Shows basic information about a user. If no member is provided, the user
+        that executed the command will be used.
+        """
         current_member = member or interaction.user
         roles = current_member.roles
         lc = interaction.locale
         public_flags = self._get_badges(current_member.public_flags)
 
-        embed = Embed(
+        embed = discord.Embed(
             title=_(lc, "user_info.about.user_information"),
             color=current_member.accent_color or colors.DISCORD_DEFAULT,
-        )
+        )  # accent color is not provided in the default member object
+
         embed.set_author(name=str(current_member), icon_url=current_member.display_avatar.url)
         embed.set_thumbnail(url=current_member.avatar.url)
         embed.add_field(
@@ -169,12 +177,15 @@ class UserInfo(cmds.Group):
 
         await interaction.response.send_message(embeds=[embed])
 
-    @cmds.command(name="avatar", description="Shows the avatar of a user.")
-    @cmds.describe(member="The member you want the avatar from.")
-    async def avatar(self, interaction: Interaction, member: Optional[Member]):
+    @app_commands.command(name="avatar", description="Shows the avatar of a user.")
+    @app_commands.describe(member="The member you want the avatar from.")
+    async def avatar(self, interaction: discord.Interaction, member: Optional[discord.Member]):
+        """Shows the avatar of a member. If no member is provided, the user
+        that executed the command will be used.
+        """
         current_member = member or interaction.user
 
-        embed = Embed(color=colors.DISCORD_DEFAULT)
+        embed = discord.Embed(color=colors.DISCORD_DEFAULT)
         embed.set_author(name=str(current_member))
         embed.set_image(url=current_member.display_avatar.url)
 

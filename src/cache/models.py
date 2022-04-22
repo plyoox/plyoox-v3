@@ -1,6 +1,4 @@
 from dataclasses import dataclass
-from datetime import datetime
-from typing import TypedDict
 
 
 @dataclass(frozen=True)
@@ -13,3 +11,14 @@ class WelcomeModel:
     leave_active: bool
     leave_channel: int | None
     leave_message: str | None
+
+
+@dataclass(frozen=True)
+class LevelingModel:
+    active: bool
+    message: str | None
+    channel: int | None
+    roles: list[list[int]]
+    no_xp_role: int | None
+    remove_roles: bool
+    no_xp_channels: list[int]

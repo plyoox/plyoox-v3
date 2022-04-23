@@ -15,7 +15,7 @@ from src.cache import CacheManager
 logger = logging.getLogger(__name__)
 
 
-plugins = ["plugins.Infos", "plugins.Leveling"]
+plugins = ["plugins.Infos", "plugins.Leveling", "plugins.Welcome", "plugins.Owner", "plugins.Moderation"]
 
 
 class Plyoox(commands.Bot):
@@ -35,6 +35,7 @@ class Plyoox(commands.Bot):
             max_messages=None,
             command_prefix=[],
             tree_cls=CommandTree,
+            owner_id=263347878150406144,
         )
 
     async def setup_hook(self) -> None:

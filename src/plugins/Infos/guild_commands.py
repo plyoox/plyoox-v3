@@ -4,7 +4,7 @@ import discord
 from discord import app_commands
 
 from lib import checks
-from plugins.Infos.user_commands import UserCommands
+from plugins.Infos import info_helper
 from translation import _
 from utils import colors
 
@@ -48,7 +48,7 @@ class GuildCommands(app_commands.Group):
 
         embed.add_field(
             name=_(lc, "roles"),
-            value=f"> {UserCommands._format_roles(roles) or _(lc, 'no_roles')}",
+            value=f"> {info_helper.format_roles(roles) or _(lc, 'no_roles')}",
             inline=False,
         )
         embed.add_field(
@@ -65,7 +65,7 @@ class GuildCommands(app_commands.Group):
             inline=False,
         )
 
-        await interaction.response.send_message(embeds=[embed])
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(
         name="today-joined",
@@ -91,7 +91,7 @@ class GuildCommands(app_commands.Group):
             color=colors.DISCORD_DEFAULT,
         )
 
-        await interaction.response.send_message(embeds=[embed])
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="members", description="Shows how many members are currently in the guild.")
     async def members(self, interaction: discord.Interaction):
@@ -104,4 +104,4 @@ class GuildCommands(app_commands.Group):
             description=_(lc, "guild_info.members", members=guild.member_count),
         )
 
-        await interaction.response.send_message(embeds=[embed])
+        await interaction.response.send_message(embed=embed)

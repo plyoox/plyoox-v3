@@ -3,8 +3,7 @@ from discord import app_commands, utils, ui
 from discord.ext import commands
 
 from main import Plyoox
-from plugins.Infos.guild_commands import GuildCommands
-from plugins.Infos.user_commands import UserCommands
+from src.plugins.Infos import guild_commands, user_commands
 from translation import _
 from utils import colors
 
@@ -13,8 +12,8 @@ class Infos(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
-    guild_info_commands = GuildCommands()
-    user_info_commands = UserCommands()
+    guild_info_commands = guild_commands.GuildCommands()
+    user_info_commands = user_commands.UserCommands()
 
     @app_commands.command(name="bot", description="Shows information about the bot")
     async def bot(self, interaction: discord.Interaction):
@@ -39,4 +38,4 @@ class Infos(commands.Cog):
             )
         )
 
-        await interaction.response.send_message(embeds=[embed], view=view)
+        await interaction.response.send_message(embed=embed, view=view)

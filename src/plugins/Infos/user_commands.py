@@ -7,8 +7,9 @@ import discord
 from discord import utils, app_commands
 
 from lib import checks, send_helper
+from plugins.Infos import info_helper
 from src.translation import _
-from utils import emojis, colors
+from utils import colors
 
 
 class UserCommands(app_commands.Group):
@@ -22,57 +23,9 @@ class UserCommands(app_commands.Group):
         return checks.guild_only_check(interaction)
 
     @staticmethod
-    def _format_roles(roles: list[discord.Role], /) -> str | None:
-        """Converts a list of roles to a string of mentions. If the result is longer than 1024 characters
-        (limit of embed field) "..." is added to the end.
-        """
-        if len(roles) == 1:
-            return None
-
-        result = []
-        roles.reverse()
-        roles.pop()
-
-        for role in roles[:44]:
-            result.append(role.mention)
-
-        if len(roles) > 44:
-            return " ".join(result) + "..."
-
-        return " ".join(result)
-
-    @staticmethod
     def sort(list_user: discord.Member):
         """Basic sort function, based on when a member joined the guild."""
         return list_user.joined_at
-
-    @staticmethod
-    def _get_badges(flags: discord.PublicUserFlags):
-        """Returns a list of the public flags a user has."""
-        flag_list = []
-
-        if flags.staff:
-            flag_list.append(emojis.staff)
-        if flags.partner:
-            flag_list.append(emojis.partner)
-        if flags.bug_hunter:
-            flag_list.append(emojis.bughunter)
-        if flags.early_supporter:
-            flag_list.append(emojis.early_supporter)
-        if flags.hypesquad:
-            flag_list.append(emojis.hypesquad)
-        if flags.hypesquad_balance:
-            flag_list.append(emojis.hypesquad_balance)
-        if flags.hypesquad_brilliance:
-            flag_list.append(emojis.hypesquad_brilliance)
-        if flags.hypesquad_bravery:
-            flag_list.append(emojis.hypesquad_bravery)
-        if flags.verified_bot_developer:
-            flag_list.append(emojis.botdev)
-        if flags.bug_hunter_level_2:
-            flag_list.append(emojis.bughunter2)
-
-        return flag_list
 
     @staticmethod
     async def _send_joined_response(interaction: discord.Interaction, member: discord.Member, position: int) -> None:
@@ -93,11 +46,11 @@ class UserCommands(app_commands.Group):
             inline=False,
         )
 
-        await interaction.response.send_message(embeds=[embed])
+        await interaction.response.send_message(embed=embed)
 
     @joined_group.command(name="position", description="Shows the user on a join position")
     @app_commands.describe(position="Join position on the guild")
-    async def join_position(self, interaction: discord.Interaction, position: app_commands.Range[int, 1]):
+    async def joined_position(self, interaction: discord.Interaction, position: app_commands.Range[int, 1]):
         """Provides join information based on the join position."""
         if interaction.guild.member_count is not None and position > interaction.guild.member_count:
             return send_helper.interaction_send(interaction, "user_info.joined.number_to_high")
@@ -114,7 +67,7 @@ class UserCommands(app_commands.Group):
 
     @joined_group.command(name="member", description="Shows join information about a specific member.")
     @app_commands.describe(member="The member you want the join position from.")
-    async def join_member(self, interaction: discord.Interaction, member: Optional[discord.Member]):
+    async def joined_member(self, interaction: discord.Interaction, member: Optional[discord.Member]):
         """Provides join information based on the member. If no member is provided, the user that executed
         the command will be used.
         """
@@ -135,7 +88,7 @@ class UserCommands(app_commands.Group):
         current_member = member or interaction.user
         roles = current_member.roles
         lc = interaction.locale
-        public_flags = self._get_badges(current_member.public_flags)
+        public_flags = info_helper.get_badges(current_member.public_flags)
 
         embed = discord.Embed(
             title=_(lc, "user_info.about.user_information"),
@@ -166,7 +119,7 @@ class UserCommands(app_commands.Group):
         )
         embed.add_field(
             name=f"{_(lc, 'roles')} ({len(roles) - 1})",
-            value=f"> {self._format_roles(roles) or _(lc, 'no_roles')}",
+            value=f"> {info_helper.format_roles(roles) or _(lc, 'no_roles')}",
             inline=False,
         )
         embed.add_field(
@@ -175,7 +128,7 @@ class UserCommands(app_commands.Group):
             inline=False,
         )
 
-        await interaction.response.send_message(embeds=[embed])
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="avatar", description="Shows the avatar of a user.")
     @app_commands.describe(member="The member you want the avatar from.")
@@ -189,4 +142,4 @@ class UserCommands(app_commands.Group):
         embed.set_author(name=str(current_member))
         embed.set_image(url=current_member.display_avatar.url)
 
-        await interaction.response.send_message(embeds=[embed])
+        await interaction.response.send_message(embed=embed)

@@ -9,7 +9,7 @@ import discord
 from discord.ext import commands
 
 from lib import formatting, send_helper, utils
-from plugins.Leveling import helper, level_commands
+from plugins.Leveling import level_commands, leveling_helper
 
 if TYPE_CHECKING:
     from src.main import Plyoox
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class Leveling(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
-        self._users_on_cooldown = defaultdict(lambda: utils.ExpiringCache(seconds=5))  # TODO: remove guild on leave
+        self._users_on_cooldown = defaultdict(lambda: utils.ExpiringCache(seconds=60))
 
     leveling_commands = level_commands.LevelingCommands()
 
@@ -83,8 +83,8 @@ class Leveling(commands.Cog):
 
         await self._update_member_data(member_data["id"], message_xp)
 
-        before_level = helper.get_level_from_xp(member_data["xp"])[0]  # level with the current xp
-        after_level = helper.get_level_from_xp(member_data["xp"] + message_xp)[0]  # level with the added xp
+        before_level = leveling_helper.get_level_from_xp(member_data["xp"])[0]  # level with the current xp
+        after_level = leveling_helper.get_level_from_xp(member_data["xp"] + message_xp)[0]  # level with the added xp
 
         if before_level != after_level:
             # highest role that will be added
@@ -137,13 +137,9 @@ class Leveling(commands.Cog):
 
             if cache.message:
                 # format the messages with the variables
-                f_guild = formatting.GuildFormatObject(guild)
-                f_member = formatting.MemberFormatObject(member)
                 f_level = formatting.LevelFormatObject(level=after_level, role=highest_add_role)
 
-                level_message = formatting.format_leveling_message(
-                    cache.message, member=f_member, guild=f_guild, level=f_level
-                )
+                level_message = formatting.format_leveling_message(cache.message, member=member, level=f_level)
 
                 # if a channel is given send the message to it
                 # else the message will be sent to the current channel
@@ -153,3 +149,13 @@ class Leveling(commands.Cog):
                     level_channel = guild.get_channel(cache.channel)
 
                     await send_helper.permission_check(level_channel, content=level_message)
+
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild: discord.Guild):
+        """Removes the leveling cooldown cache of guilds the bot left. This prevents
+        having lots of dead guilds in the cache.
+        """
+        try:
+            del self._users_on_cooldown[guild.id]
+        except KeyError:
+            pass

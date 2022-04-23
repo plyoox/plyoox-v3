@@ -31,10 +31,7 @@ class Welcome(commands.Cog):
         # format message and send it
         if cache.join_message:
             channel = guild.get_channel(cache.join_channel)
-            f_member = formatting.MemberFormatObject(member)
-            f_guild = formatting.GuildFormatObject(guild)
-
-            message = formatting.format_welcome_message(cache.join_message, f_member, f_guild)
+            message = formatting.format_welcome_message(cache.join_message, member)
 
             # send message and handle permission check
             await send_helper.permission_check(channel, content=message)
@@ -56,14 +53,11 @@ class Welcome(commands.Cog):
             channel = guild.get_channel(cache.leave_channel)
 
             if channel.permissions_for(guild.me).send_messages:
-                f_member = formatting.MemberFormatObject(member)
-                f_guild = formatting.GuildFormatObject(guild)
-
-                message = formatting.format_welcome_message(cache.leave_message, f_member, f_guild)
+                message = formatting.format_welcome_message(cache.leave_message, member)
 
                 # send message and handle permission check
                 await send_helper.permission_check(channel, content=message)
 
 
-def setup(bot: Plyoox):
-    bot.add_cog(Welcome(bot))
+async def setup(bot: Plyoox):
+    await bot.add_cog(Welcome(bot))

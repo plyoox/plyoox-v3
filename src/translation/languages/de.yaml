@@ -8,9 +8,22 @@ yes: "Ja"
 no: "Nein"
 created_at: "Erstellt am"
 name: "Name"
-guild_only: "Dieser Command kann nur auf einem Server verwendet werden."
 no_roles: "Keine Rollen"
+reason: "Grund"
+no_reason: "Kein Grund angegeben"
 
+times:
+  hour: "Stunde"
+  hours: "Stunden"
+  minutes: "Minuten"
+  day: "Tag"
+  days: "Tage"
+  month: "Monat"
+  months: "Monate"
+errors:
+  command_not_found: "Der Command konnte nicht gefunden werden. Sollte dieser Fehler öfter auftreten, melde dich beim Support."
+  guild_only: "Dieser Command kann nur auf einem Server verwendet werden."
+  owner_only: "Diesen Command kann nur der Entwickler des Bots ausführen."
 user_info:
   joined_at: "Beigetreten am"
   joined:
@@ -62,3 +75,17 @@ level:
   level_roles:
     title: "Verfügbare Level-Rollen"
     no_roles: "Der Server hat keine Level-Rollen"
+  reset_level:
+    modal_title: "{member}'s Level zurücksetzen?"
+    level_reset: "Das Level des Users wurde erfolgreich zurückgesetzt."
+  top:
+    no_users: "Auf diesem Server hat der Bot noch keine Level registriert."
+    title: "Server Ranking"
+    level: "Level"
+    xp: "Xp"
+moderation:
+  successful_execution: "Der Command wurde erfolgreich ausgeführt."
+  clear:
+    success_title: "Clear - Ergebnis"
+    deleted_messages: "Gelöschte Nachrichten"
+    affected_users: "Betroffene Mitglieder"

@@ -1,5 +1,5 @@
 from main import Plyoox
-from plugins.Infos import infos_cog
+from src.plugins.Infos import infos_cog
 
 
 async def setup(bot: Plyoox):

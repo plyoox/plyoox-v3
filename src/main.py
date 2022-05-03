@@ -22,12 +22,12 @@ class Plyoox(commands.Bot):
     db: asyncpg.Pool = None
     cache: CacheManager
     test_guild = discord.Object(505438986672537620)
-    startTime: datetime
+    start_time: datetime
 
     def __init__(self):
         intents = discord.Intents(bans=True, guild_messages=True, guilds=True, members=True)
 
-        allowed_mentions = discord.AllowedMentions(everyone=False, users=True, roles=False, replied_user=True)
+        allowed_mentions = discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=True)
 
         super().__init__(
             intents=intents,
@@ -42,15 +42,18 @@ class Plyoox(commands.Bot):
         self.loop.create_task(self._refresh_presence())
 
         for plugin in plugins:
+            print("Loaded plugin", plugin, end="\r")
+            await asyncio.sleep(1)
             await self.load_extension(plugin)
 
     async def on_ready(self) -> None:
         print("Ready")
         print(self.user.id)
 
-        self.startTime = utils.utcnow()
+        self.start_time = utils.utcnow()
 
-        # await self.tree.sync(guild=self.test_guild)
+        self.tree.copy_global_to(guild=self.test_guild)
+        await self.tree.sync(guild=self.test_guild)
 
     async def on_message(self, message: discord.Message) -> None:
         pass

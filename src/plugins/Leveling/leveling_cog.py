@@ -6,10 +6,13 @@ from collections import defaultdict
 from typing import TYPE_CHECKING
 
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 from lib import formatting, send_helper, utils
-from plugins.Leveling import level_commands, leveling_helper
+from plugins.Leveling import leveling_helper
+from translation import _
+from utils import colors
 
 if TYPE_CHECKING:
     from src.main import Plyoox
@@ -21,12 +24,10 @@ class Leveling(commands.Cog):
         self.bot = bot
         self._users_on_cooldown = defaultdict(lambda: utils.ExpiringCache(seconds=60))
 
-    leveling_commands = level_commands.LevelingCommands()
-
     async def _fetch_member_data(self, member: discord.Member) -> LevelUserData:
         """Fetches the leveling data of a member."""
         return await self.bot.db.fetchrow(
-            'SELECT * FROM leveling_users WHERE "guildId" = $1 AND "userId" = $2',
+            "SELECT * FROM leveling_users WHERE guild_id = $1 AND user_id = $2",
             member.guild.id,
             member.id,
         )
@@ -34,7 +35,7 @@ class Leveling(commands.Cog):
     async def _create_member_data(self, member: discord.Member, xp: int) -> None:
         """Creates a database entry for the member."""
         await self.bot.db.execute(
-            'INSERT INTO leveling_users ("guildId", "userId", xp) VALUES ($1, $2, $3)',
+            "INSERT INTO leveling_users (guild_id, user_id, xp) VALUES ($1, $2, $3)",
             member.guild.id,
             member.id,
             xp,
@@ -149,6 +150,20 @@ class Leveling(commands.Cog):
                     level_channel = guild.get_channel(cache.channel)
 
                     await send_helper.permission_check(level_channel, content=level_message)
+
+    @app_commands.command(name="reset-level", description="Resets the level of a member. This action cannot be undone.")
+    @app_commands.describe(member="The member from whom you want to reset rank.")
+    @app_commands.default_permissions()
+    @app_commands.guild_only
+    async def reset_level(self, interaction: discord.Interaction, member: discord.Member):
+        lc = interaction.locale
+
+        await self.bot.db.execute(
+            "DELETE FROM leveling_users WHERE user_id = $1 AND guild_id = $2", member.id, interaction.guild.id
+        )
+
+        embed = discord.Embed(color=colors.DISCORD_DEFAULT, description=_(lc, "level.reset_level.level_reset"))
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):

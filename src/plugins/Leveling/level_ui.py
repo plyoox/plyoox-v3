@@ -14,11 +14,6 @@ if TYPE_CHECKING:
 
 # maybe use this in the future
 class ConfirmLevelReset(ui.Modal):
-    name = ui.TextInput(
-        label="Name",
-        placeholder="Your name here...",
-    )
-
     def __init__(self, *, member: discord.Member, locale: discord.Locale):
         self.title = _(locale, "level.reset_level.modal_title", member=member.name)
         self.member_id = member.id
@@ -30,7 +25,7 @@ class ConfirmLevelReset(ui.Modal):
         lc = interaction.locale
 
         await bot.db.execute(
-            'DELETE FROM leveling_users WHERE "userId" = $1 AND "guildId" = $2', self.member_id, interaction.guild.id
+            "DELETE FROM leveling_users WHERE user_id = $1 AND guild_id = $2", self.member_id, interaction.guild.id
         )
 
         embed = discord.Embed(color=colors.DISCORD_DEFAULT, description=_(lc, "level.reset_level.level_reset"))

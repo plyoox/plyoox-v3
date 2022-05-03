@@ -22,3 +22,18 @@ class LevelingModel:
     no_xp_role: int | None
     remove_roles: bool
     no_xp_channels: list[int]
+
+
+@dataclass(frozen=True)
+class LoggingModel:
+    active: bool
+    webhook_id: int | None
+    webhook_token: str | None
+    member_join: bool
+    member_leave: bool
+    member_ban: bool
+    member_unban: bool
+    member_rename: bool
+    member_role_change: bool
+    message_edit: bool
+    message_delete: bool

@@ -6,16 +6,10 @@ import discord
 from discord import app_commands
 
 from lib import errors
+from lib.types import enums
 
 if TYPE_CHECKING:
     from src.main import Plyoox
-
-
-def guild_only_check(interaction: discord.Interaction) -> bool:
-    if interaction.guild is None:
-        raise errors.GuildOnly
-
-    return True
 
 
 def owner_only_check(interaction: discord.Interaction) -> bool:
@@ -41,9 +35,16 @@ def bot_permission_check(interaction: discord.Interaction, **perms: bool) -> boo
     raise app_commands.BotMissingPermissions(missing)
 
 
-def guild_only():
-    return discord.app_commands.check(guild_only_check)
+def module_active(module: enums.PlyooxModule):
+    async def predicate(interaction: discord.Interaction) -> bool:
+        bot: Plyoox = interaction.client  # type: ignore
+        cache = bot.cache
+        guild = interaction.guild
+
+        if module == enums.PlyooxModule.Leveling:
+            cache = await cache.get_leveling(guild.id)
+            return cache.active
 
 
 def owner_only():
-    return discord.app_commands.check(guild_only_check)
+    return discord.app_commands.check(owner_only_check)

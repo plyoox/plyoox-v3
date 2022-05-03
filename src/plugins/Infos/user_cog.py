@@ -5,22 +5,19 @@ from typing import Optional
 
 import discord
 from discord import utils, app_commands
+from discord.ext import commands
 
-from lib import checks, send_helper
+from lib import send_helper
 from plugins.Infos import info_helper
 from src.translation import _
 from utils import colors
 
 
-class UserCommands(app_commands.Group):
-    def __init__(self):
-        super().__init__(name="user-info", description="Provides information about a guild member or user.")
-
+@app_commands.guild_only
+class UserCommand(
+    commands.GroupCog, group_name="user-info", group_description="Provides information about a guild member or user."
+):
     joined_group = app_commands.Group(name="joined", description="Provides join information about a member.")
-
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        """This ensures that the commands cannot be run in dms."""
-        return checks.guild_only_check(interaction)
 
     @staticmethod
     def sort(list_user: discord.Member):

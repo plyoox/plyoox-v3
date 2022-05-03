@@ -4,6 +4,7 @@ from typing import Optional, TYPE_CHECKING
 
 import discord
 from discord import app_commands, Interaction
+from discord.ext import commands
 
 from lib import types, send_helper
 from plugins.Leveling import leveling_helper
@@ -14,12 +15,15 @@ if TYPE_CHECKING:
     from src.main import Plyoox
 
 
-class LevelingCommands(app_commands.Group):
-    def __init__(self):
-        super().__init__(
-            name="level",
-            description="Commands that are needed to interact with the level-system.",
-        )
+@app_commands.default_permissions()
+@app_commands.guild_only
+class LevelCommand(
+    commands.GroupCog,
+    group_name="level",
+    group_description="Commands that are needed to interact with the level-system.",
+):
+    def __init__(self, bot: Plyoox):
+        self.db = bot.db
 
     @app_commands.command(name="rank", description="Shows information about the current rank of a member.")
     @app_commands.describe(member="The member from whom you want the rank.")
@@ -27,13 +31,12 @@ class LevelingCommands(app_commands.Group):
         """Shows the current ranking information about a member. If no member is provided, the user that executed
         the command will be used.
         """
-        bot: Plyoox = interaction.client  # type: ignore
         guild = interaction.guild
         current_member = member or interaction.user
         lc = interaction.locale
 
-        user_data: types.LevelUserData = await bot.db.fetchrow(
-            'SELECT * FROM leveling_users WHERE "guildId" = $1 AND "userId" = $2',
+        user_data: types.LevelUserData = await self.db.fetchrow(
+            "SELECT * FROM leveling_users WHERE guild_id = $1 AND user_id = $2",
             guild.id,
             current_member.id,
         )
@@ -56,9 +59,8 @@ class LevelingCommands(app_commands.Group):
         """Shows the roles that are gain able through the level system"""
         lc = interaction.locale
         guild = interaction.guild
-        bot: Plyoox = interaction.client  # type: ignore
 
-        level_roles: list[list[int, int]] = await bot.db.fetchval("SELECT roles FROM leveling WHERE id = $1", guild.id)
+        level_roles: list[list[int, int]] = await self.db.fetchval("SELECT roles FROM leveling WHERE id = $1", guild.id)
         if not level_roles:
             return await send_helper.interaction_send(interaction, "level.level_roles.no_roles")
 
@@ -74,30 +76,16 @@ class LevelingCommands(app_commands.Group):
 
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="reset-level", description="Resets the level of a member. This action cannot be undone.")
-    @app_commands.describe(member="The member from whom you want to reset rank.")
-    async def reset_level(self, interaction: discord.Interaction, member: discord.Member):
-        lc = interaction.locale
-        bot: Plyoox = interaction.client  # type: ignore
-
-        await bot.db.execute(
-            'DELETE FROM leveling_users WHERE "userId" = $1 AND "guildId" = $2', member.id, interaction.guild.id
-        )
-
-        embed = discord.Embed(color=colors.DISCORD_DEFAULT, description=_(lc, "level.reset_level.level_reset"))
-        await interaction.response.send_message(embed=embed, ephemeral=True)
-
     @app_commands.command(name="top", description="Lists the top 10 users with the highest level on this guild.")
     async def top(self, interaction: Interaction):
         lc = interaction.locale
         guild = interaction.guild
-        bot: Plyoox = interaction.client  # type: ignore
 
         top_users = []
 
         while len(top_users) != 10:
-            level_users = await bot.db.fetch(
-                'SELECT "userId", xp FROM leveling_users WHERE "guildId" = $1 ORDER BY xp DESC LIMIT 15', guild.id
+            level_users = await self.db.fetch(
+                "SELECT user_id, xp FROM leveling_users WHERE guild_id = $1 ORDER BY xp DESC LIMIT 15", guild.id
             )
 
             for level_user in level_users:

@@ -6,7 +6,6 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from plugins.Moderation import clear_command
 from translation import _
 
 if TYPE_CHECKING:
@@ -17,11 +16,11 @@ class Moderation(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
-    clear_commands = clear_command.ClearCommand()
-
     @app_commands.command(name="ban", description="Bans an user from the guild.")
     @app_commands.describe(member="The member that should be banned.", reason="Why the member should be banned.")
     @app_commands.checks.bot_has_permissions(ban_members=True)
+    @app_commands.default_permissions(ban_members=True)
+    @app_commands.guild_only
     async def ban(self, interaction: discord.Interaction, member: discord.Member, reason: Optional[str]):
         pass
 
@@ -32,6 +31,8 @@ class Moderation(commands.Cog):
         duration="How long the member should be banned.",
     )
     @app_commands.checks.bot_has_permissions(ban_members=True)
+    @app_commands.default_permissions(ban_members=True)
+    @app_commands.guild_only
     async def tempban(
         self, interaction: discord.Interaction, member: discord.Member, duration: str, reason: Optional[str]
     ):
@@ -40,12 +41,16 @@ class Moderation(commands.Cog):
     @app_commands.command(name="kick", description="Kicks an user from the guild.")
     @app_commands.describe(member="The member that should be kicked.", reason="Why the member should be kicked.")
     @app_commands.checks.bot_has_permissions(kick_members=True)
+    @app_commands.default_permissions(kick_members=True)
+    @app_commands.guild_only
     async def kick(self, interaction: discord.Interaction, member: discord.Member, reason: Optional[str]):
         pass
 
     @app_commands.command(name="mute", description="Mutes an user permanently.")
     @app_commands.describe(member="The member that should be muted.", reason="Why the member should be muted.")
     @app_commands.checks.bot_has_permissions(manage_roles=True)
+    @app_commands.default_permissions(mute_members=True)
+    @app_commands.guild_only
     async def mute(self, interaction: discord.Interaction, member: discord.Member, reason: Optional[str]):
         pass
 
@@ -56,6 +61,8 @@ class Moderation(commands.Cog):
         duration="How long the member should be banned.",
     )
     @app_commands.checks.bot_has_permissions(manage_roles=True, moderate_members=True)
+    @app_commands.default_permissions(mute_members=True)
+    @app_commands.guild_only
     async def tempmute(
         self, interaction: discord.Interaction, member: discord.Member, duration: str, reason: Optional[str]
     ):

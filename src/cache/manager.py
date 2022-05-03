@@ -1,15 +1,31 @@
 import asyncpg
 
-from src.cache.models import WelcomeModel, LevelingModel
+from src.cache.models import WelcomeModel, LevelingModel, LoggingModel
 
 
 class CacheManager:
     _welcome: dict[int, WelcomeModel] = dict()
     _leveling: dict[int, LevelingModel] = dict()
+    _logging: dict[int, LoggingModel] = dict()
     _pool: asyncpg.Pool
 
     def __init__(self, pool: asyncpg.Pool):
         self._pool = pool
+
+    def remove_guild_cache(self, id: int) -> None:
+        """Deletes the caches from a guild."""
+
+        # Welcome cache
+        if self._welcome.get(id) is not None:
+            del self._welcome[id]
+
+        # Leveling cache
+        if self._leveling.get(id) is not None:
+            del self._leveling[id]
+
+        # Logging cache
+        if self._logging.get(id) is not None:
+            del self._logging[id]
 
     async def get_welcome(self, id: int) -> WelcomeModel | None:
         """Returns the cache for the welcome plugin."""
@@ -55,5 +71,32 @@ class CacheManager:
                 remove_roles=result["remove_roles"],
             )
             self._leveling[id] = model
+
+            return model
+
+    async def get_logging(self, id: int) -> LoggingModel | None:
+        """Returns the cache for the logging plugin."""
+        cache = self._logging.get(id)
+
+        if cache is not None:
+            return cache
+
+        result = await self._pool.fetchrow("SELECT * from logging WHERE id = $1", id)
+
+        if result is not None:
+            model = LoggingModel(
+                active=result["active"],
+                webhook_id=result["webhook_id"],
+                webhook_token=result["webhook_token"],
+                member_ban=result["member_ban"],
+                member_unban=result["member_unban"],
+                member_join=result["member_join"],
+                member_leave=result["member_leave"],
+                member_rename=result["member_rename"],
+                message_edit=result["message_edit"],
+                message_delete=result["message_delete"],
+                member_role_change=result["member_role_change"],
+            )
+            self._logging[id] = model
 
             return model

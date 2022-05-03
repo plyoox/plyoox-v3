@@ -3,21 +3,22 @@ from typing import Optional
 
 import discord
 from discord import app_commands
+from discord.ext import commands
 
-from lib import checks
 from translation import _
 from utils import colors
 
 LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
 
 
-class ClearCommand(app_commands.Group):
-    def __init__(self):
-        super().__init__(name="clear", description="Clears messages in a channel. Specific filters can be applied.")
-
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        return checks.bot_permission_check(interaction, manage_messages=True, read_messages=True)
-
+@app_commands.guild_only
+@app_commands.default_permissions(manage_messages=True)
+@app_commands.checks.bot_has_permissions(manage_messages=True)
+class ClearCommand(
+    commands.GroupCog,
+    group_name="clear",
+    group_description="Clears messages in a channel. Specific filters can be applied.",
+):
     @staticmethod
     async def do_removal(interaction: discord.Interaction, limit, *, reason, predicate):
         """This function is a helper to clear messages in an interaction channel.
@@ -46,7 +47,6 @@ class ClearCommand(app_commands.Group):
     @app_commands.describe(
         amount="The amount of messages you want to purge.", reason="Why the messages should be deleted."
     )
-    @app_commands.checks.bot_has_permissions(manage_messages=True)
     async def clear_all(
         self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]
     ):

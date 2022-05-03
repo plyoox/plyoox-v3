@@ -2,24 +2,19 @@ from __future__ import annotations
 
 import discord
 from discord import app_commands
+from discord.ext import commands
 
-from lib import checks
 from plugins.Infos import info_helper
 from translation import _
 from utils import colors
 
 
-class GuildCommands(app_commands.Group):
-    def __init__(self):
-        super().__init__(
-            name="guild-info",
-            description="Provides information about a guild or guild specific information.",
-        )
-
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        """This ensures that the commands cannot be run in dms."""
-        return checks.guild_only_check(interaction)
-
+@app_commands.guild_only
+class GuildCommand(
+    commands.GroupCog,
+    group_name="guild-info",
+    group_description="Provides information about a guild or guild specific information.",
+):
     @app_commands.command(
         name="about",
         description="Displays general information about the current guild.",
@@ -53,7 +48,7 @@ class GuildCommands(app_commands.Group):
         )
         embed.add_field(
             name=_(lc, "guild_info.about.more_infos"),
-            value=f"> __{_(lc, 'guild_info.about.premium_level')}:__ {guild.premium_tier} ({guild.premium_subscription_count})\n "
+            value=f"> __{_(lc, 'guild_info.about.premium_level')}:__ {guild.premium_tier} ({guild.premium_subscription_count})\n"
             f"> __{_(lc, 'guild_info.about.vanity_url')}:__ {guild.vanity_url or _(lc, 'guild_info.about.no_vanity_url')}\n"
             f"> __{_(lc, 'guild_info.about.emojis')}:__ {len(guild.emojis)}/{guild.emoji_limit}\n"
             f"> __{_(lc, 'guild_info.about.stickers')}:__ {len(guild.stickers)}/{guild.sticker_limit}",
@@ -61,7 +56,7 @@ class GuildCommands(app_commands.Group):
         )
         embed.add_field(
             name=_(lc, "guild_info.about.features"),
-            value=f"> {', '.join(f'`{feature}`' for feature in guild.features) or _(lc, 'guild_info.about.no_features')}\n",
+            value=f"> {', '.join(f'`{feature}`' for feature in guild.features) or _(lc, 'guild_info.about.no_features')}",
             inline=False,
         )
 

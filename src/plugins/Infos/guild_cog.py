@@ -74,13 +74,12 @@ class GuildCommand(
         guild = interaction.guild
         lc = interaction.locale
 
-        joined = len(
-            [
-                member.id
-                for member in guild.members
-                if (discord.utils.utcnow() - member.joined_at).total_seconds() <= 86400
-            ]
-        )
+        joined = 0
+
+        for member in guild.members:
+            if (discord.utils.utcnow() - member.joined_at).total_seconds() <= 86400:
+                joined += 1
+
         embed = discord.Embed(
             description=_(lc, "guild_info.today_joined", members=joined),
             color=colors.DISCORD_DEFAULT,

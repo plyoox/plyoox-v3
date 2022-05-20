@@ -6,7 +6,7 @@ import discord
 from discord import app_commands, Interaction
 from discord.ext import commands
 
-from lib import types, send_helper
+from lib import types, send_helper, checks
 from plugins.Leveling import leveling_helper
 from translation import _
 from utils import colors
@@ -24,6 +24,9 @@ class LevelCommand(
 ):
     def __init__(self, bot: Plyoox):
         self.db = bot.db
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        return await checks.module_enabled_check(interaction, types.PlyooxModule.Leveling)
 
     @app_commands.command(name="rank", description="Shows information about the current rank of a member.")
     @app_commands.describe(member="The member from whom you want the rank.")

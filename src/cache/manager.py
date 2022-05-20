@@ -81,21 +81,25 @@ class CacheManager:
         if cache is not None:
             return cache
 
-        result = await self._pool.fetchrow("SELECT * from logging WHERE id = $1", id)
+        return await self._set_logging(id)
 
-        if result is not None:
+    async def _set_logging(self, id: int, *, query_result=None) -> LoggingModel | None:
+        if query_result is None:
+            query_result = await self._pool.fetchrow("SELECT * from logging WHERE id = $1", id)
+
+        if query_result is not None:
             model = LoggingModel(
-                active=result["active"],
-                webhook_id=result["webhook_id"],
-                webhook_token=result["webhook_token"],
-                member_ban=result["member_ban"],
-                member_unban=result["member_unban"],
-                member_join=result["member_join"],
-                member_leave=result["member_leave"],
-                member_rename=result["member_rename"],
-                message_edit=result["message_edit"],
-                message_delete=result["message_delete"],
-                member_role_change=result["member_role_change"],
+                active=query_result["active"],
+                webhook_id=query_result["webhook_id"],
+                webhook_token=query_result["webhook_token"],
+                member_ban=query_result["member_ban"],
+                member_unban=query_result["member_unban"],
+                member_join=query_result["member_join"],
+                member_leave=query_result["member_leave"],
+                member_rename=query_result["member_rename"],
+                message_edit=query_result["message_edit"],
+                message_delete=query_result["message_delete"],
+                member_role_change=query_result["member_role_change"],
             )
             self._logging[id] = model
 

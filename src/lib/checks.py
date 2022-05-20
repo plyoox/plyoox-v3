@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING
 import discord
 from discord import app_commands
 
-from lib import errors
-from lib.types import enums
+from lib import errors, types
+from translation import _
 
 if TYPE_CHECKING:
     from src.main import Plyoox
+    from src.cache import CacheManager
 
 
 def owner_only_check(interaction: discord.Interaction) -> bool:
@@ -35,15 +36,21 @@ def bot_permission_check(interaction: discord.Interaction, **perms: bool) -> boo
     raise app_commands.BotMissingPermissions(missing)
 
 
-def module_active(module: enums.PlyooxModule):
-    async def predicate(interaction: discord.Interaction) -> bool:
-        bot: Plyoox = interaction.client  # type: ignore
-        cache = bot.cache
-        guild = interaction.guild
+async def module_enabled_check(interaction: discord.Interaction, module: types.PlyooxModule) -> bool:
+    manager: CacheManager = interaction.client.cache  # type: ignore
+    guild = interaction.guild
+    lc = interaction.locale
 
-        if module == enums.PlyooxModule.Leveling:
-            cache = await cache.get_leveling(guild.id)
-            return cache.active
+    if module == types.PlyooxModule.Leveling:
+        cache = await manager.get_leveling(guild.id)
+        if not cache or not cache.active:
+            raise errors.ModuleDisabled(_(lc, "errors.module_disabled", module=str(module.name)))
+
+        return True
+
+
+def module_active(module: types.PlyooxModule):
+    return discord.app_commands.check(lambda i: module_enabled_check(i, module))
 
 
 def owner_only():

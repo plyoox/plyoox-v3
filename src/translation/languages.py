@@ -50,7 +50,7 @@ def get_key(language: str, key: str, **kwargs: dict[str, ...]):
         try:
             return message.format(**kwargs)
         except KeyError:
-            pass
+            return message
 
     return f"{language}.{key}"
 

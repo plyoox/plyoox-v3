@@ -4,6 +4,7 @@ import os
 import traceback
 from datetime import datetime
 
+import aiohttp
 import asyncpg
 import discord
 from discord import utils
@@ -23,6 +24,7 @@ class Plyoox(commands.Bot):
     cache: CacheManager
     test_guild = discord.Object(505438986672537620)
     start_time: datetime
+    session: aiohttp.ClientSession
 
     def __init__(self):
         intents = discord.Intents(bans=True, guild_messages=True, guilds=True, members=True)
@@ -42,8 +44,7 @@ class Plyoox(commands.Bot):
         self.loop.create_task(self._refresh_presence())
 
         for plugin in plugins:
-            print("Loaded plugin", plugin, end="\r")
-            await asyncio.sleep(1)
+            print("Loaded plugin", plugin, end="\r\n")
             await self.load_extension(plugin)
 
     async def on_ready(self) -> None:
@@ -53,7 +54,7 @@ class Plyoox(commands.Bot):
         self.start_time = utils.utcnow()
 
         self.tree.copy_global_to(guild=self.test_guild)
-        await self.tree.sync(guild=self.test_guild)
+        # await self.tree.sync(guild=self.test_guild)
 
     async def on_message(self, message: discord.Message) -> None:
         pass
@@ -72,6 +73,9 @@ class Plyoox(commands.Bot):
         except asyncpg.ConnectionDoesNotExistError:
             logger.error(f"Could not connect to the database: {traceback.format_exc()}")
             exit(-1)
+
+    async def _create_http_client(self):
+        self.session = aiohttp.ClientSession()
 
     async def _refresh_presence(self) -> None:
         while True:

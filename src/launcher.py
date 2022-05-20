@@ -20,6 +20,7 @@ async def main():
     bot = Plyoox()
 
     await bot._create_db_pool()
+    await bot._create_http_client()
 
     async with bot:
         await bot.start(os.getenv("TOKEN"))

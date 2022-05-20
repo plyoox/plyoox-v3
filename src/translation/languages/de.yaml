@@ -11,7 +11,7 @@ name: "Name"
 no_roles: "Keine Rollen"
 reason: "Grund"
 no_reason: "Kein Grund angegeben"
-
+account_created: "Account erstellt"
 times:
   hour: "Stunde"
   hours: "Stunden"
@@ -24,6 +24,7 @@ errors:
   command_not_found: "Der Command konnte nicht gefunden werden. Sollte dieser Fehler öfter auftreten, melde dich beim Support."
   guild_only: "Dieser Command kann nur auf einem Server verwendet werden."
   owner_only: "Diesen Command kann nur der Entwickler des Bots ausführen."
+  module_disabled: "Das Modul {module} ist auf diesem Server deaktiviert."
 user_info:
   joined_at: "Beigetreten am"
   joined:
@@ -89,3 +90,7 @@ moderation:
     success_title: "Clear - Ergebnis"
     deleted_messages: "Gelöschte Nachrichten"
     affected_users: "Betroffene Mitglieder"
+logging:
+  member_join:
+    title: "Mitglied beigetreten"
+    description: "Der User {member.name} ist dem Server beigetreten."

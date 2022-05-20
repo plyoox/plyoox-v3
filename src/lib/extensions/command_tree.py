@@ -16,5 +16,7 @@ class CommandTree(app_commands.CommandTree):
             await interaction.response.send_message(_(interaction.locale, "errors.command_not_found"), ephemeral=True)
         elif isinstance(error, errors.OwnerOnly):
             await interaction.response.send_message(_(interaction.locale, "errors.owner_only"), ephemeral=True)
+        elif isinstance(error, errors.ModuleDisabled):
+            await interaction.response.send_message(error, ephemeral=True)
         else:
             traceback.print_exc()

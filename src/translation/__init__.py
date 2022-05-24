@@ -1,1 +1,1 @@
-from src.translation.languages import _
+from .languages import _

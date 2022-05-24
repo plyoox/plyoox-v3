@@ -7,10 +7,9 @@ import discord
 from discord import utils, app_commands
 from discord.ext import commands
 
-from lib import send_helper
-from plugins.Infos import info_helper
-from src.translation import _
-from utils import colors
+from lib.helper import interaction_send, get_badges, format_roles
+from lib.colors import DISCORD_DEFAULT
+from translation import _
 
 
 @app_commands.guild_only
@@ -29,7 +28,7 @@ class UserCommand(
         """Shortcut to send the response for the joined command."""
         locale = interaction.locale
 
-        embed = discord.Embed(title=_(locale, "user_info.joined.title"), color=colors.DISCORD_DEFAULT)
+        embed = discord.Embed(title=_(locale, "user_info.joined.title"), color=DISCORD_DEFAULT)
         embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
         embed.add_field(name=_(locale, "user_info.joined.position"), value=f"> `{position}`", inline=False)
         embed.add_field(
@@ -50,7 +49,7 @@ class UserCommand(
     async def joined_position(self, interaction: discord.Interaction, position: app_commands.Range[int, 1]):
         """Provides join information based on the join position."""
         if interaction.guild.member_count is not None and position > interaction.guild.member_count:
-            return send_helper.interaction_send(interaction, "user_info.joined.number_to_high")
+            return interaction_send(interaction, "user_info.joined.number_to_high")
 
         members = [member for member in interaction.guild.members]
         members.sort(key=self.sort)
@@ -58,7 +57,7 @@ class UserCommand(
         try:
             member = members[position - 1]
         except KeyError:
-            return send_helper.interaction_send(interaction, "user_info.joined.postion_no_member")
+            return interaction_send(interaction, "user_info.joined.postion_no_member")
 
         await self._send_joined_response(interaction, member, position)
 
@@ -85,11 +84,11 @@ class UserCommand(
         current_member = member or interaction.user
         roles = current_member.roles
         lc = interaction.locale
-        public_flags = info_helper.get_badges(current_member.public_flags)
+        public_flags = get_badges(current_member.public_flags)
 
         embed = discord.Embed(
             title=_(lc, "user_info.about.user_information"),
-            color=current_member.accent_color or colors.DISCORD_DEFAULT,
+            color=current_member.accent_color or DISCORD_DEFAULT,
         )  # accent color is not provided in the default member object
 
         embed.set_author(name=str(current_member), icon_url=current_member.display_avatar.url)
@@ -116,7 +115,7 @@ class UserCommand(
         )
         embed.add_field(
             name=f"{_(lc, 'roles')} ({len(roles) - 1})",
-            value=f"> {info_helper.format_roles(roles) or _(lc, 'no_roles')}",
+            value=f"> {format_roles(roles) or _(lc, 'no_roles')}",
             inline=False,
         )
         embed.add_field(
@@ -135,7 +134,7 @@ class UserCommand(
         """
         current_member = member or interaction.user
 
-        embed = discord.Embed(color=colors.DISCORD_DEFAULT)
+        embed = discord.Embed(color=DISCORD_DEFAULT)
         embed.set_author(name=str(current_member))
         embed.set_image(url=current_member.display_avatar.url)
 

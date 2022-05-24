@@ -2,9 +2,9 @@ import discord
 from discord import app_commands, utils, ui
 from discord.ext import commands
 
+from lib.colors import DISCORD_DEFAULT
 from main import Plyoox
 from translation import _
-from utils import colors
 
 
 class Infos(commands.Cog):
@@ -16,7 +16,7 @@ class Infos(commands.Cog):
         """Shows basic information about the bot."""
         lc = interaction.locale
 
-        embed = discord.Embed(color=colors.DISCORD_DEFAULT, title=_(lc, "infos.bot.title"))
+        embed = discord.Embed(color=DISCORD_DEFAULT, title=_(lc, "infos.bot.title"))
         embed.add_field(name=_(lc, "infos.bot.coder"), value=f"> JohannesIBK#9220", inline=False)
         embed.add_field(name=_(lc, "infos.bot.guild_count"), value=f"> {len(self.bot.guilds)}", inline=False)
         embed.add_field(

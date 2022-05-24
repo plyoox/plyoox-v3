@@ -1,8 +1,10 @@
 from main import Plyoox
-from src.plugins.Infos import infos_cog, guild_cog, user_cog
+from .guild_cog import GuildCommand
+from .infos_cog import Infos
+from .user_cog import UserCommand
 
 
 async def setup(bot: Plyoox):
-    await bot.add_cog(infos_cog.Infos(bot))
-    await bot.add_cog(user_cog.UserCommand())
-    await bot.add_cog(guild_cog.GuildCommand())
+    await bot.add_cog(Infos(bot))
+    await bot.add_cog(UserCommand())
+    await bot.add_cog(GuildCommand())

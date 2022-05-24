@@ -5,8 +5,8 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from lib.colors import DISCORD_DEFAULT
 from translation import _
-from utils import colors
 
 LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
 
@@ -31,7 +31,7 @@ class ClearCommand(
         deleted_count = len(deleted_messages)
         affected_users = set(m.author.id for m in deleted_messages)  # list of affected users
 
-        embed = discord.Embed(color=colors.DISCORD_DEFAULT, title=_(lc, "moderation.clear.success_title"))
+        embed = discord.Embed(color=DISCORD_DEFAULT, title=_(lc, "moderation.clear.success_title"))
         embed.title = _(lc, "moderation.clear.success_title")
 
         embed.add_field(

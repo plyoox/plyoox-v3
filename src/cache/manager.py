@@ -1,6 +1,6 @@
 import asyncpg
 
-from src.cache.models import WelcomeModel, LevelingModel, LoggingModel
+from .models import WelcomeModel, LevelingModel, LoggingModel
 
 
 class CacheManager:
@@ -92,6 +92,7 @@ class CacheManager:
                 active=query_result["active"],
                 webhook_id=query_result["webhook_id"],
                 webhook_token=query_result["webhook_token"],
+                webhook_channel=query_result["webhook_channel"],
                 member_ban=query_result["member_ban"],
                 member_unban=query_result["member_unban"],
                 member_join=query_result["member_join"],

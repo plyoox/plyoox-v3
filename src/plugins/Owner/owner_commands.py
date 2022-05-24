@@ -4,10 +4,10 @@ from typing import TYPE_CHECKING
 import discord
 from discord import app_commands
 
-from lib import checks
+from lib.checks import owner_only_check
 
 if TYPE_CHECKING:
-    from src.main import Plyoox
+    from main import Plyoox
 
 
 class OwnerCommands(app_commands.Group):
@@ -17,7 +17,7 @@ class OwnerCommands(app_commands.Group):
     plugin_group = app_commands.Group(name="plugin", description="Managing the Plugin system.")
 
     def interaction_check(self, interaction: discord.Interaction) -> bool:
-        return checks.owner_only_check(interaction)
+        return owner_only_check(interaction)
 
     @plugin_group.command(name="load", description="Loads a plugin")
     async def plugin_load(self, interaction: discord.Interaction, plugin: str):

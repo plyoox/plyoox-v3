@@ -91,6 +91,22 @@ moderation:
     deleted_messages: "Gelöschte Nachrichten"
     affected_users: "Betroffene Mitglieder"
 logging:
+  member_id: "Mitglied-ID"
+  no_content: "*Diese Nachricht enthält keinen Inhalt.*"
+  no_attachments: "*Diese Nachricht hat keine Anhänge.*"
   member_join:
     title: "Mitglied beigetreten"
     description: "Der User {member.name} ist dem Server beigetreten."
+  member_remove:
+    title: "Mitglied verlassen"
+  message_delete:
+    title: "Nachricht gelöscht"
+    description_raw: "Eine Nachricht aus {channel} wurde gelöscht."
+    description_cached: "Eine Nachricht von **{member}** wurde aus {channel.mention} gelöscht."
+    message_content: "Inhalt der Nachricht"
+    attachment_count: "Anzahl der Anhänge"
+  message_edit:
+    title: "Nachricht bearbeitet"
+    description: "**{member}** hat eine Nachricht in {channel} bearbeitet."
+    old_message: "Vorherige Nachricht"
+    new_message: "Neue Nachricht"

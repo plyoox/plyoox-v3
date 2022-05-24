@@ -4,9 +4,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from plugins.Infos import info_helper
+from lib.helper import format_roles
 from translation import _
-from utils import colors
+from lib import colors
 
 
 @app_commands.guild_only
@@ -43,7 +43,7 @@ class GuildCommand(
 
         embed.add_field(
             name=_(lc, "roles"),
-            value=f"> {info_helper.format_roles(roles) or _(lc, 'no_roles')}",
+            value=f"> {format_roles(roles) or _(lc, 'no_roles')}",
             inline=False,
         )
         embed.add_field(

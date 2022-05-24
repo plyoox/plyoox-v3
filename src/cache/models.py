@@ -28,6 +28,7 @@ class LevelingModel:
 class LoggingModel:
     active: bool
     webhook_id: int | None
+    webhook_channel: int | None
     webhook_token: str | None
     member_join: bool
     member_leave: bool

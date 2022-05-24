@@ -4,14 +4,14 @@ from typing import TYPE_CHECKING
 
 from discord.ext import commands
 
-from src.plugins.Owner import owner_commands
+from .owner_commands import OwnerCommands
 
 if TYPE_CHECKING:
-    from src.main import Plyoox
+    from main import Plyoox
 
 
 class Owner(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
-    owner_commands = owner_commands.OwnerCommands()
+    owner_commands = OwnerCommands()

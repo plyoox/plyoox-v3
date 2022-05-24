@@ -1,7 +1,11 @@
+import logging
 import os
+import traceback
 
 import discord
 import yaml
+
+logger = logging.getLogger(__name__)
 
 _languages = dict()
 
@@ -21,7 +25,7 @@ def _flatten_dict(_dict: dict[str, str | dict]) -> dict:
 
 
 def _load_languages():
-    path = os.getcwd().replace("\\", "//") + "//translation//languages"
+    path = os.getcwd().replace("\\", "/") + "/translation/languages"
     files = os.listdir(path)
 
     for file in files:
@@ -36,7 +40,8 @@ def _load_languages():
 def _(locale: discord.Locale, key: str | bool, **kwargs):
     """Returns the message for the given locale. Currently, only german and english are available.
     If the user has a language that is not available it will fall back to english."""
-    locale = "de" if locale == discord.Locale.german else "en"
+    # locale = "de" if locale == discord.Locale.german else "en"
+    locale = "de" if locale == discord.Locale.german else "de"
 
     return get_key(locale, key, **kwargs)
 
@@ -50,6 +55,7 @@ def get_key(language: str, key: str, **kwargs: dict[str, ...]):
         try:
             return message.format(**kwargs)
         except KeyError:
+            logger.error(f"Could not format message {key}\n: {traceback.format_exc()}")
             return message
 
     return f"{language}.{key}"

@@ -48,7 +48,7 @@ class LevelingUsers(Base):
     id = _Column(sql.INTEGER, primary_key=True)
     guild_id = _Column(sql.BIGINT, nullable=False)
     user_id = _Column(sql.BIGINT, nullable=False)
-    xp: _Column(sql.INTEGER, server_default=0)
+    xp = _Column(sql.INTEGER, server_default=0)
 
 
 class Welcome(Base):

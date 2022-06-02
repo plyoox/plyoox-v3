@@ -41,10 +41,12 @@ class LoggingEvents(commands.Cog):
         try:
             await webhook.send(embed=embed, embeds=embeds)
         except discord.NotFound:
-            query_result = await self.bot.db.fetchrow(
-                "UPDATE logging SET webhook_id = NULL, webhook_token = NULL WHERE id = $1 RETURNING *", guild_id
+            await self.bot.db.execute(
+                "UPDATE logging SET webhook_id = NULL, webhook_token = NULL WHERE id = $1", guild_id
             )
-            await self.bot.cache._set_logging(guild_id, query_result=query_result)
+
+            self.bot.cache.edit_cache("log", guild_id, "webhook_token", None)
+            self.bot.cache.edit_cache("log", guild_id, "webhook_id", None)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):

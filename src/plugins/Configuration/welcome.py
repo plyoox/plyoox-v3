@@ -67,6 +67,7 @@ class WelcomeConfig(app_commands.Group):
         if channel is None:
             await bot.db.execute("UPDATE welcome SET join_channel = NULL WHERE id = $1", guild.id)
             await helper.interaction_send(interaction, "config.channel_removed")
+            bot.cache.edit_cache("wel", guild.id, "join_channel", None)
             return
 
         if not channel.permissions_for(guild.me).send_messages:
@@ -79,6 +80,7 @@ class WelcomeConfig(app_commands.Group):
             channel.id,
         )
 
+        bot.cache.edit_cache("wel", guild.id, "join_channel", channel.id)
         await helper.interaction_send(interaction, "config.welcome.join_channel_set", channel=channel)
 
     @app_commands.command(name="join-message", description="Changes the message when a user joins.")

@@ -1,3 +1,5 @@
+from typing import Literal
+
 import asyncpg
 
 from .models import WelcomeModel, LevelingModel, LoggingModel
@@ -105,3 +107,17 @@ class CacheManager:
             self._logging[id] = model
 
             return model
+
+    def edit_cache(self, cache: Literal["wel", "log", "lvl"], id: int, key: str, value: int | str | bool | None):
+        guild_cache = None
+
+        if cache == "wel":
+            guild_cache = self._welcome
+        elif cache == "log":
+            guild_cache = self._logging
+        elif cache == "lvl":
+            guild_cache = self._leveling
+
+        if guild_cache is not None:
+            if hasattr(guild_cache, key):
+                setattr(guild_cache, key, value)

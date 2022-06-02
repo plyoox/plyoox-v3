@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 
-@dataclass(frozen=True)
+@dataclass(slots=True)
 class WelcomeModel:
     active: bool
     join_active: bool
@@ -13,7 +13,7 @@ class WelcomeModel:
     leave_message: str | None
 
 
-@dataclass(frozen=True)
+@dataclass(slots=True)
 class LevelingModel:
     active: bool
     message: str | None
@@ -24,7 +24,7 @@ class LevelingModel:
     no_xp_channels: list[int]
 
 
-@dataclass(frozen=True)
+@dataclass(slots=True)
 class LoggingModel:
     active: bool
     webhook_id: int | None

@@ -32,6 +32,7 @@ class WelcomeMessageModal(ui.Modal):
 
         if message is None or not message.strip():
             await bot.db.execute("UPDATE welcome SET join_message = NULL WHERE id = $1", guild.id)
+            bot.cache.edit_cache("wel", guild.id, "join_message", None)
             await helper.interaction_send(interaction, "config.welcome.modal.message_removed")
             return
 
@@ -44,6 +45,7 @@ class WelcomeMessageModal(ui.Modal):
             guild.id,
             formatted_message,
         )
+        bot.cache.edit_cache("wel", guild.id, "join_message", formatted_message)
 
         embed = discord.Embed(
             description=formatting.format_welcome_message(formatted_message, interaction.user),

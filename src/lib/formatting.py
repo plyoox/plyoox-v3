@@ -3,11 +3,15 @@ from __future__ import annotations
 import re
 from typing import TYPE_CHECKING
 
+from discord import utils
+
 if TYPE_CHECKING:
     import discord
 
 GUILD_FORMAT_REGEX = re.compile("{guild\\.(name|id|members)}")
 USER_FORMAT_REGEX = re.compile("{user\\.(name|id|mention|discriminator)}")
+
+CHANNEL_REGEX = re.compile("(#.{1,100})")
 
 
 class LevelFormatObject:
@@ -21,11 +25,12 @@ class LevelFormatObject:
 
 def format_welcome_message(message: str, member: discord.Member) -> str | None:
     """Formats a join or leave message."""
-    guild = discord.Guild
+    guild = member.guild
 
     return (
         message.replace("{user}", str(member))
         .replace("{user.name}", member.name)
+        .replace("{user.mention}", member.mention)
         .replace("{user.discriminator}", member.discriminator)
         .replace("{user.id}", str(member.id))
         .replace("{guild.name}", guild.name)
@@ -44,6 +49,7 @@ def format_leveling_message(message: str, member: discord.Member, level: LevelFo
     return (
         message.replace("{user}", str(member))
         .replace("{user.name}", member.name)
+        .replace("{user.mention}", member.mention)
         .replace("{user.discriminator}", member.discriminator)
         .replace("{user.id}", str(member.id))
         .replace("{guild.name}", guild.name)
@@ -51,3 +57,18 @@ def format_leveling_message(message: str, member: discord.Member, level: LevelFo
         .replace("{level}", str(level))
         .replace("{level.role}", str(guild.id))
     )
+
+
+def resolve_channels(message: str, guild: discord.Guild) -> str:
+    resolved_channels: list[str] = CHANNEL_REGEX.findall(message)
+
+    for channel in set(resolved_channels):
+        if channel.count("#") != 1:
+            continue
+
+        guild_channel: discord.TextChannel = utils.get(guild.text_channels, name=channel[1:])
+
+        if guild_channel is not None:
+            message = message.replace(channel, guild_channel.mention)
+
+    return message

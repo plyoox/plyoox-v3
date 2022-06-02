@@ -21,6 +21,8 @@ class _Column(sql.Column):
         if default is not None:
             if isinstance(default, enum.Enum):
                 server_default = default.name
+            elif isinstance(default, list):
+                server_default = "{}"
             else:
                 server_default = str(default)
 
@@ -58,8 +60,11 @@ class Welcome(Base):
     active = _Column(sql.BOOLEAN, server_default=False)
     join_channel = _Column(sql.BIGINT)
     join_message = _Column(sql.VARCHAR(length=2000))
-    join_roles = _Column(sql.ARRAY(sql.BIGINT))
+    join_roles = _Column(sql.ARRAY(sql.BIGINT), server_default=[])
     join_active = _Column(sql.BOOLEAN, server_default=False)
+    leave_channel = _Column(sql.BIGINT)
+    leave_message = _Column(sql.VARCHAR(length=2000))
+    leave_active = _Column(sql.BOOLEAN, server_default=False)
 
 
 class Logging(Base):

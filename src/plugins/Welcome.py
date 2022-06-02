@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
 
-from lib.formatting import format_welcome_message
-from lib.helper import permission_check
+from lib import formatting, helper
 from main import Plyoox
 
 
@@ -32,10 +31,10 @@ class Welcome(commands.Cog):
         # format message and send it
         if cache.join_message:
             channel = guild.get_channel(cache.join_channel)
-            message = format_welcome_message(cache.join_message, member)
+            message = formatting.format_welcome_message(cache.join_message, member)
 
             # send message and handle permission check
-            await permission_check(channel, content=message)
+            await helper.permission_check(channel, content=message)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
@@ -54,10 +53,10 @@ class Welcome(commands.Cog):
             channel = guild.get_channel(cache.leave_channel)
 
             if channel.permissions_for(guild.me).send_messages:
-                message = format_welcome_message(cache.leave_message, member)
+                message = formatting.format_welcome_message(cache.leave_message, member)
 
                 # send message and handle permission check
-                await permission_check(channel, content=message)
+                await helper.permission_check(channel, content=message)
 
 
 async def setup(bot: Plyoox):

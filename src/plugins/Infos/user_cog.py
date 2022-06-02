@@ -37,7 +37,7 @@ class UserCommand(
             inline=False,
         )
         embed.add_field(
-            name=_(locale, "user_info.joined_at"),
+            name=_(locale, "joined_at"),
             value=f"> {discord.utils.format_dt(member.joined_at)}",
             inline=False,
         )

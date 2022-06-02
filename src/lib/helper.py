@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Union
 
-import emojis
+from lib import emojis
 from translation import _
 
 if TYPE_CHECKING:
@@ -57,16 +57,16 @@ def get_badges(flags: discord.PublicUserFlags):
     return flag_list
 
 
-async def interaction_send(interaction: discord.Interaction, key: str, ephemeral=True):
+async def interaction_send(interaction: discord.Interaction, key: str, /, ephemeral=True, **kwargs):
     """Responds to an interaction with a locale string as ephemeral. This is mostly used to respond to errors."""
-    await interaction.response.send_message(_(interaction.locale, key), ephemeral=ephemeral)
+    await interaction.response.send_message(_(interaction.locale, key, **kwargs), ephemeral=ephemeral)
 
 
 async def permission_check(
     channel: Union[discord.TextChannel, discord.VoiceChannel, discord.Thread],
     content: str = None,
     embeds: list[discord.Embed] = None,
-):
+) -> None:
     """Only sends the message if the bot has the permission to send messages in the channel."""
     if channel is None:
         return

@@ -6,10 +6,9 @@ import discord
 from discord import app_commands, Interaction
 from discord.ext import commands
 
-from lib.checks import module_enabled_check
+from lib import checks, helper
 from lib.colors import DISCORD_DEFAULT
 from lib.enums import PlyooxModule
-from lib.helper import interaction_send
 from lib.types import LevelUserData
 from translation import _
 from ._helper import get_level_from_xp, get_level_xp
@@ -29,7 +28,7 @@ class LevelCommand(
         self.db = bot.db
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        return await module_enabled_check(interaction, PlyooxModule.Leveling)
+        return await checks.module_enabled_check(interaction, PlyooxModule.Leveling)
 
     @app_commands.command(name="rank", description="Shows information about the current rank of a member.")
     @app_commands.describe(member="The member from whom you want the rank.")
@@ -48,7 +47,7 @@ class LevelCommand(
         )
 
         if user_data is None:
-            return await interaction_send(interaction, "level.rank.no_data")
+            return await helper.interaction_send(interaction, "level.rank.no_data")
 
         current_level, remaining_xp = get_level_from_xp(user_data["xp"])
         required_xp = get_level_xp(current_level)
@@ -68,7 +67,7 @@ class LevelCommand(
 
         level_roles: list[list[int, int]] = await self.db.fetchval("SELECT roles FROM leveling WHERE id = $1", guild.id)
         if not level_roles:
-            return await interaction_send(interaction, "level.level_roles.no_roles")
+            return await helper.interaction_send(interaction, "level.level_roles.no_roles")
 
         roles: list[str] = []
 
@@ -109,7 +108,7 @@ class LevelCommand(
                 break
 
         if len(top_users) == 0:
-            return await interaction_send(interaction, "level.top.no_users")
+            return await helper.interaction_send(interaction, "level.top.no_users")
 
         embed = discord.Embed(
             color=DISCORD_DEFAULT,

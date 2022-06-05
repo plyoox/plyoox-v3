@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import random
-import time
-from collections import defaultdict
 from typing import TYPE_CHECKING
 
 import discord
@@ -12,7 +10,6 @@ from discord.ext import commands
 from lib.colors import DISCORD_DEFAULT
 from lib.formatting import LevelFormatObject, format_leveling_message
 from lib.helper import permission_check
-from lib.utils import ExpiringCache
 from ._helper import get_level_from_xp
 from translation import _
 
@@ -24,7 +21,7 @@ if TYPE_CHECKING:
 class Leveling(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
-        self._users_on_cooldown = defaultdict(lambda: ExpiringCache(seconds=60))
+        self._cooldown_by_user = commands.CooldownMapping.from_cooldown(1, 60, commands.BucketType.member)
 
     async def _fetch_member_data(self, member: discord.Member) -> LevelUserData:
         """Fetches the leveling data of a member."""
@@ -58,8 +55,9 @@ class Leveling(commands.Cog):
         guild = message.guild
 
         # user is on cooldown
-        if self._users_on_cooldown[guild.id].get(member.id):
-            return
+        bucket = self._cooldown_by_user.get_bucket(message)
+        if bucket.update_rate_limit(message.created_at.timestamp()):
+            return False
 
         cache = await self.bot.cache.get_leveling(guild.id)
 
@@ -75,13 +73,13 @@ class Leveling(commands.Cog):
         if cache.no_xp_role in member._roles:
             return
 
-        self._users_on_cooldown[guild.id][member.id] = time.time()  # set user on cooldown
         message_xp = random.randint(15, 25)  # generate a random amount of xp between 15 and 25
         member_data = await self._fetch_member_data(member)
 
         # member has no data saved
         if member_data is None:
-            return await self._create_member_data(member, message_xp)
+            await self._create_member_data(member, message_xp)
+            return
 
         await self._update_member_data(member_data["id"], message_xp)
 
@@ -165,13 +163,3 @@ class Leveling(commands.Cog):
 
         embed = discord.Embed(color=DISCORD_DEFAULT, description=_(lc, "level.reset_level.level_reset"))
         await interaction.response.send_message(embed=embed, ephemeral=True)
-
-    @commands.Cog.listener()
-    async def on_guild_remove(self, guild: discord.Guild):
-        """Removes the leveling cooldown cache of guilds the bot left. This prevents
-        having lots of dead guilds in the cache.
-        """
-        try:
-            del self._users_on_cooldown[guild.id]
-        except KeyError:
-            pass

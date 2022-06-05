@@ -2,121 +2,83 @@ from typing import Literal
 
 import asyncpg
 
-from .models import WelcomeModel, LevelingModel, LoggingModel
+from .models import WelcomeModel, LevelingModel, LoggingModel, ModerationModel
 
 
 class CacheManager:
-    _welcome: dict[int, WelcomeModel] = dict()
-    _leveling: dict[int, LevelingModel] = dict()
-    _logging: dict[int, LoggingModel] = dict()
+    _welcome: dict[int, WelcomeModel | None] = dict()
+    _leveling: dict[int, LevelingModel | None] = dict()
+    _moderation: dict[int, ModerationModel | None] = dict()
+    _logging: dict[int, LoggingModel | None] = dict()
     _pool: asyncpg.Pool
 
     def __init__(self, pool: asyncpg.Pool):
         self._pool = pool
 
+    def __get_cache(self, cache: dict, id: int, query: str, model):
+        guild_cache = cache.get(id, False)
+        if guild_cache is not False:
+            return cache
+
+        result = await self._pool.fetchrow(query, id)
+        if result is None:
+            cache[id] = None
+            return
+
+        result = dict(result)
+        del result["id"]
+
+        model = model(**result)
+        cache[id] = model
+
+        return model
+
     def remove_guild_cache(self, id: int) -> None:
         """Deletes the caches from a guild."""
 
         # Welcome cache
-        if self._welcome.get(id) is not None:
+        if self._welcome.get(id, False) is not False:
             del self._welcome[id]
 
         # Leveling cache
-        if self._leveling.get(id) is not None:
+        if self._leveling.get(id, False) is not False:
             del self._leveling[id]
 
         # Logging cache
-        if self._logging.get(id) is not None:
+        if self._logging.get(id, False) is not False:
             del self._logging[id]
+
+        # Moderation cache
+        if self._moderation.get(id, False) is not False:
+            del self._moderation[id]
 
     async def get_welcome(self, id: int) -> WelcomeModel | None:
         """Returns the cache for the welcome plugin."""
-        cache = self._welcome.get(id)
-
-        if cache is not None:
-            return cache
-
-        result = await self._pool.fetchrow("SELECT * from welcome WHERE id = $1", id)
-
-        if result is not None:
-            model = WelcomeModel(
-                active=result["active"],
-                join_active=result["join_active"],
-                join_role=result["join_active"],
-                join_channel=result["join_channel"],
-                join_message=result["join_message"],
-                leave_active=result["leave_active"],
-                leave_channel=result["leave_channel"],
-                leave_message=result["leave_message"],
-            )
-            self._welcome[id] = model
-
-            return model
+        return self.__get_cache(self._welcome, id, "SELECT * from welcome WHERE id = $1", WelcomeModel)
 
     async def get_leveling(self, id: int) -> LevelingModel | None:
         """Returns the cache for the leveling plugin."""
-        cache = self._leveling.get(id)
+        return self.__get_cache(self._leveling, id, "SELECT * from leveling WHERE id = $1", LevelingModel)
 
-        if cache is not None:
-            return cache
-
-        result = await self._pool.fetchrow("SELECT * from leveling WHERE id = $1", id)
-
-        if result is not None:
-            model = LevelingModel(
-                channel=result["channel"],
-                no_xp_channels=result["no_xp_channels"],
-                no_xp_role=result["no_xp_role"],
-                roles=result["roles"],
-                message=result["message"],
-                active=result["active"],
-                remove_roles=result["remove_roles"],
-            )
-            self._leveling[id] = model
-
-            return model
+    async def get_moderation(self, id: int) -> ModerationModel | None:
+        """Returns the cache for the moderation plugin."""
+        return self.__get_cache(self._moderation, id, "SELECT * from moderation WHERE id = $1", ModerationModel)
 
     async def get_logging(self, id: int) -> LoggingModel | None:
         """Returns the cache for the logging plugin."""
-        cache = self._logging.get(id)
-
-        if cache is not None:
-            return cache
-
-        return await self._set_logging(id)
-
-    async def _set_logging(self, id: int, *, query_result=None) -> LoggingModel | None:
-        if query_result is None:
-            query_result = await self._pool.fetchrow("SELECT * from logging WHERE id = $1", id)
-
-        if query_result is not None:
-            model = LoggingModel(
-                active=query_result["active"],
-                webhook_id=query_result["webhook_id"],
-                webhook_token=query_result["webhook_token"],
-                webhook_channel=query_result["webhook_channel"],
-                member_ban=query_result["member_ban"],
-                member_unban=query_result["member_unban"],
-                member_join=query_result["member_join"],
-                member_leave=query_result["member_leave"],
-                member_rename=query_result["member_rename"],
-                message_edit=query_result["message_edit"],
-                message_delete=query_result["message_delete"],
-                member_role_change=query_result["member_role_change"],
-            )
-            self._logging[id] = model
-
-            return model
+        return self.__get_cache(self._logging, id, "SELECT * from logging WHERE id = $1", LoggingModel)
 
     def edit_cache(self, cache: Literal["wel", "log", "lvl"], id: int, key: str, value: int | str | bool | None):
         guild_cache = None
 
         if cache == "wel":
-            guild_cache = self._welcome
+            guild_cache = self._welcome.get(id)
         elif cache == "log":
-            guild_cache = self._logging
+            guild_cache = self._logging.get(id)
         elif cache == "lvl":
-            guild_cache = self._leveling
+            guild_cache = self._leveling.get(id)
+        elif cache == "mod":
+            guild_cache = self._moderation.get(id)
 
         if guild_cache is not None:
             if hasattr(guild_cache, key):

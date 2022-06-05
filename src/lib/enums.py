@@ -14,6 +14,10 @@ class AutomodAction(enum.Enum):
     mute = "mute"
 
 
+class AutomodFinalAction(AutomodAction):
+    points = "points"
+
+
 class MentionSettings(enum.Enum):
     member = "member"
     include_roles = "include_roles"

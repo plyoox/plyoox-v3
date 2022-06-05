@@ -85,11 +85,20 @@ class Logging(Base):
     message_delete = _Column(sql.BOOLEAN, server_default=False)
 
 
-class Automod(Base):
-    __tablename__ = "automod"
+class Moderation(Base):
+    __tablename__ = "moderation"
 
     id = _Column(sql.BIGINT, primary_key=True, autoincrement=False)
+    mod_roles = _Column(sql.ARRAY(sql.BIGINT))
+    ignored_roles = _Column(sql.ARRAY(sql.BIGINT))
+    mute_role = _Column(sql.BIGINT)
+    logchannel = _Column(sql.BIGINT)
+    ban_time = _Column(sql.INTEGER, server_default=86400)
+    mute_time = _Column(sql.INTEGER, server_default=86400)
+
     active = _Column(sql.BOOLEAN, server_default=False)
+    automod_action = _Column(sql.Enum(enums.AutomodFinalAction))
+    notify_user = _Column(sql.BOOLEAN, server_default=True)
 
     invite_action = _Column(sql.Enum(enums.AutomodAction), server_default=enums.AutomodAction.none)
     invite_whitelist_channels = _Column(sql.ARRAY(sql.BIGINT))

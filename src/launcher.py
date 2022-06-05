@@ -5,12 +5,10 @@ import os
 
 from dotenv import load_dotenv
 
-from main import Plyoox
-
 load_dotenv()
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--generate-db", action=argparse.BooleanOptionalAction)
+parser.add_argument("--generate-db", action="store_true")
 args = parser.parse_args()
 
 logger = logging.getLogger()
@@ -37,6 +35,8 @@ async def generate_db():
 
 
 async def main():
+    from main import Plyoox
+
     bot = Plyoox()
 
     await bot._create_db_pool()

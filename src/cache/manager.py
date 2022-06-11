@@ -15,7 +15,7 @@ class CacheManager:
     def __init__(self, pool: asyncpg.Pool):
         self._pool = pool
 
-    def __get_cache(self, cache: dict, id: int, query: str, model):
+    async def __get_cache(self, cache: dict, id: int, query: str, model):
         guild_cache = cache.get(id, False)
         if guild_cache is not False:
             return cache
@@ -54,19 +54,19 @@ class CacheManager:
 
     async def get_welcome(self, id: int) -> WelcomeModel | None:
         """Returns the cache for the welcome plugin."""
-        return self.__get_cache(self._welcome, id, "SELECT * from welcome WHERE id = $1", WelcomeModel)
+        return await self.__get_cache(self._welcome, id, "SELECT * from welcome WHERE id = $1", WelcomeModel)
 
     async def get_leveling(self, id: int) -> LevelingModel | None:
         """Returns the cache for the leveling plugin."""
-        return self.__get_cache(self._leveling, id, "SELECT * from leveling WHERE id = $1", LevelingModel)
+        return await self.__get_cache(self._leveling, id, "SELECT * from leveling WHERE id = $1", LevelingModel)
 
     async def get_moderation(self, id: int) -> ModerationModel | None:
         """Returns the cache for the moderation plugin."""
-        return self.__get_cache(self._moderation, id, "SELECT * from moderation WHERE id = $1", ModerationModel)
+        return await self.__get_cache(self._moderation, id, "SELECT * from moderation WHERE id = $1", ModerationModel)
 
     async def get_logging(self, id: int) -> LoggingModel | None:
         """Returns the cache for the logging plugin."""
-        return self.__get_cache(self._logging, id, "SELECT * from logging WHERE id = $1", LoggingModel)
+        return await self.__get_cache(self._logging, id, "SELECT * from logging WHERE id = $1", LoggingModel)
 
     def edit_cache(self, cache: Literal["wel", "log", "lvl"], id: int, key: str, value: int | str | bool | None):
         guild_cache = None

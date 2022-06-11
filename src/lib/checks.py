@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import discord
-from discord import app_commands
 
 from lib.enums import PlyooxModule
 from lib.errors import ModuleDisabled, OwnerOnly
@@ -21,20 +20,6 @@ def owner_only_check(interaction: discord.Interaction) -> bool:
         return True
 
     raise OwnerOnly
-
-
-# https://github.com/Rapptz/discord.py/blob/master/discord/app_commands/checks.py#L344
-def bot_permission_check(interaction: discord.Interaction, **perms: bool) -> bool:
-    guild = interaction.guild
-    me = guild.me
-
-    permissions = interaction.channel.permissions_for(me)
-    missing = [perm for perm, value in perms.items() if getattr(permissions, perm) != value]
-
-    if not missing:
-        return True
-
-    raise app_commands.BotMissingPermissions(missing)
 
 
 async def module_enabled_check(interaction: discord.Interaction, module: PlyooxModule) -> bool:

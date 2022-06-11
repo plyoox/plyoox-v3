@@ -47,7 +47,8 @@ class LevelCommand(
         )
 
         if user_data is None:
-            return await helper.interaction_send(interaction, "level.rank.no_data")
+            await helper.interaction_send(interaction, "level.rank.no_data")
+            return
 
         current_level, remaining_xp = get_level_from_xp(user_data["xp"])
         required_xp = get_level_xp(current_level)
@@ -67,7 +68,8 @@ class LevelCommand(
 
         level_roles: list[list[int, int]] = await self.db.fetchval("SELECT roles FROM leveling WHERE id = $1", guild.id)
         if not level_roles:
-            return await helper.interaction_send(interaction, "level.level_roles.no_roles")
+            await helper.interaction_send(interaction, "level.level_roles.no_roles")
+            return
 
         roles: list[str] = []
 
@@ -108,7 +110,8 @@ class LevelCommand(
                 break
 
         if len(top_users) == 0:
-            return await helper.interaction_send(interaction, "level.top.no_users")
+            await helper.interaction_send(interaction, "level.top.no_users")
+            return
 
         embed = discord.Embed(
             color=DISCORD_DEFAULT,

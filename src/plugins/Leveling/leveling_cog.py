@@ -73,7 +73,7 @@ class Leveling(commands.Cog):
         if cache.no_xp_role in member._roles:
             return
 
-        message_xp = random.randint(15, 25)  # generate a random amount of xp between 15 and 25
+        message_xp = random.randint(a=15, b=25)  # generate a random amount of xp between 15 and 25
         member_data = await self._fetch_member_data(member)
 
         # member has no data saved
@@ -152,7 +152,7 @@ class Leveling(commands.Cog):
 
     @app_commands.command(name="reset-level", description="Resets the level of a member. This action cannot be undone.")
     @app_commands.describe(member="The member from whom you want to reset rank.")
-    @app_commands.default_permissions()
+    @app_commands.default_permissions(administrator=True)
     @app_commands.guild_only
     async def reset_level(self, interaction: discord.Interaction, member: discord.Member):
         lc = interaction.locale

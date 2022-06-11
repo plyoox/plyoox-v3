@@ -13,7 +13,7 @@ no_roles: "*Keine Rollen*"
 no_channel: "*Keine Kanal*"
 no_message: "*Keine Nachricht*"
 reason: "Grund"
-no_reason: "Kein Grund angegeben"
+no_reason: "*Kein Grund angegeben*"
 account_created: "Account erstellt"
 joined_at: "Beigetreten am"
 message: "Nachricht"
@@ -30,6 +30,7 @@ errors:
   guild_only: "Dieser Command kann nur auf einem Server verwendet werden."
   owner_only: "Diesen Command kann nur der Entwickler des Bots ausführen."
   module_disabled: "Das Modul {module} ist auf diesem Server deaktiviert."
+  bot_missing_permission: "Der Bot benötigt folgende Berechtigung(en), um den Command auszuführen: {permissions}"
 user_info:
   joined:
     postion_no_member: "Auf dieser Position ist kein Mitglied."
@@ -90,10 +91,17 @@ level:
     xp: "Xp"
 moderation:
   successful_execution: "Der Command wurde erfolgreich ausgeführt."
+  hierarchy_not_permitted: "Der Benutzer muss in der Hierarchie unter dir sein."
+  bot_cannot_punish: "Der Benutzer muss in der Hierarchie unter dem Bot sein."
+  logging:
+    ban: "User wurde gebannt"
+    ban_description: "Der Benutzer {target} ({target.id}) wurde von {moderator} permanent gebannt."
   clear:
     success_title: "Clear - Ergebnis"
     deleted_messages: "Gelöschte Nachrichten"
     affected_users: "Betroffene Mitglieder"
+  ban:
+    successfully_banned: "Der Benutzer wurde erfolgreich für gebannt."
 logging:
   member_id: "Mitglied-ID"
   no_content: "*Diese Nachricht enthält keinen Inhalt.*"

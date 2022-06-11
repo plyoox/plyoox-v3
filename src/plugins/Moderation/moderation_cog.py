@@ -6,6 +6,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from plugins.Moderation import _logging_helper
 from translation import _
 
 if TYPE_CHECKING:
@@ -16,13 +17,37 @@ class Moderation(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
+    @staticmethod
+    def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
+        if interaction.user <= target:
+            await interaction.response.send_message(
+                _(interaction.locale, "moderation.hierarchy_not_permitted"), ephemeral=True
+            )
+            return False
+
+        if target >= interaction.guild.me:
+            await interaction.response.send_message(
+                _(interaction.locale, "moderation.  bot_cannot_punish"), ephemeral=True
+            )
+            return False
+
+        return True
+
     @app_commands.command(name="ban", description="Bans an user from the guild.")
     @app_commands.describe(member="The member that should be banned.", reason="Why the member should be banned.")
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
     async def ban(self, interaction: discord.Interaction, member: discord.Member, reason: Optional[str]):
-        pass
+        lc = interaction.locale
+        guild = interaction.guild
+
+        if not Moderation._can_execute_on(interaction, member):
+            return
+
+        await _logging_helper.log_ban(interaction, target=member, reason=reason)
+        await guild.ban(member, reason=reason, delete_message_days=1)
+        await interaction.response.send_message(_(lc, "moderation.ban.successfully_banned"))
 
     @app_commands.command(name="tempban", description="Bans an user from the guild for a specific time.")
     @app_commands.describe(

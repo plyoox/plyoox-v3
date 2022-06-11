@@ -14,8 +14,14 @@ class AutomodAction(enum.Enum):
     mute = "mute"
 
 
-class AutomodFinalAction(AutomodAction):
+class AutomodFinalAction(enum.Enum):
     points = "points"
+    none = "none"
+    kick = "kick"
+    ban = "ban"
+    tempban = "tban"
+    tmute = "tmute"
+    mute = "mute"
 
 
 class MentionSettings(enum.Enum):

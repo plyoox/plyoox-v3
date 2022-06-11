@@ -18,5 +18,9 @@ class CommandTree(app_commands.CommandTree):
             await interaction.response.send_message(_(interaction.locale, "errors.owner_only"), ephemeral=True)
         elif isinstance(error, errors.ModuleDisabled):
             await interaction.response.send_message(error, ephemeral=True)
+        elif isinstance(error, app_commands.BotMissingPermissions):
+            await interaction.response.send_message(
+                _(interaction.locale, "errors.bot_missing_permissions", errors=", ".join(error.missing_permissions))
+            )
         else:
             traceback.print_exc()

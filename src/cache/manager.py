@@ -68,7 +68,9 @@ class CacheManager:
         """Returns the cache for the logging plugin."""
         return await self.__get_cache(self._logging, id, "SELECT * FROM logging WHERE id = $1", LoggingModel)
 
-    def edit_cache(self, cache: Literal["wel", "log", "lvl", "mod"], id: int, key: str, value: int | str | bool | None) -> None:
+    def edit_cache(
+        self, cache: Literal["wel", "log", "lvl", "mod"], id: int, key: str, value: int | str | bool | None
+    ) -> None:
         guild_cache = None
 
         if cache == "wel":

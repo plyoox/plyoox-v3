@@ -33,9 +33,10 @@ class Plyoox(commands.Bot):
     start_time: datetime
     session: aiohttp.ClientSession
 
-    def __init__(self):
+    def __init__(self, *, sync_commands: bool = False):
         intents = discord.Intents(bans=True, message_content=True, guild_messages=True, guilds=True, members=True)
         allowed_mentions = discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=True)
+        self.sync_commands = sync_commands
 
         super().__init__(
             intents=intents,
@@ -61,7 +62,12 @@ class Plyoox(commands.Bot):
         self.start_time = utils.utcnow()
 
         self.tree.copy_global_to(guild=self.test_guild)
-        # await self.tree.sync(guild=self.test_guild)
+        if self.sync_commands:
+            # Sync commands with discord
+            logger.debug("Sync commands with discord...")
+            await self.tree.sync(guild=self.test_guild)
+            await self.close()
+            logger.info("Commands synced")
 
     async def on_message(self, message: discord.Message) -> None:
         pass

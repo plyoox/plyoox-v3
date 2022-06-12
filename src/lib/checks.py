@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from cache import CacheManager
 
 
-def owner_only_check(interaction: discord.Interaction) -> None:
+def owner_only_check(interaction: discord.Interaction) -> bool:
     """Raise an error if the user is not the owner of the bot."""
     bot: Plyoox = interaction.client  # type: ignore
 
@@ -23,7 +23,7 @@ def owner_only_check(interaction: discord.Interaction) -> None:
     return True
 
 
-async def module_enabled_check(interaction: discord.Interaction, module: PlyooxModule) -> None:
+async def module_enabled_check(interaction: discord.Interaction, module: PlyooxModule) -> bool:
     """Raise an error if the module is not enabled."""
     manager: CacheManager = interaction.client.cache  # type: ignore
     guild = interaction.guild

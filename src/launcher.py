@@ -7,10 +7,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Parse command line arguments
 parser = argparse.ArgumentParser()
 parser.add_argument("--generate-db", action="store_true")
 args = parser.parse_args()
 
+# Set up logging
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 logging.getLogger("discord.gateway").setLevel(logging.INFO)
@@ -24,14 +26,16 @@ async def generate_db():
 
     import lib.database as db
 
-    dns = os.getenv("POSTGRES").replace("postgresql://", "postgresql+asyncpg://")
-    engine = async_sql.create_async_engine(dns)
+    # Create database engine
+    engine = async_sql.create_async_engine(
+        os.getenv("POSTGRES").replace("postgresql://", "postgresql+asyncpg://")
+    )
 
     async with engine.begin() as conn:
-        print("Setup Database")
-        logger.info("Setup database")
+        logger.debug("Setup database...")
         await conn.run_sync(db.metadata.drop_all)
         await conn.run_sync(db.metadata.create_all)
+        logger.info("Database set up")
 
 
 async def main():

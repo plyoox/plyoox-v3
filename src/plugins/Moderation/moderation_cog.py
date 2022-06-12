@@ -18,7 +18,7 @@ class Moderation(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
+    async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
         if interaction.user <= target:
             await interaction.response.send_message(
                 _(interaction.locale, "moderation.hierarchy_not_permitted"), ephemeral=True
@@ -42,7 +42,7 @@ class Moderation(commands.Cog):
         lc = interaction.locale
         guild = interaction.guild
 
-        if not Moderation._can_execute_on(interaction, member):
+        if not await Moderation._can_execute_on(interaction, member):
             return
 
         await _logging_helper.log_ban(interaction, target=member, reason=reason)

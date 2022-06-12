@@ -10,7 +10,8 @@ if TYPE_CHECKING:
 
 
 def format_roles(roles: list[discord.Role]) -> str | None:
-    """Converts a list of roles to a string of mentions. If the result is longer than 1024 characters
+    """
+    Converts a list of roles to a string of mentions. If the result is longer than 1024 characters
     (limit of embed field) "..." is added to the end.
     """
     if len(roles) == 1:
@@ -29,7 +30,7 @@ def format_roles(roles: list[discord.Role]) -> str | None:
     return " ".join(result)
 
 
-def get_badges(flags: discord.PublicUserFlags):
+def get_badges(flags: discord.PublicUserFlags) -> list[str]:
     """Returns a list of the public flags a user has."""
     flag_list = []
 
@@ -63,7 +64,7 @@ async def interaction_send(interaction: discord.Interaction, key: str, /, epheme
 
 
 async def permission_check(
-    channel: Union[discord.TextChannel, discord.VoiceChannel, discord.Thread],
+    channel: discord.TextChannel | discord.VoiceChannel | discord.Thread,
     content: str = None,
     embeds: list[discord.Embed] = None,
 ) -> None:
@@ -71,7 +72,5 @@ async def permission_check(
     if channel is None:
         return
 
-    me = channel.guild.me
-
-    if channel.permissions_for(me).send_messages:
+    if channel.permissions_for(channel.guild.me).send_messages:
         await channel.send(content=content, embeds=embeds)

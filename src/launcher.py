@@ -9,7 +9,9 @@ load_dotenv()
 
 # Parse command line arguments
 parser = argparse.ArgumentParser()
-parser.add_argument("--generate-db", action="store_true")
+group = parser.add_mutually_exclusive_group()
+group.add_argument("--generate-db", action="store_true", help="Generate database")
+group.add_argument("--sync-commands", action="store_true", help="Sync commands with discord")
 args = parser.parse_args()
 
 # Set up logging
@@ -39,7 +41,7 @@ async def generate_db():
 async def main():
     from main import Plyoox
 
-    bot = Plyoox()
+    bot = Plyoox(sync_commands=args.sync_commands)
 
     await bot._create_db_pool()
     await bot._create_http_client()

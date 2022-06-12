@@ -14,3 +14,4 @@
     - `OWNER_ID` (discord bot owner user id)
     - `TEST_SERVER_ID` (discord test server id)
 6. `python3 launcher.py --generate-db`
+7. `python3 launcher.py --sync-commands`

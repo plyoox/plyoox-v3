@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+import sys
 import traceback
 from datetime import datetime
 
@@ -26,9 +27,9 @@ plugins = [
 
 
 class Plyoox(commands.Bot):
-    db: asyncpg.Pool = None
+    db: asyncpg.Pool
     cache: CacheManager
-    test_guild = discord.Object(505438986672537620)
+    test_guild = discord.Object(int(os.getenv("TEST_SERVER_ID")))
     start_time: datetime
     session: aiohttp.ClientSession
 
@@ -42,18 +43,20 @@ class Plyoox(commands.Bot):
             max_messages=2000,
             command_prefix=[],
             tree_cls=CommandTree,
-            owner_id=263347878150406144,
+            owner_id=int(os.getenv("OWNER_ID")),
         )
 
     async def setup_hook(self) -> None:
         self.loop.create_task(self._refresh_presence())
 
         for plugin in plugins:
-            print("Loaded plugin", plugin, end="\r\n")
+            logger.debug(f"Load plugin '{plugin}'...")
             await self.load_extension(plugin)
 
+        logger.info("Plugins loaded")
+
     async def on_ready(self) -> None:
-        print("Ready")
+        logger.info("Ready")
 
         self.start_time = utils.utcnow()
 
@@ -65,17 +68,14 @@ class Plyoox(commands.Bot):
 
     async def _create_db_pool(self) -> None:
         try:
-            self.db = await asyncpg.create_pool(
-                dsn=os.getenv("POSTGRES"),
-                port=5432,
-            )
+            self.db = await asyncpg.create_pool(os.getenv("POSTGRES"))
             self.cache = CacheManager(self.db)
 
         except asyncpg.ConnectionDoesNotExistError:
-            logger.error(f"Could not connect to the database: {traceback.format_exc()}")
-            exit(-1)
+            logger.critical(f"Could not connect to the database: {traceback.format_exc()}")
+            sys.exit(1)
 
-    async def _create_http_client(self):
+    async def _create_http_client(self) -> None:
         self.session = aiohttp.ClientSession()
 
     async def _refresh_presence(self) -> None:

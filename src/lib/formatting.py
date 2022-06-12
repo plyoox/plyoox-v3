@@ -8,8 +8,8 @@ from discord import utils
 if TYPE_CHECKING:
     import discord
 
-GUILD_FORMAT_REGEX = re.compile("{guild\\.(name|id|members)}")
-USER_FORMAT_REGEX = re.compile("{user\\.(name|id|mention|discriminator)}")
+GUILD_FORMAT_REGEX = re.compile(r"{guild\.(name|id|members)}")
+USER_FORMAT_REGEX = re.compile(r"{user\.(name|id|mention|discriminator)}")
 
 CHANNEL_REGEX = re.compile("(#.{1,100})")
 
@@ -23,7 +23,7 @@ class LevelFormatObject:
         return self.level
 
 
-def format_welcome_message(message: str, member: discord.Member) -> str | None:
+def format_welcome_message(message: str, member: discord.Member) -> str:
     """Formats a join or leave message."""
     guild = member.guild
 

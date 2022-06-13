@@ -30,7 +30,7 @@ def _load_languages():
 
     for file in files:
         if file.endswith(".yaml"):
-            with open(f"{path}//{file}", encoding="utf8") as language_file:
+            with open(f"{path}/{file}", encoding="utf8") as language_file:
                 data = yaml.safe_load(language_file)
                 language_data = _flatten_dict(data)
 

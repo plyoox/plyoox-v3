@@ -44,11 +44,11 @@ class Plyoox(commands.Bot):
             max_messages=2000,
             command_prefix=[],
             tree_cls=CommandTree,
-            owner_id=int(os.getenv("OWNER_ID")),
         )
 
     async def setup_hook(self) -> None:
         self.loop.create_task(self._refresh_presence())
+        self.owner_id = self.application.owner.id
 
         for plugin in plugins:
             logger.debug(f"Load plugin '{plugin}'...")
@@ -58,7 +58,6 @@ class Plyoox(commands.Bot):
 
     async def on_ready(self) -> None:
         logger.info("Ready")
-
         self.start_time = utils.utcnow()
 
         self.tree.copy_global_to(guild=self.test_guild)

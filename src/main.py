@@ -29,7 +29,7 @@ plugins = [
 class Plyoox(commands.Bot):
     db: asyncpg.Pool
     cache: CacheManager
-    test_guild = discord.Object(int(os.getenv("TEST_SERVER_ID")))
+    test_guild = discord.Object(int(os.getenv("TEST_GUILD")))
     start_time: datetime
     session: aiohttp.ClientSession
 

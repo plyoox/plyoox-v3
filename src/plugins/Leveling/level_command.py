@@ -7,8 +7,8 @@ from discord import app_commands, Interaction
 from discord.ext import commands
 
 from lib import checks, helper
-from lib.colors import DISCORD_DEFAULT
 from lib.enums import PlyooxModule
+from lib.extensions import Embed
 from lib.types import LevelUserData
 from translation import _
 from ._helper import get_level_from_xp, get_level_xp
@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 
 @app_commands.default_permissions()
 @app_commands.guild_only
+@checks.module_active(PlyooxModule.Leveling)
 class LevelCommand(
     commands.GroupCog,
     group_name="level",
@@ -26,9 +27,6 @@ class LevelCommand(
 ):
     def __init__(self, bot: Plyoox):
         self.db = bot.db
-
-    async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        return await checks.module_enabled_check(interaction, PlyooxModule.Leveling)
 
     @app_commands.command(name="rank", description="Shows information about the current rank of a member.")
     @app_commands.describe(member="The member from whom you want the rank.")
@@ -53,10 +51,10 @@ class LevelCommand(
         current_level, remaining_xp = get_level_from_xp(user_data["xp"])
         required_xp = get_level_xp(current_level)
 
-        embed = discord.Embed(color=DISCORD_DEFAULT)
+        embed = Embed()
         embed.set_author(name=str(current_member), icon_url=current_member.avatar)
-        embed.add_field(name=_(lc, "level.rank.level"), value=f"> {current_level}", inline=False)
-        embed.add_field(name=_(lc, "level.rank.xp"), value=f"> {remaining_xp}/{required_xp}", inline=False)
+        embed.add_field(name=_(lc, "level.rank.level"), value=f"> {current_level}")
+        embed.add_field(name=_(lc, "level.rank.xp"), value=f"> {remaining_xp}/{required_xp}")
 
         await interaction.response.send_message(embed=embed)
 
@@ -78,7 +76,7 @@ class LevelCommand(
             if role is not None:
                 roles.append(f"{level} - {role.mention}")
 
-        embed = discord.Embed(color=DISCORD_DEFAULT, title=_(lc, "level.level_roles.title"))
+        embed = Embed(title=_(lc, "level.level_roles.title"))
         embed.description = "\n".join(roles)
 
         await interaction.response.send_message(embed=embed)
@@ -113,8 +111,7 @@ class LevelCommand(
             await helper.interaction_send(interaction, "level.top.no_users")
             return
 
-        embed = discord.Embed(
-            color=DISCORD_DEFAULT,
+        embed = Embed(
             title=_(lc, "level.top.title"),
         )
 
@@ -123,6 +120,7 @@ class LevelCommand(
                 name=f"{index + 1}. {top_user['member'].display_name}",
                 value=f"> {_(lc, 'level.top.level')} {top_user['level']}\n"
                 f"> {top_user['xp_progress']} {_(lc, 'level.top.xp')}",
+                inline=True,
             )
 
         await interaction.response.send_message(embed=embed)

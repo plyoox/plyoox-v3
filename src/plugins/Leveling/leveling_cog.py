@@ -7,11 +7,11 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from lib.colors import DISCORD_DEFAULT
+from lib.extensions import Embed
 from lib.formatting import LevelFormatObject, format_leveling_message
 from lib.helper import permission_check
-from ._helper import get_level_from_xp
 from translation import _
+from ._helper import get_level_from_xp
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -161,5 +161,5 @@ class Leveling(commands.Cog):
             "DELETE FROM leveling_users WHERE user_id = $1 AND guild_id = $2", member.id, interaction.guild.id
         )
 
-        embed = discord.Embed(color=DISCORD_DEFAULT, description=_(lc, "level.reset_level.level_reset"))
+        embed = Embed(description=_(lc, "level.reset_level.level_reset"))
         await interaction.response.send_message(embed=embed, ephemeral=True)

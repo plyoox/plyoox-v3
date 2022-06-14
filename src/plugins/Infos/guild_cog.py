@@ -4,9 +4,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from lib.extensions import Embed
 from lib.helper import format_roles
 from translation import _
-from lib import colors
 
 
 @app_commands.guild_only
@@ -25,7 +25,7 @@ class GuildCommand(
         guild = interaction.guild
         roles = guild.roles
 
-        embed = discord.Embed(title=_(lc, "guild_info.about.title"), color=colors.DISCORD_DEFAULT)
+        embed = Embed(title=_(lc, "guild_info.about.title"))
         embed.set_thumbnail(url=guild.icon)
         embed.add_field(
             name=_(lc, "guild_info.about.general_information"),
@@ -33,31 +33,20 @@ class GuildCommand(
             f"> __{_(lc, 'id')}:__ {guild.id}\n"
             f"> __{_(lc, 'guild_info.about.owner')}:__ {guild.owner}\n"
             f"> __{_(lc, 'created_at')}:__ {discord.utils.format_dt(guild.created_at)}",
-            inline=False,
         )
-        embed.add_field(
-            name=_(lc, "guild_info.about.members"),
-            value=f"> {str(guild.member_count)}",
-            inline=False,
-        )
+        embed.add_field(name=_(lc, "guild_info.about.members"), value=f"> {str(guild.member_count)}")
 
-        embed.add_field(
-            name=_(lc, "roles"),
-            value=f"> {format_roles(roles) or _(lc, 'no_roles')}",
-            inline=False,
-        )
+        embed.add_field(name=_(lc, "roles"), value=f"> {format_roles(roles) or _(lc, 'no_roles')}")
         embed.add_field(
             name=_(lc, "guild_info.about.more_infos"),
             value=f"> __{_(lc, 'guild_info.about.premium_level')}:__ {guild.premium_tier} ({guild.premium_subscription_count})\n"
             f"> __{_(lc, 'guild_info.about.vanity_url')}:__ {guild.vanity_url or _(lc, 'guild_info.about.no_vanity_url')}\n"
             f"> __{_(lc, 'guild_info.about.emojis')}:__ {len(guild.emojis)}/{guild.emoji_limit}\n"
             f"> __{_(lc, 'guild_info.about.stickers')}:__ {len(guild.stickers)}/{guild.sticker_limit}",
-            inline=False,
         )
         embed.add_field(
             name=_(lc, "guild_info.about.features"),
             value=f"> {', '.join(f'`{feature}`' for feature in guild.features) or _(lc, 'guild_info.about.no_features')}",
-            inline=False,
         )
 
         await interaction.response.send_message(embed=embed)
@@ -80,10 +69,7 @@ class GuildCommand(
             if (discord.utils.utcnow() - member.joined_at).total_seconds() <= 86400:
                 joined += 1
 
-        embed = discord.Embed(
-            description=_(lc, "guild_info.today_joined", members=joined),
-            color=colors.DISCORD_DEFAULT,
-        )
+        embed = Embed(description=_(lc, "guild_info.today_joined", members=joined))
 
         await interaction.response.send_message(embed=embed)
 
@@ -93,9 +79,6 @@ class GuildCommand(
         guild = interaction.guild
         lc = interaction.locale
 
-        embed = discord.Embed(
-            color=colors.DISCORD_DEFAULT,
-            description=_(lc, "guild_info.members", members=guild.member_count),
-        )
+        embed = Embed(description=_(lc, "guild_info.members", members=guild.member_count))
 
         await interaction.response.send_message(embed=embed)

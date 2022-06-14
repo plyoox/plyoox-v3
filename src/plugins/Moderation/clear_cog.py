@@ -2,10 +2,9 @@ import re
 from typing import Optional
 
 import discord
-from discord import app_commands
+from discord import app_commands, Embed
 from discord.ext import commands
 
-from lib.colors import DISCORD_DEFAULT
 from translation import _
 
 LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
@@ -31,14 +30,12 @@ class ClearCommand(
         deleted_count = len(deleted_messages)
         affected_users = set(m.author.id for m in deleted_messages)  # list of affected users
 
-        embed = discord.Embed(color=DISCORD_DEFAULT, title=_(lc, "moderation.clear.success_title"))
+        embed = Embed(title=_(lc, "moderation.clear.success_title"))
         embed.title = _(lc, "moderation.clear.success_title")
 
-        embed.add_field(
-            name=_(lc, "moderation.clear.deleted_messages"), value=f"> {deleted_count}/{limit}", inline=False
-        )
-        embed.add_field(name=_(lc, "moderation.clear.affected_users"), value=f"> {len(affected_users)}", inline=False)
-        embed.add_field(name=_(lc, "reason"), value=f"> {reason or _(lc, 'no_reason')}", inline=False)
+        embed.add_field(name=_(lc, "moderation.clear.deleted_messages"), value=f"> {deleted_count}/{limit}")
+        embed.add_field(name=_(lc, "moderation.clear.affected_users"), value=f"> {len(affected_users)}")
+        embed.add_field(name=_(lc, "reason"), value=f"> {reason or _(lc, 'no_reason')}")
 
         # send the information to the user. the response has been deferred, so this uses followup
         await interaction.followup.send(_(lc, "moderation.successful_execution"), embed=embed)

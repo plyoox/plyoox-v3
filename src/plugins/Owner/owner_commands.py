@@ -5,6 +5,7 @@ import discord
 from discord import app_commands
 
 from lib.checks import owner_only
+from lib.extensions import Embed
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -27,7 +28,7 @@ class OwnerCommands(app_commands.Group):
         try:
             await bot.load_extension(plugin)
         except Exception:
-            embed = discord.Embed(description=f"```py\n{traceback.format_exc()}```")
+            embed = Embed(description=f"```py\n{traceback.format_exc()}```")
             await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message("Plugin successfully loaded.", ephemeral=True)
@@ -42,7 +43,7 @@ class OwnerCommands(app_commands.Group):
         try:
             await bot.unload_extension(plugin)
         except Exception:
-            embed = discord.Embed(description=f"```py\n{traceback.format_exc()}```")
+            embed = Embed(description=f"```py\n{traceback.format_exc()}```")
             await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message("Plugin successfully unloaded.", ephemeral=True)
@@ -57,7 +58,7 @@ class OwnerCommands(app_commands.Group):
         try:
             await bot.reload_extension(plugin)
         except Exception:
-            embed = discord.Embed(description=f"```py\n{traceback.format_exc()}```")
+            embed = Embed(description=f"```py\n{traceback.format_exc()}```")
             await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message("Plugin successfully reloaded.", ephemeral=True)

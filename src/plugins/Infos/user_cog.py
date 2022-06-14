@@ -7,6 +7,7 @@ import discord
 from discord import utils, app_commands
 from discord.ext import commands
 
+from lib.extensions import Embed
 from lib.helper import interaction_send, get_badges, format_roles
 from lib.colors import DISCORD_DEFAULT
 from translation import _
@@ -28,19 +29,14 @@ class UserCommand(
         """Shortcut to send the response for the joined command."""
         locale = interaction.locale
 
-        embed = discord.Embed(title=_(locale, "user_info.joined.title"), color=DISCORD_DEFAULT)
+        embed = Embed(title=_(locale, "user_info.joined.title"))
         embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
-        embed.add_field(name=_(locale, "user_info.joined.position"), value=f"> `{position}`", inline=False)
+        embed.add_field(name=_(locale, "user_info.joined.position"), value=f"> `{position}`")
         embed.add_field(
             name=_(locale, "user_info.joined.days_since"),
             value=f"> `{(datetime.datetime.now(tz=datetime.timezone.utc) - member.joined_at).days}`",
-            inline=False,
         )
-        embed.add_field(
-            name=_(locale, "joined_at"),
-            value=f"> {discord.utils.format_dt(member.joined_at)}",
-            inline=False,
-        )
+        embed.add_field(name=_(locale, "joined_at"), value=f"> {discord.utils.format_dt(member.joined_at)}")
 
         await interaction.response.send_message(embed=embed)
 
@@ -86,7 +82,7 @@ class UserCommand(
         lc = interaction.locale
         public_flags = get_badges(current_member.public_flags)
 
-        embed = discord.Embed(
+        embed = Embed(
             title=_(lc, "user_info.about.user_information"),
             color=current_member.accent_color or DISCORD_DEFAULT,
         )  # accent color is not provided in the default member object
@@ -98,7 +94,6 @@ class UserCommand(
             value=f"> __{_(lc, 'id')}:__ {current_member.id}\n"
             f"> __{_(lc, 'nick')}:__ {current_member.nick or _(lc, 'user_info.about.no_nick')}\n"
             f"> __{_(lc, 'user_info.about.server_avatar')}:__ {_(lc, bool(current_member.guild_avatar))}",
-            inline=False,
         )
         embed.add_field(
             name=_(lc, "guild"),
@@ -106,7 +101,6 @@ class UserCommand(
             f"> __{_(lc, 'user_info.about.member_verification')}:__ {_(lc, current_member.pending)}\n"
             f"> __{_(lc, 'user_info.about.premium_subscriber')}:__ "
             f"{utils.format_dt(current_member.premium_since) if current_member.premium_since else _(lc, False)}",
-            inline=False,
         )
         embed.add_field(
             name=_(lc, "user_info.about.account"),
@@ -114,14 +108,11 @@ class UserCommand(
             f"> __{_(lc, 'user_info.about.bot')}:__ {_(lc, current_member.bot)}",
         )
         embed.add_field(
-            name=f"{_(lc, 'roles')} ({len(roles) - 1})",
-            value=f"> {format_roles(roles) or _(lc, 'no_roles')}",
-            inline=False,
+            name=f"{_(lc, 'roles')} ({len(roles) - 1})", value=f"> {format_roles(roles) or _(lc, 'no_roles')}"
         )
         embed.add_field(
             name=f"{_(lc, 'user_info.about.public_badges')} ({len(public_flags)})",
             value=f"> {''.join(public_flags) if len(public_flags) else _(lc, 'user_info.about.no_flags')}",
-            inline=False,
         )
 
         await interaction.response.send_message(embed=embed)
@@ -134,7 +125,7 @@ class UserCommand(
         """
         current_member = member or interaction.user
 
-        embed = discord.Embed(color=DISCORD_DEFAULT)
+        embed = Embed()
         embed.set_author(name=str(current_member))
         embed.set_image(url=current_member.display_avatar.url)
 

@@ -6,7 +6,7 @@ from lib.colors import DISCORD_DEFAULT
 
 
 class Embed(discord.Embed):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs: object):
         kwargs.setdefault("color", DISCORD_DEFAULT)
         super().__init__(**kwargs)
 

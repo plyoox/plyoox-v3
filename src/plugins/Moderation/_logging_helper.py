@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from discord import utils
 
-from lib.colors import DISCORD_DEFAULT
+from lib.extensions import Embed
 from translation import _
 
 if TYPE_CHECKING:
@@ -32,7 +32,7 @@ async def log_ban(interaction: discord.Interaction, *, target: discord.Member, r
 
     lc = interaction.guild_locale
 
-    embed = discord.Embed(color=DISCORD_DEFAULT)
+    embed = Embed()
     embed.set_author(name=_(lc, "moderation.logging.ban"), icon_url=target.display_avatar)
     embed.description = _(lc, "moderation.logging.ban_description", target=target, moderator=interaction.user)
     embed.add_field(name=_(lc, "reason"), value=reason or _(lc, "no_reason"))
@@ -49,7 +49,7 @@ async def log_kick(interaction: discord.Interaction, *, target: discord.Member, 
 
     lc = interaction.guild_locale
 
-    embed = discord.Embed(color=DISCORD_DEFAULT)
+    embed = Embed()
     embed.set_author(name=_(lc, "moderation.logging.kick"), icon_url=target.display_avatar)
     embed.description = _(lc, "moderation.logging.kick_description", target=target, moderator=interaction.user)
     embed.add_field(name=_(lc, "reason", reason=reason), value=reason or _(lc, "no_reason"))

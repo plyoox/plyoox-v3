@@ -99,6 +99,8 @@ moderation:
   kick:
     kick: "User wurde gekickt"
     kick_description: "Der Benutzer {target} ({target.id}) wurde von {moderator} gekickt."
+    successfully_kicked: "Der Benutzer wurde erfolgreich für {reason} gekickt."
+    unsuccessfully_kicked: "Der Benutzer konnte nicht gekickt werden."
   clear:
     success_title: "Clear - Ergebnis"
     deleted_messages: "Gelöschte Nachrichten"
@@ -106,9 +108,6 @@ moderation:
   ban:
     successfully_banned: "Der Benutzer wurde erfolgreich für {reason} gebannt."
     unsuccessfully_banned: "Der Benutzer konnte nicht gebannt werden."
-  kick:
-    successfully_kicked: "Der Benutzer wurde erfolgreich für {reason} gekickt."
-    unsuccessfully_kicked: "Der Benutzer konnte nicht gekickt werden."
 logging:
   member_id: "Mitglied-ID"
   user_id: "Mitglied-ID"

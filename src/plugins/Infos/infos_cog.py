@@ -18,6 +18,7 @@ class Infos(commands.Cog):
 
         embed = Embed(title=_(lc, "infos.bot.title"))
         embed.add_field(name=_(lc, "infos.bot.coder"), value=f"> JohannesIBK#9220")
+        embed.add_field(name=_(lc, "infos.bot.additional_coders"), value=f"> X Gamer Guide#1866")
         embed.add_field(name=_(lc, "infos.bot.guild_count"), value=f"> {len(self.bot.guilds)}")
         embed.add_field(name=_(lc, "infos.bot.uptime"), value=f"> {utils.format_dt(self.bot.start_time, 'R')}")
 

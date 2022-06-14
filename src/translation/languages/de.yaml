@@ -71,6 +71,7 @@ infos:
   bot:
     title: "Informationen über den Bot"
     coder: "Entwickler"
+    additional_coders: "Weitere Entwickler"
     guild_count: "Server-Anzahl"
     uptime: "Zuletzt gestartet"
 level:

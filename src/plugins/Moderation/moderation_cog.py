@@ -19,13 +19,13 @@ class Moderation(commands.Cog):
 
     @staticmethod
     async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
-        if interaction.user <= target:
+        if interaction.user.top_role <= target.top_role:
             await interaction.response.send_message(
                 _(interaction.locale, "moderation.hierarchy_not_permitted"), ephemeral=True
             )
             return False
 
-        if target >= interaction.guild.me:
+        if target.top_role >= interaction.guild.me.top_role:
             await interaction.response.send_message(
                 _(interaction.locale, "moderation.  bot_cannot_punish"), ephemeral=True
             )
@@ -43,11 +43,12 @@ class Moderation(commands.Cog):
         guild = interaction.guild
 
         if not await Moderation._can_execute_on(interaction, member):
+            interaction.response.send_message(_(lc, "moderation.ban.unsuccessful"))
             return
 
         await _logging_helper.log_ban(interaction, target=member, reason=reason)
         await guild.ban(member, reason=reason, delete_message_days=1)
-        await interaction.response.send_message(_(lc, "moderation.ban.successfully_banned"))
+        await interaction.response.send_message(_(lc, "moderation.ban.successfully_banned", reason=reason or _(lc, "no_reason")))
 
     @app_commands.command(name="tempban", description="Bans an user from the guild for a specific time.")
     @app_commands.describe(
@@ -69,7 +70,15 @@ class Moderation(commands.Cog):
     @app_commands.default_permissions(kick_members=True)
     @app_commands.guild_only
     async def kick(self, interaction: discord.Interaction, member: discord.Member, reason: Optional[str]):
-        pass
+        lc = interaction.locale
+        guild = interaction.guild
+
+        if not await Moderation._can_execute_on(interaction, member):
+            return
+
+        await _logging_helper.log_kick(interaction, target=member, reason=reason)
+        await guild.kick(member, reason=reason)
+        await interaction.response.send_message(_(lc, "moderation.kick.successfully_kicked", reason=reason or _(lc, "no_reason")))
 
     @app_commands.command(name="mute", description="Mutes an user permanently.")
     @app_commands.describe(member="The member that should be muted.", reason="Why the member should be muted.")

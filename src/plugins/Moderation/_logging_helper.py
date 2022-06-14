@@ -40,3 +40,18 @@ async def log_ban(interaction: discord.Interaction, *, target: discord.Member, r
     embed.set_footer(text=f"{_(lc, 'id')}: {target.id}")
 
     await logchannel.send(embed=embed)
+
+
+async def log_kick(interaction: discord.Interaction, *, target: discord.Member, reason: str | None) -> None:
+    logchannel = await _get_logchannel(interaction)
+    if logchannel is None:
+        return
+
+    lc = interaction.guild_locale
+
+    embed = discord.Embed(color=DISCORD_DEFAULT)
+    embed.set_author(name=_(lc, "moderation.logging.kick"), icon_url=target.display_avatar)
+    embed.description = _(lc, "moderation.logging.kick_description", target=target, moderator=interaction.user)
+    embed.add_field(name=_(lc, "reason", reason=reason), value=reason or _(lc, "no_reason"))
+    embed.add_field(name=_(lc, "timestamp"), value=utils.format_dt(utils.utcnow(), "F"))
+    embed.set_footer(text=f"{_(lc, 'id')}: {target.id}")

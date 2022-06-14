@@ -96,12 +96,19 @@ moderation:
   logging:
     ban: "User wurde gebannt"
     ban_description: "Der Benutzer {target} ({target.id}) wurde von {moderator} permanent gebannt."
+  kick:
+    kick: "User wurde gekickt"
+    kick_description: "Der Benutzer {target} ({target.id}) wurde von {moderator} gekickt."
   clear:
     success_title: "Clear - Ergebnis"
     deleted_messages: "Gelöschte Nachrichten"
     affected_users: "Betroffene Mitglieder"
   ban:
-    successfully_banned: "Der Benutzer wurde erfolgreich für gebannt."
+    successfully_banned: "Der Benutzer wurde erfolgreich für {reason} gebannt."
+    unsuccessfully_banned: "Der Benutzer konnte nicht gebannt werden."
+  kick:
+    successfully_kicked: "Der Benutzer wurde erfolgreich für {reason} gekickt."
+    unsuccessfully_kicked: "Der Benutzer konnte nicht gekickt werden."
 logging:
   member_id: "Mitglied-ID"
   no_content: "*Diese Nachricht enthält keinen Inhalt.*"

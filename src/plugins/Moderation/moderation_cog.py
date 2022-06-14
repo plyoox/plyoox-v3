@@ -48,7 +48,9 @@ class Moderation(commands.Cog):
 
         await _logging_helper.log_ban(interaction, target=member, reason=reason)
         await guild.ban(member, reason=reason, delete_message_days=1)
-        await interaction.response.send_message(_(lc, "moderation.ban.successfully_banned", reason=reason or _(lc, "no_reason")))
+        await interaction.response.send_message(
+            _(lc, "moderation.ban.successfully_banned", reason=reason or _(lc, "no_reason"))
+        )
 
     @app_commands.command(name="tempban", description="Bans an user from the guild for a specific time.")
     @app_commands.describe(
@@ -78,7 +80,9 @@ class Moderation(commands.Cog):
 
         await _logging_helper.log_kick(interaction, target=member, reason=reason)
         await guild.kick(member, reason=reason)
-        await interaction.response.send_message(_(lc, "moderation.kick.successfully_kicked", reason=reason or _(lc, "no_reason")))
+        await interaction.response.send_message(
+            _(lc, "moderation.kick.successfully_kicked", reason=reason or _(lc, "no_reason"))
+        )
 
     @app_commands.command(name="mute", description="Mutes an user permanently.")
     @app_commands.describe(member="The member that should be muted.", reason="Why the member should be muted.")

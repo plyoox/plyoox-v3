@@ -111,6 +111,7 @@ moderation:
     unsuccessfully_kicked: "Der Benutzer konnte nicht gekickt werden."
 logging:
   member_id: "Mitglied-ID"
+  user_id: "Mitglied-ID"
   no_content: "*Diese Nachricht enthält keinen Inhalt.*"
   no_attachments: "*Diese Nachricht hat keine Anhänge.*"
   member_join:
@@ -118,6 +119,11 @@ logging:
     description: "Der User {member.name} ist dem Server beigetreten."
   member_remove:
     title: "Mitglied verlassen"
+  member_ban:
+    title_member: "Mitglied gebannt"
+    title_user: "User gebannt"
+  member_unban:
+    title: "User entbannt"
   message_delete:
     title: "Nachricht gelöscht"
     description_raw: "Eine Nachricht aus {channel} wurde gelöscht."

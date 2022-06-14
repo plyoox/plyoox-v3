@@ -12,7 +12,7 @@ from discord import utils
 from discord.ext import commands
 
 from cache import CacheManager
-from lib.extensions.command_tree import CommandTree
+from lib.extensions import CommandTree
 
 logger = logging.getLogger(__name__)
 

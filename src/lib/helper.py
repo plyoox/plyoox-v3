@@ -2,11 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from discord import utils
+
 from lib import emojis
 from translation import _
 
 if TYPE_CHECKING:
     import discord
+    from datetime import datetime
 
 
 def format_roles(roles: list[discord.Role]) -> str | None:
@@ -74,3 +77,7 @@ async def permission_check(
 
     if channel.permissions_for(channel.guild.me).send_messages:
         await channel.send(content=content, embeds=embeds)
+
+
+def embed_timestamp_format(timestamp: datetime) -> str:
+    return f"> {utils.format_dt(timestamp)}\n> {utils.format_dt(timestamp, 'R')}"

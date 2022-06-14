@@ -8,7 +8,7 @@ from discord import utils
 from discord.ext import commands
 
 from lib import helper
-from lib.colors import DISCORD_DEFAULT
+from lib.extensions import Embed
 from translation import _
 
 if TYPE_CHECKING:
@@ -33,8 +33,8 @@ class LoggingEvents(commands.Cog):
         guild_id: int,
         cache: LoggingModel,
         *,
-        embed: discord.Embed = utils.MISSING,
-        embeds: list[discord.Embed] = utils.MISSING,
+        embed: Embed = utils.MISSING,
+        embeds: list[Embed] = utils.MISSING,
     ):
         webhook = discord.Webhook.partial(cache.webhook_id, cache.webhook_token, session=self.bot.session)
 
@@ -57,12 +57,12 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_join:
             return
 
-        embed = discord.Embed(color=DISCORD_DEFAULT)
+        embed = Embed()
         embed.set_author(name=_(lc, "logging.member_join.title"), icon_url=member.display_avatar)
         embed.description = _(lc, "logging.member_join.description", member=member)
         embed.add_field(
             name=_(lc, "logging.member_join.account_created"),
-            value=f"> {utils.format_dt(member.joined_at)}\n{utils.format_dt(member.joined_at, 'R')}",
+            value=helper.embed_timestamp_format(member.created_at),
         )
         embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {member.id}")
 
@@ -77,27 +77,50 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_join:
             return
 
-        embed = discord.Embed(color=DISCORD_DEFAULT)
+        embed = Embed()
         embed.set_author(name=_(lc, "logging.member_leave.title"), icon_url=member.display_avatar)
         embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {member.id}")
-        embed.add_field(
-            name=_(lc, "roles"), value=f"> {helper.format_roles(member.roles)}" or _(lc, "no_roles"), inline=False
-        )
-        embed.add_field(
-            name=_(lc, "joined_at"),
-            value=f"> {utils.format_dt(member.joined_at)}\n{utils.format_dt(member.joined_at, 'R')}",
-            inline=False,
-        )
+        embed.add_field(name=_(lc, "account_created"), value=helper.embed_timestamp_format(member.created_at))
+        embed.add_field(name=_(lc, "roles"), value=f"> {helper.format_roles(member.roles)}" or _(lc, "no_roles"))
+        embed.add_field(name=_(lc, "joined_at"), value=helper.embed_timestamp_format(member.joined_at))
 
         await self._send_message(member.guild.id, cache, embed=embed)
 
     @commands.Cog.listener()
-    async def on_member_ban(self, guild: discord.Guild, user: discord.User):
-        pass
+    async def on_member_ban(self, guild: discord.Guild, user: discord.User | discord.Member):
+        lc = guild.preferred_locale
+
+        cache = await self._get_cache(guild.id)
+        if cache is None or not cache.member_ban:
+            return
+
+        embed = Embed()
+        embed.add_field(name=_(lc, "account_created"), value=helper.embed_timestamp_format(user.created_at))
+        if isinstance(user, discord.Member):
+            embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {user.id}")
+            embed.set_author(name=_(lc, "logging.member_ban.title_member"), icon_url=user.display_avatar)
+            embed.add_field(name=_(lc, "roles"), value=f"> {helper.format_roles(user.roles)}" or _(lc, "no_roles"))
+            embed.add_field(name=_(lc, "joined_at"), value=helper.embed_timestamp_format(user.joined_at))
+        else:
+            embed.set_author(name=_(lc, "logging.member_ban.title_user"), icon_url=user.display_avatar)
+            embed.set_footer(text=f"{_(lc, 'logging.user_id')}: {user.id}")
+
+        await self._send_message(guild.id, cache, embed=embed)
 
     @commands.Cog.listener()
     async def on_member_unban(self, guild: discord.Guild, user: discord.User):
-        pass
+        lc = guild.preferred_locale
+
+        cache = await self._get_cache(guild.id)
+        if cache is None or not cache.member_unban:
+            return
+
+        embed = Embed()
+        embed.set_author(name=_(lc, "logging.member_unban.title"), icon_url=user.display_avatar)
+        embed.set_footer(text=f"{_(lc, 'logging.user_id')}: {user.id}")
+        embed.add_field(name=_(lc, "account_created"), value=helper.embed_timestamp_format(user.created_at))
+
+        await self._send_message(guild.id, cache, embed=embed)
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
@@ -117,7 +140,7 @@ class LoggingEvents(commands.Cog):
         lc = guild.preferred_locale
         message = payload.cached_message
 
-        log_embed = discord.Embed(color=DISCORD_DEFAULT)
+        log_embed = Embed()
         embeds = [log_embed]
 
         if message is not None:
@@ -131,12 +154,10 @@ class LoggingEvents(commands.Cog):
             # messages longer than 1024 characters receive their own embed
             if len(message.content) <= 1024:
                 log_embed.add_field(
-                    name=_(lc, "logging.message_edit.old_message"),
-                    value=message.content or _(lc, "logging.no_c ontent"),
-                    inline=False,
+                    name=_(lc, "logging.message_edit.old_message"), value=message.content or _(lc, "logging.no_content")
                 )
             else:
-                old_message_embed = discord.Embed(color=DISCORD_DEFAULT, description=message.content)
+                old_message_embed = Embed(description=message.content)
                 embeds.append(old_message_embed)
         else:
             edit_member_id = payload.data["author"]["id"]
@@ -148,8 +169,8 @@ class LoggingEvents(commands.Cog):
             edit_member = f"{user_name}#{user_discriminator}"
             edit_channel = f"<#{payload.channel_id}>"
 
-        log_embed.set_author(name=_(lc, "logging.message_edit.title"), icon_url=avatar)
         log_embed.description = _(lc, "logging.message_edit.description", member=edit_member, channel=edit_channel)
+        log_embed.set_author(name=_(lc, "logging.message_edit.title"), icon_url=avatar)
         log_embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {edit_member_id}")
 
         content = payload.data["content"]
@@ -157,12 +178,10 @@ class LoggingEvents(commands.Cog):
         # messages longer than 1024 characters receive their own embed
         if len(content) <= 1024:
             log_embed.add_field(
-                name=_(lc, "logging.message_edit.new_message"),
-                value=content or _(lc, "logging.no_content"),
-                inline=False,
+                name=_(lc, "logging.message_edit.new_message"), value=content or _(lc, "logging.no_content")
             )
         else:
-            new_message_embed = discord.Embed(color=DISCORD_DEFAULT, description=content)
+            new_message_embed = Embed(description=content)
             embeds.append(new_message_embed)
 
         await self._send_message(guild.id, cache, embeds=embeds)
@@ -187,7 +206,7 @@ class LoggingEvents(commands.Cog):
         message = payload.cached_message
         member = message.author if message else None
 
-        log_embed = discord.Embed(color=DISCORD_DEFAULT)
+        log_embed = Embed()
         embeds = [log_embed]
 
         log_embed.set_author(
@@ -209,10 +228,9 @@ class LoggingEvents(commands.Cog):
                 log_embed.add_field(
                     name=_(lc, "logging.message_delete.message_content"),
                     value=message.content or _(lc, "logging.no_content"),
-                    inline=False,
                 )
             else:
-                content_embed = discord.Embed(color=DISCORD_DEFAULT, description=message.content)
+                content_embed = Embed(description=message.content)
                 embeds.append(content_embed)
 
             log_embed.add_field(

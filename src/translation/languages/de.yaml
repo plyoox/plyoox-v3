@@ -134,21 +134,3 @@ logging:
     description: "**{member}** hat eine Nachricht in {channel} bearbeitet."
     old_message: "Vorherige Nachricht"
     new_message: "Neue Nachricht"
-config:
-  active: "Aktiviert"
-  channel_removed: "Der Kanal wurde erfolgreich aus der Konfiguration entfernt."
-  cannot_write: "Der Bot hat keine Berechtigung in diesen Channel zu schreiben."
-  message_to_long: "Deine eingegebene Nachricht ist zu lang."
-  welcome:
-    title: "Welcome Konfiguration"
-    description: "Das Modul begrüßt neue Mitglieder und kann ihnen eine Rolle geben, oder Mitglieder, die den Server verlassen, verabschieden."
-    no_config: "Keine Konfiguration für das Plugin gefunden."
-    member_join: "Beitritt"
-    member_leave: "Verlassen"
-    join_channel_set: "Der Channel {channel.mention} wurde erfolgreich als Willkommenskanal festgesetzt."
-    welcome_message: "Willkommensnachricht"
-    modal:
-      title: "Willkommensnachricht ändern"
-      message_example: "Hallo {user.mention}, willkommen auf dem {guild.name} Discord Server!"
-      message_removed: "Die Willkommensnachricht wurde erfolgreich entfernt."
-      embed_used: "Da die Nachricht über 2000 Zeichen lang ist, werden die Willkommensnachrichten in einem Embed versendet. Wenn der Bot eine Nachricht versenden soll, benutze weniger als 2000 Zeichen."

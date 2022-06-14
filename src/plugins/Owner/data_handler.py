@@ -12,8 +12,3 @@ if TYPE_CHECKING:
 class EventHandlerCog(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
-
-    @commands.Cog.listener()
-    def on_guild_remove(self, guild: discord.Guild):
-        # Remove the guild cache
-        self.bot.cache.remove_guild_cache(guild.id)

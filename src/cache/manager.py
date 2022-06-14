@@ -1,24 +1,27 @@
 from typing import Literal
 
 import asyncpg
+from lru import LRU
 
 from .models import WelcomeModel, LevelingModel, LoggingModel, ModerationModel
 
 
 class CacheManager:
-    _welcome: dict[int, WelcomeModel | None] = dict()
-    _leveling: dict[int, LevelingModel | None] = dict()
-    _moderation: dict[int, ModerationModel | None] = dict()
-    _logging: dict[int, LoggingModel | None] = dict()
+    __slots__ = ("_pool",)
+
+    _welcome = LRU(128)
+    _leveling = LRU(128)
+    _moderation = LRU(128)
+    _logging = LRU(128)
     _pool: asyncpg.Pool
 
     def __init__(self, pool: asyncpg.Pool):
         self._pool = pool
 
-    async def __get_cache(self, cache: dict, id: int, query: str, model):
+    async def __get_cache(self, cache: LRU, id: int, query: str, model):
         guild_cache = cache.get(id, False)
         if guild_cache is not False:
-            return cache
+            return guild_cache
 
         result = await self._pool.fetchrow(query, id)
         if result is None:
@@ -32,25 +35,6 @@ class CacheManager:
         cache[id] = model
 
         return model
-
-    def remove_guild_cache(self, id: int) -> None:
-        """Deletes the caches from a guild."""
-
-        # Welcome cache
-        if self._welcome.get(id, False) is not False:
-            del self._welcome[id]
-
-        # Leveling cache
-        if self._leveling.get(id, False) is not False:
-            del self._leveling[id]
-
-        # Logging cache
-        if self._logging.get(id, False) is not False:
-            del self._logging[id]
-
-        # Moderation cache
-        if self._moderation.get(id, False) is not False:
-            del self._moderation[id]
 
     async def get_welcome(self, id: int) -> WelcomeModel | None:
         """Returns the cache for the welcome plugin."""
@@ -74,13 +58,13 @@ class CacheManager:
         guild_cache = None
 
         if cache == "wel":
-            guild_cache = self._welcome.get(id)
+            guild_cache = self._welcome.get(id, None)
         elif cache == "log":
-            guild_cache = self._logging.get(id)
+            guild_cache = self._logging.get(id, None)
         elif cache == "lvl":
-            guild_cache = self._leveling.get(id)
+            guild_cache = self._leveling.get(id, None)
         elif cache == "mod":
-            guild_cache = self._moderation.get(id)
+            guild_cache = self._moderation.get(id, None)
 
         if guild_cache is not None:
             if hasattr(guild_cache, key):

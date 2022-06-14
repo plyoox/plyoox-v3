@@ -73,7 +73,7 @@ class Leveling(commands.Cog):
         if cache.no_xp_role in member._roles:
             return
 
-        message_xp = random.randint(a=15, b=25)  # generate a random amount of xp between 15 and 25
+        message_xp = random.randint(15, 25)  # generate a random amount of xp between 15 and 25
         member_data = await self._fetch_member_data(member)
 
         # member has no data saved
@@ -93,7 +93,7 @@ class Leveling(commands.Cog):
 
             # only add role if available and the bot has proper permissions
             if len(cache.roles) and guild.me.guild_permissions.manage_roles:
-                add_role_id = list(filter(lambda r: r[1] == after_level if r else False, cache.roles))
+                add_role_id = list(filter(lambda r: r[1] == after_level, cache.roles))
                 highest_add_role = guild.get_role(add_role_id[0][0])
 
                 if cache.remove_roles and highest_add_role:

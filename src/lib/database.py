@@ -52,6 +52,8 @@ class LevelingUsers(Base):
     user_id = _Column(sql.BIGINT, nullable=False)
     xp = _Column(sql.INTEGER, server_default=0)
 
+    uix_user = sql.UniqueConstraint("guild_id", "user_id")
+
 
 class Welcome(Base):
     __tablename__ = "welcome"
@@ -111,14 +113,15 @@ class Moderation(Base):
     link_whitelist_roles = _Column(sql.ARRAY(sql.BIGINT))
     link_list = _Column(sql.ARRAY(sql.VARCHAR(length=30)))
     link_points = _Column(sql.SMALLINT, server_default=1)
-    link_as_whitelist = _Column(sql.BOOLEAN, server_default=True)
+    link_is_whitelist = _Column(sql.BOOLEAN, server_default=True)
 
     mention_action = _Column(sql.Enum(AutomodAction), server_default=AutomodAction.none)
-    mention_points_channels = _Column(sql.SMALLINT, server_default=1)
-    mention_points_roles = _Column(sql.SMALLINT, server_default=1)
+    mention_whitelist_channels = _Column(sql.SMALLINT, server_default=1)
+    mention_whitelist_roles = _Column(sql.SMALLINT, server_default=1)
     mention_whitelist = _Column(sql.ARRAY(sql.BIGINT))
     mention_settings = _Column(sql.Enum(MentionSettings), server_default=MentionSettings.member)
-    mentions_count = _Column(sql.SMALLINT, server_default=5)
+    mention_count = _Column(sql.SMALLINT, server_default=5)
+    mention_points = _Column(sql.SMALLINT, server_default=1)
 
     caps_action = _Column(sql.Enum(AutomodAction), server_default=AutomodAction.none)
     caps_whitelist_channels = _Column(sql.ARRAY(sql.BIGINT))

@@ -1,9 +1,10 @@
 import enum
 
 import sqlalchemy as sql
+import sqlalchemy.dialects.postgresql as pg
 import sqlalchemy.orm as orm
 
-from lib.enums import AutomodAction, AutomodFinalAction, MentionSettings
+from lib.enums import MentionSettings
 
 metadata = sql.MetaData()
 mapper_registry = orm.registry(metadata=metadata)
@@ -34,23 +35,23 @@ class _Column(sql.Column):
 class Leveling(Base):
     __tablename__ = "leveling"
 
-    id = _Column(sql.BIGINT, primary_key=True, autoincrement=False)
-    active = _Column(sql.BOOLEAN, server_default=False)
-    channel = _Column(sql.BIGINT)
-    message = _Column(sql.VARCHAR(length=2000))
-    roles = _Column(sql.ARRAY(sql.BIGINT))
-    no_xp_channels = _Column(sql.ARRAY(sql.BIGINT))
-    no_xp_role = _Column(sql.BIGINT)
-    remove_roles = _Column(sql.BOOLEAN, server_default=False)
+    id = _Column(pg.BIGINT, primary_key=True, autoincrement=False)
+    active = _Column(pg.BOOLEAN, server_default=False)
+    channel = _Column(pg.BIGINT)
+    message = _Column(pg.VARCHAR(length=2000))
+    roles = _Column(pg.ARRAY(sql.BIGINT))
+    no_xp_channels = _Column(pg.ARRAY(sql.BIGINT))
+    no_xp_role = _Column(pg.BIGINT)
+    remove_roles = _Column(pg.BOOLEAN, server_default=False)
 
 
 class LevelingUsers(Base):
     __tablename__ = "leveling_users"
 
-    id = _Column(sql.INTEGER, primary_key=True)
-    guild_id = _Column(sql.BIGINT, nullable=False)
-    user_id = _Column(sql.BIGINT, nullable=False)
-    xp = _Column(sql.INTEGER, server_default=0)
+    id = _Column(pg.INTEGER, primary_key=True)
+    guild_id = _Column(pg.BIGINT, nullable=False)
+    user_id = _Column(pg.BIGINT, nullable=False)
+    xp = _Column(pg.INTEGER, server_default=0)
 
     uix_user = sql.UniqueConstraint("guild_id", "user_id")
 
@@ -58,72 +59,72 @@ class LevelingUsers(Base):
 class Welcome(Base):
     __tablename__ = "welcome"
 
-    id = _Column(sql.BIGINT, primary_key=True, autoincrement=False)
-    active = _Column(sql.BOOLEAN, server_default=False)
-    join_channel = _Column(sql.BIGINT)
-    join_message = _Column(sql.VARCHAR(length=2000))
-    join_roles = _Column(sql.ARRAY(sql.BIGINT), server_default=[])
-    join_active = _Column(sql.BOOLEAN, server_default=False)
-    leave_channel = _Column(sql.BIGINT)
-    leave_message = _Column(sql.VARCHAR(length=2000))
-    leave_active = _Column(sql.BOOLEAN, server_default=False)
+    id = _Column(pg.BIGINT, primary_key=True, autoincrement=False)
+    active = _Column(pg.BOOLEAN, server_default=False)
+    join_channel = _Column(pg.BIGINT)
+    join_message = _Column(pg.VARCHAR(length=2000))
+    join_roles = _Column(pg.ARRAY(pg.BIGINT), server_default=[])
+    join_active = _Column(pg.BOOLEAN, server_default=False)
+    leave_channel = _Column(pg.BIGINT)
+    leave_message = _Column(pg.VARCHAR(length=2000))
+    leave_active = _Column(pg.BOOLEAN, server_default=False)
 
 
 class Logging(Base):
     __tablename__ = "logging"
 
-    id = _Column(sql.BIGINT, primary_key=True, autoincrement=False)
-    active = _Column(sql.BOOLEAN, server_default=False)
-    webhook_id = _Column(sql.BIGINT)
-    webhook_channel = _Column(sql.BIGINT)
-    webhook_token = _Column(sql.VARCHAR(length=80))
-    member_join = _Column(sql.BOOLEAN, server_default=False)
-    member_leave = _Column(sql.BOOLEAN, server_default=False)
-    member_ban = _Column(sql.BOOLEAN, server_default=False)
-    member_unban = _Column(sql.BOOLEAN, server_default=False)
-    member_rename = _Column(sql.BOOLEAN, server_default=False)
-    member_role_change = _Column(sql.BOOLEAN, server_default=False)
-    message_edit = _Column(sql.BOOLEAN, server_default=False)
-    message_delete = _Column(sql.BOOLEAN, server_default=False)
+    id = _Column(pg.BIGINT, primary_key=True, autoincrement=False)
+    active = _Column(pg.BOOLEAN, server_default=False)
+    webhook_id = _Column(pg.BIGINT)
+    webhook_channel = _Column(pg.BIGINT)
+    webhook_token = _Column(pg.VARCHAR(length=80))
+    member_join = _Column(pg.BOOLEAN, server_default=False)
+    member_leave = _Column(pg.BOOLEAN, server_default=False)
+    member_ban = _Column(pg.BOOLEAN, server_default=False)
+    member_unban = _Column(pg.BOOLEAN, server_default=False)
+    member_rename = _Column(pg.BOOLEAN, server_default=False)
+    member_role_change = _Column(pg.BOOLEAN, server_default=False)
+    message_edit = _Column(pg.BOOLEAN, server_default=False)
+    message_delete = _Column(pg.BOOLEAN, server_default=False)
 
 
 class Moderation(Base):
     __tablename__ = "moderation"
 
-    id = _Column(sql.BIGINT, primary_key=True, autoincrement=False)
-    mod_roles = _Column(sql.ARRAY(sql.BIGINT))
-    ignored_roles = _Column(sql.ARRAY(sql.BIGINT))
-    mute_role = _Column(sql.BIGINT)
-    logchannel = _Column(sql.BIGINT)
-    ban_time = _Column(sql.INTEGER, server_default=86400)
-    mute_time = _Column(sql.INTEGER, server_default=86400)
+    id = _Column(pg.BIGINT, primary_key=True, autoincrement=False)
+    mod_roles = _Column(pg.ARRAY(pg.BIGINT))
+    ignored_roles = _Column(pg.ARRAY(pg.BIGINT))
+    log_id = _Column(pg.BIGINT)
+    log_channel = _Column(pg.BIGINT)
+    log_token = _Column(pg.VARCHAR(length=80))
+    ban_time = _Column(pg.INTEGER, server_default=86400)
+    mute_time = _Column(pg.INTEGER, server_default=86400)
 
-    active = _Column(sql.BOOLEAN, server_default=False)
-    automod_action = _Column(sql.Enum(AutomodFinalAction), server_default=AutomodFinalAction.none)
-    notify_user = _Column(sql.BOOLEAN, server_default=True)
+    automod_active = _Column(pg.BOOLEAN, server_default=False)
+    automod_actions = _Column(pg.JSON)
+    notify_user = _Column(pg.BOOLEAN, server_default=False)
 
-    invite_action = _Column(sql.Enum(AutomodAction), server_default=AutomodAction.none)
-    invite_whitelist_channels = _Column(sql.ARRAY(sql.BIGINT))
-    invite_whitelist_roles = _Column(sql.ARRAY(sql.BIGINT))
-    invite_allowed = _Column(sql.ARRAY(sql.VARCHAR(length=10)))
-    invite_points = _Column(sql.SMALLINT, server_default=1)
+    invite_active = _Column(pg.BOOLEAN, server_default=False)
+    invite_whitelist_channels = _Column(pg.ARRAY(pg.BIGINT))
+    invite_whitelist_roles = _Column(pg.ARRAY(pg.BIGINT))
+    invite_allowed = _Column(pg.ARRAY(pg.VARCHAR(length=10)))
+    invite_actions = _Column(pg.JSON)
 
-    link_action = _Column(sql.Enum(AutomodAction), server_default=AutomodAction.none)
-    link_whitelist_channels = _Column(sql.ARRAY(sql.BIGINT))
-    link_whitelist_roles = _Column(sql.ARRAY(sql.BIGINT))
-    link_list = _Column(sql.ARRAY(sql.VARCHAR(length=30)))
-    link_points = _Column(sql.SMALLINT, server_default=1)
-    link_is_whitelist = _Column(sql.BOOLEAN, server_default=True)
+    link_active = _Column(pg.BOOLEAN, server_default=False)
+    link_whitelist_channels = _Column(pg.ARRAY(pg.BIGINT))
+    link_whitelist_roles = _Column(pg.ARRAY(pg.BIGINT))
+    link_list = _Column(pg.ARRAY(pg.VARCHAR(length=30)))
+    link_is_whitelist = _Column(pg.BOOLEAN, server_default=True)
+    link_actions = _Column(pg.JSON)
 
-    mention_action = _Column(sql.Enum(AutomodAction), server_default=AutomodAction.none)
-    mention_whitelist_channels = _Column(sql.SMALLINT, server_default=1)
-    mention_whitelist_roles = _Column(sql.SMALLINT, server_default=1)
-    mention_whitelist = _Column(sql.ARRAY(sql.BIGINT))
-    mention_settings = _Column(sql.Enum(MentionSettings), server_default=MentionSettings.member)
-    mention_count = _Column(sql.SMALLINT, server_default=5)
-    mention_points = _Column(sql.SMALLINT, server_default=1)
+    mention_active = _Column(pg.BOOLEAN, server_default=False)
+    mention_whitelist_channels = _Column(pg.ARRAY(pg.BIGINT))
+    mention_whitelist_roles = _Column(pg.ARRAY(pg.BIGINT))
+    mention_settings = _Column(pg.ENUM(MentionSettings), server_default=MentionSettings.member)
+    mention_count = _Column(pg.SMALLINT, server_default=5)
+    mention_actions = _Column(pg.JSON)
 
-    caps_action = _Column(sql.Enum(AutomodAction), server_default=AutomodAction.none)
-    caps_whitelist_channels = _Column(sql.ARRAY(sql.BIGINT))
-    caps_whitelist_roles = _Column(sql.ARRAY(sql.BIGINT))
-    caps_points = _Column(sql.SMALLINT, server_default=1)
+    caps_active = _Column(pg.BOOLEAN, server_default=False)
+    caps_whitelist_channels = _Column(pg.ARRAY(pg.BIGINT))
+    caps_whitelist_roles = _Column(pg.ARRAY(pg.BIGINT))
+    caps_actions = _Column(pg.JSON)

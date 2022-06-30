@@ -12,6 +12,7 @@ from discord import utils
 from discord.ext import commands
 
 from cache import CacheManager
+from lib import database
 from lib.extensions import CommandTree
 
 logger = logging.getLogger(__name__)
@@ -73,7 +74,7 @@ class Plyoox(commands.Bot):
 
     async def _create_db_pool(self) -> None:
         try:
-            self.db = await asyncpg.create_pool(os.getenv("POSTGRES"))
+            self.db = await asyncpg.create_pool(os.getenv("POSTGRES"), init=database.__init_db_connection)
             self.cache = CacheManager(self.db)
 
         except asyncpg.ConnectionDoesNotExistError:

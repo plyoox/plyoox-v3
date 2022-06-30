@@ -1,4 +1,6 @@
 import enum
+import json
+from typing import TYPE_CHECKING
 
 import sqlalchemy as sql
 import sqlalchemy.dialects.postgresql as pg
@@ -6,9 +8,16 @@ import sqlalchemy.orm as orm
 
 from lib.enums import MentionSettings
 
+if TYPE_CHECKING:
+    import asyncpg
+
 metadata = sql.MetaData()
 mapper_registry = orm.registry(metadata=metadata)
 Base = mapper_registry.generate_base()
+
+
+async def __init_db_connection(conn: asyncpg.Connection):
+    await conn.set_type_codec("json", encoder=json.dumps, decoder=json.loads, schema="pg_catalog")
 
 
 class _Column(sql.Column):

@@ -84,14 +84,6 @@ class Moderation(commands.Cog):
             _(lc, "moderation.kick.successfully_kicked", reason=reason or _(lc, "no_reason"))
         )
 
-    @app_commands.command(name="mute", description="Mutes an user permanently.")
-    @app_commands.describe(member="The member that should be muted.", reason="Why the member should be muted.")
-    @app_commands.checks.bot_has_permissions(manage_roles=True)
-    @app_commands.default_permissions(mute_members=True)
-    @app_commands.guild_only
-    async def mute(self, interaction: discord.Interaction, member: discord.Member, reason: Optional[str]):
-        pass
-
     @app_commands.command(name="tempmute", description="Mutes an user for a specific time.")
     @app_commands.describe(
         member="The member that should be muted.",

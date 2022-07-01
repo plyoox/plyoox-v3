@@ -74,7 +74,7 @@ class Plyoox(commands.Bot):
 
     async def _create_db_pool(self) -> None:
         try:
-            self.db = await asyncpg.create_pool(os.getenv("POSTGRES"), init=database.__init_db_connection)
+            self.db = await asyncpg.create_pool(os.getenv("POSTGRES"), init=database._init_db_connection)
             self.cache = CacheManager(self.db)
 
         except asyncpg.ConnectionDoesNotExistError:

@@ -6,16 +6,15 @@ class PlyooxModule(enum.Enum):
 
 
 class AutomodAction(enum.Enum):
-    none = "none"
+    delete = "delete"
     kick = "kick"
     ban = "ban"
     tempban = "tban"
-    tmute = "tmute"
-    mute = "mute"
+    tempmute = "tmute"
+    points = "points"
 
 
 class AutomodFinalAction(enum.Enum):
-    points = "points"
     none = "none"
     kick = "kick"
     ban = "ban"
@@ -29,3 +28,10 @@ class MentionSettings(enum.Enum):
     include_roles = "include_roles"
     include_mass = "include_mass"
     include_all = "include_all"
+
+
+class AutomodChecks:
+    no_role = "no_role"
+    no_avatar = "no_avatar"
+    account_age = "account_age"
+    join_date = "join_date"

@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from lib import enums
+from lib.enums import MentionSettings
+from lib.types.database import AutomodActionType
 
 
 @dataclass(slots=True)
@@ -44,38 +45,33 @@ class LoggingModel:
 
 @dataclass(slots=True)
 class ModerationModel:
-    mod_roles: list[int]
-    ignored_roles = list[int] | None
-    mute_role = int | None
-    logchannel = int | None
-    ban_time = int
-    mute_time = int
-
     active: bool
-    automod_action: enums.AutomodFinalAction
+    mod_roles: list[int] | None
+    ignored_roles: list[int] | None
+    log_id: int | None
+    log_channel: int | None
+    log_token: str | None
+    automod_active: bool
+    automod_actions: list[AutomodActionType] | None
     notify_user: bool
-
-    invite_action: enums.AutomodAction
+    invite_active: bool
+    invite_actions: list[AutomodActionType] | None
     invite_whitelist_channels: list[int] | None
     invite_whitelist_roles: list[int] | None
     invite_allowed: list[str] | None
-    invite_points: int
-
-    link_action: enums.AutomodAction
+    link_active: bool
+    link_actions: list[AutomodActionType] | None
     link_whitelist_channels: list[int] | None
     link_whitelist_roles: list[int] | None
     link_list: list[str] | None
-    link_points: int
-    link_as_whitelist: bool
-
-    mention_action: enums.AutomodAction
-    mention_points_channels: int
-    mention_points_roles: int
-    mention_whitelist: list[int] | None
-    mention_settings: enums.MentionSettings
-    mentions_count: int
-
-    caps_action: enums.AutomodAction
+    link_is_whitelist: bool
+    mention_active: bool
+    mention_actions: list[AutomodActionType] | None
+    mention_whitelist_channels: list[int] | None
+    mention_whitelist_roles: list[int] | None
+    mention_settings: MentionSettings
+    mention_count: int
+    caps_active: bool
+    caps_actions: list[AutomodActionType] | None
     caps_whitelist_channels: list[int] | None
     caps_whitelist_roles: list[int] | None
-    caps_points: int

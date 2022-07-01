@@ -109,6 +109,8 @@ moderation:
   ban:
     successfully_banned: "Der Benutzer wurde erfolgreich für {reason} gebannt."
     unsuccessfully_banned: "Der Benutzer konnte nicht gebannt werden."
+fun:
+  color: "Zufällige Farbe: HEX:\n`{hex}` RGB: (`{rgb}`)"
 logging:
   member_id: "Mitglied-ID"
   user_id: "Mitglied-ID"

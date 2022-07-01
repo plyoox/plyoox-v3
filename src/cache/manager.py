@@ -102,7 +102,7 @@ class CacheManager:
             invite_active=result["invite_active"],
             invite_whitelist_channels=result["invite_whitelist_channels"] or [],
             invite_whitelist_roles=result["invite_whitelist_roles"] or [],
-            invite_allowed=result["invite_allowed"],
+            invite_allowed=result["invite_allowed"] or [],
             caps_actions=result["caps_actions"] or [],
             caps_active=result["caps_active"],
             caps_whitelist_roles=result["caps_whitelist_roles"] or [],

@@ -1,3 +1,4 @@
+import asyncio
 import random
 
 import discord
@@ -34,6 +35,23 @@ class Fun(
 
         embed = Embed(description=_(lc, "fun.color", rgb=f"{red}, {green}, {blue}", hex=f"#{color:06X}"), color=color)
         await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="slot", description="Rolls a slot machine.")
+    async def slot(self, interaction: discord.Interaction):
+        lc = interaction.locale
+        result = [":grey_question:" for _ in range(3)]
+        embed = Embed(description=" ".join(result))
+        await interaction.response.send_message(embed=embed)
+        for i in range(3):
+            await asyncio.sleep(0.5)
+            result[i] = random.choice(("🍒", "🍓", "🍇", "🍍", "🍊"))  # 0.8% probability of winning
+            embed = Embed(description=" ".join(result))
+            if i == 2:
+                if result[0] == result[1] == result[2]:
+                    embed.description += "\n\n" + _(lc, "fun.slot.win")
+                else:
+                    embed.description += "\n\n" + _(lc, "fun.slot.lose")
+            await interaction.edit_original_message(embed=embed)
 
 
 async def setup(bot: Plyoox):

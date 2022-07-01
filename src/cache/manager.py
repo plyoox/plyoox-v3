@@ -43,6 +43,9 @@ class CacheManager:
             return guild_cache
 
         result = await self._pool.fetchrow("SELECT * FROM welcome WHERE id = $1", id)
+        if result is None:
+            self._welcome[id] = None
+            return None
 
         result = dict(result)
         del result["id"]
@@ -59,6 +62,9 @@ class CacheManager:
             return guild_cache
 
         result = await self._pool.fetchrow("SELECT * FROM leveling WHERE id = $1", id)
+        if result is None:
+            self._leveling[id] = None
+            return
 
         result = dict(result)
         del result["id"]
@@ -83,11 +89,15 @@ class CacheManager:
             return guild_cache
 
         result = await self._pool.fetchrow("SELECT * FROM moderation WHERE id = $1", id)
+        if result is None:
+            self._moderation[id] = None
+            return None
 
         result = dict(result)
         del result["id"]
 
         model = ModerationModel(
+            active=result["active"],
             invite_actions=result["invite_actions"] or [],
             invite_active=result["invite_active"],
             invite_whitelist_channels=result["invite_whitelist_channels"] or [],
@@ -129,6 +139,9 @@ class CacheManager:
             return guild_cache
 
         result = await self._pool.fetchrow("SELECT * FROM logging WHERE id = $1", id)
+        if result is None:
+            self._logging[id] = None
+            return None
 
         result = dict(result)
         del result["id"]

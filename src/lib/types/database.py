@@ -1,5 +1,15 @@
 from typing import TypedDict, Optional
 
+from lib.enums import AutomodAction, AutomodChecks
+
+
+class AutomodActionType(TypedDict):
+    action: AutomodAction
+    check: Optional[AutomodChecks]
+    days: Optional[int]
+    points: Optional[int]
+    duration: Optional[int]
+
 
 class LevelUserData(TypedDict):
     id: int

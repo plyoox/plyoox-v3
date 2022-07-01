@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import enum
 import json
 from typing import TYPE_CHECKING
@@ -16,7 +18,7 @@ mapper_registry = orm.registry(metadata=metadata)
 Base = mapper_registry.generate_base()
 
 
-async def __init_db_connection(conn: asyncpg.Connection):
+async def _init_db_connection(conn: asyncpg.Connection):
     await conn.set_type_codec("json", encoder=json.dumps, decoder=json.loads, schema="pg_catalog")
 
 
@@ -101,13 +103,12 @@ class Moderation(Base):
     __tablename__ = "moderation"
 
     id = _Column(pg.BIGINT, primary_key=True, autoincrement=False)
+    active = _Column(pg.BOOLEAN, server_default=False)
     mod_roles = _Column(pg.ARRAY(pg.BIGINT))
     ignored_roles = _Column(pg.ARRAY(pg.BIGINT))
     log_id = _Column(pg.BIGINT)
     log_channel = _Column(pg.BIGINT)
     log_token = _Column(pg.VARCHAR(length=80))
-    ban_time = _Column(pg.INTEGER, server_default=86400)
-    mute_time = _Column(pg.INTEGER, server_default=86400)
 
     automod_active = _Column(pg.BOOLEAN, server_default=False)
     automod_actions = _Column(pg.JSON)

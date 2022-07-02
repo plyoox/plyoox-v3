@@ -62,6 +62,14 @@ class Fun(
     async def dice(self, interaction: discord.Interaction):
         await interaction.response.send_message(random.choice((":one:", ":two:", ":three:", ":four:", ":five:", ":six:")))
 
+    @app_commands.command(name="cat", description="Shows a cute cat.")
+    async def cat(self, interaction: discord.Interaction):
+        await interaction.response.send_message(random.choice(gifs["cat"]))
+
+    @app_commands.command(name="dog", description="Shows a cute dog.")
+    async def dog(self, interaction: discord.Interaction):
+        await interaction.response.send_message(random.choice(gifs["dog"]))
+
     @app_commands.command(name="cry", description="Cries.")
     async def cry(self, interaction: discord.Interaction):
         lc = interaction.locale

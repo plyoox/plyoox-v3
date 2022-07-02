@@ -85,11 +85,15 @@ class Fun(
 
     @app_commands.command(name="cat", description="Shows a cute cat.")
     async def cat(self, interaction: discord.Interaction):
-        await interaction.response.send_message(random.choice(gifs["cat"]))
+        embed = Embed()
+        embed.set_image(url=random.choice(gifs["cat"]))
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="dog", description="Shows a cute dog.")
     async def dog(self, interaction: discord.Interaction):
-        await interaction.response.send_message(random.choice(gifs["dog"]))
+        embed = Embed()
+        embed.set_image(url=random.choice(gifs["dog"]))
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="cry", description="Cries.")
     async def cry(self, interaction: discord.Interaction):

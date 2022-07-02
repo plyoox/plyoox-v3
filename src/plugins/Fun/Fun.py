@@ -75,6 +75,13 @@ class Fun(
         )
         await interaction.response.send_message(embed=embed)
 
+    @app_commands.command(name="thisorthat", description="Chooses one of the two given arguments.")
+    @app_commands.describe(this="The first argument", that="The second argument")
+    async def thisorthat(self, interaction: discord.Interaction, this: str, that: str):
+        lc = interaction.locale
+        embed = Embed(title=_(lc, "fun.thisorthat.title"), description=random.choice((this, that)))
+        await interaction.response.send_message(embed=embed)
+
     @app_commands.command(name="dice", description="Rolls a dice.")
     async def dice(self, interaction: discord.Interaction):
         await interaction.response.send_message(random.choice((":one:", ":two:", ":three:", ":four:", ":five:", ":six:")))

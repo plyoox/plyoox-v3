@@ -1,33 +1,45 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import datetime
+from typing import TYPE_CHECKING, Literal
 
+import discord
 from discord import utils
 
+from lib import helper
+from lib.enums import AutomodAction
 from lib.extensions import Embed
+from lib.types import AutomodExecutionReason
 from translation import _
 
 if TYPE_CHECKING:
-    import discord
     from main import Plyoox
 
 
-async def _get_logchannel(interaction: discord.Interaction) -> discord.TextChannel | None:
-    bot: Plyoox = interaction.client  # type: ignore
-    guild = interaction.guild
+async def _get_logchannel(bot: Plyoox, guild: discord.Guild) -> discord.Webhook | None:
     cache = await bot.cache.get_moderation(guild.id)
 
-    if cache is None or not cache.active or cache.logchannel is None:
-        return
+    if cache is None or not cache.active or cache.log_channel is None:
+        return None
 
-    channel = guild.get_channel(cache.logchannel)
-    if channel is not None and channel.permissions_for(guild.me).send_messages:
-        return channel
+    return discord.Webhook.partial(cache.log_id, cache.log_token, session=bot.session)
+
+
+async def _send_webhook(bot: Plyoox, guild_id: int, webhook: discord.Webhook, embed: discord.Embed) -> None:
+    try:
+        await webhook.send(embed=embed)
+    except discord.Forbidden:
+        await bot.db.execute(
+            "UPDATE moderation SET log_channel = NULL, log_id = NULL, log_token = NULL WHERE id = $1",
+            guild_id,
+        )
+
+        bot.cache.edit_cache("mod", guild_id, log_channel=None, log_id=None, log_token=None)
 
 
 async def log_ban(interaction: discord.Interaction, *, target: discord.Member, reason: str | None) -> None:
-    logchannel = await _get_logchannel(interaction)
-    if logchannel is None:
+    webhook = await _get_logchannel(interaction.client, interaction.guild)  # type: ignore
+    if webhook is None:
         return
 
     lc = interaction.guild_locale
@@ -39,12 +51,12 @@ async def log_ban(interaction: discord.Interaction, *, target: discord.Member, r
     embed.add_field(name=_(lc, "timestamp"), value=utils.format_dt(utils.utcnow(), "F"))
     embed.set_footer(text=f"{_(lc, 'id')}: {target.id}")
 
-    await logchannel.send(embed=embed)
+    await _send_webhook(interaction.client, interaction.guild_id, webhook, embed=embed)  # type: ignore
 
 
 async def log_kick(interaction: discord.Interaction, *, target: discord.Member, reason: str | None) -> None:
-    logchannel = await _get_logchannel(interaction)
-    if logchannel is None:
+    webhook = await _get_logchannel(interaction.client, interaction.guild)  # type: ignore
+    if webhook is None:
         return
 
     lc = interaction.guild_locale
@@ -52,6 +64,39 @@ async def log_kick(interaction: discord.Interaction, *, target: discord.Member, 
     embed = Embed()
     embed.set_author(name=_(lc, "moderation.logging.kick"), icon_url=target.display_avatar)
     embed.description = _(lc, "moderation.logging.kick_description", target=target, moderator=interaction.user)
-    embed.add_field(name=_(lc, "reason", reason=reason), value=reason or _(lc, "no_reason"))
+    embed.add_field(name=_(lc, "reason"), value=reason or _(lc, "no_reason"))
     embed.add_field(name=_(lc, "timestamp"), value=utils.format_dt(utils.utcnow(), "F"))
     embed.set_footer(text=f"{_(lc, 'id')}: {target.id}")
+
+    await _send_webhook(interaction.client, interaction.guild_id, webhook, embed=embed)  # type: ignore
+
+
+async def automod_log(
+    bot: Plyoox,
+    message: discord.Message,
+    action: AutomodAction,
+    type: AutomodExecutionReason,
+    *,
+    until: datetime.datetime | None = None,
+    points: int | None = None,
+) -> None:
+    webhook = await _get_logchannel(bot, message.guild)
+    if webhook is None:
+        return
+
+    lc = message.guild.preferred_locale
+    member = message.author
+
+    embed = Embed()
+    embed.set_author(name=_(lc, f"automod.{action}.title"), icon_url=member.display_avatar)
+    embed.description = _(lc, f"description.{action}.description", target=member)
+    embed.add_field(name=_(lc, "reason"), value="> " + _(lc, f"automod.reason.{type}"))
+    embed.add_field(name=_(lc, "automod.executed_at"), value="> " + utils.format_dt(utils.utcnow()))
+    embed.set_footer(text=f"{_(lc, 'id')}: {member.id}")
+
+    if until is not None:
+        embed.add_field(name=_(lc, "automod.punished_until"), value=helper.embed_timestamp_format(until))
+    elif points is not None:
+        embed.add_field(name=_(lc, "automod.points_added"), value="> " + str(points))
+
+    await _send_webhook(bot, message.guild.id, webhook, embed=embed)

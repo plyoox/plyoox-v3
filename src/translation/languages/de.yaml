@@ -118,6 +118,8 @@ fun:
   hug:
     successfully_hugged: "{mention} umarmt {target}!"
     self_hug: "Du kannst dich nicht selber umarmen!"
+  ship:
+    same: "Du kannst einen Benutzer nicht mit sich selber shippen!"
 logging:
   member_id: "Mitglied-ID"
   user_id: "Mitglied-ID"

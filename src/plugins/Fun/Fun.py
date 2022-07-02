@@ -1,6 +1,7 @@
 import asyncio
 import json
 import random
+from typing import Optional
 
 import discord
 from discord import Embed, app_commands
@@ -57,6 +58,22 @@ class Fun(
                 else:
                     embed.description += "\n\n" + _(lc, "fun.slot.lose")
             await interaction.edit_original_message(embed=embed)
+
+    @app_commands.command(name="ship", description="Ships two users.")
+    @app_commands.describe(user1="A user to be shipped", user2="Another optional user that will be shipped with the first one")
+    async def ship(self, interaction: discord.Interaction, user1: discord.Member, user2: Optional[discord.Member]):
+        lc = interaction.locale
+        if user2 is None:
+            user2 = interaction.user
+        if user1 == user2:
+            await interaction.response.send_message(_(lc, "fun.ship.same"), ephemeral=True)
+            return
+        percent = random.randint(0, 100)
+        embed = Embed(
+            title=f"{user1.name} :heart: {user2.name}",
+            description=f"**`{('█' * (percent // 10)):10}` {percent}%**"
+        )
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="dice", description="Rolls a dice.")
     async def dice(self, interaction: discord.Interaction):

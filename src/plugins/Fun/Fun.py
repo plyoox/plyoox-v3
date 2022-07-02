@@ -58,6 +58,10 @@ class Fun(
                     embed.description += "\n\n" + _(lc, "fun.slot.lose")
             await interaction.edit_original_message(embed=embed)
 
+    @app_commands.command(name="dice")
+    async def dice(self, interaction: discord.Interaction):
+        await interaction.response.send_message(random.choice((":one:", ":two:", ":three:", ":four:", ":five:", ":six:")))
+
     @app_commands.command(name="cry", description="Cries.")
     async def cry(self, interaction: discord.Interaction):
         lc = interaction.locale

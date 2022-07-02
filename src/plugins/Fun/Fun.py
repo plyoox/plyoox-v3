@@ -25,10 +25,7 @@ class Fun(
 
     @app_commands.command(name="coinflip", description="Flipps a coin.")
     async def coinflip(self, interaction: discord.Interaction):
-        if random.randint(0, 1):
-            await interaction.response.send_message(":coin:")
-        else:
-            await interaction.response.send_message(":one:")
+        await interaction.response.send_message(random.choice((":coin:", ":one:")))
 
     @app_commands.command(name="color", description="Generates a random color.")
     async def color(self, interaction: discord.Interaction):

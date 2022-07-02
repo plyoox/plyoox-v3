@@ -136,6 +136,19 @@ automod:
   points:
     title: "Automod: Punkte hinzugefügt"
     description: "Der Benutzer {target} ({target.id}) hat {points} Punkte für einen Verstoß erhalten."
+fun:
+  color: "Zufällige Farbe:\nHEX:`{hex}`\nRGB: (`{rgb}`)"
+  slot:
+    win: ":tada: Gewonnen!"
+    lose: "Leider verloren!"
+  cry: "{mention} weint!"
+  hug:
+    successfully_hugged: "{mention} umarmt {target}!"
+    self_hug: "Du kannst dich nicht selber umarmen!"
+  ship:
+    same: "Du kannst einen Benutzer nicht mit sich selber shippen!"
+  thisorthat:
+    title: "Meine zufällig gewählte Antwort"
 logging:
   member_id: "Mitglied-ID"
   user_id: "Mitglied-ID"

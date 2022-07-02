@@ -58,7 +58,7 @@ class Fun(
                     embed.description += "\n\n" + _(lc, "fun.slot.lose")
             await interaction.edit_original_message(embed=embed)
 
-    @app_commands.command(name="dice")
+    @app_commands.command(name="dice", description="Rolls a dice.")
     async def dice(self, interaction: discord.Interaction):
         await interaction.response.send_message(random.choice((":one:", ":two:", ":three:", ":four:", ":five:", ":six:")))
 

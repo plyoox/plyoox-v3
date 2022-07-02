@@ -73,7 +73,10 @@ class Fun(
     @app_commands.describe(member="The user to hug.")
     async def hug(self, interaction: discord.Interaction, member: discord.Member):
         lc = interaction.locale
-        embed = Embed(description=_(lc, "fun.hug", mention=interaction.user.mention, target=member.mention))
+        if member == interaction.user:
+            await interaction.response.send_message(_(lc, "fun.hug.self_hug"), ephemeral=True)
+            return
+        embed = Embed(description=_(lc, "fun.hug.successfully_hugged", mention=interaction.user.mention, target=member.mention))
         embed.set_image(url=random.choice(gifs["hug"]))
         await interaction.response.send_message(embed=embed)
 

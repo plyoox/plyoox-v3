@@ -115,7 +115,9 @@ fun:
     win: ":tada: Gewonnen!"
     lose: "Leider verloren!"
   cry: "{mention} weint!"
-  hug: "{mention} umarmt {target}!"
+  hug:
+    successfully_hugged: "{mention} umarmt {target}!"
+    self_hug: "Du kannst dich nicht selber umarmen!"
 logging:
   member_id: "Mitglied-ID"
   user_id: "Mitglied-ID"

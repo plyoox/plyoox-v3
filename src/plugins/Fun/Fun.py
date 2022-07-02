@@ -49,7 +49,7 @@ class Fun(
         await interaction.response.send_message(embed=embed)
         for i in range(3):
             await asyncio.sleep(0.5)
-            result[i] = random.choice(("🍒", "🍓", "🍇", "🍍", "🍊"))  # 0.8% probability of winning
+            result[i] = random.choice((":cherries:", ":strawberry:", ":grapes:", ":pineapple:", ":tangerine:"))  # 0.8% probability of winning
             embed = Embed(description=" ".join(result))
             if i == 2:
                 if result[0] == result[1] == result[2]:

@@ -24,7 +24,7 @@ plugins = [
     "plugins.Owner",
     "plugins.Moderation",
     "plugins.Logging",
-    "plugins.Fun.Fun",
+    "plugins.Fun",
 ]
 
 

@@ -141,10 +141,8 @@ fun:
   slot:
     win: ":tada: Gewonnen!"
     lose: "Leider verloren!"
-  cry: "{mention} weint!"
-  hug:
-    successfully_hugged: "{mention} umarmt {target}!"
-    self_hug: "Du kannst dich nicht selber umarmen!"
+  cry: "{user.mention} weint!"
+  hug: "{user.mention} umarmt {target.mention}!"
   ship:
     same: "Du kannst einen Benutzer nicht mit sich selber shippen!"
   thisorthat:

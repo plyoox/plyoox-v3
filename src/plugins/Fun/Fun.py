@@ -45,7 +45,7 @@ class Fun(
     @app_commands.command(name="slot", description="Rolls a slot machine.")
     async def slot(self, interaction: discord.Interaction):
         lc = interaction.locale
-        result = [":grey_question:" for _ in range(3)]
+        result = [":grey_question:"] * 3
         embed = Embed(description=" ".join(result))
         await interaction.response.send_message(embed=embed)
         for i in range(3):

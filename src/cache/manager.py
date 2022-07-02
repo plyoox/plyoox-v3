@@ -3,7 +3,7 @@ from typing import Literal
 import asyncpg
 from lru import LRU
 
-from .models import WelcomeModel, LevelingModel, LoggingModel, ModerationModel
+from .models import WelcomeModel, LevelingModel, LoggingModel, ModerationModel, AutomodExecutionModel
 
 
 class CacheManager:
@@ -17,6 +17,22 @@ class CacheManager:
 
     def __init__(self, pool: asyncpg.Pool):
         self._pool = pool
+
+    @staticmethod
+    def __to_moderation_actions(actions: list[dict] | None) -> list[AutomodExecutionModel]:
+        if actions is None:
+            return []
+
+        return [
+            AutomodExecutionModel(
+                action=action["a"],
+                check=action.get("c"),
+                points=action.get("p"),
+                days=action.get("d"),
+                duration=action.get("t"),
+            )
+            for action in actions
+        ]
 
     async def __get_cache(self, cache: LRU, id: int, query: str, model):
         guild_cache = cache.get(id, False)
@@ -98,36 +114,37 @@ class CacheManager:
 
         model = ModerationModel(
             active=result["active"],
-            invite_actions=result["invite_actions"] or [],
+            invite_actions=self.__to_moderation_actions(result["invite_actions"]),
             invite_active=result["invite_active"],
             invite_whitelist_channels=result["invite_whitelist_channels"] or [],
             invite_whitelist_roles=result["invite_whitelist_roles"] or [],
             invite_allowed=result["invite_allowed"] or [],
-            caps_actions=result["caps_actions"] or [],
+            caps_actions=self.__to_moderation_actions(result["caps_actions"]),
             caps_active=result["caps_active"],
             caps_whitelist_roles=result["caps_whitelist_roles"] or [],
             caps_whitelist_channels=result["caps_whitelist_channels"] or [],
             log_id=result["log_id"],
             log_channel=result["log_channel"],
             log_token=result["log_token"],
-            mention_actions=result["mention_actions"] or [],
+            mention_actions=self.__to_moderation_actions(result["mention_actions"]),
             mention_active=result["mention_active"],
             mention_whitelist_roles=result["mention_whitelist_roles"] or [],
             mention_whitelist_channels=result["mention_whitelist_channels"] or [],
             mention_count=result["mention_count"],
             mention_settings=result["mention_settings"],
-            automod_actions=result["automod_actions"] or [],
+            automod_actions=self.__to_moderation_actions(result["automod_actions"]),
             automod_active=result["automod_active"],
             link_list=result["link_list"] or [],
             link_active=result["link_active"],
             link_whitelist_channels=result["link_whitelist_channels"] or [],
             link_whitelist_roles=result["link_whitelist_roles"] or [],
-            link_actions=result["link_actions"] or [],
+            link_actions=self.__to_moderation_actions(result["link_actions"]),
             link_is_whitelist=result["link_is_whitelist"],
             mod_roles=result["mod_roles"] or [],
             notify_user=result["notify_user"],
             ignored_roles=result["ignored_roles"] or [],
         )
+
         self._moderation[id] = model
 
         return model

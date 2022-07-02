@@ -3,7 +3,7 @@ from typing import TypedDict, Optional
 from lib.enums import AutomodAction, AutomodChecks
 
 
-class AutomodActionType(TypedDict):
+class AutomodExecutionAction(TypedDict):
     action: AutomodAction
     check: Optional[AutomodChecks]
     days: Optional[int]

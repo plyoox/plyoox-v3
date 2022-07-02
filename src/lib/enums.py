@@ -5,32 +5,30 @@ class PlyooxModule(enum.Enum):
     Leveling = 1
 
 
-class AutomodAction(enum.Enum):
+class AutomodAction(str, enum.Enum):
     delete = "delete"
     kick = "kick"
     ban = "ban"
-    tempban = "tban"
-    tempmute = "tmute"
+    tempban = "tempban"
+    tempmute = "tempmute"
     points = "points"
 
 
-class AutomodFinalAction(enum.Enum):
-    none = "none"
+class AutomodFinalAction(str, enum.Enum):
     kick = "kick"
     ban = "ban"
-    tempban = "tban"
-    tmute = "tmute"
-    mute = "mute"
+    tempban = "tempban"
+    tempmute = "tempmute"
 
 
-class MentionSettings(enum.Enum):
+class MentionSettings(str, enum.Enum):
     member = "member"
     include_roles = "include_roles"
     include_mass = "include_mass"
     include_all = "include_all"
 
 
-class AutomodChecks:
+class AutomodChecks(str, enum.Enum):
     no_role = "no_role"
     no_avatar = "no_avatar"
     account_age = "account_age"

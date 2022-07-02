@@ -5,3 +5,4 @@ sqlalchemy~=1.4.36
 PyYAML~=6.0
 lru-dict
 git+https://github.com/Rapptz/discord.py.git#egg=discord.py
+recordclass~=0.17.2

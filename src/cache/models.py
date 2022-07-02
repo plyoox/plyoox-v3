@@ -1,11 +1,9 @@
-from dataclasses import dataclass
+from recordclass import RecordClass
 
-from lib.enums import MentionSettings
-from lib.types.database import AutomodActionType
+from lib.enums import MentionSettings, AutomodAction, AutomodChecks
 
 
-@dataclass(slots=True)
-class WelcomeModel:
+class WelcomeModel(RecordClass):
     active: bool
     join_active: bool
     join_channel: int | None
@@ -16,8 +14,7 @@ class WelcomeModel:
     leave_message: str | None
 
 
-@dataclass(slots=True)
-class LevelingModel:
+class LevelingModel(RecordClass):
     active: bool
     message: str | None
     channel: int | None
@@ -27,8 +24,7 @@ class LevelingModel:
     no_xp_channels: list[int] | None
 
 
-@dataclass(slots=True)
-class LoggingModel:
+class LoggingModel(RecordClass):
     active: bool
     webhook_id: int | None
     webhook_channel: int | None
@@ -43,8 +39,15 @@ class LoggingModel:
     message_delete: bool
 
 
-@dataclass(slots=True)
-class ModerationModel:
+class AutomodExecutionModel(RecordClass):
+    action: AutomodAction
+    check: AutomodChecks
+    days: int
+    points: int
+    duration: int
+
+
+class ModerationModel(RecordClass):
     active: bool
     mod_roles: list[int] | None
     ignored_roles: list[int] | None
@@ -52,26 +55,26 @@ class ModerationModel:
     log_channel: int | None
     log_token: str | None
     automod_active: bool
-    automod_actions: list[AutomodActionType] | None
+    automod_actions: list[AutomodExecutionModel] | None
     notify_user: bool
     invite_active: bool
-    invite_actions: list[AutomodActionType] | None
+    invite_actions: list[AutomodExecutionModel] | None
     invite_whitelist_channels: list[int] | None
     invite_whitelist_roles: list[int] | None
     invite_allowed: list[str] | None
     link_active: bool
-    link_actions: list[AutomodActionType] | None
+    link_actions: list[AutomodExecutionModel] | None
     link_whitelist_channels: list[int] | None
     link_whitelist_roles: list[int] | None
     link_list: list[str] | None
     link_is_whitelist: bool
     mention_active: bool
-    mention_actions: list[AutomodActionType] | None
+    mention_actions: list[AutomodExecutionModel] | None
     mention_whitelist_channels: list[int] | None
     mention_whitelist_roles: list[int] | None
     mention_settings: MentionSettings
     mention_count: int
     caps_active: bool
-    caps_actions: list[AutomodActionType] | None
+    caps_actions: list[AutomodExecutionModel] | None
     caps_whitelist_channels: list[int] | None
     caps_whitelist_roles: list[int] | None

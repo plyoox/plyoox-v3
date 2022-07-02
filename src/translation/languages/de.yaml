@@ -109,6 +109,33 @@ moderation:
   ban:
     successfully_banned: "Der Benutzer wurde erfolgreich für {reason} gebannt."
     unsuccessfully_banned: "Der Benutzer konnte nicht gebannt werden."
+automod:
+  executed_at: "Ausgeführt am"
+  punished_until: "Bestraft bis"
+  points_added: "Punkte hinzugefügt"
+  reason:
+    link: "Link"
+    mention: "Erwähnungsspam"
+    invite: "Discord Einladung"
+    caps: "Großbuchstaben-Spam"
+  kick:
+    title: "Automod: Kick"
+    description: "Der Benutzer {target} ({target.id}) wurde vom Automod gekickt."
+  ban:
+    title: "Automod: Ban"
+    description: "Der Benutzer {target} ({target.id}) wurde vom Automod gebannt."
+  delete:
+    title: "Automod: Nachricht gelöscht"
+    description: "Eine Nachricht von {target} ({target.id}) wurde vom Automod gelöscht."
+  tempban:
+    title: "Automod: Temporärer Bann"
+    description: "Der Benutzer {target} ({target.id}) wurde vom Automod temporär gebannt."
+  tempmute:
+    title: "Automod: Temporäre Mute"
+    description: "Der Benutzer {target} ({target.id}) wurde vom Automod temporär gesperrt."
+  points:
+    title: "Automod: Punkte hinzugefügt"
+    description: "Der Benutzer {target} ({target.id}) hat {points} Punkte für einen Verstoß erhalten."
 logging:
   member_id: "Mitglied-ID"
   user_id: "Mitglied-ID"

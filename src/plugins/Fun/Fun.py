@@ -65,6 +65,14 @@ class Fun(
         embed.set_image(url=random.choice(gifs["cry"]))
         await interaction.response.send_message(embed=embed)
 
+    @app_commands.command(name="hug", description="Hugs a user.")
+    @app_commands.describe(member="The user to hug.")
+    async def hug(self, interaction: discord.Interaction, member: discord.Member):
+        lc = interaction.locale
+        embed = Embed(description=_(lc, "fun.hug", mention=interaction.user.mention, target=member.mention))
+        embed.set_image(url=random.choice(gifs["hug"]))
+        await interaction.response.send_message(embed=embed)
+
 
 async def setup(bot: Plyoox):
     await bot.add_cog(Fun(bot))

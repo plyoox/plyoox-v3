@@ -114,6 +114,7 @@ fun:
   slot:
     win: ":tada: Gewonnen!"
     lose: "Leider verloren!"
+  cry: "{mention} weint!"
 logging:
   member_id: "Mitglied-ID"
   user_id: "Mitglied-ID"

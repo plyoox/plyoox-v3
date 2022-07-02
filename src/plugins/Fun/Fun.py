@@ -1,4 +1,5 @@
 import asyncio
+import json
 import random
 
 import discord
@@ -6,6 +7,10 @@ from discord import Embed, app_commands
 from discord.ext import commands
 from main import Plyoox
 from translation import _
+
+
+with open("plugins/Fun/gifs.json") as f:
+    gifs = json.load(f)
 
 
 @app_commands.guild_only
@@ -52,6 +57,13 @@ class Fun(
                 else:
                     embed.description += "\n\n" + _(lc, "fun.slot.lose")
             await interaction.edit_original_message(embed=embed)
+
+    @app_commands.command(name="cry", description="Cries.")
+    async def cry(self, interaction: discord.Interaction):
+        lc = interaction.locale
+        embed = Embed(description=_(lc, "fun.cry", mention=interaction.user.mention))
+        embed.set_image(url=random.choice(gifs["cry"]))
+        await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot: Plyoox):

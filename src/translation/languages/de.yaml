@@ -132,7 +132,7 @@ automod:
     title: "Automod: Temporärer Bann"
     description: "Der Benutzer {target} ({target.id}) wurde vom Automod temporär gebannt."
   tempmute:
-    title: "Automod: Temporäre Mute"
+    title: "Automod: Temporärer Mute"
     description: "Der Benutzer {target} ({target.id}) wurde vom Automod temporär gesperrt."
   points:
     title: "Automod: Punkte hinzugefügt"

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import json
 import random
 from typing import Optional, TYPE_CHECKING
@@ -47,14 +46,10 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
     async def slot(self, interaction: discord.Interaction):
         lc = interaction.locale
 
-        result = [":grey_question:"] * 3
+        result = []
         embed = Embed(description=" ".join(result))
 
-        await interaction.response.send_message(embed=embed)
-
         for i in range(3):
-            await asyncio.sleep(0.5)
-
             result[i] = random.choice(
                 (":cherries:", ":strawberry:", ":grapes:", ":pineapple:", ":tangerine:")
             )  # 0.8% probability of winning
@@ -66,7 +61,7 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
         else:
             embed.description += "\n\n" + _(lc, "fun.slot.lose")
 
-        await interaction.edit_original_message(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="ship", description="Ships two users.")
     @app_commands.describe(

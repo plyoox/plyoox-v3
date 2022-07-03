@@ -60,7 +60,6 @@ class ModerationModel(RecordClass):
     log_id: int | None
     log_channel: int | None
     log_token: str | None
-    automod_active: bool
     automod_actions: list[AutomodExecutionModel] | None
     notify_user: bool
     invite_active: bool

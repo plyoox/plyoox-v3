@@ -209,11 +209,7 @@ class Automod(commands.Cog):
         roles = message.author._roles
         channel = message.channel
 
-        if (
-            not cache.automod_active
-            or not getattr(cache, f"{reason}_active")
-            or not getattr(cache, f"{reason}_actions")
-        ):
+        if not getattr(cache, f"{reason}_active") or not getattr(cache, f"{reason}_actions"):
             return False
 
         if any(role.id in cache.mod_roles + cache.ignored_roles for role in roles):
@@ -226,3 +222,6 @@ class Automod(commands.Cog):
             return False
 
         return True
+
+    async def _handle_points(self, message: discord.Message, action: AutomodExecutionModel):
+        pass

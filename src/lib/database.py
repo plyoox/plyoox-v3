@@ -110,7 +110,6 @@ class Moderation(Base):
     log_channel = _Column(pg.BIGINT)
     log_token = _Column(pg.VARCHAR(length=80))
 
-    automod_active = _Column(pg.BOOLEAN, server_default=False)
     automod_actions = _Column(pg.JSON)
     notify_user = _Column(pg.BOOLEAN, server_default=False)
 

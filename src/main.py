@@ -105,4 +105,4 @@ class Plyoox(commands.Bot):
 
     @property
     def timer(self) -> Timer | None:
-        return self.get_cog("Timers")
+        return self.get_cog("Timer")

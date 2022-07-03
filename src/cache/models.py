@@ -89,5 +89,5 @@ class TimerModel(RecordClass):
     guild_id: int
     target_id: int
     type: TimerType
-    until: datetime
+    expires: datetime
     data: dict[str, Any] | None

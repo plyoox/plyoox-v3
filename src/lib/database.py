@@ -147,5 +147,5 @@ class Timers(Base):
     guild_id = _Column(pg.BIGINT, nullable=False)
     target_id = _Column(pg.BIGINT, nullable=False)
     type = _Column(pg.ENUM(TimerType), nullable=False)
-    until = _Column(pg.DATE, nullable=False)
+    expires = _Column(pg.DATE, nullable=False)
     data = _Column(pg.JSON)

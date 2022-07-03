@@ -1,12 +1,8 @@
 from __future__ import annotations
 
 import re
-from typing import TYPE_CHECKING
 
-from discord import utils
-
-if TYPE_CHECKING:
-    import discord
+import discord
 
 GUILD_FORMAT_REGEX = re.compile(r"{guild\.(name|id|members)}")
 USER_FORMAT_REGEX = re.compile(r"{user\.(name|id|mention|discriminator)}")
@@ -66,7 +62,7 @@ def resolve_channels(message: str, guild: discord.Guild) -> str:
         if channel.count("#") != 1:
             continue
 
-        guild_channel: discord.TextChannel = utils.get(guild.text_channels, name=channel[1:])
+        guild_channel: discord.TextChannel = discord.utils.get(guild.text_channels, name=channel[1:])
 
         if guild_channel is not None:
             message = message.replace(channel, guild_channel.mention)

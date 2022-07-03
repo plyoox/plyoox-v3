@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from discord import utils
+import discord
 
 from lib import emojis
 from translation import _
 
 if TYPE_CHECKING:
-    import discord
     from datetime import datetime
 
 
@@ -80,4 +79,4 @@ async def permission_check(
 
 
 def embed_timestamp_format(timestamp: datetime) -> str:
-    return f"> {utils.format_dt(timestamp)}\n> {utils.format_dt(timestamp, 'R')}"
+    return f"> {discord.utils.format_dt(timestamp)}\n> {discord.utils.format_dt(timestamp, 'R')}"

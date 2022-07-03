@@ -33,3 +33,7 @@ class AutomodChecks(str, enum.Enum):
     no_avatar = "no_avatar"
     account_age = "account_age"
     join_date = "join_date"
+
+
+class TimerType(str, enum.Enum):
+    tempban = "tempban"

@@ -1,6 +1,10 @@
+from typing import Any, TYPE_CHECKING
+
 from recordclass import RecordClass
 
-from lib.enums import MentionSettings, AutomodAction, AutomodChecks
+if TYPE_CHECKING:
+    from datetime import datetime
+    from lib.enums import MentionSettings, AutomodAction, AutomodChecks, TimerType
 
 
 class WelcomeModel(RecordClass):
@@ -78,3 +82,12 @@ class ModerationModel(RecordClass):
     caps_actions: list[AutomodExecutionModel] | None
     caps_whitelist_channels: list[int] | None
     caps_whitelist_roles: list[int] | None
+
+
+class TimerModel(RecordClass):
+    id: int
+    guild_id: int
+    target_id: int
+    type: TimerType
+    until: datetime
+    data: dict[str, Any] | None

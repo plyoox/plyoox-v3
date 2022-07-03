@@ -8,7 +8,7 @@ import sqlalchemy as sql
 import sqlalchemy.dialects.postgresql as pg
 import sqlalchemy.orm as orm
 
-from lib.enums import MentionSettings
+from lib.enums import MentionSettings, TimerType
 
 if TYPE_CHECKING:
     import asyncpg
@@ -138,3 +138,14 @@ class Moderation(Base):
     caps_whitelist_channels = _Column(pg.ARRAY(pg.BIGINT))
     caps_whitelist_roles = _Column(pg.ARRAY(pg.BIGINT))
     caps_actions = _Column(pg.JSON)
+
+
+class Timers(Base):
+    __tablename__ = "timers"
+
+    id = _Column(pg.BIGINT, primary_key=True, autoincrement=True)
+    guild_id = _Column(pg.BIGINT, nullable=False)
+    target_id = _Column(pg.BIGINT, nullable=False)
+    type = _Column(pg.ENUM(TimerType), nullable=False)
+    until = _Column(pg.DATE, nullable=False)
+    data = _Column(pg.JSON)

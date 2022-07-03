@@ -161,11 +161,11 @@ class Automod(commands.Cog):
 
         if automod_action == AutomodAction.ban:
             if guild.me.guild_permissions.ban_members:
-                await guild.ban(message.author, reason=_(lc, f"automod.reason.{automod_action}"))
+                await guild.ban(message.author, reason=_(lc, f"automod.reason.{reason}"))
                 await _logging.automod_log(self.bot, message, automod_action, reason)
         elif automod_action == AutomodAction.kick:
             if guild.me.guild_permissions.kick_members:
-                await guild.kick(message.author, reason=_(lc, f"automod.reason.{automod_action}"))
+                await guild.kick(message.author, reason=_(lc, f"automod.reason.{reason}"))
                 await _logging.automod_log(self.bot, message, automod_action, reason)
         elif automod_action == AutomodAction.delete:
             if guild.me.guild_permissions.manage_messages:

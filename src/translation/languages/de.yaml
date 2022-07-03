@@ -91,6 +91,7 @@ level:
     level: "Level"
     xp: "Xp"
 moderation:
+  tempban_expired: "Tempban abgelaufen"
   successful_execution: "Der Command wurde erfolgreich ausgeführt."
   hierarchy_not_permitted: "Der Benutzer muss in der Hierarchie unter dir sein."
   bot_cannot_punish: "Der Benutzer muss in der Hierarchie unter dem Bot sein."

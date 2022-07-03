@@ -4,6 +4,7 @@ import os
 import sys
 import traceback
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 import aiohttp
 import asyncpg
@@ -15,6 +16,9 @@ from cache import CacheManager
 from lib import database
 from lib.extensions import CommandTree
 
+if TYPE_CHECKING:
+    from plugins.Timers import Timer
+
 logger = logging.getLogger(__name__)
 
 plugins = [
@@ -25,6 +29,7 @@ plugins = [
     "plugins.Moderation",
     "plugins.Logging",
     "plugins.Fun",
+    "plugins.Timers",
 ]
 
 
@@ -95,3 +100,7 @@ class Plyoox(commands.Bot):
 
             await self.change_presence(status=status, activity=activity)
             await asyncio.sleep(60 * 60 * 12)  # 12 hours
+
+    @property
+    def timer(self) -> Timer | None:
+        return self.get_cog("Timers")

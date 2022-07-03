@@ -89,7 +89,7 @@ async def automod_log(
 
     embed = Embed()
     embed.set_author(name=_(lc, f"automod.{action}.title"), icon_url=member.display_avatar)
-    embed.description = _(lc, f"description.{action}.description", target=member)
+    embed.description = _(lc, f"automod.{action}.description", target=member)
     embed.add_field(name=_(lc, "reason"), value="> " + _(lc, f"automod.reason.{type}"))
     embed.add_field(name=_(lc, "automod.executed_at"), value="> " + utils.format_dt(utils.utcnow()))
     embed.set_footer(text=f"{_(lc, 'id')}: {member.id}")

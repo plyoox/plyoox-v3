@@ -1,10 +1,9 @@
-from typing import Any, TYPE_CHECKING
+from datetime import datetime
+from typing import Any
 
 from recordclass import RecordClass
 
-if TYPE_CHECKING:
-    from datetime import datetime
-    from lib.enums import MentionSettings, AutomodAction, AutomodChecks, TimerType
+from lib.enums import MentionSettings, AutomodAction, AutomodChecks, TimerType
 
 
 class WelcomeModel(RecordClass):

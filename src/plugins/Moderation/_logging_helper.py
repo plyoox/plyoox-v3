@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 import discord
 from discord import utils
+from discord.utils import MISSING
 
 from lib import helper
 from lib.enums import AutomodAction
@@ -25,9 +26,15 @@ async def _get_logchannel(bot: Plyoox, guild: discord.Guild) -> discord.Webhook 
     return discord.Webhook.partial(cache.log_id, cache.log_token, session=bot.session)
 
 
-async def _send_webhook(bot: Plyoox, guild_id: int, webhook: discord.Webhook, embed: discord.Embed) -> None:
+async def _send_webhook(
+    bot: Plyoox,
+    guild_id: int,
+    webhook: discord.Webhook,
+    embed: discord.Embed = MISSING,
+    embeds: list[discord.Embed] = MISSING,
+) -> None:
     try:
-        await webhook.send(embed=embed)
+        await webhook.send(embed=embed, embeds=embeds)
     except discord.Forbidden:
         await bot.db.execute(
             "UPDATE moderation SET log_channel = NULL, log_id = NULL, log_token = NULL WHERE id = $1",
@@ -87,9 +94,10 @@ async def automod_log(
     lc = message.guild.preferred_locale
     member = message.author
 
-    embed = Embed()
+    embeds = []
+
+    embed = Embed(description=_(lc, f"automod.{action}.description", target=member))
     embed.set_author(name=_(lc, f"automod.{action}.title"), icon_url=member.display_avatar)
-    embed.description = _(lc, f"automod.{action}.description", target=member)
     embed.add_field(name=_(lc, "reason"), value="> " + _(lc, f"automod.reason.{type}"))
     embed.add_field(name=_(lc, "automod.executed_at"), value="> " + utils.format_dt(utils.utcnow()))
     embed.set_footer(text=f"{_(lc, 'id')}: {member.id}")
@@ -99,4 +107,13 @@ async def automod_log(
     elif points is not None:
         embed.add_field(name=_(lc, "automod.points_added"), value="> " + str(points))
 
-    await _send_webhook(bot, message.guild.id, webhook, embed=embed)
+    embeds.append(embed)
+
+    if message.content:
+        if len(message.content) <= 1024:
+            embed.add_field(name=_(lc, "message"), value=message.content)
+        else:
+            message_embed = Embed(title=_(lc, "message"), description=message.content)
+            embeds.append(message_embed)
+
+    await _send_webhook(bot, message.guild.id, webhook, embeds=embeds)

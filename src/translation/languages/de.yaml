@@ -121,22 +121,22 @@ automod:
     caps: "Großbuchstaben-Spam"
   kick:
     title: "Automod: Kick"
-    description: "Der Benutzer {target} ({target.id}) wurde vom Automod gekickt."
+    description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod gekickt."
   ban:
     title: "Automod: Ban"
-    description: "Der Benutzer {target} ({target.id}) wurde vom Automod gebannt."
+    description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod gebannt."
   delete:
     title: "Automod: Nachricht gelöscht"
-    description: "Eine Nachricht von {target} ({target.id}) wurde vom Automod gelöscht."
+    description: "Eine Nachricht von **{target}** ({target.id}) wurde vom Automod gelöscht."
   tempban:
     title: "Automod: Temporärer Bann"
-    description: "Der Benutzer {target} ({target.id}) wurde vom Automod temporär gebannt."
+    description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod temporär gebannt."
   tempmute:
     title: "Automod: Temporärer Mute"
-    description: "Der Benutzer {target} ({target.id}) wurde vom Automod temporär gesperrt."
+    description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod temporär gesperrt."
   points:
     title: "Automod: Punkte hinzugefügt"
-    description: "Der Benutzer {target} ({target.id}) hat {points} Punkte für einen Verstoß erhalten."
+    description: "Der Benutzer **{target}** ({target.id}) hat `{points}` Punkte für einen Verstoß erhalten."
 fun:
   color: "Zufällige Farbe:\nHEX:`{hex}`\nRGB: (`{rgb}`)"
   slot:

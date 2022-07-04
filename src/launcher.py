@@ -39,12 +39,15 @@ async def generate_db():
 
 
 async def main():
+    import web_server
     from main import Plyoox
 
     bot = Plyoox(sync_commands=args.sync_commands)
 
     await bot._create_db_pool()
     await bot._create_http_client()
+
+    await web_server.start_webserver(bot)
 
     async with bot:
         await bot.start(os.getenv("TOKEN"))

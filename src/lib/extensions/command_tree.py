@@ -22,5 +22,7 @@ class CommandTree(app_commands.CommandTree):
             await interaction.response.send_message(
                 _(interaction.locale, "errors.bot_missing_permissions", errors=", ".join(error.missing_permissions))
             )
+        elif isinstance(error, app_commands.TransformerError):
+            await interaction.response.send_message(error, ephemeral=True)
         else:
             traceback.print_exc()

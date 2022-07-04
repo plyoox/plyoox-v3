@@ -16,12 +16,11 @@ from translation import _
 
 if TYPE_CHECKING:
     from main import Plyoox
+    from cache.models import ModerationModel
 
 
-async def _get_logchannel(bot: Plyoox, guild: discord.Guild) -> discord.Webhook | None:
-    cache = await bot.cache.get_moderation(guild.id)
-
-    if cache is None or not cache.active or cache.log_channel is None:
+async def _get_logchannel(bot: Plyoox, cache: ModerationModel) -> discord.Webhook | None:
+    if cache.log_channel is None:
         return None
 
     return discord.Webhook.partial(cache.log_id, cache.log_token, session=bot.session)
@@ -53,22 +52,42 @@ async def log_simple_punish_command(
     type: ModerationExecutedCommand,
     until: datetime.datetime | None = None,
 ) -> None:
-    webhook = await _get_logchannel(interaction.client, interaction.guild)  # type: ignore
-    if webhook is None:
+    cache: ModerationModel = await interaction.client.cache.get_moderation(interaction.guild.id)  # type: ignore
+    if cache is None or not cache.active:
         return
 
-    lc = interaction.guild_locale
+    webhook = await _get_logchannel(interaction.client, cache)  # type: ignore
+    if webhook is not None:
+        lc = interaction.guild_locale
 
-    embed = Embed(description=_(lc, f"moderation.{type}.log_description", target=target, moderator=interaction.user))
-    embed.set_author(name=_(lc, f"moderation.{type}.log_title"), icon_url=target.display_avatar)
-    embed.add_field(name=_(lc, "reason"), value="> " + (reason or _(lc, "no_reason")))
-    embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
-    embed.set_footer(text=f"{_(lc, 'id')}: {target.id}")
+        embed = Embed(
+            description=_(lc, f"moderation.{type}.log_description", target=target, moderator=interaction.user)
+        )
+        embed.set_author(name=_(lc, f"moderation.{type}.log_title"), icon_url=target.display_avatar)
+        embed.add_field(name=_(lc, "reason"), value="> " + (reason or _(lc, "no_reason")))
+        embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
+        embed.set_footer(text=f"{_(lc, 'id')}: {target.id}")
 
-    if until is not None:
-        embed.add_field(name=_(lc, "punished_until"), value=helper.embed_timestamp_format(until))
+        if until is not None:
+            embed.add_field(name=_(lc, "punished_until"), value=helper.embed_timestamp_format(until))
 
-    await _send_webhook(interaction.client, interaction.guild.id, webhook, embed=embed)  # type: ignore
+        await _send_webhook(interaction.client, interaction.guild.id, webhook, embed=embed)  # type: ignore
+
+    if cache.notify_user and isinstance(target, discord.Member):
+        lc = interaction.locale
+
+        try:
+            await target.send(
+                _(
+                    lc,
+                    f"moderation.{type}.user_message",
+                    reason=reason or _(lc, "no_reason"),
+                    timestamp=discord.utils.format_dt(until) if until is not None else None,
+                    guild=interaction.guild,
+                )
+            )
+        except discord.Forbidden:
+            pass
 
 
 async def automod_log(
@@ -80,33 +99,52 @@ async def automod_log(
     until: datetime.datetime | None = None,
     points: str | None = None,
 ) -> None:
-    webhook = await _get_logchannel(bot, message.guild)
-    if webhook is None:
+    cache = await bot.cache.get_moderation(message.guild.id)
+    if cache is None or not cache.active:
         return
 
-    lc = message.guild.preferred_locale
-    member = message.author
+    webhook = await _get_logchannel(bot, cache)
+    if webhook is not None:
+        lc = message.guild.preferred_locale
+        member = message.author
 
-    embeds = []
+        embeds = []
 
-    embed = Embed(description=_(lc, f"automod.{action}.description", target=member))
-    embed.set_author(name=_(lc, f"automod.{action}.title"), icon_url=member.display_avatar)
-    embed.add_field(name=_(lc, "reason"), value="> " + _(lc, f"automod.reason.{type}"))
-    embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
-    embed.set_footer(text=f"{_(lc, 'id')}: {member.id}")
+        embed = Embed(description=_(lc, f"automod.{action}.description", target=member))
+        embed.set_author(name=_(lc, f"automod.{action}.title"), icon_url=member.display_avatar)
+        embed.add_field(name=_(lc, "reason"), value="> " + _(lc, f"automod.reason.{type}"))
+        embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
+        embed.set_footer(text=f"{_(lc, 'id')}: {member.id}")
 
-    if until is not None:
-        embed.add_field(name=_(lc, "punished_until"), value=helper.embed_timestamp_format(until))
-    elif points is not None:
-        embed.add_field(name=_(lc, "automod.points_added"), value="> " + points)
+        if until is not None:
+            embed.add_field(name=_(lc, "punished_until"), value=helper.embed_timestamp_format(until))
+        elif points is not None:
+            embed.add_field(name=_(lc, "automod.points_added"), value="> " + points)
 
-    embeds.append(embed)
+        embeds.append(embed)
 
-    if message.content:
-        if len(message.content) <= 1024:
-            embed.add_field(name=_(lc, "message"), value=message.content)
-        else:
-            message_embed = Embed(title=_(lc, "message"), description=message.content)
-            embeds.append(message_embed)
+        if message.content:
+            if len(message.content) <= 1024:
+                embed.add_field(name=_(lc, "message"), value=message.content)
+            else:
+                message_embed = Embed(title=_(lc, "message"), description=message.content)
+                embeds.append(message_embed)
 
-    await _send_webhook(bot, message.guild.id, webhook, embeds=embeds)
+        await _send_webhook(bot, message.guild.id, webhook, embeds=embeds)
+
+    if cache.notify_user:
+        lc = message.guild.preferred_locale
+
+        try:
+            await message.author.send(
+                _(
+                    lc,
+                    f"automod.{action}.user_message",
+                    reason=_(lc, f"automod.reason.{type}"),
+                    timestamp=discord.utils.format_dt(until) if until is not None else None,
+                    guild=message.guild,
+                    points=points,
+                )
+            )
+        except discord.Forbidden:
+            pass

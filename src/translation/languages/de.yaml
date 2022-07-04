@@ -102,6 +102,7 @@ moderation:
     log_title: "User wurde gekickt"
     log_description: "Der Benutzer {target} ({target.id}) wurde von {moderator} gekickt."
     successfully_kicked: "Der Benutzer wurde erfolgreich gekickt."
+    user_message: "Du wurdest vom Server {guild.name} für {reason} gekickt."
   clear:
     success_title: "Clear - Ergebnis"
     deleted_messages: "Gelöschte Nachrichten"
@@ -110,16 +111,19 @@ moderation:
     log_title: "User wurde gebannt"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} permanent gebannt."
     successfully_banned: "Der Benutzer wurde erfolgreich für gebannt."
+    user_message: "Du wurdest vom Server {guild.name} für {reason} permanent gebannt."
   tempban:
     log_title: "User wurde temporär gebannt"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} temporär gebannt."
     successfully_banned: "Der Benutzer wurde erfolgreich temporär gebannt."
     too_long: "Der angegebene Zeitraum ist zu lang. Es ist maximal 1 Jahr möglich."
+    user_message: "Du wurdest vom Server {guild.name} für {reason} bis {timestamp} gebannt."
   tempmute:
     log_title: "User wurde temporär gemutet"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} temporär gemutet."
     too_long: "Der angegebene Zeitraum ist zu lang. Derzeit sind maximal 28 Tage möglich."
     successfully_muted: "Der Benutzer wurde erfolgreich temporär gemutet."
+    user_message: "Du wurdest im Server {guild.name} für {reason} bis {timestamp} gemutet."
   unban:
     log_title: "User wurde entbannt"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} entbannt."
@@ -128,6 +132,7 @@ moderation:
     log_title: "User wurde gekickt (softban)"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} gekickt (softban)."
     successfully_kicked: "Der Benutzer wurde erfolgreich gekickt (softban)."
+    user_message: "Du wurdest vom Server {guild.name} für {reason} gekickt (softban)."
 automod:
   points_added: "Punkte hinzugefügt"
   reason:
@@ -139,21 +144,27 @@ automod:
   kick:
     title: "Automod: Kick"
     description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod gekickt."
+    user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` gekickt."
   ban:
     title: "Automod: Ban"
     description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod gebannt."
+    user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` gebannt."
   delete:
     title: "Automod: Nachricht gelöscht"
     description: "Eine Nachricht von **{target}** ({target.id}) wurde vom Automod gelöscht."
+    user_message: "Deine Nachricht wurde automatisch wegen `{reason}` gelöscht."
   tempban:
     title: "Automod: Temporärer Bann"
     description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod temporär gebannt."
+    user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` bis {timestamp} gebannt."
   tempmute:
     title: "Automod: Temporärer Mute"
     description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod temporär gesperrt."
+    user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` bis {timestamp} gesperrt."
   points:
     title: "Automod: Punkte hinzugefügt"
     description: "Der Benutzer **{target}** ({target.id}) hat Punkte für einen Verstoß erhalten."
+    user_message: "Du hast für `{reason}` automatisch **{points}** Punkte erhalten."
 fun:
   color: "Zufällige Farbe:\nHEX:`{hex}`\nRGB: (`{rgb}`)"
   slot:

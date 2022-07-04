@@ -47,9 +47,10 @@ class Moderation(commands.Cog):
         if not await Moderation._can_execute_on(interaction, member):
             return
 
+        await interaction.response.defer(ephemeral=True)
         await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="ban")
         await guild.ban(member, reason=reason, delete_message_days=1)
-        await interaction.response.send_message(_(lc, "moderation.ban.successfully_banned"), ephemeral=True)
+        await interaction.followup.send(_(lc, "moderation.ban.successfully_banned"), ephemeral=True)
 
     @app_commands.command(name="tempban", description="Bans an user from the guild for a specific time.")
     @app_commands.describe(
@@ -78,13 +79,15 @@ class Moderation(commands.Cog):
         if not await Moderation._can_execute_on(interaction, member):
             return
 
+        await interaction.response.defer(ephemeral=True)
+
         await _logging_helper.log_simple_punish_command(
             interaction, target=member, until=banned_until, reason=reason, type="tempban"
         )
         await self.bot.timer.create_timer(member.id, guild.id, type=TimerType.tempban, expires=banned_until)
         await guild.ban(member, reason=reason, delete_message_days=1)
 
-        await interaction.response.send_message(_(lc, "moderation.tempban.successfully_banned"), ephemeral=True)
+        await interaction.followup.send(_(lc, "moderation.tempban.successfully_banned"), ephemeral=True)
 
     @app_commands.command(name="kick", description="Kicks an user from the guild.")
     @app_commands.describe(member="The member that should be kicked.", reason="Why the member should be kicked.")
@@ -98,10 +101,11 @@ class Moderation(commands.Cog):
         if not await Moderation._can_execute_on(interaction, member):
             return
 
+        await interaction.followup.defer(ephemeral=True)
         await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="kick")
         await guild.kick(member, reason=reason)
 
-        await interaction.response.send_message(_(lc, "moderation.kick.successfully_kicked"), ephemeral=True)
+        await interaction.followup.send(_(lc, "moderation.kick.successfully_kicked"), ephemeral=True)
 
     @app_commands.command(name="tempmute", description="Mutes an user for a specific time.")
     @app_commands.describe(
@@ -116,6 +120,7 @@ class Moderation(commands.Cog):
         self, interaction: discord.Interaction, member: discord.Member, duration: str, reason: Optional[str]
     ):
         lc = interaction.locale
+        await interaction.response.defer(ephemeral=True)
 
         banned_until = parsers.parse_datetime_from_string(duration)
         if banned_until is None:
@@ -134,7 +139,7 @@ class Moderation(commands.Cog):
             interaction, target=member, until=banned_until, reason=reason, type="tempmute"
         )
 
-        await interaction.response.send_message(_(lc, "moderation.tempban.successfully_muted"), ephemeral=True)
+        await interaction.followup.send(_(lc, "moderation.tempban.successfully_muted"), ephemeral=True)
 
     @app_commands.command(name="unban", description="Unbans an user from the guild.")
     @app_commands.describe(user="The member that should be unbanned.", reason="Why the member has been unbanned.")
@@ -162,11 +167,13 @@ class Moderation(commands.Cog):
         if not await Moderation._can_execute_on(interaction, member):
             return
 
+        await interaction.response.defer(ephemeral=True)
+
         await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="softban")
         await guild.ban(member, reason=reason, delete_message_days=1)
         await guild.unban(member, reason=reason)
 
-        await interaction.response.send_message(_(lc, "moderation.softban.successfully_kicked"), ephemeral=True)
+        await interaction.followup.send(_(lc, "moderation.softban.successfully_kicked"), ephemeral=True)
 
     @tempmute.autocomplete("duration")
     @tempban.autocomplete("duration")

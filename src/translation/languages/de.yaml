@@ -119,6 +119,7 @@ automod:
     mention: "Erwähnungsspam"
     invite: "Discord Einladung"
     caps: "Großbuchstaben-Spam"
+    points: "Maximale Punkteanzahl erreicht"
   kick:
     title: "Automod: Kick"
     description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod gekickt."
@@ -136,7 +137,7 @@ automod:
     description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod temporär gesperrt."
   points:
     title: "Automod: Punkte hinzugefügt"
-    description: "Der Benutzer **{target}** ({target.id}) hat `{points}` Punkte für einen Verstoß erhalten."
+    description: "Der Benutzer **{target}** ({target.id}) hat Punkte für einen Verstoß erhalten."
 fun:
   color: "Zufällige Farbe:\nHEX:`{hex}`\nRGB: (`{rgb}`)"
   slot:

@@ -139,6 +139,17 @@ class Moderation(Base):
     caps_actions = _Column(pg.JSON)
 
 
+class AutomodUsers(Base):
+    __tablename__ = "automod_users"
+
+    id = _Column(pg.INTEGER, primary_key=True)
+    guild_id = _Column(pg.BIGINT, nullable=False)
+    user_id = _Column(pg.BIGINT, nullable=False)
+    timestamp = _Column(pg.TIMESTAMP(timezone=True), nullable=False)
+    points = _Column(pg.SMALLINT, nullable=False)
+    reason = _Column(pg.VARCHAR(length=128))
+
+
 class Timers(Base):
     __tablename__ = "timers"
 

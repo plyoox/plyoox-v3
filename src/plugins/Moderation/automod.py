@@ -167,12 +167,12 @@ class Automod(commands.Cog):
             if guild.me.guild_permissions.kick_members:
                 await guild.kick(message.author, reason=_(lc, f"automod.reason.{reason}"))
                 await _logging.automod_log(self.bot, message, automod_action, reason)
+            if guild.me.guild_permissions.manage_messages:
+                await message.delete()
         elif automod_action == AutomodAction.delete:
             if guild.me.guild_permissions.manage_messages:
                 await message.delete()
                 await _logging.automod_log(self.bot, message, automod_action, reason)
-        elif automod_action == AutomodAction.points:
-            pass
         elif automod_action == AutomodAction.tempban:
             if guild.me.guild_permissions.ban_members:
                 banned_until = utils.utcnow() + datetime.timedelta(seconds=action.duration)
@@ -195,6 +195,12 @@ class Automod(commands.Cog):
 
                 await message.author.timeout(muted_until)
                 await _logging.automod_log(self.bot, message, automod_action, reason, until=muted_until)
+            if guild.me.guild_permissions.manage_messages:
+                await message.delete()
+        elif automod_action == AutomodAction.points:
+            if guild.me.guild_permissions.manage_messages:
+                await message.delete()
+            await self._handle_points(message, action, reason)
 
     @staticmethod
     def _is_affected(message: discord.Message, cache: ModerationModel, reason: AutomodExecutionReason) -> bool:
@@ -223,5 +229,40 @@ class Automod(commands.Cog):
 
         return True
 
-    async def _handle_points(self, message: discord.Message, action: AutomodExecutionModel):
-        pass
+    async def _handle_points(
+        self, message: discord.Message, action: AutomodExecutionModel, reason: AutomodExecutionReason
+    ) -> None:
+        guild = message.guild
+        author = message.author
+
+        await self.bot.db.execute(
+            "INSERT INTO automod_users (guild_id, user_id, timestamp, points, reason) VALUES ($1, $2, $3, $4, $5)",
+            guild.id,
+            author.id,
+            utils.utcnow(),
+            action.points,
+            _(message.guild.preferred_locale, f"automod.reason.{reason}"),
+        )
+
+        points = await self.bot.db.fetchval(
+            "SELECT SUM(points) FROM automod_users WHERE user_id = $1 AND guild_id = $2", author.id, guild.id
+        )
+
+        if points > 10:
+            return
+
+        await _logging.automod_log(self.bot, message, action.action, reason, points=f"{points}/10 [+{action.points}]")
+
+        if points is None:
+            _log.warning(f"{author.id} has no points in {guild.id}...")
+            return
+
+        if points >= 10:
+            cache = await self.bot.cache.get_moderation(guild.id)
+            if cache is None:
+                return
+
+            await self.handle_action(message, cache.automod_actions, "points")
+            await self.bot.db.execute(
+                "DELETE FROM automod_users WHERE user_id = $1 AND guild_id = $2", author.id, guild.id
+            )

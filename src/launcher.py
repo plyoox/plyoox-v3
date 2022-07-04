@@ -2,8 +2,14 @@ import argparse
 import asyncio
 import logging
 import os
+import sys
 
 from dotenv import load_dotenv
+
+if sys.platform == "linux":
+    import uvloop
+
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 load_dotenv()
 

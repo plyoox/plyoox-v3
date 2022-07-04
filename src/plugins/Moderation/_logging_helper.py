@@ -11,6 +11,7 @@ from lib import helper
 from lib.enums import AutomodAction
 from lib.extensions import Embed
 from lib.types import AutomodExecutionReason
+from lib.types.types import ModerationExecutedCommand
 from translation import _
 
 if TYPE_CHECKING:
@@ -44,38 +45,30 @@ async def _send_webhook(
         bot.cache.edit_cache("mod", guild_id, log_channel=None, log_id=None, log_token=None)
 
 
-async def log_ban(interaction: discord.Interaction, *, target: discord.Member, reason: str | None) -> None:
+async def log_simple_punish_command(
+    interaction: discord.Interaction,
+    target: discord.Member,
+    *,
+    reason: str,
+    type: ModerationExecutedCommand,
+    until: datetime.datetime | None = None,
+) -> None:
     webhook = await _get_logchannel(interaction.client, interaction.guild)  # type: ignore
     if webhook is None:
         return
 
     lc = interaction.guild_locale
 
-    embed = Embed()
-    embed.set_author(name=_(lc, "moderation.logging.ban"), icon_url=target.display_avatar)
-    embed.description = _(lc, "moderation.logging.ban_description", target=target, moderator=interaction.user)
-    embed.add_field(name=_(lc, "reason"), value=reason or _(lc, "no_reason"))
-    embed.add_field(name=_(lc, "timestamp"), value=utils.format_dt(utils.utcnow(), "F"))
+    embed = Embed(description=_(lc, f"moderation.{type}.log_description", target=target, moderator=interaction.user))
+    embed.set_author(name=_(lc, f"moderation.{type}.log_title"), icon_url=target.display_avatar)
+    embed.add_field(name=_(lc, "reason"), value="> " + (reason or _(lc, "no_reason")))
+    embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
     embed.set_footer(text=f"{_(lc, 'id')}: {target.id}")
 
-    await _send_webhook(interaction.client, interaction.guild_id, webhook, embed=embed)  # type: ignore
+    if until is not None:
+        embed.add_field(name=_(lc, "punished_until"), value=helper.embed_timestamp_format(until))
 
-
-async def log_kick(interaction: discord.Interaction, *, target: discord.Member, reason: str | None) -> None:
-    webhook = await _get_logchannel(interaction.client, interaction.guild)  # type: ignore
-    if webhook is None:
-        return
-
-    lc = interaction.guild_locale
-
-    embed = Embed()
-    embed.set_author(name=_(lc, "moderation.logging.kick"), icon_url=target.display_avatar)
-    embed.description = _(lc, "moderation.logging.kick_description", target=target, moderator=interaction.user)
-    embed.add_field(name=_(lc, "reason"), value=reason or _(lc, "no_reason"))
-    embed.add_field(name=_(lc, "timestamp"), value=utils.format_dt(utils.utcnow(), "F"))
-    embed.set_footer(text=f"{_(lc, 'id')}: {target.id}")
-
-    await _send_webhook(interaction.client, interaction.guild_id, webhook, embed=embed)  # type: ignore
+    await _send_webhook(interaction.client, interaction.guild.id, webhook, embed=embed)  # type: ignore
 
 
 async def automod_log(
@@ -99,11 +92,11 @@ async def automod_log(
     embed = Embed(description=_(lc, f"automod.{action}.description", target=member))
     embed.set_author(name=_(lc, f"automod.{action}.title"), icon_url=member.display_avatar)
     embed.add_field(name=_(lc, "reason"), value="> " + _(lc, f"automod.reason.{type}"))
-    embed.add_field(name=_(lc, "automod.executed_at"), value="> " + utils.format_dt(utils.utcnow()))
+    embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
     embed.set_footer(text=f"{_(lc, 'id')}: {member.id}")
 
     if until is not None:
-        embed.add_field(name=_(lc, "automod.punished_until"), value=helper.embed_timestamp_format(until))
+        embed.add_field(name=_(lc, "punished_until"), value=helper.embed_timestamp_format(until))
     elif points is not None:
         embed.add_field(name=_(lc, "automod.points_added"), value="> " + points)
 

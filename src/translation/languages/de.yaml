@@ -17,6 +17,8 @@ no_reason: "*Kein Grund angegeben*"
 account_created: "Account erstellt"
 joined_at: "Beigetreten am"
 message: "Nachricht"
+executed_at: "Ausgeführt am"
+punished_until: "Bestraft bis"
 times:
   hour: "Stunde"
   hours: "Stunden"
@@ -91,28 +93,34 @@ level:
     level: "Level"
     xp: "Xp"
 moderation:
+  invalid_duration: "Die angegebene Zeit ist nicht gültig."
   tempban_expired: "Tempban abgelaufen"
   successful_execution: "Der Command wurde erfolgreich ausgeführt."
   hierarchy_not_permitted: "Der Benutzer muss in der Hierarchie unter dir sein."
   bot_cannot_punish: "Der Benutzer muss in der Hierarchie unter dem Bot sein."
-  logging:
-    ban: "User wurde gebannt"
-    ban_description: "Der Benutzer {target} ({target.id}) wurde von {moderator} permanent gebannt."
   kick:
-    kick: "User wurde gekickt"
-    kick_description: "Der Benutzer {target} ({target.id}) wurde von {moderator} gekickt."
-    successfully_kicked: "Der Benutzer wurde erfolgreich für {reason} gekickt."
-    unsuccessfully_kicked: "Der Benutzer konnte nicht gekickt werden."
+    log_title: "User wurde gekickt"
+    log_description: "Der Benutzer {target} ({target.id}) wurde von {moderator} gekickt."
+    successfully_kicked: "Der Benutzer wurde erfolgreich gekickt."
   clear:
     success_title: "Clear - Ergebnis"
     deleted_messages: "Gelöschte Nachrichten"
     affected_users: "Betroffene Mitglieder"
   ban:
-    successfully_banned: "Der Benutzer wurde erfolgreich für {reason} gebannt."
-    unsuccessfully_banned: "Der Benutzer konnte nicht gebannt werden."
+    log_title: "User wurde gebannt"
+    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} permanent gebannt."
+    successfully_banned: "Der Benutzer wurde erfolgreich für gebannt."
+  tempban:
+    log_title: "User wurde temporär gebannt"
+    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} temporär gebannt."
+    successfully_banned: "Der Benutzer wurde erfolgreich temporär gebannt."
+    too_long: "Der angegebene Zeitraum ist zu lang. Es ist maximal 1 Jahr möglich."
+  tempmute:
+    log_title: "User wurde temporär gemutet"
+    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} temporär gemutet."
+    too_long: "Der angegebene Zeitraum ist zu lang. Derzeit sind maximal 28 Tage möglich."
+    successfully_muted: "Der Benutzer wurde erfolgreich temporär gemutet."
 automod:
-  executed_at: "Ausgeführt am"
-  punished_until: "Bestraft bis"
   points_added: "Punkte hinzugefügt"
   reason:
     link: "Link"

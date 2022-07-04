@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING
 
 import tornado.log
@@ -8,10 +7,6 @@ import tornado.web
 
 if TYPE_CHECKING:
     from main import Plyoox
-
-logger = logging.getLogger("tornado.application")
-logger.setLevel(logging.ERROR)
-tornado.log.enable_pretty_logging(logger=logger)
 
 
 class BaseHandler(tornado.web.RequestHandler):

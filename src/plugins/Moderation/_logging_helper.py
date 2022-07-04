@@ -85,7 +85,7 @@ async def automod_log(
     type: AutomodExecutionReason,
     *,
     until: datetime.datetime | None = None,
-    points: int | None = None,
+    points: str | None = None,
 ) -> None:
     webhook = await _get_logchannel(bot, message.guild)
     if webhook is None:
@@ -105,7 +105,7 @@ async def automod_log(
     if until is not None:
         embed.add_field(name=_(lc, "automod.punished_until"), value=helper.embed_timestamp_format(until))
     elif points is not None:
-        embed.add_field(name=_(lc, "automod.points_added"), value="> " + str(points))
+        embed.add_field(name=_(lc, "automod.points_added"), value="> " + points)
 
     embeds.append(embed)
 

@@ -74,7 +74,7 @@ class Welcome(Base):
     active = _Column(pg.BOOLEAN, server_default=False)
     join_channel = _Column(pg.BIGINT)
     join_message = _Column(pg.VARCHAR(length=2000))
-    join_roles = _Column(pg.ARRAY(pg.BIGINT), server_default=[])
+    join_roles = _Column(pg.ARRAY(pg.BIGINT))
     join_active = _Column(pg.BOOLEAN, server_default=False)
     leave_channel = _Column(pg.BIGINT)
     leave_message = _Column(pg.VARCHAR(length=2000))

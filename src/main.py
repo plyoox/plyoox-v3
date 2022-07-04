@@ -36,7 +36,7 @@ plugins = [
 
 
 class Plyoox(commands.Bot):
-    db: asyncpg.Pool
+    db: asyncpg.Pool = None
     cache: CacheManager
     test_guild = discord.Object(int(os.getenv("TEST_GUILD")))
     start_time: datetime
@@ -65,17 +65,18 @@ class Plyoox(commands.Bot):
 
         logger.info("Plugins loaded")
 
-    async def on_ready(self) -> None:
-        logger.info("Ready")
-        self.start_time = utils.utcnow()
-
         self.tree.copy_global_to(guild=self.test_guild)
         if self.sync_commands:
             # Sync commands with discord
             logger.debug("Sync commands with discord...")
             await self.tree.sync(guild=self.test_guild)
             await self.close()
-            logger.info("Commands synced")
+            logger.info("Commands successfully synced")
+            sys.exit(0)
+
+    async def on_ready(self) -> None:
+        logger.info("Ready")
+        self.start_time = utils.utcnow()
 
     async def on_message(self, message: discord.Message) -> None:
         pass

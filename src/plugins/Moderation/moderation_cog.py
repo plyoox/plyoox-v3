@@ -129,12 +129,44 @@ class Moderation(commands.Cog):
         if not await Moderation._can_execute_on(interaction, member):
             return
 
+        await member.timeout(banned_until, reason=reason)
         await _logging_helper.log_simple_punish_command(
             interaction, target=member, until=banned_until, reason=reason, type="tempmute"
         )
-        await member.timeout(banned_until, reason=reason)
 
         await interaction.response.send_message(_(lc, "moderation.tempban.successfully_muted"), ephemeral=True)
+
+    @app_commands.command(name="unban", description="Unbans an user from the guild.")
+    @app_commands.describe(user="The member that should be unbanned.", reason="Why the member has been unbanned.")
+    @app_commands.checks.bot_has_permissions(ban_members=True)
+    @app_commands.default_permissions(ban_members=True)
+    @app_commands.guild_only
+    async def unban(self, interaction: discord.Interaction, user: discord.User, reason: Optional[str]):
+        lc = interaction.locale
+        guild = interaction.guild
+
+        await guild.unban(user, reason=reason)
+        await _logging_helper.log_simple_punish_command(interaction, target=user, reason=reason, type="unban")
+
+        await interaction.response.send_message(_(lc, "moderation.unban.successfully_unbanned"), ephemeral=True)
+
+    @app_commands.command(name="softban", description="Kicks an user from the guild and deletes their messages.")
+    @app_commands.describe(member="The member that should be kicked.", reason="Why the member should be kicked.")
+    @app_commands.checks.bot_has_permissions(ban_members=True)
+    @app_commands.default_permissions(ban_members=True)
+    @app_commands.guild_only
+    async def softban(self, interaction: discord.Interaction, member: discord.Member, reason: Optional[str]):
+        lc = interaction.locale
+        guild = interaction.guild
+
+        if not await Moderation._can_execute_on(interaction, member):
+            return
+
+        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="softban")
+        await guild.ban(member, reason=reason, delete_message_days=1)
+        await guild.unban(member, reason=reason)
+
+        await interaction.response.send_message(_(lc, "moderation.softban.successfully_kicked"), ephemeral=True)
 
     @tempmute.autocomplete("duration")
     @tempban.autocomplete("duration")

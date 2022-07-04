@@ -47,7 +47,7 @@ async def _send_webhook(
 
 async def log_simple_punish_command(
     interaction: discord.Interaction,
-    target: discord.Member,
+    target: discord.User | discord.Member,
     *,
     reason: str,
     type: ModerationExecutedCommand,

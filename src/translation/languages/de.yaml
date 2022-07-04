@@ -120,6 +120,14 @@ moderation:
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} temporär gemutet."
     too_long: "Der angegebene Zeitraum ist zu lang. Derzeit sind maximal 28 Tage möglich."
     successfully_muted: "Der Benutzer wurde erfolgreich temporär gemutet."
+  unban:
+    log_title: "User wurde entbannt"
+    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} entbannt."
+    successfully_unbanned: "Der Benutzer wurde erfolgreich entbannt."
+  softban:
+    log_title: "User wurde gekickt (softban)"
+    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} gekickt (softban)."
+    successfully_kicked: "Der Benutzer wurde erfolgreich gekickt (softban)."
 automod:
   points_added: "Punkte hinzugefügt"
   reason:

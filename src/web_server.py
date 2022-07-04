@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-from logging.handlers import RotatingFileHandler
 from typing import TYPE_CHECKING
 
 import tornado.log
@@ -9,7 +8,6 @@ import tornado.web
 
 if TYPE_CHECKING:
     from main import Plyoox
-
 
 logger = logging.getLogger("tornado.application")
 logger.setLevel(logging.ERROR)

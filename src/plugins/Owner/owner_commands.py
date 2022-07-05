@@ -6,6 +6,7 @@ from discord import app_commands
 
 from lib.checks import owner_only
 from lib.extensions import Embed
+from translation import languages
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -62,3 +63,9 @@ class OwnerCommands(app_commands.Group):
             await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message("Plugin successfully reloaded.", ephemeral=True)
+
+    @app_commands.command(name="reload-language", description="Reloads the language files.")
+    async def reload_language(self, interaction: discord.Interaction):
+        languages._load_languages()
+
+        await interaction.response.send_message("Language files successfully reloaded.", ephemeral=True)

@@ -123,7 +123,46 @@ class LoggingEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
-        pass
+        cache = await self._get_cache(before.guild.id)
+        if cache is None:
+            return
+
+        if cache.member_role_change and before.roles != after.roles:
+            lc = before.guild.preferred_locale
+
+            embed = Embed()
+            embed.set_author(name=_(lc, "logging.member_role_change.title"), icon_url=before.display_avatar)
+            embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {before.id}")
+
+            embed.add_field(
+                name=_(lc, "logging.member_role_change.new_roles"),
+                value=f"> {helper.format_roles(after.roles) or _(lc,'no_roles')}",
+            )
+
+            embed.add_field(
+                name=_(lc, "logging.member_role_change.old_roles"),
+                value=f"> {helper.format_roles(before.roles) or _(lc,'no_roles')}",
+            )
+
+            await self._send_message(before.guild.id, cache, embed=embed)
+        elif cache.member_rename and before.display_name != after.display_name:
+            lc = before.guild.preferred_locale
+
+            embed = Embed()
+            embed.set_author(name=_(lc, "logging.member_rename.title"), icon_url=before.display_avatar)
+            embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {before.id}")
+
+            embed.add_field(
+                name=_(lc, "logging.member_rename.old_name"),
+                value=f"> {before.display_name}",
+            )
+
+            embed.add_field(
+                name=_(lc, "logging.member_rename.new_name"),
+                value=f"> {after.display_name}",
+            )
+
+            await self._send_message(before.guild.id, cache, embed=embed)
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent):

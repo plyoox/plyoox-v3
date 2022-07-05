@@ -202,3 +202,11 @@ logging:
     description: "**{member}** hat eine Nachricht in {channel} bearbeitet."
     old_message: "Vorherige Nachricht"
     new_message: "Neue Nachricht"
+  member_role_change:
+    title: "Rolle geändert"
+    new_roles: "Neue Rolle(n)"
+    old_roles: "Alte Rolle(n)"
+  member_rename:
+    title: "Mitglied umbenannt"
+    old_name: "Vorheriger Name"
+    new_name: "Neuer Name"

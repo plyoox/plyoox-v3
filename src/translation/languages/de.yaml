@@ -33,6 +33,7 @@ errors:
   owner_only: "Diesen Command kann nur der Entwickler des Bots ausführen."
   module_disabled: "Das Modul {module} ist auf diesem Server deaktiviert."
   bot_missing_permission: "Der Bot benötigt folgende Berechtigung(en), um den Command auszuführen: {permissions}"
+  command_on_cooldown: "Der Command ist derzeit auf Cooldown. Du kannst ihn in {retry_after} Sekunden wieder versuchen."
 user_info:
   joined:
     postion_no_member: "Auf dieser Position ist kein Mitglied."

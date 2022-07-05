@@ -173,6 +173,10 @@ class Moderation(commands.Cog):
         await guild.unban(user, reason=reason)
         await _logging_helper.log_simple_punish_command(interaction, target=user, reason=reason, type="unban")
 
+        await self.bot.db.execute(
+            "DELETE FROM timers WHERE target_id = $1 AND guild_id = $2 AND type = 'tempban'", user.id, guild.id
+        )
+
         await interaction.response.send_message(_(lc, "moderation.unban.successfully_unbanned"), ephemeral=True)
 
     @app_commands.command(name="softban", description="Kicks an user from the guild and deletes their messages.")

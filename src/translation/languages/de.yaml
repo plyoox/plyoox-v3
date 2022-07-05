@@ -134,6 +134,11 @@ moderation:
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} gekickt (softban)."
     successfully_kicked: "Der Benutzer wurde erfolgreich gekickt (softban)."
     user_message: "Du wurdest vom Server {guild.name} für {reason} gekickt (softban)."
+  unmute:
+    log_title: "User wurde entmutet"
+    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} entmutet."
+    successfully_unmuted: "Der Benutzer wurde erfolgreich entmutet."
+    user_message: "Du wurdest vom Server {guild.name} für {reason} entmutet."
   slowmode:
     disabled: "Der Slowmode wurde deaktiviert."
     enabled: "Der Slowmode wurde aktiviert."

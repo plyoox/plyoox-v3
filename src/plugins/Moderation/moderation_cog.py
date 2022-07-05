@@ -40,7 +40,12 @@ class Moderation(commands.Cog):
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
-    async def ban(self, interaction: discord.Interaction, member: discord.Member, reason: Optional[str]):
+    async def ban(
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        reason: Optional[app_commands.Range[str, None, 512]],
+    ):
         lc = interaction.locale
         guild = interaction.guild
 
@@ -62,7 +67,11 @@ class Moderation(commands.Cog):
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
     async def tempban(
-        self, interaction: discord.Interaction, member: discord.Member, duration: str, reason: Optional[str]
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        duration: str,
+        reason: Optional[app_commands.Range[str, None, 512]],
     ):
         lc = interaction.locale
         guild = interaction.guild
@@ -94,7 +103,12 @@ class Moderation(commands.Cog):
     @app_commands.checks.bot_has_permissions(kick_members=True)
     @app_commands.default_permissions(kick_members=True)
     @app_commands.guild_only
-    async def kick(self, interaction: discord.Interaction, member: discord.Member, reason: Optional[str]):
+    async def kick(
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        reason: Optional[app_commands.Range[str, None, 512]],
+    ):
         lc = interaction.locale
         guild = interaction.guild
 
@@ -117,7 +131,11 @@ class Moderation(commands.Cog):
     @app_commands.default_permissions(mute_members=True)
     @app_commands.guild_only
     async def tempmute(
-        self, interaction: discord.Interaction, member: discord.Member, duration: str, reason: Optional[str]
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        duration: str,
+        reason: Optional[app_commands.Range[str, None, 512]],
     ):
         lc = interaction.locale
         await interaction.response.defer(ephemeral=True)
@@ -146,7 +164,9 @@ class Moderation(commands.Cog):
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
-    async def unban(self, interaction: discord.Interaction, user: discord.User, reason: Optional[str]):
+    async def unban(
+        self, interaction: discord.Interaction, user: discord.User, reason: Optional[app_commands.Range[str, None, 512]]
+    ):
         lc = interaction.locale
         guild = interaction.guild
 
@@ -160,7 +180,12 @@ class Moderation(commands.Cog):
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
-    async def softban(self, interaction: discord.Interaction, member: discord.Member, reason: Optional[str]):
+    async def softban(
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        reason: Optional[app_commands.Range[str, None, 512]],
+    ):
         lc = interaction.locale
         guild = interaction.guild
 
@@ -190,6 +215,26 @@ class Moderation(commands.Cog):
         else:
             await interaction.channel.edit(slowmode_delay=duration)
             await interaction.response.send_message(_(lc, "moderation.slowmode.enabled"), ephemeral=True)
+
+    @app_commands.command(name="unmute", description="Unmutes an user.")
+    @app_commands.describe(member="The member that should be unmuted.", reason="Why the member should be unmuted.")
+    @app_commands.checks.bot_has_permissions(mute_members=True)
+    async def unmute(
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        reason: Optional[app_commands.Range[str, None, 512]],
+    ):
+        lc = interaction.locale
+        await interaction.response.defer(ephemeral=True)
+
+        if not await Moderation._can_execute_on(interaction, member):
+            return
+
+        await member.timeout(None, reason=_(lc, "moderation.unmute.reason"))
+        await _logging_helper.log_simple_punish_command(interaction, target=member, type="unmute", reason=reason)
+
+        await interaction.followup.send(_(lc, "moderation.unmute.successfully_unmuted"), ephemeral=True)
 
     @tempmute.autocomplete("duration")
     @tempban.autocomplete("duration")

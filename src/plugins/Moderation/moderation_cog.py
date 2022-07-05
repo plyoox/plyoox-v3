@@ -170,7 +170,11 @@ class Moderation(commands.Cog):
         lc = interaction.locale
         guild = interaction.guild
 
-        await guild.unban(user, reason=reason)
+        try:
+            await guild.unban(user, reason=reason)
+        except discord.NotFound:
+            await interaction.response.send_message(_(lc, "moderation.unban.not_banned"), ephemeral=True)
+            return
         await _logging_helper.log_simple_punish_command(interaction, target=user, reason=reason, type="unban")
 
         await self.bot.db.execute(

@@ -129,6 +129,7 @@ moderation:
     log_title: "User wurde entbannt"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} entbannt."
     successfully_unbanned: "Der Benutzer wurde erfolgreich entbannt."
+    not_banned: "Der Benutzer ist nicht gebannt."
   softban:
     log_title: "User wurde gekickt (softban)"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} gekickt (softban)."

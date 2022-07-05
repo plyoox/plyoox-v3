@@ -101,9 +101,12 @@ class Timer(commands.Cog):
         if guild is None:
             return
 
-        await guild.unban(
-            discord.Object(id=timer.target_id), reason=_(guild.preferred_locale, "moderation.tempban_expired")
-        )
+        try:
+            await guild.unban(
+                discord.Object(id=timer.target_id), reason=_(guild.preferred_locale, "moderation.tempban_expired")
+            )
+        except discord.NotFound:
+            pass
 
 
 async def setup(bot: Plyoox):

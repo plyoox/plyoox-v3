@@ -64,9 +64,9 @@ guild_info:
     more_infos: "Weitere Informationen"
     premium_level: "Boost-Level"
     vanity_url: "Custom Invite"
-    no_vanity_url: "Kein Custom Invite"
+    no_vanity_url: "*Kein Custom Invite*"
     features: "Discord Features"
-    no_features: "Keine zusätzlichen Discord-Features"
+    no_features: "*Keine zusätzlichen Discord-Features*"
     file_size_limit: "Maximale Dateigröße"
   today_joined: "In den letzten 24 Stunden sind {members} Mitglieder auf den Server gejoint."
   members: "Der Server hat {members} Mitglieder."
@@ -143,6 +143,12 @@ moderation:
   slowmode:
     disabled: "Der Slowmode wurde deaktiviert."
     enabled: "Der Slowmode wurde aktiviert."
+  invite_info:
+    title: "Invite-Info"
+    description: "Informationen über Einladung `{code}`"
+    creator: "Ersteller"
+    mention: "Erwähnung"
+    invalid_invite: "Die angegebene Einladung ist nicht gültig."
 automod:
   points_added: "Punkte hinzugefügt"
   reason:

@@ -8,7 +8,9 @@ from discord.ext import commands
 
 from lib import parsers
 from lib.enums import TimerType
+from lib.extensions import Embed
 from plugins.Moderation import _logging_helper
+from .automod import DISCORD_INVITE
 from translation import _
 
 if TYPE_CHECKING:
@@ -245,6 +247,45 @@ class Moderation(commands.Cog):
         await _logging_helper.log_simple_punish_command(interaction, target=member, type="unmute", reason=reason)
 
         await interaction.followup.send(_(lc, "moderation.unmute.successfully_unmuted"), ephemeral=True)
+
+    @app_commands.command(name="invite-info", description="Shows information about a invite.")
+    @app_commands.describe(invite="The invite you want to get information about.")
+    @app_commands.checks.bot_has_permissions()
+    @app_commands.checks.cooldown(2, 30, key=lambda i: (i.guild.id, i.author.id))
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.guild_only
+    async def invite_info(self, interaction: discord.Interaction, invite: str):
+        lc = interaction.locale
+
+        if not DISCORD_INVITE.match(invite):
+            await interaction.response.send_message(_(lc, "moderation.invite_info.invalid_invite"), ephemeral=True)
+            return
+
+        invite = await self.bot.fetch_invite(invite)
+        if invite is None:
+            await interaction.response.send_message(_(lc, "moderation.invite_info.not_found"), ephemeral=True)
+            return
+
+        embed = Embed(
+            description=_(lc, "moderation.invite_info.description", code=invite.code),
+            title=_(lc, "moderation.invite_info.title"),
+        )
+        embed.set_thumbnail(url=invite.guild.icon)
+
+        embed.add_field(
+            name=_(lc, "moderation.invite_info.creator"),
+            value=f"> **{_(lc, 'id')}:** {invite.inviter.id}\n"
+            f"> **{_(lc, 'name')}:** {invite.inviter}\n"
+            f"> **{_(lc, 'moderation.invite_info.mention')}:** {invite.inviter.mention}",
+        )
+        embed.add_field(
+            name=_(lc, "guild"),
+            value=f"> **{_(lc, 'name')}:** {invite.guild.name}\n"
+            f"> **{_(lc, 'id')}:** {invite.guild.id}\n"
+            f"> **{_(lc, 'guild_info.about.vanity_url')}:** {invite.guild.vanity_url or _(lc, 'guild_info.about.no_vanity_url')}\n",
+        )
+
+        await interaction.response.send_message(embed=embed)
 
     @tempmute.autocomplete("duration")
     @tempban.autocomplete("duration")

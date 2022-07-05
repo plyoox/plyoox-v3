@@ -133,6 +133,9 @@ moderation:
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} gekickt (softban)."
     successfully_kicked: "Der Benutzer wurde erfolgreich gekickt (softban)."
     user_message: "Du wurdest vom Server {guild.name} für {reason} gekickt (softban)."
+  slowmode:
+    disabled: "Der Slowmode wurde deaktiviert."
+    enabled: "Der Slowmode wurde aktiviert."
 automod:
   points_added: "Punkte hinzugefügt"
   reason:

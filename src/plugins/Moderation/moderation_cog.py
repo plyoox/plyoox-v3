@@ -175,6 +175,22 @@ class Moderation(commands.Cog):
 
         await interaction.followup.send(_(lc, "moderation.softban.successfully_kicked"), ephemeral=True)
 
+    @app_commands.command(name="slowmode", description="Sets the slowmode of the current channel.")
+    @app_commands.describe(duration="How long the slowmode should be (max 6hrs).")
+    @app_commands.checks.cooldown(2, 10, key=lambda i: i.channel_id)
+    @app_commands.checks.bot_has_permissions(manage_channels=True)
+    @app_commands.default_permissions(manage_messages=True)
+    @app_commands.guild_only
+    async def slowmode(self, interaction: discord.Interaction, duration: Optional[app_commands.Range[int, 1, 21600]]):
+        lc = interaction.locale
+
+        if duration is None:
+            await interaction.channel.edit(slowmode_delay=0)
+            await interaction.response.send_message(_(lc, "moderation.slowmode.disabled"), ephemeral=True)
+        else:
+            await interaction.channel.edit(slowmode_delay=duration)
+            await interaction.response.send_message(_(lc, "moderation.slowmode.enabled"), ephemeral=True)
+
     @tempmute.autocomplete("duration")
     @tempban.autocomplete("duration")
     async def autocomplete_duration(self, interaction: discord.Interaction, current: str):

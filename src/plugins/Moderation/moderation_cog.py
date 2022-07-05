@@ -127,7 +127,7 @@ class Moderation(commands.Cog):
         reason="Why the member should be muted.",
         duration="How long the member should be muted (max 28 days).",
     )
-    @app_commands.checks.bot_has_permissions(manage_roles=True, moderate_members=True)
+    @app_commands.checks.bot_has_permissions(moderate_members=True)
     @app_commands.default_permissions(mute_members=True)
     @app_commands.guild_only
     async def tempmute(
@@ -227,6 +227,8 @@ class Moderation(commands.Cog):
     @app_commands.command(name="unmute", description="Unmutes an user.")
     @app_commands.describe(member="The member that should be unmuted.", reason="Why the member should be unmuted.")
     @app_commands.checks.bot_has_permissions(mute_members=True)
+    @app_commands.default_permissions(mute_members=True)
+    @app_commands.guild_only
     async def unmute(
         self,
         interaction: discord.Interaction,

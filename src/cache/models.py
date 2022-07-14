@@ -15,6 +15,7 @@ class WelcomeModel(RecordClass):
     join_channel: int | None
     join_role: int | None
     join_message: str | None
+    join_ignore_screening: bool
     leave_active: bool
     leave_channel: int | None
     leave_message: str | None

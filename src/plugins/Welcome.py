@@ -23,6 +23,9 @@ class Welcome(commands.Cog):
 
         # only add role if the bot has the permissions
         if cache.join_role and guild.me.guild_permissions.manage_roles:
+            if member.pending and not cache.join_ignore_screening:
+                return
+
             role = guild.get_role(cache.join_role)
 
             if role is not None:
@@ -38,8 +41,8 @@ class Welcome(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
-        cache = await self.bot.cache.get_welcome(member.id)
         guild = member.guild
+        cache = await self.bot.cache.get_welcome(guild.id)
 
         if cache is None:
             return
@@ -57,6 +60,26 @@ class Welcome(commands.Cog):
 
                 # send message and handle permission check
                 await helper.permission_check(channel, content=message)
+
+    @commands.Cog.listener()
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        if before.pending == after.pending:
+            return
+
+        guild = before.guild
+        cache = await self.bot.cache.get_welcome(guild.id)
+
+        if cache is None:
+            return
+
+        if cache.join_ignore_screening:
+            return
+
+        if cache.join_role and guild.me.guild_permissions.manage_roles:
+            role = guild.get_role(cache.join_role)
+
+            if role is not None:
+                await after.add_roles(role, reason="Adding join role")
 
 
 async def setup(bot: Plyoox):

@@ -20,6 +20,7 @@ from lib.extensions import CommandTree
 
 if TYPE_CHECKING:
     from plugins.Timers import Timer
+    from plugins.Notification import Notification
 
 logger = logging.getLogger(__name__)
 
@@ -108,3 +109,7 @@ class Plyoox(commands.Bot):
     @property
     def timer(self) -> Timer | None:
         return self.get_cog("Timer")
+
+    @property
+    def notification(self) -> Notification | None:
+        return self.get_cog("Notification")

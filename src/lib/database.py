@@ -154,9 +154,19 @@ class AutomodUsers(Base):
 class Timers(Base):
     __tablename__ = "timers"
 
-    id = _Column(pg.BIGINT, primary_key=True, autoincrement=True)
+    id = _Column(pg.INTEGER, primary_key=True, autoincrement=True)
     guild_id = _Column(pg.BIGINT, nullable=False)
     target_id = _Column(pg.BIGINT, nullable=False)
     type = _Column(pg.ENUM(TimerType), nullable=False)
     expires = _Column(pg.TIMESTAMP(timezone=True), nullable=False)
     data = _Column(pg.JSON)
+
+
+class TwitchNotifications(Base):
+    __tablename__ = "twitch_notifications"
+
+    id = _Column(pg.INTEGER, primary_key=True, autoincrement=True)
+    guild_id = _Column(pg.BIGINT, nullable=False)
+    user_id = _Column(pg.INTEGER, nullable=False)
+    channel_id = _Column(pg.BIGINT, nullable=False)
+    message = _Column(pg.VARCHAR(length=2000), nullable=False)

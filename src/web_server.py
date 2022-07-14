@@ -50,10 +50,26 @@ class CacheUpdater(BaseHandler):
         return self.set_status(200)
 
 
+class TwitchNotifier(BaseHandler):
+    async def get(self):
+        if self.request.remote_ip not in ["::1", "127.0.0.1"]:
+            return self.set_status(403)
+
+        user_id = int(self.get_arguments("user_id")[0])
+        user_name = self.get_argument("user_name")[0]
+
+        self.set_status(200)
+
+        notifications = self.bot.notification
+        if notifications is not None:
+            await notifications.send_twitch_notification(user_id, user_name)
+
+
 async def start_webserver(bot: Plyoox):
     web = tornado.web.Application(
         [
             (r"/update/cache", CacheUpdater, {"bot": bot}),
+            (r"/notification/twitch", TwitchNotifier, {"bot": bot}),
         ]
     )
 

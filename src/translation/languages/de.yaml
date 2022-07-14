@@ -200,6 +200,9 @@ logging:
   member_join:
     title: "Mitglied beigetreten"
     description: "Der User {member.name} ist dem Server beigetreten."
+  member_leave:
+    title: "Mitglied verlassen"
+    description: "Der User {member.name} hat den Server verlassen."
   member_remove:
     title: "Mitglied verlassen"
   member_ban:

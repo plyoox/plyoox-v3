@@ -97,7 +97,7 @@ class UserCommand(
         )
         embed.add_field(
             name=_(lc, "guild"),
-            value=f"> __{_(lc, 'user_info.joined_at')}:__ {utils.format_dt(current_member.joined_at)}\n"
+            value=f"> __{_(lc, 'joined_at')}:__ {utils.format_dt(current_member.joined_at)}\n"
             f"> __{_(lc, 'user_info.about.member_verification')}:__ {_(lc, current_member.pending)}\n"
             f"> __{_(lc, 'user_info.about.premium_subscriber')}:__ "
             f"{utils.format_dt(current_member.premium_since) if current_member.premium_since else _(lc, False)}",

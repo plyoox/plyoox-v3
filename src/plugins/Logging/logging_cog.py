@@ -56,11 +56,10 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_join:
             return
 
-        embed = Embed()
+        embed = Embed(description=_(lc, "logging.member_join.description", member=member))
         embed.set_author(name=_(lc, "logging.member_join.title"), icon_url=member.display_avatar)
-        embed.description = _(lc, "logging.member_join.description", member=member)
         embed.add_field(
-            name=_(lc, "logging.member_join.account_created"),
+            name=_(lc, "account_created"),
             value=helper.embed_timestamp_format(member.created_at),
         )
         embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {member.id}")
@@ -76,11 +75,11 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_join:
             return
 
-        embed = Embed()
+        embed = Embed(description=_(lc, "logging.member_leave.description", member=member))
         embed.set_author(name=_(lc, "logging.member_leave.title"), icon_url=member.display_avatar)
         embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {member.id}")
         embed.add_field(name=_(lc, "account_created"), value=helper.embed_timestamp_format(member.created_at))
-        embed.add_field(name=_(lc, "roles"), value=f"> {helper.format_roles(member.roles)}" or _(lc, "no_roles"))
+        embed.add_field(name=_(lc, "roles"), value=f"> {helper.format_roles(member.roles) or _(lc, 'no_roles')}")
         embed.add_field(name=_(lc, "joined_at"), value=helper.embed_timestamp_format(member.joined_at))
 
         await self._send_message(member.guild.id, cache, embed=embed)

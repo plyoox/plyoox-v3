@@ -7,3 +7,7 @@ class OwnerOnly(app_commands.AppCommandError):
 
 class ModuleDisabled(app_commands.AppCommandError):
     pass
+
+
+class AnilistQueryError(app_commands.AppCommandError):
+    pass

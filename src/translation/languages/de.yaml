@@ -226,3 +226,20 @@ logging:
     title: "Mitglied umbenannt"
     old_name: "Vorheriger Name"
     new_name: "Neuer Name"
+anilist:
+  rate_limit: "Das Ratelimit der API wurde erreicht. Bitte versuche es später erneut."
+  search:
+    no_result: "Kein Ergebnis gefunden."
+    title: "Ergebnisse für {query}"
+  info:
+    relations: "Verwandt mit"
+    information: "Informationen"
+    description: "Beschreibung"
+    genres: "Genres"
+    status: "Status"
+    episodes: "Episoden"
+    season: "Saison"
+    year: "Jahr"
+    country: "Herkunftsland"
+    score: "Bewertung"
+    trailer: "Trailer"

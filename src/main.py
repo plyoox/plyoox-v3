@@ -32,6 +32,7 @@ plugins = [
     "plugins.Logging",
     "plugins.Fun",
     "plugins.Timers",
+    "plugins.Anilist",
 ]
 
 

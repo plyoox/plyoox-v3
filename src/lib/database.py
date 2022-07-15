@@ -166,6 +166,15 @@ class TwitchNotifications(Base):
 
     id = _Column(pg.INTEGER, primary_key=True, autoincrement=True)
     guild_id = _Column(pg.BIGINT, nullable=False)
-    user_id = _Column(pg.INTEGER, nullable=False)
-    channel_id = _Column(pg.BIGINT, nullable=False)
-    message = _Column(pg.VARCHAR(length=2000), nullable=False)
+    user_id = _Column(pg.INTEGER, sql.ForeignKey("twitch_users.id"), nullable=False)
+    channel_id = _Column(pg.BIGINT)
+    message = _Column(pg.VARCHAR(length=2000))
+
+
+class TwitchUsers(Base):
+    __tablename__ = "twitch_users"
+
+    id = _Column(pg.INTEGER, primary_key=True)
+    username = _Column(pg.VARCHAR(length=32), nullable=False)
+    discord_id = _Column(pg.BIGINT, nullable=False)
+    avatar = _Column(pg.VARCHAR(length=128))

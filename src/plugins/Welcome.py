@@ -23,7 +23,7 @@ class Welcome(commands.Cog):
 
         # only add role if the bot has the permissions
         if cache.join_role and guild.me.guild_permissions.manage_roles:
-            if member.pending and not cache.join_ignore_screening:
+            if member.pending:
                 return
 
             role = guild.get_role(cache.join_role)
@@ -70,9 +70,6 @@ class Welcome(commands.Cog):
         cache = await self.bot.cache.get_welcome(guild.id)
 
         if cache is None:
-            return
-
-        if cache.join_ignore_screening:
             return
 
         if cache.join_role and guild.me.guild_permissions.manage_roles:

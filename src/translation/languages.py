@@ -25,7 +25,8 @@ def _flatten_dict(_dict: dict[str, str | dict]) -> dict:
 
 
 def _load_languages():
-    path = os.getcwd().replace("\\", "/") + "/translation/languages"
+    path = os.getcwd().replace("\\", "/") + "src/translation/languages"
+
     files = os.listdir(path)
 
     for file in files:

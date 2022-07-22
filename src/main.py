@@ -70,13 +70,14 @@ class Plyoox(commands.Bot):
 
         logger.info("Plugins loaded")
 
-        self.tree.copy_global_to(guild=self.test_guild)
+        if self.test_guild is not None:
+            self.tree.copy_global_to(guild=self.test_guild)
+
         if self.sync_commands:
             # Sync commands with discord
             logger.debug("Sync commands with discord...")
 
-            if self.test_guild:
-                self.tree.copy_global_to(guild=self.test_guild)
+            if self.test_guild is not None:
                 await self.tree.sync(guild=self.test_guild)
             else:
                 await self.tree.sync()

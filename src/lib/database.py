@@ -178,3 +178,10 @@ class TwitchUsers(Base):
     username = _Column(pg.VARCHAR(length=32), nullable=False)
     discord_id = _Column(pg.BIGINT, nullable=False)
     avatar = _Column(pg.VARCHAR(length=128))
+
+
+# Only base columns that are needed for the bot to function.
+class GuildConfig(Base):
+    __tablename__ = "guild_config"
+
+    id = _Column(pg.BIGINT, primary_key=True)

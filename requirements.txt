@@ -4,7 +4,7 @@ aiohttp~=3.8.1
 sqlalchemy~=1.4.36
 PyYAML~=6.0
 lru-dict
-git+https://gitlab.com/plyoox/discord.py.git#egg=discord.py
+git+https://github.com/Rapptz/discord.py.git#egg=discord.py
 recordclass~=0.17.2
 python-dateutil~=2.8.2
 tornado~=6.1

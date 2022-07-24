@@ -34,6 +34,8 @@ plugins = [
     "plugins.Fun",
     "plugins.Timers",
     "plugins.Anilist",
+    "plugins.DataHandler",
+    "plugins.Notification",
 ]
 
 

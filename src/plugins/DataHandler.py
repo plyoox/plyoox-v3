@@ -6,17 +6,13 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from .owner_commands import OwnerCommands
-
 if TYPE_CHECKING:
     from main import Plyoox
 
 
-class Owner(commands.Cog):
+class EventHandlerCog(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
-
-    owner_commands = OwnerCommands()
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
@@ -33,3 +29,7 @@ class Owner(commands.Cog):
             "INSERT INTO guild_config (id) VALUES ($1) ON CONFLICT DO NOTHING", interaction.guild_id
         )
         await interaction.response.send_message("Guild registered.", ephemeral=True)
+
+
+async def setup(bot: Plyoox):
+    await bot.add_cog(EventHandlerCog(bot))

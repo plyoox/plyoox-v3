@@ -1,21 +1,24 @@
+from __future__ import annotations
+
+import os
 import traceback
 from typing import TYPE_CHECKING
 
 import discord
 from discord import app_commands
+from discord.ext import commands
 
-from lib.checks import owner_only
 from lib.extensions import Embed
 from translation import languages
+from .owner_commands import OwnerCommands
 
 if TYPE_CHECKING:
     from main import Plyoox
 
 
-@owner_only()
-class OwnerCommands(app_commands.Group):
-    def __init__(self):
-        super().__init__(name="owner", description="Owner only commands for managing the bot.")
+class Owner(commands.GroupCog, group_name="owner", group_description="Owner only commands for managing the bot."):
+    def __init__(self, bot: Plyoox):
+        self.bot = bot
 
     plugin_group = app_commands.Group(name="plugin", description="Managing the Plugin system.")
 
@@ -69,3 +72,9 @@ class OwnerCommands(app_commands.Group):
         languages._load_languages()
 
         await interaction.response.send_message("Language files successfully reloaded.", ephemeral=True)
+
+
+async def setup(bot: Plyoox):
+    if guild_id := os.getenv("OWNER_GUILD"):
+        owner_guild = discord.Object(int(guild_id))
+        await bot.add_cog(Owner(bot), guild=owner_guild)

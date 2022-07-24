@@ -10,7 +10,6 @@ from discord.ext import commands
 
 from lib.extensions import Embed
 from translation import languages
-from .owner_commands import OwnerCommands
 
 if TYPE_CHECKING:
     from main import Plyoox

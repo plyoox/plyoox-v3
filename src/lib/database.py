@@ -166,7 +166,7 @@ class TwitchNotifications(Base):
 
     id = _Column(pg.INTEGER, primary_key=True, autoincrement=True)
     guild_id = _Column(pg.BIGINT, nullable=False)
-    user_id = _Column(pg.INTEGER, sql.ForeignKey("twitch_users.id"), nullable=False)
+    user_id = _Column(pg.INTEGER, sql.ForeignKey("twitch_users.id", ondelete="cascade"), nullable=False)
     channel_id = _Column(pg.BIGINT)
     message = _Column(pg.VARCHAR(length=2000))
 
@@ -178,6 +178,7 @@ class TwitchUsers(Base):
     username = _Column(pg.VARCHAR(length=32), nullable=False)
     discord_id = _Column(pg.BIGINT, nullable=False)
     avatar = _Column(pg.VARCHAR(length=128))
+    eventsub_id = _Column(pg.VARCHAR(length=64), nullable=False)
 
 
 # Only base columns that are needed for the bot to function.

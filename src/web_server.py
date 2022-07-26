@@ -55,8 +55,8 @@ class TwitchNotifier(BaseHandler):
         if self.request.remote_ip not in ["::1", "127.0.0.1"]:
             return self.set_status(403)
 
-        user_id = int(self.get_arguments("user_id")[0])
-        user_name = self.get_argument("user_name")[0]
+        user_id = int(self.get_argument("user_id"))
+        user_name = self.get_argument("user_name")
 
         self.set_status(200)
 

@@ -19,6 +19,9 @@ class Notification(commands.Cog):
         )
 
         for notification in notification:
+            if notification["message"] is None:
+                continue
+
             guild = self.bot.get_guild(notification["guild_id"])
             if guild is None:
                 continue
@@ -28,7 +31,9 @@ class Notification(commands.Cog):
                 await self.bot.db.execute("DELETE FROM twitch_notifications WHERE id = $1", notification["id"])
 
             if channel.permissions_for(guild.me).send_messages:
-                await channel.send(notification["message"].replace("{link}", f"https://twitch.tv/{user_name}"))
+                message = notification["message"].replace("{link}", f"https://twitch.tv/{user_name}")
+
+                await channel.send(message)
                 await asyncio.sleep(0.2)
 
 

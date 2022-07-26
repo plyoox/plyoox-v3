@@ -71,11 +71,11 @@ class Notification(commands.Cog):
                     _log.error(f"Deleting event subscription {event_sub} failed with status {res.status}.")
 
     async def send_twitch_notification(self, user_id: int, user_name: str):
-        notification = await self.bot.db.fetch(
+        notifications = await self.bot.db.fetch(
             "SELECT id, guild_id, channel_id, message FROM twitch_notifications WHERE user_id = $1", user_id
         )
 
-        for notification in notification:
+        for notification in notifications:
             if notification["message"] is None:
                 continue
 

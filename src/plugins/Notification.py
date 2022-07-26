@@ -90,7 +90,9 @@ class Notification(commands.Cog):
             if channel.permissions_for(guild.me).send_messages:
                 message = notification["message"].replace("{link}", f"https://twitch.tv/{user_name}")
 
-                await channel.send(message)
+                await channel.send(
+                    message, allowed_mentions=discord.AllowedMentions(everyone=True, roles=True, users=True)
+                )
                 await asyncio.sleep(0.2)
 
 

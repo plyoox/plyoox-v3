@@ -3,7 +3,6 @@ from typing import Optional
 
 import discord
 from discord import app_commands, Embed
-from discord.ext import commands
 
 from translation import _
 
@@ -13,11 +12,10 @@ LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
 @app_commands.guild_only
 @app_commands.default_permissions(manage_messages=True)
 @app_commands.checks.bot_has_permissions(manage_messages=True)
-class ClearCommand(
-    commands.GroupCog,
-    group_name="clear",
-    group_description="Clears messages in a channel. Specific filters can be applied.",
-):
+class ClearCommand(app_commands.Group):
+    def __init__(self):
+        super().__init__(name="clear", description="Clears messages in a channel. Specific filters can be applied.")
+
     @staticmethod
     async def do_removal(interaction: discord.Interaction, limit, *, reason, predicate):
         """This function is a helper to clear messages in an interaction channel.

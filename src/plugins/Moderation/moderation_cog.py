@@ -10,8 +10,9 @@ from lib import parsers
 from lib.enums import TimerType
 from lib.extensions import Embed
 from plugins.Moderation import _logging_helper
-from .automod import DISCORD_INVITE
 from translation import _
+from . import clear_command
+from .automod import DISCORD_INVITE
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -20,6 +21,8 @@ if TYPE_CHECKING:
 class Moderation(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
+
+    clear_group = clear_command.ClearCommand()
 
     @staticmethod
     async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:

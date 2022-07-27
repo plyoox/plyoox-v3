@@ -149,6 +149,22 @@ moderation:
     creator: "Ersteller"
     mention: "Erwähnung"
     invalid_invite: "Die angegebene Einladung ist nicht gültig."
+  massban:
+    invalid_regex: "Der angegebene reguläre Ausdruck ist nicht gültig."
+    no_users_found: "Keine Benutzer gefunden, die diesen Kriterien entsprechen."
+    ban_users: "{member_count} Benutzer werden gebannt..."
+    ban_failed: "Beim Bannen der Benutzer sind zu viele Fehler aufgetreten. Es wurden {member_count} benutzer gebannt."
+    ban_success: "Es wurden erfolgreich {member_count} Benutzer gebannt."
+    cancel_ban: "Der Massbann wurde erfolgreich abgebrochen."
+    ban_button_label: "Bannen"
+    close_button_label: "Abbrechen"
+    view_member_button_label: "Mitglieder anzeigen"
+    close_view_members_button_label: "Zurück"
+    next_member_button_label: "Nächste Seite"
+    last_member_button_label: "Vorherige Seite"
+    view_member_title: "Liste der Mitglieder"
+    page: "Seite"
+    overview_description: "Bitte bestätige die Auswahl der Benutzer, die gebannt werden sollen."
 automod:
   points_added: "Punkte hinzugefügt"
   reason:

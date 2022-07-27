@@ -13,6 +13,8 @@ from plugins.Moderation import _logging_helper
 from .automod import DISCORD_INVITE
 from translation import _
 
+from . import massban_group
+
 if TYPE_CHECKING:
     from main import Plyoox
 
@@ -20,6 +22,8 @@ if TYPE_CHECKING:
 class Moderation(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
+
+    massban_group = massban_group.Massban()
 
     @staticmethod
     async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:

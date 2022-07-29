@@ -8,6 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from lib.checks import owner_only
 from lib.extensions import Embed
 from translation import languages
 
@@ -15,6 +16,7 @@ if TYPE_CHECKING:
     from main import Plyoox
 
 
+@owner_only()
 class Owner(commands.GroupCog, group_name="owner", group_description="Owner only commands for managing the bot."):
     def __init__(self, bot: Plyoox):
         self.bot = bot

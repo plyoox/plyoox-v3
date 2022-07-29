@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import io
 from typing import Optional, TYPE_CHECKING
 
 import discord
+from PIL import Image, ImageDraw, ImageChops
 from discord import app_commands, Interaction
 from discord.ext import commands
+from easy_pil import Editor, Font
 
 from lib import checks, helper
 from lib.colors import DISCORD_DEFAULT
@@ -17,6 +20,16 @@ if TYPE_CHECKING:
     from main import Plyoox
 
 
+def _crop_to_circle(avatar: Image):
+    big_size = (128 * 3, 128 * 3)
+
+    mask = Image.new("L", big_size, 0)
+    ImageDraw.Draw(mask).ellipse((0, 0) + big_size, fill=255)
+    mask = mask.resize((128, 128))
+    mask = ImageChops.darker(mask, avatar.split()[-1])
+    avatar.putalpha(mask)
+
+
 @app_commands.default_permissions()
 @app_commands.guild_only
 class LevelCommand(
@@ -24,8 +37,46 @@ class LevelCommand(
     group_name="level",
     group_description="Commands that are needed to interact with the level-system.",
 ):
+    BACKGROUND = Image.open("./src/assets/level_card.png")
+    FONT = Font.poppins(size=24)
+    FONT_sm = Font.poppins(size=18)
+    FONT_xs = Font.poppins(size=16)
+
     def __init__(self, bot: Plyoox):
         self.db = bot.db
+
+    @staticmethod
+    def _generate_image(username: str, avatar: Image, level: int, current_xp: int, needed_xp: int) -> Image:
+        background = Editor(LevelCommand.BACKGROUND.copy())
+
+        _crop_to_circle(avatar)
+
+        percentage = min(current_xp / needed_xp, 1)
+
+        background.paste(avatar, (30, 36))
+        background.rectangle((190, 100), width=int(250 * percentage), height=19, fill="#24C689", radius=10)
+        background.text((190, 70), username, font=LevelCommand.FONT, color="white")
+        background.text((190, 130), f"Level", font=LevelCommand.FONT_sm, color="#dedede")
+        background.text((290, 130), f"XP", font=LevelCommand.FONT_sm, color="#dedede")
+        background.text((190, 150), f"{level}", font=LevelCommand.FONT_xs, color="gray")
+        background.text((290, 150), f"{current_xp}/{needed_xp}", font=LevelCommand.FONT_xs, color="gray")
+
+        buffer = io.BytesIO()
+        background.image.save(buffer, format="PNG")
+        buffer.seek(0)
+
+        return discord.File(buffer, filename=f"{username.split('#')[0]}.png")
+
+    @staticmethod
+    async def _create_level_image(
+        bot: Plyoox, member: discord.Member, level: int, current_xp: int, needed_xp: int
+    ) -> discord.File:
+        avatar_image_raw = await member.display_avatar.with_size(128).read()
+        avatar_image = Image.open(io.BytesIO(avatar_image_raw))
+
+        return await bot.loop.run_in_executor(
+            None, LevelCommand._generate_image, str(member), avatar_image, level, current_xp, needed_xp
+        )
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         return await checks.module_enabled_check(interaction, PlyooxModule.Leveling)
@@ -38,7 +89,6 @@ class LevelCommand(
         """
         guild = interaction.guild
         current_member = member or interaction.user
-        lc = interaction.locale
 
         user_data: LevelUserData = await self.db.fetchrow(
             "SELECT * FROM leveling_users WHERE guild_id = $1 AND user_id = $2",
@@ -53,12 +103,11 @@ class LevelCommand(
         current_level, remaining_xp = get_level_from_xp(user_data["xp"])
         required_xp = get_level_xp(current_level)
 
-        embed = discord.Embed(color=DISCORD_DEFAULT)
-        embed.set_author(name=str(current_member), icon_url=current_member.avatar)
-        embed.add_field(name=_(lc, "level.rank.level"), value=f"> {current_level}", inline=False)
-        embed.add_field(name=_(lc, "level.rank.xp"), value=f"> {remaining_xp}/{required_xp}", inline=False)
+        image = await self._create_level_image(
+            interaction.client, current_member, current_level, remaining_xp, required_xp  # type: ignore
+        )
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(file=image)
 
     @app_commands.command(name="show-roles", description="Shows the available level roles.")
     async def show_roles(self, interaction: discord.Interaction):

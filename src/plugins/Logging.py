@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 import logging
 from typing import TYPE_CHECKING
 
@@ -34,12 +35,13 @@ class LoggingEvents(commands.Cog):
         cache: LoggingModel,
         *,
         embed: Embed = utils.MISSING,
+        file: discord.File = None,
         embeds: list[Embed] = utils.MISSING,
     ):
         webhook = discord.Webhook.partial(cache.webhook_id, cache.webhook_token, session=self.bot.session)
 
         try:
-            await webhook.send(embed=embed, embeds=embeds)
+            await webhook.send(embed=embed, embeds=embeds, file=file)
         except discord.NotFound:
             await self.bot.db.execute(
                 "UPDATE logging SET webhook_id = NULL, webhook_token = NULL WHERE id = $1", guild_id
@@ -286,7 +288,46 @@ class LoggingEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent):
-        pass
+        guild = self.bot.get_guild(payload.guild_id)
+        if guild is None:
+            logger.warning(f"Could not find guild with id {payload.guild_id}")
+            return
+
+        cache = await self._get_cache(guild.id)
+        if cache is None or not cache.message_delete:
+            return
+
+        # do not log messages deleted from the logging channel
+        # this prevents a logging loop
+        if cache.webhook_channel == payload.channel_id:
+            return
+
+        lc = guild.preferred_locale
+
+        embed = Embed(
+            title=_(lc, "logging.bulk_delete.title"),
+            description=_(
+                lc,
+                "logging.bulk_delete.description",
+                count=len(payload.message_ids),
+                channel=f"<#{payload.channel_id}>",
+            ),
+        )
+        file = discord.utils.MISSING
+
+        if len(payload.cached_messages):
+            messages = [
+                f"{msg.author} ({msg.author.id}):\t\t{msg.content}" for msg in payload.cached_messages if msg.content
+            ]
+
+            if len(messages) > 0:
+                _file = io.BytesIO()
+                _file.write("\n".join([msg for msg in messages]).encode("utf-8"))
+                _file.seek(0)
+
+                file = discord.File(_file, filename="deleted_messages.txt")
+
+        await self._send_message(guild.id, cache, embed=embed, file=file)
 
 
 async def setup(bot: Plyoox):

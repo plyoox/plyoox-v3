@@ -245,6 +245,9 @@ logging:
     title: "Mitglied umbenannt"
     old_name: "Vorheriger Name"
     new_name: "Neuer Name"
+  bulk_delete:
+    title: "Nachrichten gelöscht"
+    description: "Es wurden {count} Nachrichten aus {channel} gelöscht."
 anilist:
   rate_limit: "Das Ratelimit der API wurde erreicht. Bitte versuche es später erneut."
   search:

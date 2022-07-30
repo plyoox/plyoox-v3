@@ -1,11 +1,7 @@
 from __future__ import annotations
 
-import datetime
-import re
-from typing import Union, Optional
-
 import discord
-from discord import app_commands, ui
+from discord import ui
 
 from lib import emojis
 from lib.extensions import Embed

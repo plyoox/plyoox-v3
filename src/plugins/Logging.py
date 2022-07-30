@@ -167,7 +167,7 @@ class LoggingEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent):
-        if payload.data["author"]["bot"]:
+        if payload.data.get("author") is None or payload.data["author"]["bot"]:
             return  # ignore bots due to interaction edits
 
         guild = self.bot.get_guild(payload.guild_id)

@@ -78,6 +78,12 @@ query ($id: Int, $type: MediaType, $isAdult: Boolean = false, $search: String, $
           siteUrl
         }
       }
+      stats {
+        scoreDistribution {
+          score
+          amount
+      	}
+      }
     }
   }
 }

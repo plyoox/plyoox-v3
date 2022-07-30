@@ -126,7 +126,7 @@ class BackMemberButton(ui.Button):
 class CloseMemberViewButton(ui.Button):
     def __init__(self, view: MassbanView, locale: discord.Locale):
         super().__init__(
-            label=_(locale, "moderation.massban.close_view_members_button_label"),
+            label=_(locale, "back"),
             style=discord.ButtonStyle.gray,
             emoji=emojis.chevron_left,
         )

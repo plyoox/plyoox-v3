@@ -12,7 +12,7 @@ from lib.errors import AnilistQueryError
 from lib.extensions import Embed
 from lib.types.anilist import AnilistSearchResponse, _AnilistTitle, AnilistDetailedResponse
 from translation import _
-from . import queries
+from . import queries, _views
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -170,4 +170,6 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
             await interaction.followup.send(_(interaction.locale, "anilist.search.no_result"))
             return
 
-        await interaction.followup.send(embed=self._generate_info_embed(interaction=interaction, data=data[0]))
+        embed = self._generate_info_embed(interaction=interaction, data=data[0])
+
+        await interaction.followup.send(embed=embed, view=_views.AnilistInfoView(data[0], embed, interaction.locale))

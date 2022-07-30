@@ -19,6 +19,7 @@ joined_at: "Beigetreten am"
 message: "Nachricht"
 executed_at: "Ausgeführt am"
 punished_until: "Bestraft bis"
+back: "Zurück"
 times:
   hour: "Stunde"
   hours: "Stunden"
@@ -159,7 +160,6 @@ moderation:
     ban_button_label: "Bannen"
     close_button_label: "Abbrechen"
     view_member_button_label: "Mitglieder anzeigen"
-    close_view_members_button_label: "Zurück"
     next_member_button_label: "Nächste Seite"
     last_member_button_label: "Vorherige Seite"
     view_member_title: "Liste der Mitglieder"
@@ -265,3 +265,6 @@ anilist:
     country: "Herkunftsland"
     score: "Bewertung"
     trailer: "Trailer"
+  view:
+    score_button: "Bewertung anzeigen"
+    score_title: "Bewertung-Statistik"

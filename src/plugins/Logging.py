@@ -287,3 +287,7 @@ class LoggingEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent):
         pass
+
+
+async def setup(bot: Plyoox):
+    await bot.add_cog(LoggingEvents(bot))

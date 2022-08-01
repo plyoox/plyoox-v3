@@ -28,8 +28,6 @@ def _crop_to_circle(avatar: Image):
     avatar.putalpha(mask)
 
 
-@app_commands.default_permissions()
-@app_commands.guild_only
 @checks.module_active(PlyooxModule.Leveling)
 class LevelGroup(app_commands.Group):
     BACKGROUND = Image.open("./src/assets/level_card.png")
@@ -37,10 +35,13 @@ class LevelGroup(app_commands.Group):
     FONT_sm = easy_pil.Font.poppins(size=18)
     FONT_xs = easy_pil.Font.poppins(size=16)
 
-    def __init__(self, bot: Plyoox):
-        super().__init__(name="level", description="Commands that are needed to interact with the level-system.")
-
-        self.db = bot.db
+    def __init__(self):
+        super().__init__(
+            name="level",
+            description="Commands that are needed to interact with the level-system.",
+            guild_only=True,
+            default_permissions=discord.Permissions(),
+        )
 
     @staticmethod
     def _generate_image(username: str, avatar: Image, level: int, current_xp: int, needed_xp: int) -> Image:
@@ -83,8 +84,9 @@ class LevelGroup(app_commands.Group):
         """
         guild = interaction.guild
         current_member = member or interaction.user
+        bot: Plyoox = interaction.client  # type: ignore
 
-        user_data: LevelUserData = await self.db.fetchrow(
+        user_data: LevelUserData = await bot.db.fetchrow(
             "SELECT * FROM leveling_users WHERE guild_id = $1 AND user_id = $2",
             guild.id,
             current_member.id,
@@ -108,8 +110,9 @@ class LevelGroup(app_commands.Group):
         """Shows the roles that are gain able through the level system"""
         lc = interaction.locale
         guild = interaction.guild
+        bot: Plyoox = interaction.client  # type: ignore
 
-        level_roles: list[list[int, int]] = await self.db.fetchval("SELECT roles FROM leveling WHERE id = $1", guild.id)
+        level_roles: list[list[int, int]] = await bot.db.fetchval("SELECT roles FROM leveling WHERE id = $1", guild.id)
         if not level_roles:
             await helper.interaction_send(interaction, "level.level_roles.no_roles")
             return
@@ -130,11 +133,12 @@ class LevelGroup(app_commands.Group):
     async def top(self, interaction: discord.Interaction):
         lc = interaction.locale
         guild = interaction.guild
+        bot: Plyoox = interaction.client  # type: ignore
 
         top_users = []
 
         while len(top_users) != 10:
-            level_users = await self.db.fetch(
+            level_users = await bot.db.fetch(
                 "SELECT user_id, xp FROM leveling_users WHERE guild_id = $1 ORDER BY xp DESC LIMIT 15", guild.id
             )
 

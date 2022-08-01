@@ -70,7 +70,12 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
             return
 
         await interaction.followup.send(
-            embed=_helper.generate_search_embed(query=query, data=data, interaction=interaction, title=title.lower())
+            embed=_helper.generate_search_embed(
+                query=query,
+                data=data,
+                interaction=interaction,
+                title=title.lower(),  # type: ignore  # This is a bug in pycharm type checker
+            )
         )
 
     @app_commands.command(name="info", description="Get information about an anime on Anilist.")

@@ -11,3 +11,4 @@ tornado~=6.1
 aiolimiter
 uvloop~=0.16.0
 Pillow~=9.2.0
+easy_pil~=0.1.9

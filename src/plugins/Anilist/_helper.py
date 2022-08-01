@@ -1,14 +1,23 @@
+from __future__ import annotations
+
 import io
-from typing import Literal
+import logging
+from typing import Literal, TYPE_CHECKING
 
 import discord
 import easy_pil
 from PIL import Image
 
-from lib import types
 from lib.extensions import Embed
-from lib.types.anilist import _AnilistTitle, AnilistSearchResponse, AnilistDetailedResponse
+from . import queries
 from translation import _
+
+if TYPE_CHECKING:
+    from main import Plyoox
+    from plugins.Anilist._views import AnilistSearchView
+    from lib.types.anilist import _AnilistTitle, AnilistSearchResponse, AnilistDetailedResponse, AnilistScore
+
+_log = logging.getLogger(__name__)
 
 POPPINS_md = easy_pil.Font.poppins(size=18)
 POPPINS_xs = easy_pil.Font.poppins(size=14)
@@ -57,12 +66,11 @@ def generate_search_embed(
     *,
     query: str,
     data: list[AnilistSearchResponse],
-    interaction: discord.Interaction,
+    locale: discord.Locale,
     title: Literal["romaji", "english", "native"],
 ) -> discord.Embed:
     """Generates an embed from Anilist data"""
-    lc = interaction.locale
-    embed = Embed(title=_(lc, "anilist.search.title", query=query))
+    embed = Embed(title=_(locale, "anilist.search.title", query=query))
 
     for item in data:
         embed.add_field(name=get_title(item["title"], title), value=to_description(item["description"]))
@@ -72,6 +80,32 @@ def generate_search_embed(
             return embed
 
     return embed
+
+
+async def paginate_search(interaction: discord.Interaction, view: AnilistSearchView) -> None:
+    bot: Plyoox = interaction.client  # type: ignore
+    if bot.anilist is None:
+        await interaction.response.send_message(_(interaction.locale, "anilist.cog_not_loaded"))
+        _log.warning("Anilist cog not loaded")
+        return
+
+    await interaction.response.defer()
+
+    data = await bot.anilist._fetch_query(query=queries.SEARCH_QUERY, page=view.current_page, search=view.query)
+
+    if not data:
+        await interaction.followup.send(_(interaction.locale, "anilist.search.no_result"))
+        return
+
+    embed = generate_search_embed(
+        query=view.query,
+        data=data["media"],
+        locale=interaction.locale,
+        title=view.title_language,  # type: ignore
+    )
+    view._update_buttons(has_next_page=data["pageInfo"]["hasNextPage"])
+
+    await interaction.followup.send(embed=embed, view=view)
 
 
 def generate_info_embed(data: AnilistDetailedResponse, lc: discord.Locale) -> discord.Embed:
@@ -108,7 +142,7 @@ def generate_info_embed(data: AnilistDetailedResponse, lc: discord.Locale) -> di
     return embed
 
 
-def generate_score_image(scores: list[types.AnilistScore]) -> discord.File:
+def generate_score_image(scores: list[AnilistScore]) -> discord.File:
     bg_image = Image.new("RGB", (525, 200), "#18181b")
     background = easy_pil.Editor(bg_image)
 

@@ -28,11 +28,11 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
         await asyncio.sleep(seconds)
         self.limit_lock = False
 
-    async def _fetch_query(self, query: str, search: str) -> list:
+    async def _fetch_query(self, query: str, search: str, page: int = 1) -> dict:
         """Fetches data from Anilist"""
 
         async with self.limiter:
-            variables = {"sort": "POPULARITY_DESC", "type": "ANIME", "search": search}
+            variables = {"sort": "POPULARITY_DESC", "type": "ANIME", "search": search, "page": page}
             data = {"query": query, "variables": variables}
 
             async with self.bot.session.post(self.url, json=data) as resp:
@@ -46,7 +46,7 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
 
                 data = await resp.json()
 
-                return data["data"]["Page"]["media"]
+                return data["data"]["Page"]
 
     @app_commands.command(name="search", description="Search for an anime on Anilist.")
     @app_commands.describe(
@@ -63,19 +63,24 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
             return
 
         await interaction.response.defer()
-        data = await self._fetch_query(queries.SEARCH_QUERY, query)
+        response = await self._fetch_query(queries.SEARCH_QUERY, query)
+        data = response["media"]
 
-        if data is None:
-            await interaction.followup.send(_(interaction.locale, "anilist.search.no_result"))
+        if not data:
+            await interaction.followup.send(_(interaction.locale, "anilist.search.no_result"), ephemeral=True)
             return
 
+        view = _views.AnilistSearchView(interaction, query, title.lower())
+        view._update_buttons(has_next_page=response["pageInfo"]["hasNextPage"])
+
         await interaction.followup.send(
+            view=view,
             embed=_helper.generate_search_embed(
                 query=query,
                 data=data,
-                interaction=interaction,
-                title=title.lower(),  # type: ignore  # This is a bug in pycharm type checker
-            )
+                locale=interaction.locale,
+                title=title.lower(),  # type: ignore
+            ),
         )
 
     @app_commands.command(name="info", description="Get information about an anime on Anilist.")
@@ -86,9 +91,10 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
             return
 
         await interaction.response.defer()
-        data = await self._fetch_query(queries.INFO_QUERY, query)
+        response = await self._fetch_query(queries.INFO_QUERY, query)
+        data = response["media"]
 
-        if data is None:
+        if not data:
             await interaction.followup.send(_(interaction.locale, "anilist.search.no_result"))
             return
 

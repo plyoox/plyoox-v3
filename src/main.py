@@ -21,6 +21,7 @@ from lib.extensions import CommandTree
 if TYPE_CHECKING:
     from plugins.Timers import Timer
     from plugins.Notification import Notification
+    from plugins.Anilist import Anilist
 
 logger = logging.getLogger(__name__)
 
@@ -125,3 +126,7 @@ class Plyoox(commands.Bot):
     @property
     def notification(self) -> Notification | None:
         return self.get_cog("Notification")
+
+    @property
+    def anilist(self) -> Anilist | None:
+        return self.get_cog("Anilist")

@@ -20,6 +20,8 @@ message: "Nachricht"
 executed_at: "Ausgeführt am"
 punished_until: "Bestraft bis"
 back: "Zurück"
+next_site: "Nächste Seite"
+previous_site: "Vorherige Seite"
 times:
   hour: "Stunde"
   hours: "Stunden"
@@ -160,8 +162,6 @@ moderation:
     ban_button_label: "Bannen"
     close_button_label: "Abbrechen"
     view_member_button_label: "Mitglieder anzeigen"
-    next_member_button_label: "Nächste Seite"
-    last_member_button_label: "Vorherige Seite"
     view_member_title: "Liste der Mitglieder"
     page: "Seite"
     overview_description: "Bitte bestätige die Auswahl der Benutzer, die gebannt werden sollen."
@@ -250,6 +250,7 @@ logging:
     description: "Es wurden {count} Nachrichten aus {channel} gelöscht."
 anilist:
   score: "Bewertung"
+  cog_not_loaded: "Ein interner Fehler ist aufgetreten (Plugin nicht geladen)."
   rate_limit: "Das Ratelimit der API wurde erreicht. Bitte versuche es später erneut."
   search:
     no_result: "Kein Ergebnis gefunden."

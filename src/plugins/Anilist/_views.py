@@ -14,6 +14,53 @@ if TYPE_CHECKING:
     from main import Plyoox
 
 
+class SiteBackButton(ui.Button):
+    def __init__(self, view: AnilistSearchView, locale: discord.Locale, disabled: bool = False):
+        super().__init__(
+            label=_(locale, "previous_site"),
+            style=discord.ButtonStyle.green,
+            emoji=emojis.chevron_left,
+            disabled=disabled,
+        )
+
+        self.search_view = view
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        self.search_view.current_page -= 1
+        await _helper.paginate_search(interaction, self.search_view)
+
+
+class SiteNextButton(ui.Button):
+    def __init__(self, view: AnilistSearchView, locale: discord.Locale, disabled: bool = False):
+        super().__init__(
+            label=_(locale, "next_site"), style=discord.ButtonStyle.green, emoji=emojis.chevron_right, disabled=disabled
+        )
+
+        self.search_view = view
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        self.search_view.current_page += 1
+        await _helper.paginate_search(interaction, self.search_view)
+
+
+class AnilistSearchView(PrivateView):
+    def __init__(self, interaction: discord.Interaction, query: str, title: str):
+        super().__init__(interaction)
+
+        self._back_button = SiteBackButton(self, interaction.locale, disabled=True)
+        self._next_button = SiteNextButton(self, interaction.locale)
+
+        self.current_page = 1
+        self.add_item(self._back_button)
+        self.add_item(self._next_button)
+        self.query = query
+        self.title_language = title
+
+    def _update_buttons(self, *, has_next_page: bool):
+        self._back_button.disabled = self.current_page <= 1
+        self._next_button.disabled = not has_next_page
+
+
 class BackButton(ui.Button):
     def __init__(self, view: AnilistInfoView, *, locale: discord.Locale):
         super().__init__(

@@ -268,3 +268,5 @@ anilist:
   view:
     score_button: "Bewertung anzeigen"
     score_title: "Bewertung-Statistik"
+views:
+  creator_only: "Diese Aktion kann nur der Ersteller verwenden."

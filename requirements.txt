@@ -10,5 +10,5 @@ python-dateutil~=2.8.2
 tornado~=6.1
 aiolimiter
 uvloop~=0.16.0
-Pillow~=9.2.0
+Pillow
 easy-pil~=0.1.9

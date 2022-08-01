@@ -8,7 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from lib.errors import AnilistQueryError
+from lib import errors
 from translation import _
 from . import queries, _views, _helper
 
@@ -39,10 +39,10 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
                 if retry_after := resp.headers.get("Retry-After"):
                     self.limit_lock = True
                     self.bot.loop.create_task(self.__reset_limit(int(retry_after)))
-                    raise AnilistQueryError("Rate limit exceeded")
+                    raise errors.AnilistQueryError("Rate limit exceeded")
 
                 if resp.status != 200:
-                    raise AnilistQueryError(f"Anilist returned status code {resp.status}")
+                    raise errors.AnilistQueryError(f"Anilist returned status code {resp.status}")
 
                 data = await resp.json()
 

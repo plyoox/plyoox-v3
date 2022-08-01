@@ -2,19 +2,19 @@ from __future__ import annotations
 
 import discord
 from discord import app_commands
-from discord.ext import commands
 
-from lib.extensions import Embed
-from lib.helper import format_roles
+from lib import helper, extensions
 from translation import _
 
 
-@app_commands.guild_only
-class GuildCommand(
-    commands.GroupCog,
-    group_name="guild-info",
-    group_description="Provides information about a guild or guild specific information.",
-):
+class GuildGroup(app_commands.Group):
+    def __init__(self):
+        super().__init__(
+            name="guild-info",
+            description="Provides information about a guild or guild specific information.",
+            guild_only=True,
+        )
+
     @app_commands.command(
         name="about",
         description="Displays general information about the current guild.",
@@ -25,7 +25,7 @@ class GuildCommand(
         guild = interaction.guild
         roles = guild.roles
 
-        embed = Embed(title=_(lc, "guild_info.about.title"))
+        embed = extensions.Embed(title=_(lc, "guild_info.about.title"))
         embed.set_thumbnail(url=guild.icon)
         embed.add_field(
             name=_(lc, "guild_info.about.general_information"),
@@ -36,7 +36,7 @@ class GuildCommand(
         )
         embed.add_field(name=_(lc, "guild_info.about.members"), value=f"> {str(guild.member_count)}")
 
-        embed.add_field(name=_(lc, "roles"), value=f"> {format_roles(roles) or _(lc, 'no_roles')}")
+        embed.add_field(name=_(lc, "roles"), value=f"> {helper.format_roles(roles) or _(lc, 'no_roles')}")
         embed.add_field(
             name=_(lc, "guild_info.about.more_infos"),
             value=f"> __{_(lc, 'guild_info.about.premium_level')}:__ {guild.premium_tier} ({guild.premium_subscription_count})\n"
@@ -69,7 +69,7 @@ class GuildCommand(
             if (discord.utils.utcnow() - member.joined_at).total_seconds() <= 86400:
                 joined += 1
 
-        embed = Embed(description=_(lc, "guild_info.today_joined", members=joined))
+        embed = extensions.Embed(description=_(lc, "guild_info.today_joined", members=joined))
 
         await interaction.response.send_message(embed=embed)
 
@@ -79,6 +79,6 @@ class GuildCommand(
         guild = interaction.guild
         lc = interaction.locale
 
-        embed = Embed(description=_(lc, "guild_info.members", members=guild.member_count))
+        embed = extensions.Embed(description=_(lc, "guild_info.members", members=guild.member_count))
 
         await interaction.response.send_message(embed=embed)

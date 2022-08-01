@@ -8,15 +8,14 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from lib.checks import owner_only
-from lib.extensions import Embed
+from lib import checks, extensions
 from translation import languages
 
 if TYPE_CHECKING:
     from main import Plyoox
 
 
-@owner_only()
+@checks.owner_only()
 class Owner(commands.GroupCog, group_name="owner", group_description="Owner only commands for managing the bot."):
     def __init__(self, bot: Plyoox):
         self.bot = bot
@@ -33,7 +32,7 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
         try:
             await bot.load_extension(plugin)
         except Exception:
-            embed = Embed(description=f"```py\n{traceback.format_exc()}```")
+            embed = extensions.Embed(description=f"```py\n{traceback.format_exc()}```")
             await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message("Plugin successfully loaded.", ephemeral=True)
@@ -48,7 +47,7 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
         try:
             await bot.unload_extension(plugin)
         except Exception:
-            embed = Embed(description=f"```py\n{traceback.format_exc()}```")
+            embed = extensions.Embed(description=f"```py\n{traceback.format_exc()}```")
             await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message("Plugin successfully unloaded.", ephemeral=True)
@@ -63,7 +62,7 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
         try:
             await bot.reload_extension(plugin)
         except Exception:
-            embed = Embed(description=f"```py\n{traceback.format_exc()}```")
+            embed = extensions.Embed(description=f"```py\n{traceback.format_exc()}```")
             await interaction.response.send_message(embed=embed)
         else:
             await interaction.response.send_message("Plugin successfully reloaded.", ephemeral=True)

@@ -2,21 +2,25 @@ import discord
 from discord import app_commands, utils, ui
 from discord.ext import commands
 
-from lib.extensions import Embed
+from lib import extensions
 from main import Plyoox
 from translation import _
+from . import guild_group, user_group
 
 
 class Infos(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
+    guild_commands = guild_group.GuildGroup()
+    user_commands = user_group.UserGroup()
+
     @app_commands.command(name="bot", description="Shows information about the bot")
     async def bot(self, interaction: discord.Interaction):
         """Shows basic information about the bot."""
         lc = interaction.locale
 
-        embed = Embed(title=_(lc, "infos.bot.title"))
+        embed = extensions.Embed(title=_(lc, "infos.bot.title"))
         embed.add_field(name=_(lc, "infos.bot.coder"), value=f"> JohannesIBK#9220")
         embed.add_field(name=_(lc, "infos.bot.additional_coders"), value=f"> X Gamer Guide#1866")
         embed.add_field(name=_(lc, "infos.bot.guild_count"), value=f"> {len(self.bot.guilds)}")

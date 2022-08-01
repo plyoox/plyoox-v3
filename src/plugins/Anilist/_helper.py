@@ -8,13 +8,13 @@ import discord
 import easy_pil
 from PIL import Image
 
-from lib.extensions import Embed
+from lib import extensions
 from . import queries
 from translation import _
 
 if TYPE_CHECKING:
     from main import Plyoox
-    from plugins.Anilist._views import AnilistSearchView
+    from . import _views
     from lib.types.anilist import _AnilistTitle, AnilistSearchResponse, AnilistDetailedResponse, AnilistScore
 
 _log = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ def generate_search_embed(
     title: Literal["romaji", "english", "native"],
 ) -> discord.Embed:
     """Generates an embed from Anilist data"""
-    embed = Embed(title=_(locale, "anilist.search.title", query=query))
+    embed = extensions.Embed(title=_(locale, "anilist.search.title", query=query))
 
     for item in data:
         embed.add_field(name=get_title(item["title"], title), value=to_description(item["description"]))
@@ -82,7 +82,7 @@ def generate_search_embed(
     return embed
 
 
-async def paginate_search(interaction: discord.Interaction, view: AnilistSearchView) -> None:
+async def paginate_search(interaction: discord.Interaction, view: _views.AnilistSearchView) -> None:
     bot: Plyoox = interaction.client  # type: ignore
     if bot.anilist is None:
         await interaction.response.send_message(_(interaction.locale, "anilist.cog_not_loaded"))
@@ -113,7 +113,7 @@ def generate_info_embed(data: AnilistDetailedResponse, lc: discord.Locale) -> di
     if data["title"]["english"]:
         title += f" ({data['title']['english']})"
 
-    embed = Embed(color=discord.Color.from_str(data["coverImage"]["color"]))
+    embed = extensions.Embed(color=discord.Color.from_str(data["coverImage"]["color"]))
     embed.set_author(name=title, url=data["siteUrl"])
     embed.set_thumbnail(url=data["coverImage"]["large"])
     embed.set_image(url=data["bannerImage"])

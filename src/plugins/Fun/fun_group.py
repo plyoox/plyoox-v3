@@ -8,7 +8,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from lib.extensions import Embed
+from lib import extensions
 from translation import _
 
 if TYPE_CHECKING:
@@ -39,7 +39,9 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
         green = color >> 8 & 0xFF
         blue = color & 0xFF
 
-        embed = Embed(description=_(lc, "fun.color", rgb=f"{red}, {green}, {blue}", hex=f"#{color:06X}"), color=color)
+        embed = extensions.Embed(
+            description=_(lc, "fun.color", rgb=f"{red}, {green}, {blue}", hex=f"#{color:06X}"), color=color
+        )
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="slot", description="Rolls a slot machine.")
@@ -47,14 +49,14 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
         lc = interaction.locale
 
         result = []
-        embed = Embed(description=" ".join(result))
+        embed = extensions.Embed(description=" ".join(result))
 
         for i in range(3):
             result[i] = random.choice(
                 (":cherries:", ":strawberry:", ":grapes:", ":pineapple:", ":tangerine:")
             )  # 0.8% probability of winning
 
-            embed = Embed(description=" ".join(result))
+            embed = extensions.Embed(description=" ".join(result))
 
         if len(set(result)) == 1:
             embed.description += "\n\n" + _(lc, "fun.slot.win")
@@ -78,7 +80,7 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
             return
 
         percent = random.randint(0, 100)
-        embed = Embed(
+        embed = extensions.Embed(
             title=f"{user1.name} :heart: {user2.name}", description=f"**`{('█' * (percent // 10)):10}` {percent}%**"
         )
         await interaction.response.send_message(embed=embed)

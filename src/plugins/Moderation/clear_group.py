@@ -2,19 +2,21 @@ import re
 from typing import Optional
 
 import discord
-from discord import app_commands, Embed
+from discord import app_commands
 
+from lib import extensions
 from translation import _
 
 LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
 
 
-@app_commands.guild_only
 @app_commands.default_permissions(manage_messages=True)
 @app_commands.checks.bot_has_permissions(manage_messages=True)
-class ClearCommand(app_commands.Group):
+class ClearGroup(app_commands.Group):
     def __init__(self):
-        super().__init__(name="clear", description="Clears messages in a channel. Specific filters can be applied.")
+        super().__init__(
+            name="clear", description="Clears messages in a channel. Specific filters can be applied.", guild_only=True
+        )
 
     @staticmethod
     async def do_removal(interaction: discord.Interaction, limit, *, reason, predicate):
@@ -28,7 +30,7 @@ class ClearCommand(app_commands.Group):
         deleted_count = len(deleted_messages)
         affected_users = set(m.author.id for m in deleted_messages)  # list of affected users
 
-        embed = Embed(title=_(lc, "moderation.clear.success_title"))
+        embed = extensions.Embed(title=_(lc, "moderation.clear.success_title"))
         embed.title = _(lc, "moderation.clear.success_title")
 
         embed.add_field(name=_(lc, "moderation.clear.deleted_messages"), value=f"> {deleted_count}/{limit}")

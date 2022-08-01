@@ -10,13 +10,13 @@ from discord import utils
 from discord.ext import commands
 
 from lib.enums import AutomodAction, AutomodChecks, MentionSettings, TimerType
-from lib.types import AutomodExecutionReason
 from translation import _
 from . import _logging_helper as _logging
 
 if TYPE_CHECKING:
     from main import Plyoox
     from cache.models import AutomodExecutionModel, ModerationModel
+    from lib.types import AutomodExecutionReason
 
 _log = logging.getLogger("Automod")
 

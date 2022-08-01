@@ -7,11 +7,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from lib.extensions import Embed
-from lib.formatting import LevelFormatObject, format_leveling_message
-from lib.helper import permission_check
+from lib import formatting, helper, extensions
 from translation import _
-from ._helper import get_level_from_xp
+from . import _helper, level_group
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -22,6 +20,8 @@ class Leveling(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
         self._cooldown_by_user = commands.CooldownMapping.from_cooldown(1, 60, commands.BucketType.member)
+
+    level_commands = level_group.LevelGroup()
 
     async def _fetch_member_data(self, member: discord.Member) -> LevelUserData:
         """Fetches the leveling data of a member."""
@@ -83,8 +83,8 @@ class Leveling(commands.Cog):
 
         await self._update_member_data(member_data["id"], message_xp)
 
-        before_level = get_level_from_xp(member_data["xp"])[0]  # level with the current xp
-        after_level = get_level_from_xp(member_data["xp"] + message_xp)[0]  # level with the added xp
+        before_level = _helper.get_level_from_xp(member_data["xp"])[0]  # level with the current xp
+        after_level = _helper.get_level_from_xp(member_data["xp"] + message_xp)[0]  # level with the added xp
 
         if before_level != after_level:
             # highest role that will be added
@@ -137,18 +137,18 @@ class Leveling(commands.Cog):
 
             if cache.message:
                 # format the messages with the variables
-                f_level = LevelFormatObject(level=after_level, role=highest_add_role)
+                f_level = formatting.LevelFormatObject(level=after_level, role=highest_add_role)
 
-                level_message = format_leveling_message(cache.message, member=member, level=f_level)
+                level_message = formatting.format_leveling_message(cache.message, member=member, level=f_level)
 
                 # if a channel is given send the message to it
                 # else the message will be sent to the current channel
                 if cache.channel is None:
-                    await permission_check(channel, content=level_message)
+                    await helper.permission_check(channel, content=level_message)
                 else:
                     level_channel = guild.get_channel(cache.channel)
 
-                    await permission_check(level_channel, content=level_message)
+                    await helper.permission_check(level_channel, content=level_message)
 
     @app_commands.command(name="reset-level", description="Resets the level of a member. This action cannot be undone.")
     @app_commands.describe(member="The member from whom you want to reset rank.")
@@ -161,5 +161,5 @@ class Leveling(commands.Cog):
             "DELETE FROM leveling_users WHERE user_id = $1 AND guild_id = $2", member.id, interaction.guild.id
         )
 
-        embed = Embed(description=_(lc, "level.reset_level.level_reset"))
+        embed = extensions.Embed(description=_(lc, "level.reset_level.level_reset"))
         await interaction.response.send_message(embed=embed, ephemeral=True)

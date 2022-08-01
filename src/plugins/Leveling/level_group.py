@@ -4,20 +4,18 @@ import io
 from typing import Optional, TYPE_CHECKING
 
 import discord
+import easy_pil
 from PIL import Image, ImageDraw, ImageChops
-from discord import app_commands, Interaction
-from discord.ext import commands
-from easy_pil import Editor, Font
+from discord import app_commands
 
-from lib import checks, helper
+from lib import checks, helper, extensions
 from lib.enums import PlyooxModule
-from lib.extensions import Embed
-from lib.types import LevelUserData
 from translation import _
-from ._helper import get_level_from_xp, get_level_xp
+from . import _helper
 
 if TYPE_CHECKING:
     from main import Plyoox
+    from lib.types import LevelUserData
 
 
 def _crop_to_circle(avatar: Image):
@@ -33,22 +31,20 @@ def _crop_to_circle(avatar: Image):
 @app_commands.default_permissions()
 @app_commands.guild_only
 @checks.module_active(PlyooxModule.Leveling)
-class LevelCommand(
-    commands.GroupCog,
-    group_name="level",
-    group_description="Commands that are needed to interact with the level-system.",
-):
+class LevelGroup(app_commands.Group):
     BACKGROUND = Image.open("./src/assets/level_card.png")
-    FONT = Font.poppins(size=24)
-    FONT_sm = Font.poppins(size=18)
-    FONT_xs = Font.poppins(size=16)
+    FONT = easy_pil.Font.poppins(size=24)
+    FONT_sm = easy_pil.Font.poppins(size=18)
+    FONT_xs = easy_pil.Font.poppins(size=16)
 
     def __init__(self, bot: Plyoox):
+        super().__init__(name="level", description="Commands that are needed to interact with the level-system.")
+
         self.db = bot.db
 
     @staticmethod
     def _generate_image(username: str, avatar: Image, level: int, current_xp: int, needed_xp: int) -> Image:
-        background = Editor(LevelCommand.BACKGROUND.copy())
+        background = easy_pil.Editor(LevelGroup.BACKGROUND.copy())
 
         _crop_to_circle(avatar)
 
@@ -56,11 +52,11 @@ class LevelCommand(
 
         background.paste(avatar, (30, 36))
         background.rectangle((190, 100), width=int(250 * percentage), height=19, fill="#24C689", radius=10)
-        background.text((190, 70), username, font=LevelCommand.FONT, color="white")
-        background.text((190, 130), f"Level", font=LevelCommand.FONT_sm, color="#dedede")
-        background.text((290, 130), f"XP", font=LevelCommand.FONT_sm, color="#dedede")
-        background.text((190, 150), f"{level}", font=LevelCommand.FONT_xs, color="gray")
-        background.text((290, 150), f"{current_xp}/{needed_xp}", font=LevelCommand.FONT_xs, color="gray")
+        background.text((190, 70), username, font=LevelGroup.FONT, color="white")
+        background.text((190, 130), f"Level", font=LevelGroup.FONT_sm, color="#dedede")
+        background.text((290, 130), f"XP", font=LevelGroup.FONT_sm, color="#dedede")
+        background.text((190, 150), f"{level}", font=LevelGroup.FONT_xs, color="gray")
+        background.text((290, 150), f"{current_xp}/{needed_xp}", font=LevelGroup.FONT_xs, color="gray")
 
         buffer = io.BytesIO()
         background.image.save(buffer, format="PNG")
@@ -76,7 +72,7 @@ class LevelCommand(
         avatar_image = Image.open(io.BytesIO(avatar_image_raw))
 
         return await bot.loop.run_in_executor(
-            None, LevelCommand._generate_image, str(member), avatar_image, level, current_xp, needed_xp
+            None, LevelGroup._generate_image, str(member), avatar_image, level, current_xp, needed_xp
         )
 
     @app_commands.command(name="rank", description="Shows information about the current rank of a member.")
@@ -98,8 +94,8 @@ class LevelCommand(
             await helper.interaction_send(interaction, "level.rank.no_data")
             return
 
-        current_level, remaining_xp = get_level_from_xp(user_data["xp"])
-        required_xp = get_level_xp(current_level)
+        current_level, remaining_xp = _helper.get_level_from_xp(user_data["xp"])
+        required_xp = _helper.get_level_xp(current_level)
 
         image = await self._create_level_image(
             interaction.client, current_member, current_level, remaining_xp, required_xp  # type: ignore
@@ -125,13 +121,13 @@ class LevelCommand(
             if role is not None:
                 roles.append(f"{level} - {role.mention}")
 
-        embed = Embed(title=_(lc, "level.level_roles.title"))
+        embed = extensions.Embed(title=_(lc, "level.level_roles.title"))
         embed.description = "\n".join(roles)
 
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="top", description="Lists the top 10 users with the highest level on this guild.")
-    async def top(self, interaction: Interaction):
+    async def top(self, interaction: discord.Interaction):
         lc = interaction.locale
         guild = interaction.guild
 
@@ -146,8 +142,8 @@ class LevelCommand(
                 member = guild.get_member(level_user["userId"])
 
                 if member is not None:
-                    current_level, current_xp = get_level_from_xp(level_user["xp"])
-                    required_xp = get_level_xp(current_level)
+                    current_level, current_xp = _helper.get_level_from_xp(level_user["xp"])
+                    required_xp = _helper.get_level_xp(current_level)
 
                     top_users.append(
                         {"member": member, "level": current_level, "xp_progress": f"{current_xp}/{required_xp}"}
@@ -160,7 +156,7 @@ class LevelCommand(
             await helper.interaction_send(interaction, "level.top.no_users")
             return
 
-        embed = Embed(
+        embed = extensions.Embed(
             title=_(lc, "level.top.title"),
         )
 

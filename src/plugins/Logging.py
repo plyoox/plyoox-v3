@@ -8,8 +8,7 @@ import discord
 from discord import utils
 from discord.ext import commands
 
-from lib import helper
-from lib.extensions import Embed
+from lib import helper, extensions
 from translation import _
 
 if TYPE_CHECKING:
@@ -34,9 +33,9 @@ class LoggingEvents(commands.Cog):
         guild_id: int,
         cache: LoggingModel,
         *,
-        embed: Embed = utils.MISSING,
+        embed: discord.Embed = utils.MISSING,
         file: discord.File = None,
-        embeds: list[Embed] = utils.MISSING,
+        embeds: list[discord.Embed] = utils.MISSING,
     ):
         webhook = discord.Webhook.partial(cache.webhook_id, cache.webhook_token, session=self.bot.session)
 
@@ -58,7 +57,7 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_join:
             return
 
-        embed = Embed(description=_(lc, "logging.member_join.description", member=member))
+        embed = extensions.Embed(description=_(lc, "logging.member_join.description", member=member))
         embed.set_author(name=_(lc, "logging.member_join.title"), icon_url=member.display_avatar)
         embed.add_field(
             name=_(lc, "account_created"),
@@ -77,7 +76,7 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_join:
             return
 
-        embed = Embed(description=_(lc, "logging.member_leave.description", member=member))
+        embed = extensions.Embed(description=_(lc, "logging.member_leave.description", member=member))
         embed.set_author(name=_(lc, "logging.member_leave.title"), icon_url=member.display_avatar)
         embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {member.id}")
         embed.add_field(name=_(lc, "account_created"), value=helper.embed_timestamp_format(member.created_at))
@@ -94,7 +93,7 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_ban:
             return
 
-        embed = Embed()
+        embed = extensions.Embed()
         embed.add_field(name=_(lc, "account_created"), value=helper.embed_timestamp_format(user.created_at))
         if isinstance(user, discord.Member):
             embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {user.id}")
@@ -115,7 +114,7 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_unban:
             return
 
-        embed = Embed()
+        embed = extensions.Embed()
         embed.set_author(name=_(lc, "logging.member_unban.title"), icon_url=user.display_avatar)
         embed.set_footer(text=f"{_(lc, 'logging.user_id')}: {user.id}")
         embed.add_field(name=_(lc, "account_created"), value=helper.embed_timestamp_format(user.created_at))
@@ -131,7 +130,7 @@ class LoggingEvents(commands.Cog):
         if cache.member_role_change and before.roles != after.roles:
             lc = before.guild.preferred_locale
 
-            embed = Embed()
+            embed = extensions.Embed()
             embed.set_author(name=_(lc, "logging.member_role_change.title"), icon_url=before.display_avatar)
             embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {before.id}")
 
@@ -149,7 +148,7 @@ class LoggingEvents(commands.Cog):
         elif cache.member_rename and before.display_name != after.display_name:
             lc = before.guild.preferred_locale
 
-            embed = Embed()
+            embed = extensions.Embed()
             embed.set_author(name=_(lc, "logging.member_rename.title"), icon_url=before.display_avatar)
             embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {before.id}")
 
@@ -182,7 +181,7 @@ class LoggingEvents(commands.Cog):
         lc = guild.preferred_locale
         message = payload.cached_message
 
-        log_embed = Embed()
+        log_embed = extensions.Embed()
         embeds = [log_embed]
 
         if message is not None:
@@ -199,7 +198,7 @@ class LoggingEvents(commands.Cog):
                     name=_(lc, "logging.message_edit.old_message"), value=message.content or _(lc, "logging.no_content")
                 )
             else:
-                old_message_embed = Embed(description=message.content)
+                old_message_embed = extensions.Embed(description=message.content)
                 embeds.append(old_message_embed)
         else:
             edit_member_id = payload.data["author"]["id"]
@@ -223,7 +222,7 @@ class LoggingEvents(commands.Cog):
                 name=_(lc, "logging.message_edit.new_message"), value=content or _(lc, "logging.no_content")
             )
         else:
-            new_message_embed = Embed(description=content)
+            new_message_embed = extensions.Embed(description=content)
             embeds.append(new_message_embed)
 
         await self._send_message(guild.id, cache, embeds=embeds)
@@ -248,7 +247,7 @@ class LoggingEvents(commands.Cog):
         message = payload.cached_message
         member = message.author if message else None
 
-        log_embed = Embed()
+        log_embed = extensions.Embed()
         embeds = [log_embed]
 
         log_embed.set_author(
@@ -272,7 +271,7 @@ class LoggingEvents(commands.Cog):
                     value=message.content or _(lc, "logging.no_content"),
                 )
             else:
-                content_embed = Embed(description=message.content)
+                content_embed = extensions.Embed(description=message.content)
                 embeds.append(content_embed)
 
             log_embed.add_field(
@@ -304,7 +303,7 @@ class LoggingEvents(commands.Cog):
 
         lc = guild.preferred_locale
 
-        embed = Embed(
+        embed = extensions.Embed(
             title=_(lc, "logging.bulk_delete.title"),
             description=_(
                 lc,

@@ -5,8 +5,7 @@ from typing import TYPE_CHECKING
 import discord
 from discord import ui
 
-from lib import emojis, types
-from lib.extensions import Embed, PrivateView
+from lib import emojis, types, extensions
 from translation import _
 from . import _helper
 
@@ -43,7 +42,7 @@ class SiteNextButton(ui.Button):
         await _helper.paginate_search(interaction, self.search_view)
 
 
-class AnilistSearchView(PrivateView):
+class AnilistSearchView(extensions.PrivateView):
     def __init__(self, interaction: discord.Interaction, query: str, title: str):
         super().__init__(interaction)
 
@@ -80,7 +79,7 @@ class BackButton(ui.Button):
         )
 
 
-class BackButtonView(PrivateView):
+class BackButtonView(extensions.PrivateView):
     def __init__(self, view: AnilistInfoView, *, interaction: discord.Interaction):
         super().__init__(original_interaction=interaction)
 
@@ -105,7 +104,7 @@ class ViewScoreButton(ui.Button):
             None, _helper.generate_score_image, self.anilist_view.data["stats"]["scoreDistribution"]
         )
 
-        embed = Embed(
+        embed = extensions.Embed(
             title=_(lc, "anilist.view.score_title", title=self.anilist_view.data["title"]["romaji"]),
             description=f"{_(lc, 'anilist.score')}: {self.anilist_view.data['averageScore']}/100",
         )
@@ -125,7 +124,7 @@ class ViewTrailerButton(ui.Button):
         )
 
 
-class AnilistInfoView(PrivateView):
+class AnilistInfoView(extensions.PrivateView):
     def __init__(self, data: types.AnilistDetailedResponse, interaction: discord.Interaction):
         super().__init__(original_interaction=interaction)
 

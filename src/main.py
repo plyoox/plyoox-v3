@@ -15,8 +15,7 @@ from discord import utils
 from discord.ext import commands
 
 from cache import CacheManager
-from lib import database
-from lib.extensions import CommandTree
+from lib import database, extensions
 
 if TYPE_CHECKING:
     from plugins.Timers import Timer
@@ -57,7 +56,7 @@ class Plyoox(commands.Bot):
             allowed_mentions=allowed_mentions,
             max_messages=2000,
             command_prefix=[],
-            tree_cls=CommandTree,
+            tree_cls=extensions.CommandTree,
         )
 
         if os.getenv("TEST_GUILD"):

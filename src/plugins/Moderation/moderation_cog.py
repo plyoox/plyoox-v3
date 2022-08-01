@@ -8,15 +8,10 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-from lib import parsers
+from lib import parsers, extensions
 from lib.enums import TimerType
-from lib.extensions import Embed
-from plugins.Moderation import _logging_helper
 from translation import _
-from . import clear_command
-from .automod import DISCORD_INVITE
-
-from . import _views
+from . import _views, _logging_helper, clear_group, automod
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -30,7 +25,7 @@ class Moderation(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
-    clear_group = clear_command.ClearCommand()
+    clear_group = clear_group.ClearGroup()
 
     @staticmethod
     async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
@@ -268,7 +263,7 @@ class Moderation(commands.Cog):
     async def invite_info(self, interaction: discord.Interaction, invite: str):
         lc = interaction.locale
 
-        if not DISCORD_INVITE.match(invite):
+        if not automod.DISCORD_INVITE.match(invite):
             await interaction.response.send_message(_(lc, "moderation.invite_info.invalid_invite"), ephemeral=True)
             return
 
@@ -277,7 +272,7 @@ class Moderation(commands.Cog):
             await interaction.response.send_message(_(lc, "moderation.invite_info.not_found"), ephemeral=True)
             return
 
-        embed = Embed(
+        embed = extensions.Embed(
             description=_(lc, "moderation.invite_info.description", code=invite.code),
             title=_(lc, "moderation.invite_info.title"),
         )
@@ -442,7 +437,7 @@ class Moderation(commands.Cog):
             await interaction.followup.send(_(lc, "moderation.massban.no_users_found"))
             return
 
-        embed = Embed(description=_(lc, "moderation.massban.overview_description"))
+        embed = extensions.Embed(description=_(lc, "moderation.massban.overview_description"))
         await interaction.followup.send(embed=embed, view=_views.MassbanView(list(members), reason, interaction.locale))
 
     @tempmute.autocomplete("duration")

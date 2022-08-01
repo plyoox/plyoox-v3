@@ -3,8 +3,7 @@ from __future__ import annotations
 import discord
 from discord import ui
 
-from lib import emojis
-from lib.extensions import Embed
+from lib import emojis, extensions
 from translation import _
 
 
@@ -13,7 +12,7 @@ async def _change_member_view(interaction: discord.Interaction, view: MemberView
 
     view.current_index += index_change
 
-    embed = Embed(title=_(lc, "moderation.massban.view_member_title"))
+    embed = extensions.Embed(title=_(lc, "moderation.massban.view_member_title"))
     embed.set_footer(text=f"{_(lc, 'moderation.massban.page')}: {view.current_index + 1}")
 
     members = view.members[
@@ -134,7 +133,7 @@ class CloseMemberViewButton(ui.Button):
         self.massban_view = view
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        embed = Embed(description=_(interaction.locale, "moderation.massban.overview_description"))
+        embed = extensions.Embed(description=_(interaction.locale, "moderation.massban.overview_description"))
         await interaction.response.defer()
 
         await interaction.edit_original_message(embed=embed, view=self.massban_view)

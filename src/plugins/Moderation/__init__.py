@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from plugins.Moderation import moderation_cog, automod
+from . import moderation_cog, automod
 
 if TYPE_CHECKING:
     from main import Plyoox

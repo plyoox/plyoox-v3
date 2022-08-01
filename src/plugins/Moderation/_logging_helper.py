@@ -5,18 +5,15 @@ from typing import TYPE_CHECKING
 
 import discord
 from discord import utils
-from discord.utils import MISSING
 
-from lib import helper
+from lib import helper, extensions
 from lib.enums import AutomodAction
-from lib.extensions import Embed
-from lib.types import AutomodExecutionReason
-from lib.types.types import ModerationExecutedCommand
 from translation import _
 
 if TYPE_CHECKING:
     from main import Plyoox
     from cache.models import ModerationModel
+    from lib.types import AutomodExecutionReason, ModerationExecutedCommand
 
 
 async def _get_logchannel(bot: Plyoox, cache: ModerationModel) -> discord.Webhook | None:
@@ -30,8 +27,8 @@ async def _send_webhook(
     bot: Plyoox,
     guild_id: int,
     webhook: discord.Webhook,
-    embed: discord.Embed = MISSING,
-    embeds: list[discord.Embed] = MISSING,
+    embed: discord.Embed = utils.MISSING,
+    embeds: list[discord.Embed] = utils.MISSING,
 ) -> None:
     try:
         await webhook.send(embed=embed, embeds=embeds)
@@ -60,7 +57,7 @@ async def log_simple_punish_command(
     if webhook is not None:
         lc = interaction.guild_locale
 
-        embed = Embed(
+        embed = extensions.Embed(
             description=_(lc, f"moderation.{type}.log_description", target=target, moderator=interaction.user)
         )
         embed.set_author(name=_(lc, f"moderation.{type}.log_title"), icon_url=target.display_avatar)
@@ -110,7 +107,7 @@ async def automod_log(
 
         embeds = []
 
-        embed = Embed(description=_(lc, f"automod.{action}.description", target=member))
+        embed = extensions.Embed(description=_(lc, f"automod.{action}.description", target=member))
         embed.set_author(name=_(lc, f"automod.{action}.title"), icon_url=member.display_avatar)
         embed.add_field(name=_(lc, "reason"), value="> " + _(lc, f"automod.reason.{type}"))
         embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
@@ -127,7 +124,7 @@ async def automod_log(
             if len(message.content) <= 1024:
                 embed.add_field(name=_(lc, "message"), value=message.content)
             else:
-                message_embed = Embed(title=_(lc, "message"), description=message.content)
+                message_embed = extensions.Embed(title=_(lc, "message"), description=message.content)
                 embeds.append(message_embed)
 
         await _send_webhook(bot, message.guild.id, webhook, embeds=embeds)

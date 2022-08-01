@@ -438,7 +438,7 @@ class Moderation(commands.Cog):
             return
 
         embed = extensions.Embed(description=_(lc, "moderation.massban.overview_description"))
-        await interaction.followup.send(embed=embed, view=_views.MassbanView(list(members), reason, interaction.locale))
+        await interaction.followup.send(embed=embed, view=_views.MassbanView(interaction, list(members), reason))
 
     @tempmute.autocomplete("duration")
     @tempban.autocomplete("duration")

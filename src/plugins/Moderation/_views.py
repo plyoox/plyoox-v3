@@ -21,8 +21,10 @@ async def _change_member_view(interaction: discord.Interaction, view: MemberView
 
     embed.description = "\n".join(f"{m} ({m.id})" for m in members)  # type: ignore
 
+    view._update_buttons()
+
     await interaction.response.defer()
-    await interaction.edit_original_message(embed=embed, view=MemberView(view.massban_view, lc))
+    await interaction.edit_original_message(embed=embed, view=view)
 
 
 class BanButton(ui.Button):
@@ -89,14 +91,14 @@ class ViewMemberButton(ui.Button):
         self.massban_view = view
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        await _change_member_view(interaction, MemberView(view=self.massban_view, locale=interaction.locale))
+        await _change_member_view(interaction, MemberView(interaction, self.massban_view))
 
 
 class NextMemberButton(ui.Button):
     def __init__(self, view: MemberView, locale: discord.Locale, disabled: bool = False):
         super().__init__(
             label=_(locale, "next_site"),
-            style=discord.ButtonStyle.gray,
+            style=discord.ButtonStyle.green,
             emoji=emojis.chevrons_right,
             disabled=disabled,
         )
@@ -139,36 +141,39 @@ class CloseMemberViewButton(ui.Button):
         await interaction.edit_original_message(embed=embed, view=self.massban_view)
 
 
-class MemberView(ui.View):
+class MemberView(extensions.EphemeralView):
     MEMBERS_PER_PAGE = 50
 
-    def __init__(self, view: MassbanView, locale: discord.Locale):
-        super().__init__()
+    def __init__(self, interaction: discord.Interaction, view: MassbanView):
+        super().__init__(interaction)
 
         self.members = view.members
         self.current_index = 0
         self.massban_view = view
 
-        self.add_item(BackMemberButton(self, locale, disabled=True))
+        self.back_member_button = BackMemberButton(self, interaction.locale)
+        self.next_member_button = NextMemberButton(self, interaction.locale)
+        self.close_member_view_button = CloseMemberViewButton(view, interaction.locale)
 
-        if len(view.members) < self.MEMBERS_PER_PAGE:
-            self.add_item(NextMemberButton(self, locale, disabled=True))
-        else:
-            self.add_item(NextMemberButton(self, locale))
+        self.add_item(self.back_member_button)
+        self.add_item(self.next_member_button)
+        self.add_item(self.close_member_view_button)
 
-        self.add_item(CloseMemberViewButton(view, locale))
+    def _update_buttons(self) -> None:
+        self.back_member_button.disabled = self.current_index == 0
+        self.next_member_button.disabled = len(self.members) / self.MEMBERS_PER_PAGE <= self.current_index + 1
 
 
-class MassbanView(ui.View):
+class MassbanView(extensions.EphemeralView):
     members: list[discord.Member]
     reason: str
 
-    def __init__(self, members: list[discord.Member], reason: str, locale: discord.Locale):
-        super().__init__()
+    def __init__(self, interaction: discord.Interaction, members: list[discord.Member], reason: str):
+        super().__init__(interaction)
 
         self.members = members
         self.reason = reason
 
-        self.add_item(BanButton(self, locale))
-        self.add_item(CancelButton(self, locale))
-        self.add_item(ViewMemberButton(self, locale))
+        self.add_item(BanButton(self, interaction.locale))
+        self.add_item(ViewMemberButton(self, interaction.locale))
+        self.add_item(CancelButton(self, interaction.locale))

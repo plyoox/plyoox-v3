@@ -23,3 +23,18 @@ class PrivateView(ui.View):
             await self._last_interaction.message.edit(view=None)
         else:
             await self._last_interaction.edit_original_message(view=None)
+
+
+class EphemeralView(ui.View):
+    def __init__(self, original_interaction: discord.Interaction, *, timeout: float = 180.0):
+        super().__init__(timeout=timeout)
+
+        self._last_interaction = original_interaction
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        self._last_interaction = interaction
+        return True
+
+    async def on_timeout(self) -> None:
+        if not self._last_interaction.is_expired():
+            await self._last_interaction.edit_original_message(view=None)

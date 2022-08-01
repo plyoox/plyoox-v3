@@ -132,13 +132,11 @@ class CloseMemberViewButton(ui.Button):
         )
 
         self.massban_view = view
-        print("Init with", self.massban_view)
 
     async def callback(self, interaction: discord.Interaction) -> None:
         embed = Embed(description=_(interaction.locale, "moderation.massban.overview_description"))
         await interaction.response.defer()
 
-        print("Click close button", self.massban_view)
         await interaction.edit_original_message(embed=embed, view=self.massban_view)
 
 

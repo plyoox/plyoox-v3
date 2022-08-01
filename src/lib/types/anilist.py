@@ -1,4 +1,4 @@
-from typing import TypedDict, Literal, Any
+from typing import TypedDict, Literal
 
 
 class _AnilistTitle(TypedDict):
@@ -25,6 +25,15 @@ class _AnilistTag(TypedDict):
 class _AnilistRaking(TypedDict):
     type: Literal["POPULAR", "RATED"]
     allTime: bool
+
+
+class AnilistScore(TypedDict):
+    score: int
+    amount: int
+
+
+class _AnilistStats(TypedDict):
+    scoreDistribution: list[AnilistScore]
 
 
 class AnilistSearchResponse(TypedDict):
@@ -57,3 +66,4 @@ class AnilistDetailedResponse(TypedDict):
     genres: list[str]
     relations: dict
     bannerImage: str
+    stats: _AnilistStats

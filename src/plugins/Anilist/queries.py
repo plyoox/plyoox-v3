@@ -1,6 +1,6 @@
 SEARCH_QUERY = """
 query ($page: Int = 1, $id: Int, $type: MediaType, $isAdult: Boolean = false, $search: String, $status: MediaStatus, $source: MediaSource, $season: MediaSeason, $seasonYear: Int, $year: String, $yearLesser: FuzzyDateInt, $yearGreater: FuzzyDateInt, $sort: [MediaSort] = [POPULARITY_DESC, SCORE_DESC]) {
-  Page(page: $page, perPage: 10) {
+  Page(page: $page, perPage: 5) {
     pageInfo {
       currentPage
       hasNextPage
@@ -19,8 +19,8 @@ query ($page: Int = 1, $id: Int, $type: MediaType, $isAdult: Boolean = false, $s
 """
 
 INFO_QUERY = """
-query ($id: Int, $type: MediaType, $isAdult: Boolean = false, $search: String, $sort: [MediaSort] = [POPULARITY_DESC, SCORE_DESC]) {
-  Page(page: 1, perPage: 1) {
+query ($page: Int = 1, $id: Int, $type: MediaType, $isAdult: Boolean = false, $search: String, $sort: [MediaSort] = [POPULARITY_DESC, SCORE_DESC]) {
+  Page(page: $page, perPage: 1) {
     pageInfo {
       currentPage
       hasNextPage
@@ -77,6 +77,12 @@ query ($id: Int, $type: MediaType, $isAdult: Boolean = false, $search: String, $
           }
           siteUrl
         }
+      }
+      stats {
+        scoreDistribution {
+          score
+          amount
+      	}
       }
     }
   }

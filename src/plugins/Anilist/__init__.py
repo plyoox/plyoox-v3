@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from plugins.Anilist.anilist_cog import Anilist
+from .anilist_cog import Anilist
 
 if TYPE_CHECKING:
     from main import Plyoox

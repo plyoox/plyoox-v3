@@ -50,6 +50,7 @@ class ViewScoreButton(ui.Button):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         bot: Plyoox = interaction.client  # type: ignore
+        lc = interaction.locale
 
         await interaction.response.defer()
 
@@ -58,12 +59,22 @@ class ViewScoreButton(ui.Button):
         )
 
         embed = Embed(
-            title=_(interaction.locale, "anilist.view.score_title", title=self.anilist_view.data["title"]["romaji"])
+            title=_(lc, "anilist.view.score_title", title=self.anilist_view.data["title"]["romaji"]),
+            description=f"{_(lc, 'anilist.score')}: {self.anilist_view.data['averageScore']}/100",
         )
         embed.set_image(url="attachment://anilist_score.png")
 
         await interaction.edit_original_message(
             attachments=[image], embed=embed, view=BackButtonView(self.anilist_view, interaction=interaction)
+        )
+
+
+class ViewTrailerButton(ui.Button):
+    def __init__(self, view: AnilistInfoView, locale: discord.Locale):
+        data = view.data
+
+        super().__init__(
+            emoji=emojis.link, url=f"https://youtu.be/{data['trailer']['id']}", label=_(locale, "anilist.info.trailer")
         )
 
 
@@ -74,3 +85,5 @@ class AnilistInfoView(PrivateView):
         self.data = data
 
         self.add_item(ViewScoreButton(self, locale=interaction.locale))
+        if data["trailer"]["site"] == "youtube":
+            self.add_item(ViewTrailerButton(self, interaction.locale))

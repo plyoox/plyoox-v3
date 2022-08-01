@@ -249,6 +249,7 @@ logging:
     title: "Nachrichten gelöscht"
     description: "Es wurden {count} Nachrichten aus {channel} gelöscht."
 anilist:
+  score: "Bewertung"
   rate_limit: "Das Ratelimit der API wurde erreicht. Bitte versuche es später erneut."
   search:
     no_result: "Kein Ergebnis gefunden."
@@ -263,7 +264,6 @@ anilist:
     season: "Saison"
     year: "Jahr"
     country: "Herkunftsland"
-    score: "Bewertung"
     trailer: "Trailer"
   view:
     score_button: "Bewertung anzeigen"

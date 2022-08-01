@@ -92,18 +92,12 @@ def generate_info_embed(data: AnilistDetailedResponse, lc: discord.Locale) -> di
     embed.description += f"**{_(lc, 'anilist.info.season')}:** {data['season']}\n"
     embed.description += f"**{_(lc, 'anilist.info.year')}:** {data['seasonYear']}\n"
     embed.description += f"**{_(lc, 'anilist.info.country')}:** {data['countryOfOrigin']}\n"
-    embed.description += f"**{_(lc, 'anilist.info.score')}:** {data['averageScore']}/100\n"
+    embed.description += f"**{_(lc, 'anilist.score')}:** {data['averageScore']}/100\n"
 
     embed.add_field(name=_(lc, "anilist.info.description"), value=to_description(data["description"]))
 
     if data["genres"]:
         embed.add_field(name=_(lc, "anilist.info.genres"), value=", ".join(data["genres"]))
-
-    if data["trailer"]["site"] == "youtube":
-        embed.add_field(
-            name=_(lc, "anilist.info.trailer"),
-            value=f"[youtu.be/{data['trailer']['id']}](https://youtu.be/{data['trailer']['id']})",
-        )
 
     if data["relations"]["nodes"]:
         embed.add_field(

@@ -267,6 +267,6 @@ anilist:
     trailer: "Trailer"
   view:
     score_button: "Bewertung anzeigen"
-    score_title: "Bewertung-Statistik"
+    score_title: "Bewertung-Statistik für {title}"
 views:
   creator_only: "Diese Aktion kann nur der Ersteller verwenden."

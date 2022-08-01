@@ -57,7 +57,9 @@ class ViewScoreButton(ui.Button):
             None, _helper.generate_score_image, self.anilist_view.data["stats"]["scoreDistribution"]
         )
 
-        embed = Embed(title=_(interaction.locale, "anilist.view.score_title"))
+        embed = Embed(
+            title=_(interaction.locale, "anilist.view.score_title", title=self.anilist_view.data["title"]["romaji"])
+        )
         embed.set_image(url="attachment://anilist_score.png")
 
         await interaction.edit_original_message(

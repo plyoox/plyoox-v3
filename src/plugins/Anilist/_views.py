@@ -27,7 +27,9 @@ class BackButton(ui.Button):
     async def callback(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer()
         await interaction.edit_original_message(
-            embed=_helper.generate_info_embed(self.anilist_view.data, interaction.locale), view=self.anilist_view
+            embed=_helper.generate_info_embed(self.anilist_view.data, interaction.locale),
+            view=self.anilist_view,
+            attachments=[],
         )
 
 

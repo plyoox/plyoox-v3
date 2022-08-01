@@ -5,7 +5,7 @@ from translation import _
 
 
 class PrivateView(ui.View):
-    def __init__(self, original_interaction: discord.Interaction, *, timeout: float = None):
+    def __init__(self, original_interaction: discord.Interaction, *, timeout: float = 180.0):
         super().__init__(timeout=timeout)
 
         self._last_interaction = original_interaction

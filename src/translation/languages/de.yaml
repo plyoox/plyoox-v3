@@ -80,6 +80,7 @@ infos:
     additional_coders: "Weitere Entwickler"
     guild_count: "Server-Anzahl"
     uptime: "Zuletzt gestartet"
+    privacy_policy: "Datenschutzrichtlinie"
 level:
   rank:
     no_data: "Der User hat derzeit keine XP. Versuche es erneut, nachdem der User etwas geschrieben hat."

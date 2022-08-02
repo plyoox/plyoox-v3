@@ -25,6 +25,10 @@ class Infos(commands.Cog):
         embed.add_field(name=_(lc, "infos.bot.additional_coders"), value=f"> X Gamer Guide#1866")
         embed.add_field(name=_(lc, "infos.bot.guild_count"), value=f"> {len(self.bot.guilds)}")
         embed.add_field(name=_(lc, "infos.bot.uptime"), value=f"> {utils.format_dt(self.bot.start_time, 'R')}")
+        embed.add_field(
+            name=_(lc, "infos.bot.privacy_policy"),
+            value=f"> [canary.plyoox.net](https://canary.plyoox.net/privacy-discord)",
+        )
 
         view = ui.View()
         view.add_item(ui.Button(label="GitHub", url="https://github.com/plyoox/plyoox-v3"))

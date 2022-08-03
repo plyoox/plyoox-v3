@@ -304,7 +304,7 @@ class Automod(commands.Cog):
             _log.warning(f"{member.id} has no points in {guild.id}...")
             return
 
-        await _logging.warn_log(self.bot, member, moderator, f"{points}/10 [+{add_points}]", reason)
+        await _logging.warn_log(self.bot, member, moderator, reason, f"{points}/10 [+{add_points}]")
 
         if points >= 10:
             cache = await self.bot.cache.get_moderation(guild.id)

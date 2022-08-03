@@ -9,6 +9,9 @@ from typing import TYPE_CHECKING
 import discord
 from discord.ext import commands
 
+from lib import emojis
+from translation import _
+
 if TYPE_CHECKING:
     from main import Plyoox
 
@@ -90,8 +93,18 @@ class Notification(commands.Cog):
             if channel.permissions_for(guild.me).send_messages:
                 message = notification["message"].replace("{link}", f"https://twitch.tv/{user_name}")
 
+                view = discord.ui.View()
+                view.add_item(
+                    discord.ui.Button(
+                        label=_(guild.preferred_locale, "notifications.twitch_button"),
+                        style=discord.ButtonStyle.gray,
+                        url=f"https://twitch.tv/{user_name}",
+                        emoji=emojis.twitch,
+                    )
+                )
+
                 await channel.send(
-                    message, allowed_mentions=discord.AllowedMentions(everyone=True, roles=True, users=True)
+                    message, allowed_mentions=discord.AllowedMentions(everyone=True, roles=True, users=True), view=view
                 )
                 await asyncio.sleep(0.2)
 

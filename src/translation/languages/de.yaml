@@ -298,3 +298,5 @@ anilist:
     score_title: "Bewertung-Statistik für {title}"
 views:
   creator_only: "Diese Aktion kann nur der Ersteller verwenden."
+notifications:
+  twitch_button: "Zum Stream"

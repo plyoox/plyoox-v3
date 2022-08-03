@@ -9,7 +9,7 @@ import discord
 from discord import utils
 from discord.ext import commands
 
-from lib.enums import AutomodAction, AutomodChecks, MentionSettings, TimerType
+from lib.enums import AutomodAction, AutomodChecks, MentionSettings, TimerType, AutomodFinalAction
 from translation import _
 from . import _logging_helper as _logging
 
@@ -53,7 +53,7 @@ class Automod(commands.Cog):
                     if invite.guild.id == guild.id or invite.guild.id in cache.invite_allowed:
                         continue
 
-                    await self.handle_action(message, cache.invite_actions, "invite")
+                    await self._handle_action(message, cache.invite_actions, "invite")
                     return
                 except discord.NotFound:
                     continue
@@ -78,7 +78,7 @@ class Automod(commands.Cog):
                     if link not in cache.link_list:
                         continue
 
-                await self.handle_action(message, cache.link_actions, "link")
+                await self._handle_action(message, cache.link_actions, "link")
                 return
 
         mass_mentions = EVERYONE_MENTION.findall(message.content)
@@ -99,7 +99,7 @@ class Automod(commands.Cog):
             if not self._is_affected(message, cache, "mention"):
                 return
 
-            await self.handle_action(message, cache.mention_actions, "mention")
+            await self._handle_action(message, cache.mention_actions, "mention")
             return
 
         if len(message.content) > 15 and not message.content.islower():
@@ -115,18 +115,25 @@ class Automod(commands.Cog):
             if not self._is_affected(message, cache, "caps"):
                 return
 
-            await self.handle_action(message, cache.caps_actions, "caps")
+            await self._handle_action(message, cache.caps_actions, "caps")
             return
 
-    async def handle_action(
+    async def _handle_action(
         self,
         message: discord.Message,
         actions: list[AutomodExecutionModel],
         reason: AutomodExecutionReason,
     ):
+
         for action in actions:
             if Automod._handle_checks(message.author, action):
                 await self._execute_automod(message, action, reason)
+                break
+
+    async def _handle_final_action(self, member: discord.Member, actions: list[AutomodExecutionModel]):
+        for action in actions:
+            if Automod._handle_checks(member, action):
+                await self._execute_final_action(member, action)
                 break
 
     @staticmethod
@@ -148,6 +155,40 @@ class Automod(commands.Cog):
 
             return (utils.utcnow() - member.created_at).days <= days
 
+    async def _execute_final_action(self, member: discord.Member, action: AutomodExecutionModel):
+        guild = member.guild
+        lc = guild.preferred_locale
+
+        await _logging.automod_final_log(self.bot, member, action.action)  # type: ignore
+
+        if action.action == AutomodFinalAction.kick:
+            if guild.me.guild_permissions.kick_members:
+                await guild.kick(member, reason=_(lc, "automod.final.reason"))
+        elif action.action == AutomodFinalAction.ban:
+            if guild.me.guild_permissions.ban_members:
+                await guild.ban(member, reason=_(lc, "automod.final.reason"))
+
+        elif action.action == AutomodFinalAction.tempban:
+            if guild.me.guild_permissions.ban_members:
+                banned_until = utils.utcnow() + datetime.timedelta(seconds=action.duration)
+
+                timers = self.bot.timer
+                if timers is not None:
+                    await timers.create_timer(
+                        guild.id,
+                        member.id,
+                        TimerType.tempban,
+                        banned_until,
+                    )
+                    await guild.ban(member, reason=_(lc, "automod.final.reason"))
+                else:
+                    _log.error("Timer Plugin is not initialized")
+
+        elif action.action == AutomodAction.tempmute:
+            if guild.me.guild_permissions.mute_members:
+                muted_until = utils.utcnow() + datetime.timedelta(seconds=action.duration)
+                await member.timeout(muted_until)
+
     async def _execute_automod(
         self,
         message: discord.Message,
@@ -155,24 +196,24 @@ class Automod(commands.Cog):
         reason: AutomodExecutionReason,
     ) -> None:
         guild = message.guild
+        member = message.author
         lc = guild.preferred_locale
 
         automod_action = action.action
 
+        if automod_action in [AutomodAction.kick, AutomodAction.delete, AutomodAction.tempmute]:
+            pass
+
         if automod_action == AutomodAction.ban:
             if guild.me.guild_permissions.ban_members:
-                await guild.ban(message.author, reason=_(lc, f"automod.reason.{reason}"))
+                await guild.ban(member, reason=_(lc, f"automod.reason.{reason}"))
                 await _logging.automod_log(self.bot, message, automod_action, reason)
         elif automod_action == AutomodAction.kick:
             if guild.me.guild_permissions.kick_members:
-                await guild.kick(message.author, reason=_(lc, f"automod.reason.{reason}"))
+                await guild.kick(member, reason=_(lc, f"automod.reason.{reason}"))
                 await _logging.automod_log(self.bot, message, automod_action, reason)
-            if guild.me.guild_permissions.manage_messages:
-                await message.delete()
         elif automod_action == AutomodAction.delete:
-            if guild.me.guild_permissions.manage_messages:
-                await message.delete()
-                await _logging.automod_log(self.bot, message, automod_action, reason)
+            await _logging.automod_log(self.bot, message, automod_action, reason)
         elif automod_action == AutomodAction.tempban:
             if guild.me.guild_permissions.ban_members:
                 banned_until = utils.utcnow() + datetime.timedelta(seconds=action.duration)
@@ -181,11 +222,12 @@ class Automod(commands.Cog):
                 if timers is not None:
                     await timers.create_timer(
                         guild.id,
-                        message.author.id,
+                        member.id,
                         TimerType.tempban,
                         banned_until,
                     )
-                    await guild.ban(message.author, reason=_(lc, f"automod.reason.{automod_action}"))
+                    await _logging.automod_log(self.bot, message, automod_action, reason)
+                    await guild.ban(member, reason=_(lc, f"automod.reason.{automod_action}"))
                 else:
                     _log.error("Timer Plugin is not initialized")
 
@@ -193,13 +235,9 @@ class Automod(commands.Cog):
             if guild.me.guild_permissions.mute_members:
                 muted_until = utils.utcnow() + datetime.timedelta(seconds=action.duration)
 
-                await message.author.timeout(muted_until)
+                await member.timeout(muted_until)
                 await _logging.automod_log(self.bot, message, automod_action, reason, until=muted_until)
-            if guild.me.guild_permissions.manage_messages:
-                await message.delete()
         elif automod_action == AutomodAction.points:
-            if guild.me.guild_permissions.manage_messages:
-                await message.delete()
             await self._handle_points(message, action, reason)
 
     @staticmethod
@@ -235,34 +273,63 @@ class Automod(commands.Cog):
         guild = message.guild
         author = message.author
 
-        await self.bot.db.execute(
-            "INSERT INTO automod_users (guild_id, user_id, timestamp, points, reason) VALUES ($1, $2, $3, $4, $5)",
-            guild.id,
-            author.id,
-            utils.utcnow(),
+        points = await self.__add_points(
+            author,
             action.points,
-            _(message.guild.preferred_locale, f"automod.reason.{reason}"),
+            _(guild.preferred_locale, f"automod.reason.{reason}"),
         )
-
-        points = await self.bot.db.fetchval(
-            "SELECT SUM(points) FROM automod_users WHERE user_id = $1 AND guild_id = $2", author.id, guild.id
-        )
-
-        if points > 10:
-            return
-
-        await _logging.automod_log(self.bot, message, action.action, reason, points=f"{points}/10 [+{action.points}]")
 
         if points is None:
             _log.warning(f"{author.id} has no points in {guild.id}...")
             return
+
+        await message.delete()
+        await _logging.automod_log(self.bot, message, action.action, reason, points=f"{points}/10 [+{action.points}]")
 
         if points >= 10:
             cache = await self.bot.cache.get_moderation(guild.id)
             if cache is None:
                 return
 
-            await self.handle_action(message, cache.automod_actions, "points")
+            await self._handle_final_action(message.author, cache.automod_actions)
             await self.bot.db.execute(
                 "DELETE FROM automod_users WHERE user_id = $1 AND guild_id = $2", author.id, guild.id
             )
+
+    async def add_warn_points(self, member: discord.Member, moderator: discord.Member, add_points: int, reason: str):
+        guild = member.guild
+
+        points = await self.__add_points(member, add_points, reason)
+        if points is None:
+            _log.warning(f"{member.id} has no points in {guild.id}...")
+            return
+
+        await _logging.warn_log(self.bot, member, moderator, f"{points}/10 [+{add_points}]", reason)
+
+        if points >= 10:
+            cache = await self.bot.cache.get_moderation(guild.id)
+            if cache is None:
+                return
+
+            await self._handle_final_action(member, cache.automod_actions)
+            await self.bot.db.execute(
+                "DELETE FROM automod_users WHERE user_id = $1 AND guild_id = $2", member.id, guild.id
+            )
+
+    async def __add_points(self, member: discord.Member, points: int, reason: str) -> int:
+        guild = member.guild
+
+        await self.bot.db.execute(
+            "INSERT INTO automod_users (guild_id, user_id, timestamp, points, reason) VALUES ($1, $2, $3, $4, $5)",
+            guild.id,
+            member.id,
+            utils.utcnow(),
+            points,
+            reason,
+        )
+
+        points = await self.bot.db.fetchval(
+            "SELECT SUM(points) FROM automod_users WHERE user_id = $1 AND guild_id = $2", member.id, guild.id
+        )
+
+        return points

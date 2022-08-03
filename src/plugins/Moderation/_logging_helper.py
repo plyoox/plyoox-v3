@@ -7,7 +7,7 @@ import discord
 from discord import utils
 
 from lib import helper, extensions
-from lib.enums import AutomodAction
+from lib.enums import AutomodAction, AutomodFinalAction
 from translation import _
 
 if TYPE_CHECKING:
@@ -96,15 +96,16 @@ async def automod_log(
     until: datetime.datetime | None = None,
     points: str | None = None,
 ) -> None:
-    cache = await bot.cache.get_moderation(message.guild.id)
+    guild = message.guild
+    member = message.author
+    lc = guild.preferred_locale
+
+    cache = await bot.cache.get_moderation(guild.id)
     if cache is None or not cache.active:
         return
 
     webhook = await _get_logchannel(bot, cache)
     if webhook is not None:
-        lc = message.guild.preferred_locale
-        member = message.author
-
         embeds = []
 
         embed = extensions.Embed(description=_(lc, f"automod.{action}.description", target=member))
@@ -127,21 +128,88 @@ async def automod_log(
                 message_embed = extensions.Embed(title=_(lc, "message"), description=message.content)
                 embeds.append(message_embed)
 
-        await _send_webhook(bot, message.guild.id, webhook, embeds=embeds)
+        await _send_webhook(bot, guild.id, webhook, embeds=embeds)
 
     if cache.notify_user:
-        lc = message.guild.preferred_locale
-
         try:
-            await message.author.send(
+            await member.send(
                 _(
                     lc,
                     f"automod.{action}.user_message",
                     reason=_(lc, f"automod.reason.{type}"),
                     timestamp=discord.utils.format_dt(until) if until is not None else None,
-                    guild=message.guild,
+                    guild=guild,
                     points=points,
                 )
             )
+        except discord.Forbidden:
+            pass
+
+
+async def automod_final_log(
+    bot: Plyoox,
+    member: discord.Member,
+    action: AutomodFinalAction,
+    *,
+    until: datetime.datetime | None = None,
+) -> None:
+    guild = member.guild
+    lc = guild.preferred_locale
+
+    cache = await bot.cache.get_moderation(guild.id)
+    if cache is None or not cache.active:
+        return
+
+    webhook = await _get_logchannel(bot, cache)
+    if webhook is not None:
+        embed = extensions.Embed(description=_(lc, f"automod.final.description", target=member))
+        embed.set_author(name=_(lc, f"automod.final.title"), icon_url=member.display_avatar)
+        embed.add_field(name=_(lc, "automod.final.action"), value=f"> {_(lc, f'moderation.{action}.log_title')}")
+        embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
+        embed.set_footer(text=f"{_(lc, 'id')}: {member.id}")
+
+        if until is not None:
+            embed.add_field(name=_(lc, "punished_until"), value=helper.embed_timestamp_format(until))
+
+        await _send_webhook(bot, guild.id, webhook, embed=embed)
+
+    if cache.notify_user:
+        try:
+            await member.send(
+                _(
+                    lc,
+                    f"automod.{action}.user_message",
+                    reason=_(lc, f"automod.reason.points"),
+                    timestamp=discord.utils.format_dt(until) if until is not None else None,
+                    guild=guild,
+                )
+            )
+        except discord.Forbidden:
+            pass
+
+
+async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Member, reason: str, points: str) -> None:
+    guild = member.guild
+    lc = guild.preferred_locale
+
+    cache = await bot.cache.get_moderation(guild.id)
+    if cache is None or not cache.active:
+        return
+
+    webhook = await _get_logchannel(bot, cache)
+    if webhook is not None:
+        embed = extensions.Embed(description=_(lc, "moderation.warn.description", target=member, moderator=moderator))
+        embed.set_author(name=_(lc, "moderation.warn.title"), icon_url=member.display_avatar)
+        embed.add_field(name=_(lc, "reason"), value=f"> {reason}")
+        embed.add_field(name=_(lc, "moderation.moderator"), value=f"> {moderator.mention} ({moderator.id})")
+        embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
+        embed.set_footer(text=f"{_(lc, 'id')}: {member.id}")
+        embed.add_field(name=_(lc, "automod.points_added"), value=f"> {points}")
+
+        await _send_webhook(bot, guild.id, webhook, embed=embed)
+
+    if cache.notify_user:
+        try:
+            await member.send(_(lc, "moderation.warn.user_message", reason=reason, guild=guild, points=points))
         except discord.Forbidden:
             pass

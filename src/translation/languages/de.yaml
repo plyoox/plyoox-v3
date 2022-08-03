@@ -170,15 +170,19 @@ moderation:
   warn:
     title: "Warnung"
     description: "Der Benutzer {target} ({target.id}) wurde von {moderator} gewarnt."
-    user_message: "Du wurdest vom Server {guild.name} für {reason} gewarnt und hast {points} Punkte erhalten."
+    user_message: "Du wurdest auf dem Server `{guild.name}` für **{reason}** gewarnt und hast nun `{points}` Punkte."
     no_warnings: "Der Benutzer hat keine offenen Verwarnungen."
     list_title: "Aktive Verwarnungen"
     points: "Punkte"
+    point: "Punkt"
     automod_not_loaded: "Das Automod Modul wurde nicht gefunden."
     no_settings: "Der Server hat das Moderationsmodul nicht eingerichtet."
     disabled: "Das Moderationsmodul ist deaktiviert."
     no_actions: "Der Server hat keine globalen Aktionen eingerichtet."
     success: "Der Benutzer wurde erfolgreich gewarnt."
+    no_bots: "Diese Aktion kann nicht auf Bots angewendet werden."
+    successfully_removed: "Die Verwarnung wurde erfolgreich entfernt."
+    not_found: "Eine Verwarnung mit dieser ID konnte nicht gefunden werden."
 automod:
   points_added: "Punkte hinzugefügt"
   reason:

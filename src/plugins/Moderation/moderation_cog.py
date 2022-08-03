@@ -26,6 +26,12 @@ class Moderation(commands.Cog):
         self.bot = bot
 
     clear_group = clear_group.ClearGroup()
+    warn_group = app_commands.Group(
+        name="warn",
+        description="Commands to manage warnings on a user.",
+        guild_only=True,
+        default_permissions=discord.Permissions(manage_messages=True),
+    )
 
     @staticmethod
     async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
@@ -61,6 +67,7 @@ class Moderation(commands.Cog):
             return
 
         await interaction.response.defer(ephemeral=True)
+
         await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="ban")
         await guild.ban(member, reason=reason, delete_message_days=1)
         await interaction.followup.send(_(lc, "moderation.ban.successfully_banned"), ephemeral=True)
@@ -146,7 +153,6 @@ class Moderation(commands.Cog):
         reason: Optional[app_commands.Range[str, None, 512]],
     ):
         lc = interaction.locale
-        await interaction.response.defer(ephemeral=True)
 
         banned_until = parsers.parse_datetime_from_string(duration)
         if banned_until is None:
@@ -160,6 +166,7 @@ class Moderation(commands.Cog):
         if not await Moderation._can_execute_on(interaction, member):
             return
 
+        await interaction.response.defer(ephemeral=True)
         await member.timeout(banned_until, reason=reason)
         await _logging_helper.log_simple_punish_command(
             interaction, target=member, until=banned_until, reason=reason, type="tempmute"
@@ -183,13 +190,15 @@ class Moderation(commands.Cog):
         except discord.NotFound:
             await interaction.response.send_message(_(lc, "moderation.unban.not_banned"), ephemeral=True)
             return
+
+        await interaction.response.defer(ephemeral=True)
         await _logging_helper.log_simple_punish_command(interaction, target=user, reason=reason, type="unban")
 
         await self.bot.db.execute(
             "DELETE FROM timers WHERE target_id = $1 AND guild_id = $2 AND type = 'tempban'", user.id, guild.id
         )
 
-        await interaction.response.send_message(_(lc, "moderation.unban.successfully_unbanned"), ephemeral=True)
+        await interaction.followup.send(_(lc, "moderation.unban.successfully_unbanned"), ephemeral=True)
 
     @app_commands.command(name="softban", description="Kicks an user from the guild and deletes their messages.")
     @app_commands.describe(member="The member that should be kicked.", reason="Why the member should be kicked.")
@@ -244,10 +253,11 @@ class Moderation(commands.Cog):
         reason: Optional[app_commands.Range[str, None, 512]],
     ):
         lc = interaction.locale
-        await interaction.response.defer(ephemeral=True)
 
         if not await Moderation._can_execute_on(interaction, member):
             return
+
+        await interaction.response.defer(ephemeral=True)
 
         await member.timeout(None, reason=_(lc, "moderation.unmute.reason"))
         await _logging_helper.log_simple_punish_command(interaction, target=member, type="unmute", reason=reason)
@@ -439,6 +449,109 @@ class Moderation(commands.Cog):
 
         embed = extensions.Embed(description=_(lc, "moderation.massban.overview_description"))
         await interaction.followup.send(embed=embed, view=_views.MassbanView(interaction, list(members), reason))
+
+    @warn_group.command(name="list", description="Lists current warnings for a user.")
+    @app_commands.describe(member="The user to list warnings for.")
+    async def warn_list(self, interaction: discord.Interaction, member: discord.Member):
+        lc = interaction.locale
+        if member.bot:
+            await interaction.response.send_message(_(lc, "moderation.warn.no_bots"), ephemeral=True)
+            return
+
+        if not await self._can_execute_on(interaction, member):
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        warnings = await self.bot.db.fetch(
+            "SELECT id, points, reason, timestamp FROM automod_users WHERE user_id = $1 AND guild_id = $2",
+            member.id,
+            interaction.guild_id,
+        )
+
+        if not warnings:
+            await interaction.followup.send(_(lc, "moderation.warn.no_warnings"), ephemeral=True)
+            return
+
+        embed = extensions.Embed(title=_(lc, "moderation.warn.list_title"))
+        embed.description = ""
+
+        for warning in warnings:
+            embed.description += f"`{warning['id']}`. {warning['points']} {_(lc, f'moderation.warn.point' + ('s' if warning['points'] != 1 else ''))} - {warning['reason']} - {discord.utils.format_dt(warning['timestamp'])}\n"
+
+        await interaction.followup.send(embed=embed, ephemeral=True)
+
+    @warn_group.command(name="add", description="Adds a warning to a user.")
+    @app_commands.describe(
+        member="The user to add a warning to.",
+        points="The amount of points to add.",
+        reason="The reason for the warning.",
+    )
+    async def warn_add(
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        points: app_commands.Range[int, 1, 20],
+        reason: app_commands.Range[str, 1, 128],
+    ):
+        lc = interaction.locale
+        if member.bot:
+            await interaction.response.send_message(_(lc, "moderation.warn.no_bots"), ephemeral=True)
+            return
+
+        automod_cog: automod.Automod | None = self.bot.get_cog("Automod")
+        if automod_cog is None:
+            await interaction.followup.send(_(interaction.locale, "moderation.warn.automod_not_loaded"), ephemeral=True)
+            return
+
+        if not await self._can_execute_on(interaction, member):
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        cache = await self.bot.cache.get_moderation(interaction.guild_id)
+        if cache is None:
+            await interaction.followup.send(_(lc, "moderation.warn.no_settings"), ephemeral=True)
+            return
+
+        if not cache.active:
+            await interaction.followup.send(_(lc, "moderation.warn.disabled"), ephemeral=True)
+            return
+
+        if not cache.automod_actions:
+            await interaction.followup.send(_(lc, "moderation.warn.no_actions"), ephemeral=True)
+            return
+
+        await automod_cog.add_warn_points(member, interaction.user, points, reason)
+
+        await interaction.followup.send(_(lc, "moderation.warn.success"))
+
+    @warn_group.command(name="remove", description="Removes a warning from a user.")
+    @app_commands.describe(member="The user to remove a warning from.", id="The ID of the warning to remove.")
+    async def warn_remove(
+        self, interaction: discord.Interaction, member: discord.Member, id: app_commands.Range[int, 0]
+    ):
+        lc = interaction.locale
+        if member.bot:
+            await interaction.response.send_message(_(lc, "moderation.warn.no_bots"), ephemeral=True)
+            return
+
+        if not await self._can_execute_on(interaction, member):
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        query_response = await self.bot.db.execute(
+            "DELETE FROM automod_users WHERE id = $1 and guild_id = $2 AND user_id = $3",
+            id,
+            interaction.guild_id,
+            member.id,
+        )
+
+        if query_response == "DELETE 1":
+            await interaction.followup.send(_(lc, "moderation.warn.successfully_removed"), ephemeral=True)
+        else:
+            await interaction.followup.send(_(lc, "moderation.warn.not_found"), ephemeral=True)
 
     @tempmute.autocomplete("duration")
     @tempban.autocomplete("duration")

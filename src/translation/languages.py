@@ -1,6 +1,5 @@
 import logging
 import os
-import traceback
 
 import discord
 import yaml
@@ -55,8 +54,8 @@ def get_key(language: str, key: str, **kwargs: dict[str, ...]):
     if message is not None:
         try:
             return message.format(**kwargs)
-        except KeyError:
-            logger.error(f"Could not format message {key}\n: {traceback.format_exc()}")
+        except KeyError as e:
+            logger.error(f"Could not format message {key}: KeyError '{str(e)}'")
             return message
 
     return f"{language}.{key}"

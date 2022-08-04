@@ -4,7 +4,7 @@ import random
 from typing import TYPE_CHECKING
 
 import discord
-from discord import app_commands
+from discord import app_commands, ui
 from discord.ext import commands
 
 from lib import formatting, helper, extensions
@@ -14,6 +14,31 @@ from . import _helper, level_group
 if TYPE_CHECKING:
     from main import Plyoox
     from lib.types import LevelUserData
+
+
+class ResetGuildModal(ui.Modal):
+    def __init__(self, interaction: discord.Interaction):
+        locale = interaction.locale
+
+        super().__init__(title=_(locale, "level.reset_guild_level.modal_title"))
+
+        self.bot: Plyoox = interaction.client  # type: ignore
+        self.question = ui.TextInput(
+            label=_(locale, "level.reset_guild_level.question"),
+            placeholder=_(locale, "level.reset_guild_level.placeholder"),
+            required=True,
+        )
+        self.add_item(self.question)
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        lc = interaction.locale
+        if self.question.value.lower() != _(lc, "level.reset_guild_level.reset_text").lower():
+            await interaction.response.send_message(_(lc, "level.reset_guild_level.wrong_answer"), ephemeral=True)
+            return
+
+        await interaction.response.defer(ephemeral=True)
+        await self.bot.db.execute("DELETE FROM leveling_users WHERE guild_id = $1", interaction.guild_id)
+        await interaction.followup.send(_(lc, "level.reset_guild_level.success"), ephemeral=True)
 
 
 class Leveling(commands.Cog):
@@ -175,3 +200,12 @@ class Leveling(commands.Cog):
 
         embed = extensions.Embed(description=_(lc, "level.reset_level.success"))
         await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    @app_commands.command(
+        name="reset-guild-levels",
+        description="Resets the levels of all members in the guild. This action cannot be undone.",
+    )
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.guild_only
+    async def reset_guild_levels(self, interaction: discord.Interaction):
+        await interaction.response.send_modal(ResetGuildModal(interaction))

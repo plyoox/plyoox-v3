@@ -94,6 +94,13 @@ level:
     modal_title: "{member}'s Level zurücksetzen?"
     success: "Das Level des Users wurde erfolgreich zurückgesetzt."
     reset_reason: "Das Level des Benutzers wurde zurückgesetzt."
+  reset_guild_level:
+    modal_title: "Serverweite Level zurücksetzen"
+    question: "Willst du wirklich alle Level zurücksetzen?"
+    placeholder: "Wiederhole \"Alle Level löschen\""
+    reset_text: "Alle Level löschen"
+    wrong_answer: "Der angegeben Text stimmt nicht überein. Die Level wurden nicht zurückgesetzt."
+    success: "Das Level aller User wurde zurückgesetzt. Bereits vergebene Level-Rollen wurden **nicht** entfernt."
   top:
     no_users: "Auf diesem Server hat der Bot noch keine Level registriert."
     title: "Server Ranking"

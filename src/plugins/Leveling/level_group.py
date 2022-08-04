@@ -44,7 +44,9 @@ class LevelGroup(app_commands.Group):
         )
 
     @staticmethod
-    def _generate_image(username: str, avatar: Image, level: int, current_xp: int, needed_xp: int) -> Image:
+    def _generate_image(
+        locale: discord.Locale, username: str, avatar: Image, level: int, current_xp: int, needed_xp: int, rank: int
+    ) -> Image:
         background = easy_pil.Editor(LevelGroup.BACKGROUND.copy())
 
         _crop_to_circle(avatar)
@@ -54,10 +56,12 @@ class LevelGroup(app_commands.Group):
         background.paste(avatar, (30, 36))
         background.rectangle((190, 100), width=int(250 * percentage), height=19, fill="#24C689", radius=10)
         background.text((190, 70), username, font=LevelGroup.FONT, color="white")
-        background.text((190, 130), f"Level", font=LevelGroup.FONT_sm, color="#dedede")
-        background.text((290, 130), f"XP", font=LevelGroup.FONT_sm, color="#dedede")
-        background.text((190, 150), f"{level}", font=LevelGroup.FONT_xs, color="gray")
-        background.text((290, 150), f"{current_xp}/{needed_xp}", font=LevelGroup.FONT_xs, color="gray")
+        background.text((190, 130), _(locale, "level.rank.level"), font=LevelGroup.FONT_sm, color="#dedede")
+        background.text((280, 130), _(locale, "level.rank.xp"), font=LevelGroup.FONT_sm, color="#dedede")
+        background.text((370, 130), _(locale, "level.rank.rank"), font=LevelGroup.FONT_sm, color="#dedede")
+        background.text((190, 150), str(level), font=LevelGroup.FONT_xs, color="gray")
+        background.text((280, 150), f"{current_xp}/{needed_xp}", font=LevelGroup.FONT_xs, color="gray")
+        background.text((370, 150), f"#{rank}", font=LevelGroup.FONT_xs, color="gray")
 
         buffer = io.BytesIO()
         background.image.save(buffer, format="PNG")
@@ -67,13 +71,16 @@ class LevelGroup(app_commands.Group):
 
     @staticmethod
     async def _create_level_image(
-        bot: Plyoox, member: discord.Member, level: int, current_xp: int, needed_xp: int
+        interaction: discord.Interaction, member: discord.Member, level: int, current_xp: int, needed_xp: int, rank: int
     ) -> discord.File:
+        locale = interaction.locale
+        bot: Plyoox = interaction.client  # type: ignore
+
         avatar_image_raw = await member.display_avatar.with_size(128).read()
         avatar_image = Image.open(io.BytesIO(avatar_image_raw))
 
         return await bot.loop.run_in_executor(
-            None, LevelGroup._generate_image, str(member), avatar_image, level, current_xp, needed_xp
+            None, LevelGroup._generate_image, locale, str(member), avatar_image, level, current_xp, needed_xp, rank
         )
 
     @app_commands.command(name="rank", description="Shows information about the current rank of a member.")
@@ -87,7 +94,7 @@ class LevelGroup(app_commands.Group):
         bot: Plyoox = interaction.client  # type: ignore
 
         user_data: LevelUserData = await bot.db.fetchrow(
-            "SELECT * FROM leveling_users WHERE guild_id = $1 AND user_id = $2",
+            "WITH users AS (SELECT xp, user_id, row_number() OVER (ORDER BY xp DESC) AS rank FROM leveling_users WHERE guild_id = $1) SELECT xp, rank FROM users WHERE user_id = $2",
             guild.id,
             current_member.id,
         )
@@ -100,7 +107,7 @@ class LevelGroup(app_commands.Group):
         required_xp = _helper.get_level_xp(current_level)
 
         image = await self._create_level_image(
-            interaction.client, current_member, current_level, remaining_xp, required_xp  # type: ignore
+            interaction, current_member, current_level, remaining_xp, required_xp, user_data["rank"]  # type: ignore
         )
 
         await interaction.response.send_message(file=image)

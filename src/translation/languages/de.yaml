@@ -84,8 +84,9 @@ infos:
 level:
   rank:
     no_data: "Der User hat derzeit keine XP. Versuche es erneut, nachdem der User etwas geschrieben hat."
-    level: "Derzeitiges Level"
-    xp: "Derzeitige XP"
+    level: "Level"
+    xp: "XP"
+    rank: "Rang"
   level_roles:
     title: "Verfügbare Level-Rollen"
     no_roles: "Der Server hat keine Level-Rollen"

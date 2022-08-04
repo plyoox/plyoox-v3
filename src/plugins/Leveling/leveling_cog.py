@@ -156,10 +156,22 @@ class Leveling(commands.Cog):
     @app_commands.guild_only
     async def reset_level(self, interaction: discord.Interaction, member: discord.Member):
         lc = interaction.locale
+        guild = interaction.guild
 
         await self.bot.db.execute(
-            "DELETE FROM leveling_users WHERE user_id = $1 AND guild_id = $2", member.id, interaction.guild.id
+            "DELETE FROM leveling_users WHERE user_id = $1 AND guild_id = $2", member.id, guild.id
         )
 
-        embed = extensions.Embed(description=_(lc, "level.reset_level.level_reset"))
+        if guild.me.guild_permissions.manage_roles:
+            leveling_cache = await self.bot.cache.get_leveling(guild.id)
+            if leveling_cache is not None:
+                if leveling_cache.roles:
+                    roles_to_remove = []
+                    for [role_id, level] in leveling_cache.roles:
+                        if role_id in member._roles:
+                            roles_to_remove.append(discord.Object(id=role_id))
+
+                    await member.remove_roles(*roles_to_remove, reason=_(lc, "level.reset_level.reset_reason"))
+
+        embed = extensions.Embed(description=_(lc, "level.reset_level.success"))
         await interaction.response.send_message(embed=embed, ephemeral=True)

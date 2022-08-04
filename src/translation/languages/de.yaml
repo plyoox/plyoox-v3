@@ -92,7 +92,8 @@ level:
     no_roles: "Der Server hat keine Level-Rollen"
   reset_level:
     modal_title: "{member}'s Level zurücksetzen?"
-    level_reset: "Das Level des Users wurde erfolgreich zurückgesetzt."
+    success: "Das Level des Users wurde erfolgreich zurückgesetzt."
+    reset_reason: "Das Level des Benutzers wurde zurückgesetzt."
   top:
     no_users: "Auf diesem Server hat der Bot noch keine Level registriert."
     title: "Server Ranking"

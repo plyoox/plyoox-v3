@@ -22,7 +22,7 @@ class PrivateView(ui.View):
         if self._last_interaction.is_expired():
             await self._last_interaction.message.edit(view=None)
         else:
-            await self._last_interaction.edit_original_message(view=None)
+            await self._last_interaction.edit_original_response(view=None)
 
 
 class EphemeralView(ui.View):
@@ -37,4 +37,4 @@ class EphemeralView(ui.View):
 
     async def on_timeout(self) -> None:
         if not self._last_interaction.is_expired():
-            await self._last_interaction.edit_original_message(view=None)
+            await self._last_interaction.edit_original_response(view=None)

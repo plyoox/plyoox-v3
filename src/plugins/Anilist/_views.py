@@ -72,7 +72,7 @@ class BackButton(ui.Button):
 
     async def callback(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer()
-        await interaction.edit_original_message(
+        await interaction.edit_original_response(
             embed=_helper.generate_info_embed(self.anilist_view.data, interaction.locale),
             view=self.anilist_view,
             attachments=[],
@@ -110,7 +110,7 @@ class ViewScoreButton(ui.Button):
         )
         embed.set_image(url="attachment://anilist_score.png")
 
-        await interaction.edit_original_message(
+        await interaction.edit_original_response(
             attachments=[image], embed=embed, view=BackButtonView(self.anilist_view, interaction=interaction)
         )
 

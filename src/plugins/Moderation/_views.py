@@ -24,7 +24,7 @@ async def _change_member_view(interaction: discord.Interaction, view: MemberView
     view._update_buttons()
 
     await interaction.response.defer()
-    await interaction.edit_original_message(embed=embed, view=view)
+    await interaction.edit_original_response(embed=embed, view=view)
 
 
 class BanButton(ui.Button):
@@ -52,14 +52,16 @@ class BanButton(ui.Button):
             except discord.Forbidden:
                 error_count += 1
                 if error_count == 5:
-                    await interaction.edit_original_message(
+                    await interaction.edit_original_response(
                         content=_(lc, "moderation.massban.ban_failed", member_count=ban_count)
                     )
                     return
             except discord.HTTPException:
                 pass
 
-        await interaction.edit_original_message(content=_(lc, "moderation.massban.ban_success", member_count=ban_count))
+        await interaction.edit_original_response(
+            content=_(lc, "moderation.massban.ban_success", member_count=ban_count)
+        )
 
 
 class CancelButton(ui.Button):
@@ -77,7 +79,7 @@ class CancelButton(ui.Button):
             item.disabled = True
 
         await interaction.response.defer()
-        await interaction.edit_original_message(content=_(lc, "moderation.massban.cancel_ban"), view=None, embed=None)
+        await interaction.edit_original_response(content=_(lc, "moderation.massban.cancel_ban"), view=None, embed=None)
 
 
 class ViewMemberButton(ui.Button):
@@ -138,7 +140,7 @@ class CloseMemberViewButton(ui.Button):
         embed = extensions.Embed(description=_(interaction.locale, "moderation.massban.overview_description"))
         await interaction.response.defer()
 
-        await interaction.edit_original_message(embed=embed, view=self.massban_view)
+        await interaction.edit_original_response(embed=embed, view=self.massban_view)
 
 
 class MemberView(extensions.EphemeralView):

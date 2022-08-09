@@ -15,8 +15,15 @@ if TYPE_CHECKING:
     from main import Plyoox
 
 
+_T = app_commands.locale_str
+
+
 @app_commands.guild_only
-class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun commands."):
+class Fun(
+    commands.GroupCog,
+    group_name=_T("fun", key="fun.name"),
+    group_description=_T("Provides fun commands.", key="fun.description"),
+):
     gifs: dict[str, list[str]]
 
     def __init__(self, bot: Plyoox):
@@ -26,11 +33,16 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
         with open("src/plugins/Fun/gifs.json") as f:
             self.gifs = json.load(f)
 
-    @app_commands.command(name="coinflip", description="Flips a coin.")
+    @app_commands.command(
+        name=_T("coinflip", key="fun.coinflip.name"), description=_T("Flips a coin.", key="fun.coinflip.description")
+    )
     async def coinflip(self, interaction: discord.Interaction):
         await interaction.response.send_message(random.choice((":coin:", ":one:")))
 
-    @app_commands.command(name="color", description="Generates a random color.")
+    @app_commands.command(
+        name=_T("color", key="fun.color.description"),
+        description=_T("Generates a random color.", key="fun.color.description"),
+    )
     async def color(self, interaction: discord.Interaction):
         lc = interaction.locale
 
@@ -44,7 +56,9 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
         )
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="slot", description="Rolls a slot machine.")
+    @app_commands.command(
+        name=_T("slot", key="fun.slot.name"), description=_T("Rolls a slot machine.", key="fun.slot.description")
+    )
     async def slot(self, interaction: discord.Interaction):
         lc = interaction.locale
 
@@ -65,7 +79,9 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
 
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="ship", description="Ships two users.")
+    @app_commands.command(
+        name=_T("ship", key="fun.ship.name"), description=_T("Ships two users.", key="fun.ship.description")
+    )
     @app_commands.describe(
         user1="A user to be shipped", user2="Another optional user that will be shipped with the first one"
     )
@@ -85,28 +101,39 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
         )
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="thisorthat", description="Chooses one of the two given arguments.")
-    @app_commands.describe(this="The first argument", that="The second argument")
+    @app_commands.command(
+        name=_T("thisorthat", key="fun.thisorthat.name"),
+        description=_T("Chooses one of the two given choices.", key="fun.thisorthat.description"),
+    )
+    @app_commands.describe(
+        this=_T("The first choice", key="fun.thisorthat.this"), that=_T("The second choice", key="fun.thisorthat.that")
+    )
     async def thisorthat(self, interaction: discord.Interaction, this: str, that: str):
         lc = interaction.locale
 
         await interaction.response.send_message(f"**{_(lc, 'fun.thisorthat.title')}**\n{random.choice((this, that))}")
 
-    @app_commands.command(name="dice", description="Rolls a dice.")
+    @app_commands.command(
+        name=_T("dice", key="fun.dice.name"), description=_T("Rolls a dice.", key="fun.dice.description")
+    )
     async def dice(self, interaction: discord.Interaction):
         await interaction.response.send_message(
             random.choice((":one:", ":two:", ":three:", ":four:", ":five:", ":six:"))
         )
 
-    @app_commands.command(name="cat", description="Shows a cute cat.")
+    @app_commands.command(
+        name=_T("cat", key="fun.cat.name"), description=_T("Shows a cute cat.", key="fun.cat.description")
+    )
     async def cat(self, interaction: discord.Interaction):
         await interaction.response.send_message(random.choice(self.gifs["cat"]))
 
-    @app_commands.command(name="dog", description="Shows a cute dog.")
+    @app_commands.command(
+        name=_T("dog", key="fun.dog.name"), description=_T("Shows a cute dog.", key="fun.dog.description")
+    )
     async def dog(self, interaction: discord.Interaction):
         await interaction.response.send_message(random.choice(self.gifs["dog"]))
 
-    @app_commands.command(name="cry", description="Cries.")
+    @app_commands.command(name=_T("cry", key="fun.cry.name"), description=_T("Cries.", key="fun.cry.description"))
     async def cry(self, interaction: discord.Interaction):
         lc = interaction.locale
 
@@ -114,8 +141,10 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
             f"{_(lc, 'fun.cry', user=interaction.user)} {random.choice(self.gifs['cry'])}"
         )
 
-    @app_commands.command(name="hug", description="Hugs a user.")
-    @app_commands.describe(member="The user to hug.")
+    @app_commands.command(
+        name=_T("hug", key="fun.hug.name"), description=_T("Hugs a user.", description="fun.hug.description")
+    )
+    @app_commands.describe(member=_T("The user to hug.", key="fun.hug.member"))
     async def hug(self, interaction: discord.Interaction, member: discord.Member):
         lc = interaction.locale
 

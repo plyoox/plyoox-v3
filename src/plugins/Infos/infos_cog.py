@@ -8,6 +8,9 @@ from translation import _
 from . import guild_group, user_group
 
 
+_T = app_commands.locale_str
+
+
 class Infos(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
@@ -15,7 +18,9 @@ class Infos(commands.Cog):
     guild_commands = guild_group.GuildGroup()
     user_commands = user_group.UserGroup()
 
-    @app_commands.command(name="bot", description="Shows information about the bot")
+    @app_commands.command(
+        name=_T("bot", key="bot.name"), description=_T("Shows information about the bot", key="bot.description")
+    )
     async def bot(self, interaction: discord.Interaction):
         """Shows basic information about the bot."""
         lc = interaction.locale

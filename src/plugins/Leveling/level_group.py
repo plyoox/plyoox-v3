@@ -18,6 +18,9 @@ if TYPE_CHECKING:
     from lib.types import LevelUserData
 
 
+_T = app_commands.locale_str
+
+
 def _crop_to_circle(avatar: Image):
     big_size = (128 * 3, 128 * 3)
 
@@ -37,8 +40,8 @@ class LevelGroup(app_commands.Group):
 
     def __init__(self):
         super().__init__(
-            name="level",
-            description="Commands that are needed to interact with the level-system.",
+            name=_T("level", key="level.name"),
+            description=_T("Commands that are needed to interact with the level-system.", key="level.description"),
             guild_only=True,
             default_permissions=discord.Permissions(),
         )
@@ -83,8 +86,11 @@ class LevelGroup(app_commands.Group):
             None, LevelGroup._generate_image, locale, str(member), avatar_image, level, current_xp, needed_xp, rank
         )
 
-    @app_commands.command(name="rank", description="Shows information about the current rank of a member.")
-    @app_commands.describe(member="The member from whom you want the rank.")
+    @app_commands.command(
+        name=_T("rank", key="level.rank.name"),
+        description=_T("Shows information about the current rank of a member.", key="level.rank.description"),
+    )
+    @app_commands.describe(member=_T("The member from whom you want the rank.", key="level.rank.member"))
     async def rank(self, interaction: discord.Interaction, member: Optional[discord.Member]):
         """Shows the current ranking information about a member. If no member is provided, the user that executed
         the command will be used.
@@ -112,7 +118,10 @@ class LevelGroup(app_commands.Group):
 
         await interaction.response.send_message(file=image)
 
-    @app_commands.command(name="show-roles", description="Shows the available level roles.")
+    @app_commands.command(
+        name=_T("show-roles", key="level.show-roles.name"),
+        description=_T("Shows the available level roles.", key="level.show-roles.description"),
+    )
     async def show_roles(self, interaction: discord.Interaction):
         """Shows the roles that are gain able through the level system"""
         lc = interaction.locale
@@ -136,7 +145,10 @@ class LevelGroup(app_commands.Group):
 
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="top", description="Lists the top 10 users with the highest level on this guild.")
+    @app_commands.command(
+        name=_T("top", key="level.top.name"),
+        description=_T("Lists the top 10 users with the highest level on this guild.", key="level.rank.description"),
+    )
     async def top(self, interaction: discord.Interaction):
         lc = interaction.locale
         guild = interaction.guild

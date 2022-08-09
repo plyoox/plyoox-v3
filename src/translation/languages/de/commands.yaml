@@ -1,0 +1,88 @@
+level:
+  description: "Alle Commands, die für das Levelsystem benötigt werden."
+  rank:
+    description: "Zeigt dir Informationen über das derzeitige Level eines Benutzers."
+    member: "Der Benutzer, vom dem du die Informationen haben willst."
+  show-roles:
+    description: "Zeigt dir die verfügbaren Level-Rollen an."
+  top:
+    description: "Zeigt die Top 10 Benutzer im Levelsystem an."
+reset-level:
+  description: "Setzt das Level eines Benutzers zurück. Diese Aktion kann nicht rückgängig gemacht werden."
+  member: "Der Benutzer, dessen Level zurückgesetzt werden soll."
+reset-guild-levels:
+  description: "Setzt das Level aller Benutzer zurück. Diese Aktion kann nicht rückgängig gemacht werden."
+anilist:
+  description: "Einige Commands, um die Anilist-Seite zu durchsuchen."
+  search:
+    description: "Suche nach Animes auf Anilist."
+    query: "Der Text nach dem gesucht werden soll."
+    title: "In welcher Sprache die Titel angezeigt werden."
+  info:
+    description: "Zeigt Informationen über einen Anime an."
+fun:
+  description: "Spaß-Commands"
+  coinflip:
+    description: "Schmeißt eine Münze."
+  color:
+    description: "Generiert eine zufällige Farbe."
+  ship:
+    description: "Wie sehr mögen sich zwei Benutzer?"
+  thisorthat:
+    description: "Wählt eines der zwei Möglichkeiten aus."
+    this: "Erste Möglichkeit"
+    that: "Zweite Möglichkeit"
+  dice:
+    description: "Rollt einen Würfel."
+  cat:
+    description: "Zeigt eine süße Katze."
+  dog:
+    description: "Zeigt einen süßen Hund."
+  cry:
+    description: "Ich glaub ich muss heulen :("
+  hug:
+    description: "Umarmt einen Benutzer."
+    member: "Den Benutzer, den du umarmen willst."
+guild-info:
+  description: "Zeigt Informationen über den Server oder Server-spezifische Dinge an."
+  about:
+    description: "Zeigt Informationen über den Server an."
+  today-joined:
+    description: "Zeigt an, wie viele Benutzer in den letzten 24 Stunden auf den Server gejoint sind."
+  members:
+    description: "Zeigt die Anzahl der Mitglieder auf dem Server."
+bot:
+  description: "Zeigt Informationen über den Bot an."
+user-info:
+  description: "Zeigt Informationen über einen Benutzer an."
+  joined:
+    description: "Zeigt Beitrittsinformationen über einen Benutzer an."
+    position:
+      description: "Zeigt den Benutzer auf einer Beitrittsposition an."
+      position: "Die Position die du abfragen willst."
+    member:
+      description: "Zeigt die Beitrittsinformationen von einen Benutzer an."
+      member: "Der Benutzer von dem du die Beitrittsinformationen sehen willst."
+  about:
+    description: "Zeigt Informationen über einen Benutzer an."
+    member: "Der Benutzer, über den du die Informationen willst."
+  avatar:
+    description: "Zeigt den Avatar eines Benutzers an."
+    member: "Der Benutzer, von dem du den Avatar willst."
+clear:
+  description: "Löscht Nachrichten in einem Channel. Es können mehrere Filter angewendet werden."
+  amount: "The number of messages the bot should scan through."
+  reason: "Warum die Nachrichten gelöscht werden sollen."
+  all:
+    amount: "Die Anzahl der Nachrichten die gelöscht werden sollen."
+    description: "Löscht alle Nachrichten in einem Channel."
+  contains:
+    description: "Löscht alle Nachrichten, die einen spezifischen Text haben."
+    string: "Der Text, der in der Nachricht enthalten sein soll."
+  user:
+    description: "Löscht alle Nachrichten von einem bestimmten Benutzer."
+    user: "Der Benutzer, von dem die Nachrichten gelöscht werden sollen."
+  links:
+    description: "Löscht alle Nachrichten, die einen Link enthalten."
+  files:
+    description: "Löscht alle Nachrichten, die eine Datei enthalten."

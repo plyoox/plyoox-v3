@@ -25,17 +25,17 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 plugins = [
-    "plugins.Infos",
-    "plugins.Leveling",
-    "plugins.Welcome",
-    "plugins.Owner",
-    "plugins.Moderation",
-    "plugins.Logging",
+    # "plugins.Infos",
+    # "plugins.Leveling",
+    # "plugins.Welcome",
+    # "plugins.Owner",
+    # "plugins.Moderation",
+    # "plugins.Logging",
     "plugins.Fun",
-    "plugins.Timers",
-    "plugins.Anilist",
-    "plugins.DataHandler",
-    "plugins.Notification",
+    # "plugins.Timers",
+    # "plugins.Anilist",
+    # "plugins.DataHandler",
+    # "plugins.Notification",
 ]
 
 
@@ -57,6 +57,7 @@ class Plyoox(commands.Bot):
             max_messages=2000,
             command_prefix=[],
             tree_cls=extensions.CommandTree,
+            application_id=505433541916622850,
         )
 
         if os.getenv("TEST_GUILD"):
@@ -64,7 +65,9 @@ class Plyoox(commands.Bot):
 
     async def setup_hook(self) -> None:
         self.loop.create_task(self._refresh_presence())
-        self.owner_id = self.application.owner.id
+        # self.owner_id = self.application.owner.id
+
+        await self.tree.set_translator(extensions.Translator())
 
         for plugin in plugins:
             logger.debug(f"Load plugin '{plugin}'...")

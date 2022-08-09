@@ -16,6 +16,9 @@ if TYPE_CHECKING:
     from main import Plyoox
 
 
+_T = app_commands.locale_str
+
+
 @app_commands.guild_only
 class Anilist(commands.GroupCog, group_name="anilist", group_description="Commands for querying the Anilist site."):
     def __init__(self, bot: Plyoox):
@@ -84,7 +87,7 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
         )
 
     @app_commands.command(name="info", description="Get information about an anime on Anilist.")
-    @app_commands.describe(query="The query to search for.")
+    @app_commands.describe(query=_T("The query to search for.", key="anilist.search.query"))
     async def info_anilist(self, interaction: discord.Interaction, query: str):
         if not self.limiter.has_capacity() and not self.limit_lock:
             await interaction.response.send(_(interaction.locale, "anilist.rate_limit"))

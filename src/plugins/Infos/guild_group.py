@@ -15,10 +15,7 @@ class GuildGroup(app_commands.Group):
             guild_only=True,
         )
 
-    @app_commands.command(
-        name="about",
-        description="Displays general information about the current guild.",
-    )
+    @app_commands.command(name="about", description="Displays general information about the current guild.")
     async def about(self, interaction: discord.Interaction):
         """This command shows basic information about the current guild."""
         lc = interaction.locale
@@ -51,10 +48,7 @@ class GuildGroup(app_commands.Group):
 
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(
-        name="today-joined",
-        description="Shows how many members joined in the last 24 hours.",
-    )
+    @app_commands.command(name="today-joined", description="Shows how many members joined in the last 24 hours.")
     async def today_joined(self, interaction: discord.Interaction):
         """Shows the amount of members that have joined in the last 24 hours. This does
         not include members that already left. This means, that this number does not represent

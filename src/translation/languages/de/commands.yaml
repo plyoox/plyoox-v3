@@ -1,0 +1,156 @@
+level:
+  description: "Alle Commands, die für das Levelsystem benötigt werden."
+  rank:
+    description: "Zeigt dir Informationen über das derzeitige Level eines Benutzers."
+    member: "Der Benutzer, vom dem du die Informationen haben willst."
+  show-roles:
+    description: "Zeigt dir die verfügbaren Level-Rollen an."
+  top:
+    description: "Zeigt die Top 10 Benutzer im Levelsystem an."
+reset-level:
+  description: "Setzt das Level eines Benutzers zurück. Diese Aktion kann nicht rückgängig gemacht werden."
+  member: "Der Benutzer, dessen Level zurückgesetzt werden soll."
+reset-guild-levels:
+  description: "Setzt das Level aller Benutzer zurück. Diese Aktion kann nicht rückgängig gemacht werden."
+anilist:
+  description: "Einige Commands, um die Anilist-Seite zu durchsuchen."
+  search:
+    description: "Suche nach Animes auf Anilist."
+    query: "Der Text nach dem gesucht werden soll."
+    title: "In welcher Sprache die Titel angezeigt werden."
+  info:
+    description: "Zeigt Informationen über einen Anime an."
+fun:
+  description: "Spaß-Commands"
+  coinflip:
+    description: "Schmeißt eine Münze."
+  color:
+    description: "Generiert eine zufällige Farbe."
+  ship:
+    description: "Wie sehr mögen sich zwei Benutzer?"
+    user1: "Der erste Benutzer"
+    user2: "Der zweite Benutzer (optional)"
+  thisorthat:
+    description: "Wählt eines der zwei Möglichkeiten aus."
+    this: "Erste Möglichkeit"
+    that: "Zweite Möglichkeit"
+  dice:
+    description: "Rollt einen Würfel."
+  cat:
+    description: "Zeigt eine süße Katze."
+  dog:
+    description: "Zeigt einen süßen Hund."
+  cry:
+    description: "Ich glaub ich muss heulen :("
+  hug:
+    description: "Umarmt einen Benutzer."
+    member: "Den Benutzer, den du umarmen willst."
+  slot:
+    description: "Startet eine Slotmaschine."
+guild-info:
+  description: "Zeigt Informationen über den Server oder Server-spezifische Dinge an."
+  about:
+    description: "Zeigt Informationen über den Server an."
+  today-joined:
+    description: "Zeigt an, wie viele Benutzer in den letzten 24 Stunden auf den Server gejoint sind."
+  members:
+    description: "Zeigt die Anzahl der Mitglieder auf dem Server."
+bot:
+  description: "Zeigt Informationen über den Bot an."
+user-info:
+  description: "Zeigt Informationen über einen Benutzer an."
+  joined:
+    description: "Zeigt Beitrittsinformationen über einen Benutzer an."
+    position:
+      description: "Zeigt den Benutzer auf einer Beitrittsposition an."
+      position: "Die Position die du abfragen willst."
+    member:
+      description: "Zeigt die Beitrittsinformationen von einen Benutzer an."
+      member: "Der Benutzer von dem du die Beitrittsinformationen sehen willst."
+  about:
+    description: "Zeigt Informationen über einen Benutzer an."
+    member: "Der Benutzer, über den du die Informationen willst."
+  avatar:
+    description: "Zeigt den Avatar eines Benutzers an."
+    member: "Der Benutzer, von dem du den Avatar willst."
+clear:
+  description: "Löscht Nachrichten in einem Channel. Es können mehrere Filter angewendet werden."
+  amount: "The number of messages the bot should scan through."
+  reason: "Warum die Nachrichten gelöscht werden sollen."
+  all:
+    amount: "Die Anzahl der Nachrichten die gelöscht werden sollen."
+    description: "Löscht alle Nachrichten in einem Channel."
+  contains:
+    description: "Löscht alle Nachrichten, die einen spezifischen Text haben."
+    string: "Der Text, der in der Nachricht enthalten sein soll."
+  user:
+    description: "Löscht alle Nachrichten von einem bestimmten Benutzer."
+    user: "Der Benutzer, von dem die Nachrichten gelöscht werden sollen."
+  links:
+    description: "Löscht alle Nachrichten, die einen Link enthalten."
+  files:
+    description: "Löscht alle Nachrichten, die eine Datei enthalten."
+warn:
+  description: "Commands, um die Warnungen eines Benutzers zu verwalten."
+  list:
+    description: "Listet alle offenen Warnungen eines Benutzers auf."
+    member: "Der Benutzer, dessen Warnungen angezeigt werden sollen."
+  add:
+    description: "Fügt eine Warnung zu einem Benutzer hinzu."
+    member: "Der Benutzer, der eine Warnung erhalten soll."
+    points: "Wie viele Punkte die Warnung geben soll."
+    reason: "Der Grund für die Warnung."
+  remove:
+    description: "Entfernt eine Warnung von einem Benutzer."
+    member: "Der Benutzer, von dem die Warnung entfernt werden soll."
+    id: "Die ID der Warnung, die entfernt werden soll."
+ban:
+  description: "Bannt einen Benutzer vom Server."
+  member: "Der Benutzer, der gebannt werden soll."
+  reason: "Warum der Benutzer gebannt werden soll."
+tempban:
+  description: "Bannt einen Benutzer für eine bestimmte Zeit vom Server."
+  duration: "Wie lang der Benutzer gebannt werden soll."
+kick:
+  description: "Kickt einen Benutzer vom Server."
+  member: "Der Benutzer, der gekickt werden soll."
+  reason: "Warum der Benutzer gekickt werden soll."
+tempmute:
+  description: "Sperrt einen Benutzer für eine bestimmte Zeit."
+  member: "Der Benutzer, der gesperrt werden soll."
+  reason: "Warum das Mitglied gesperrt werden soll."
+  duration: "Wie lang das Mitglied gesperrt werden soll (maximal 28 Tage)."
+unban:
+  description: "Entbannt einen Benutzer vom Server."
+  user: "Der Benutzer der entbannt werden soll."
+  reason: "Warum der Benutzer entbannt werden soll."
+softban:
+  description: "Kickt einen Benutzer vom Server und löscht alle seine Nachrichten."
+slowmode:
+  description: "Setzt einen Slowmode im derzeitigen Channel."
+  duration: "Die Dauer des Slowmodes in Sekunden (maximal 6 Stunden)."
+unmute:
+  description: "Entsperrt einen Benutzer."
+  member: "Der Benutzer, der entsperrt werden soll."
+  reason: "Warum das Mitglied entsperrt werden soll."
+invite-info:
+  description: "Zeigt Informationen über eine Einladung an."
+  invite: "Der Invite, dessen Information angezeigt werden soll."
+massban:
+  description: "Bannt mehrere Benutzer basierend auf verschiedenen Kriterien."
+  channel: "Der Kanal, in dem gesucht werden soll. Wenn nicht angegeben, wird der derzeitige Kanal benutzt."
+  reason: "Der Grund für die Banns."
+  message_contains: "Text, der in einer Nachricht vorkommen muss."
+  message_starts: "Text, mit dem eine Nachricht anfangen muss."
+  message_ends: "Text, mit dem die Nachricht aufhören muss."
+  has_embed: "Ob die Nachricht ein Embed haben muss."
+  has_attachment: "Ob die Nachricht eine Datei hat."
+  joined_after: "Nur Benutzer, die nach diesem beigetreten sind."
+  joined_before: "Nur Benutzer, die vor diesem beigetreten sind."
+  has_role: "Ob der Benutzer eine Rolle haben muss."
+  has_avatar: "Ob der Benutzer einen Avatar haben muss."
+  username_regex: "Regex, der auf den Usernamen zutreffen muss."
+  sent_after: "Nur Nachrichten zählen, die nach dieser geschrieben wurden (ID)."
+  sent_before: "Nur Nachrichten zählen, die vor dieser geschrieben wurden (ID)."
+  account_younger_days: "Nur Benutzer, die jünger sind (Tage)."
+  joined_before_days: "Nur Benutzer, die davor beigetreten sind (Tage)."

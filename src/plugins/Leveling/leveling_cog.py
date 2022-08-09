@@ -16,6 +16,9 @@ if TYPE_CHECKING:
     from lib.types import LevelUserData
 
 
+_T = app_commands.locale_str
+
+
 class ResetGuildModal(ui.Modal):
     def __init__(self, interaction: discord.Interaction):
         locale = interaction.locale

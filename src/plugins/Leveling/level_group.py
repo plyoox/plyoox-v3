@@ -18,6 +18,9 @@ if TYPE_CHECKING:
     from lib.types import LevelUserData
 
 
+_T = app_commands.locale_str
+
+
 def _crop_to_circle(avatar: Image):
     big_size = (128 * 3, 128 * 3)
 
@@ -84,7 +87,7 @@ class LevelGroup(app_commands.Group):
         )
 
     @app_commands.command(name="rank", description="Shows information about the current rank of a member.")
-    @app_commands.describe(member="The member from whom you want the rank.")
+    @app_commands.describe(member=_T("The member from whom you want the rank.", key="level.rank.member"))
     async def rank(self, interaction: discord.Interaction, member: Optional[discord.Member]):
         """Shows the current ranking information about a member. If no member is provided, the user that executed
         the command will be used.

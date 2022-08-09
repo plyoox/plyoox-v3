@@ -7,15 +7,19 @@ from discord import app_commands
 from lib import extensions
 from translation import _
 
+
+_T = app_commands.locale_str
 LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
 
 
-@app_commands.default_permissions(manage_messages=True)
 @app_commands.checks.bot_has_permissions(manage_messages=True)
 class ClearGroup(app_commands.Group):
     def __init__(self):
         super().__init__(
-            name="clear", description="Clears messages in a channel. Specific filters can be applied.", guild_only=True
+            name="clear",
+            description="Clears messages in a channel. Specific filters can be applied.",
+            guild_only=True,
+            default_permissions=discord.Permissions(manage_messages=True),
         )
 
     @staticmethod
@@ -42,7 +46,8 @@ class ClearGroup(app_commands.Group):
 
     @app_commands.command(name="all", description="Clear all messages in a channel.")
     @app_commands.describe(
-        amount="The amount of messages you want to purge.", reason="Why the messages should be deleted."
+        amount="The amount of messages you want to purge.",
+        reason=_T("Why the messages should be deleted.", key="clear.reason"),
     )
     async def clear_all(
         self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]
@@ -56,9 +61,9 @@ class ClearGroup(app_commands.Group):
 
     @app_commands.command(name="contains", description="Clears all messages that contain a specific string.")
     @app_commands.describe(
-        amount="The number of messages the bot should scan through.",
+        amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
         string="If this string is contained in a message, the bot will delete it.",
-        reason="Why the messages should be deleted.",
+        reason=_T("Why the messages should be deleted.", key="clear.reason"),
     )
     async def clear_contains(
         self,
@@ -74,9 +79,9 @@ class ClearGroup(app_commands.Group):
 
     @app_commands.command(name="user", description="Clears all messages from a specific user.")
     @app_commands.describe(
-        amount="The number of messages the bot should scan through.",
+        amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
         user="The user from whom the messages are to be deleted",
-        reason="Why the messages should be deleted.",
+        reason=_T("Why the messages should be deleted.", key="clear.reason"),
     )
     async def clear_user(
         self,
@@ -90,7 +95,8 @@ class ClearGroup(app_commands.Group):
 
     @app_commands.command(name="links", description="Deletes all messages that contain a link.")
     @app_commands.describe(
-        amount="The number of messages the bot should scan through.", reason="Why the messages should be deleted."
+        amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
+        reason=_T("Why the messages should be deleted.", key="clear.reason"),
     )
     async def clear_links(
         self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]
@@ -100,7 +106,8 @@ class ClearGroup(app_commands.Group):
 
     @app_commands.command(name="files", description="Deletes all messages that contains files.")
     @app_commands.describe(
-        amount="The number of messages the bot should scan through.", reason="Why the messages should be deleted."
+        amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
+        reason=_T("Why the messages should be deleted.", key="clear.reason"),
     )
     async def clear_files(
         self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]

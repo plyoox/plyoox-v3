@@ -85,8 +85,8 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
         )
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(name="thisorthat", description="Chooses one of the two given arguments.")
-    @app_commands.describe(this="The first argument", that="The second argument")
+    @app_commands.command(name="thisorthat", description="Chooses one of the two given choices.")
+    @app_commands.describe(this="The first choice", that="The second choice")
     async def thisorthat(self, interaction: discord.Interaction, this: str, that: str):
         lc = interaction.locale
 

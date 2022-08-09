@@ -13,7 +13,9 @@ from translation import _
 class UserGroup(app_commands.Group):
     def __init__(self):
         super().__init__(
-            name="user-info", description="Provides information about a guild member or user.", guild_only=True
+            name="user-info",
+            description="Provides information about a guild member or user.",
+            guild_only=True,
         )
 
     joined_group = app_commands.Group(name="joined", description="Provides join information about a member.")

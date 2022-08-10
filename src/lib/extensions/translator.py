@@ -15,8 +15,6 @@ class Translator(app_commands.Translator):
     def __init__(self):
         pass
 
-    count = 0
-
     @staticmethod
     def _command_to_locale_key(command: app_commands.Command) -> list[str]:
         locale_keys = []

@@ -178,11 +178,8 @@ class Leveling(commands.Cog):
 
                     await helper.permission_check(level_channel, content=level_message)
 
-    @app_commands.command(
-        name=_T("reset-level", key="reset-level.name"),
-        description=_T("Resets the level of a member. This action cannot be undone.", key="reset-level.description"),
-    )
-    @app_commands.describe(member=_T("The member from whom you want to reset rank.", key="reset-level.member"))
+    @app_commands.command(name="reset-level", description="Resets the level of a member. This action cannot be undone.")
+    @app_commands.describe(member="The member from whom you want to reset rank.")
     @app_commands.default_permissions(administrator=True)
     @app_commands.guild_only
     async def reset_level(self, interaction: discord.Interaction, member: discord.Member):
@@ -208,11 +205,8 @@ class Leveling(commands.Cog):
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @app_commands.command(
-        name=_T("reset-guild-levels", key="reset-guild-levels.name"),
-        description=_T(
-            "Resets the levels of all members in the guild. This action cannot be undone.",
-            key="reset-guild-levels.description",
-        ),
+        name="reset-guild-levels",
+        description="Resets the levels of all members in the guild. This action cannot be undone.",
     )
     @app_commands.default_permissions(administrator=True)
     @app_commands.guild_only

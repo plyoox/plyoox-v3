@@ -7,23 +7,15 @@ from lib import helper, extensions
 from translation import _
 
 
-_T = app_commands.locale_str
-
-
 class GuildGroup(app_commands.Group):
     def __init__(self):
         super().__init__(
-            name=_T("guild-info", key="guild-info.name"),
-            description=_T(
-                "Provides information about a guild or guild specific information.", key="guild-info.description"
-            ),
+            name="guild-info",
+            description="Provides information about a guild or guild specific information.",
             guild_only=True,
         )
 
-    @app_commands.command(
-        name=_T("about", key="guild-info.about.name"),
-        description=_T("Displays general information about the current guild.", key="guild-info.about.description"),
-    )
+    @app_commands.command(name="about", description="Displays general information about the current guild.")
     async def about(self, interaction: discord.Interaction):
         """This command shows basic information about the current guild."""
         lc = interaction.locale
@@ -56,12 +48,7 @@ class GuildGroup(app_commands.Group):
 
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(
-        name=_T("today-joined", key="guild-info.today-joined.name"),
-        description=_T(
-            "Shows how many members joined in the last 24 hours.", key="guild-info.today-joined.description"
-        ),
-    )
+    @app_commands.command(name="today-joined", description="Shows how many members joined in the last 24 hours.")
     async def today_joined(self, interaction: discord.Interaction):
         """Shows the amount of members that have joined in the last 24 hours. This does
         not include members that already left. This means, that this number does not represent
@@ -80,10 +67,7 @@ class GuildGroup(app_commands.Group):
 
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(
-        name=_T("members", key="guild-info.members.name"),
-        description=_T("Shows how many members are currently in the guild.", key="guild-info.members.description"),
-    )
+    @app_commands.command(name="members", description="Shows how many members are currently in the guild.")
     async def members(self, interaction: discord.Interaction):
         """Returns the member count for the current guild."""
         guild = interaction.guild

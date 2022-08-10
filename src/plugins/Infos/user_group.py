@@ -10,21 +10,15 @@ from lib import colors, helper, extensions
 from translation import _
 
 
-_T = app_commands.locale_str
-
-
 class UserGroup(app_commands.Group):
     def __init__(self):
         super().__init__(
-            name=_T("user-info", key="user-info.name"),
-            description=_T("Provides information about a guild member or user.", key="user-info.description"),
+            name="user-info",
+            description="Provides information about a guild member or user.",
             guild_only=True,
         )
 
-    joined_group = app_commands.Group(
-        name=_T("joined", key="user-info.joined.name"),
-        description=_T("Provides join information about a member.", key="user-info.joined.description"),
-    )
+    joined_group = app_commands.Group(name="joined", description="Provides join information about a member.")
 
     @staticmethod
     def sort(list_user: discord.Member):
@@ -47,11 +41,8 @@ class UserGroup(app_commands.Group):
 
         await interaction.response.send_message(embed=embed)
 
-    @joined_group.command(
-        name=_T("position", key="user-info.joined.position.name"),
-        description=_T("Shows the user on a join position", key="user-info.joined.position.description"),
-    )
-    @app_commands.describe(position=_T("Join position on the guild", key="user-info.joined.position.position"))
+    @joined_group.command(name="position", description="Shows the user on a join position")
+    @app_commands.describe(position="Join position on the guild")
     async def joined_position(self, interaction: discord.Interaction, position: app_commands.Range[int, 1]):
         """Provides join information based on the join position."""
         if interaction.guild.member_count is not None and position > interaction.guild.member_count:
@@ -67,13 +58,8 @@ class UserGroup(app_commands.Group):
 
         await self._send_joined_response(interaction, member, position)
 
-    @joined_group.command(
-        name=_T("member", key="user-info.joined.member.name"),
-        description=_T("Shows join information about a specific member.", key="user-info.joined.member.description"),
-    )
-    @app_commands.describe(
-        member=_T("The member you want the join position from.", key="user-info.joined.member.member")
-    )
+    @joined_group.command(name="member", description="Shows join information about a specific member.")
+    @app_commands.describe(member="The member you want the join position from.")
     async def joined_member(self, interaction: discord.Interaction, member: Optional[discord.Member]):
         """Provides join information based on the member. If no member is provided, the user that executed
         the command will be used.
@@ -86,11 +72,8 @@ class UserGroup(app_commands.Group):
 
         await self._send_joined_response(interaction, current_member, position)
 
-    @app_commands.command(
-        name=_T("about", key="user-info.about.name"),
-        description=_T("Shows information's about a Discord member.", key="user-info.about.description"),
-    )
-    @app_commands.describe(member=_T("The member you want the information about.", key="user-info.about.member"))
+    @app_commands.command(name="about", description="Shows information's about a Discord member.")
+    @app_commands.describe(member="The member you want the information about.")
     async def about(self, interaction: discord.Interaction, member: Optional[discord.Member]):
         """Shows basic information about a user. If no member is provided, the user
         that executed the command will be used.
@@ -135,11 +118,8 @@ class UserGroup(app_commands.Group):
 
         await interaction.response.send_message(embed=embed)
 
-    @app_commands.command(
-        name=_T("avatar", key="user-info.avatar.name"),
-        description=_T("Shows the avatar of a user.", key="user-info.avatar.description"),
-    )
-    @app_commands.describe(member=_T("The member you want the avatar from.", key="user-info.avatar.member"))
+    @app_commands.command(name="avatar", description="Shows the avatar of a user.")
+    @app_commands.describe(member="The member you want the avatar from.")
     async def avatar(self, interaction: discord.Interaction, member: Optional[discord.Member]):
         """Shows the avatar of a member. If no member is provided, the user
         that executed the command will be used.

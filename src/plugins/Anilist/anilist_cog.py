@@ -20,11 +20,7 @@ _T = app_commands.locale_str
 
 
 @app_commands.guild_only
-class Anilist(
-    commands.GroupCog,
-    group_name=_T("anilist", key="anilist.name"),
-    group_description=_T("Commands for querying the Anilist site.", key="anilist.description"),
-):
+class Anilist(commands.GroupCog, group_name="anilist", group_description="Commands for querying the Anilist site."):
     def __init__(self, bot: Plyoox):
         self.bot = bot
         self.url = "https://graphql.anilist.co"
@@ -55,13 +51,9 @@ class Anilist(
 
                 return data["data"]["Page"]
 
-    @app_commands.command(
-        name=_T("search", key="anilist.search.name"),
-        description=_T("Search for an anime on Anilist.", key="anilist.search.description"),
-    )
+    @app_commands.command(name="search", description="Search for an anime on Anilist.")
     @app_commands.describe(
-        query=_T("The query to search for.", key="anilist.search.query"),
-        title=_T("If which language the titles should be shown (default original).", key="anilist.search.title"),
+        query="The query to search for.", title="If which language the titles should be shown (default original)."
     )
     async def search_anilist(
         self,
@@ -94,10 +86,7 @@ class Anilist(
             ),
         )
 
-    @app_commands.command(
-        name=_T("info", key="anilist.info.title"),
-        description=_T("Get information about an anime on Anilist.", key="anilist.info.description"),
-    )
+    @app_commands.command(name="info", description="Get information about an anime on Anilist.")
     @app_commands.describe(query=_T("The query to search for.", key="anilist.search.query"))
     async def info_anilist(self, interaction: discord.Interaction, query: str):
         if not self.limiter.has_capacity() and not self.limit_lock:

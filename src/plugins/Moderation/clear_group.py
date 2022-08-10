@@ -16,8 +16,8 @@ LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
 class ClearGroup(app_commands.Group):
     def __init__(self):
         super().__init__(
-            name=_T("clear", key="clear.name"),
-            description=_T("Clears messages in a channel. Specific filters can be applied.", key="clear.description"),
+            name="clear",
+            description="Clears messages in a channel. Specific filters can be applied.",
             guild_only=True,
             default_permissions=discord.Permissions(manage_messages=True),
         )
@@ -44,12 +44,9 @@ class ClearGroup(app_commands.Group):
         # send the information to the user. the response has been deferred, so this uses followup
         await interaction.followup.send(_(lc, "moderation.successful_execution"), embed=embed)
 
-    @app_commands.command(
-        name=_T("all", key="clear.name"),
-        description=_T("Clear all messages in a channel.", key="clear.all.description"),
-    )
+    @app_commands.command(name="all", description="Clear all messages in a channel.")
     @app_commands.describe(
-        amount=_T("The amount of messages you want to purge.", key="clear.all.amount"),
+        amount="The amount of messages you want to purge.",
         reason=_T("Why the messages should be deleted.", key="clear.reason"),
     )
     async def clear_all(
@@ -62,13 +59,10 @@ class ClearGroup(app_commands.Group):
         # do the actual clearing
         await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: True)
 
-    @app_commands.command(
-        name=_T("contains", key="clear.contains.name"),
-        description=_T("Clears all messages that contain a specific string.", key="clear.contains.description"),
-    )
+    @app_commands.command(name="contains", description="Clears all messages that contain a specific string.")
     @app_commands.describe(
         amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
-        string=_T("If this string is contained in a message, the bot will delete it."),
+        string="If this string is contained in a message, the bot will delete it.",
         reason=_T("Why the messages should be deleted.", key="clear.reason"),
     )
     async def clear_contains(
@@ -83,13 +77,10 @@ class ClearGroup(app_commands.Group):
             interaction, amount, reason=reason, predicate=lambda m: string.lower() in m.content.lower()
         )
 
-    @app_commands.command(
-        name=_T("user", key="clear.user.name"),
-        description=_T("Clears all messages from a specific user.", key="clear.user.description"),
-    )
+    @app_commands.command(name="user", description="Clears all messages from a specific user.")
     @app_commands.describe(
         amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
-        user=_T("The user from whom the messages are to be deleted", key="clear.user.user"),
+        user="The user from whom the messages are to be deleted",
         reason=_T("Why the messages should be deleted.", key="clear.reason"),
     )
     async def clear_user(
@@ -102,10 +93,7 @@ class ClearGroup(app_commands.Group):
         await interaction.response.defer(ephemeral=True)
         await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: m.author.id == user.id)
 
-    @app_commands.command(
-        name=_T("links", key="clear.links.name"),
-        description=_T("Deletes all messages that contain a link.", key="clear.links.description"),
-    )
+    @app_commands.command(name="links", description="Deletes all messages that contain a link.")
     @app_commands.describe(
         amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
         reason=_T("Why the messages should be deleted.", key="clear.reason"),
@@ -116,10 +104,7 @@ class ClearGroup(app_commands.Group):
         await interaction.response.defer(ephemeral=True)
         await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: LINK_REGEX.search(m.content))
 
-    @app_commands.command(
-        name=_T("files", key="clear.files.name"),
-        description=_T("Deletes all messages that contains files.", key="clear.files.description"),
-    )
+    @app_commands.command(name="files", description="Deletes all messages that contains files.")
     @app_commands.describe(
         amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
         reason=_T("Why the messages should be deleted.", key="clear.reason"),

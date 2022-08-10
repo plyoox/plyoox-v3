@@ -17,6 +17,9 @@ if TYPE_CHECKING:
     from main import Plyoox
 
 
+_T = app_commands.locale_str
+
+
 def can_execute_action(interaction: discord.Interaction, user: discord.Member, target: discord.Member):
     return user.id == interaction.client.owner_id or user == interaction.guild.owner or user.top_role > target.top_role  # type: ignore
 
@@ -74,8 +77,8 @@ class Moderation(commands.Cog):
 
     @app_commands.command(name="tempban", description="Bans an user from the guild for a specific time.")
     @app_commands.describe(
-        member="The member that should be banned.",
-        reason="Why the member should be banned.",
+        member=_T("The member that should be banned.", key="ban.member"),
+        reason=_T("Why the member should be banned.", key="ban.reason"),
         duration="How long the member should be banned.",
     )
     @app_commands.checks.bot_has_permissions(ban_members=True)
@@ -201,7 +204,10 @@ class Moderation(commands.Cog):
         await interaction.followup.send(_(lc, "moderation.unban.successfully_unbanned"), ephemeral=True)
 
     @app_commands.command(name="softban", description="Kicks an user from the guild and deletes their messages.")
-    @app_commands.describe(member="The member that should be kicked.", reason="Why the member should be kicked.")
+    @app_commands.describe(
+        member=_T("The member that should be kicked.", key="kick.member"),
+        reason=_T("Why the member should be kicked.", key="kick.reason"),
+    )
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
@@ -308,18 +314,18 @@ class Moderation(commands.Cog):
         channel="The channel to search through. If not specified, the current channel is used.",
         amount="The amount of messages to search through (100).",
         reason="The reason for the massban.",
-        message_contains="Must be contained in a message [needs channel].",
-        message_starts="Must be at the start of a message [needs channel].",
-        message_ends="Must be at the end of a message [needs channel].",
-        has_embed="If the message contains an embed [needs channel].",
-        has_attachment="If the message contains a attachment [needs channel].",
+        message_contains="Must be contained in a message.",
+        message_starts="Must be at the start of a message.",
+        message_ends="Must be at the end of a message",
+        has_embed="If the message contains an embed.",
+        has_attachment="If the message contains a attachment.",
         joined_after="Only users that joined after this.",
         joined_before="Only users that joined before this.",
         has_role="If users have a role or not.",
         has_avatar="If users have an avatar or not.",
         username_regex="Regex that must be matched in the username.",
-        sent_after="Only messages sent after this (id) [needs channel].",
-        sent_before="Only messages sent before this (id)  [needs channel].",
+        sent_after="Only messages sent after this (id).",
+        sent_before="Only messages sent before this (id).",
         account_younger_days="Only users that are younger than this (days).",
         joined_before_days="Only users that joined before this (days).",
     )

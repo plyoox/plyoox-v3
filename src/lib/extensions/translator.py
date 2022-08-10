@@ -1,3 +1,5 @@
+import logging
+
 import discord
 from discord import app_commands
 from discord.ext import commands
@@ -5,6 +7,7 @@ from discord.ext import commands
 from translation import get_command_key
 
 
+_log = logging.getLogger(__name__)
 Location = app_commands.TranslationContextLocation
 
 
@@ -58,11 +61,15 @@ class Translator(app_commands.Translator):
         if locale != discord.Locale.german or str(context.location).endswith("_name"):
             return
 
-        key = string.extras.get("key")
+        locale_key = self._to_locale_key(context)
+        text = get_command_key(locale, locale_key)
+        if text is not None:
+            return text
 
-        # if not key:
-        #     key = self._to_locale_key(context)
+        alternative_key = string.extras.get("key")
+        alternative_string = get_command_key(locale, alternative_key)
 
-        print(key == self._to_locale_key(context), key, self._to_locale_key(context))
+        if alternative_string is None:
+            _log.warning(f"No translation for key: {locale_key}")
 
-        return get_command_key(locale, key)
+        return alternative_string

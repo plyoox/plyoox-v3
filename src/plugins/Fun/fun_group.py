@@ -16,12 +16,7 @@ if TYPE_CHECKING:
 
 
 @app_commands.guild_only
-class Fun(
-    commands.GroupCog,
-    group_name="fun",
-    key="fun.name",
-    group_description="Provides fun commands.",
-):
+class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun commands."):
     gifs: dict[str, list[str]]
 
     def __init__(self, bot: Plyoox):

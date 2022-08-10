@@ -45,6 +45,8 @@ fun:
   hug:
     description: "Umarmt einen Benutzer."
     member: "Den Benutzer, den du umarmen willst."
+  slot:
+    description: "Startet eine Slotmaschine."
 guild-info:
   description: "Zeigt Informationen über den Server oder Server-spezifische Dinge an."
   about:

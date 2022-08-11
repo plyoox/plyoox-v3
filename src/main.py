@@ -25,17 +25,17 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 plugins = [
-    # "plugins.Infos",
-    # "plugins.Leveling",
-    # "plugins.Welcome",
-    # "plugins.Owner",
-    # "plugins.Moderation",
-    # "plugins.Logging",
+    "plugins.Infos",
+    "plugins.Leveling",
+    "plugins.Welcome",
+    "plugins.Owner",
+    "plugins.Moderation",
+    "plugins.Logging",
     "plugins.Fun",
-    # "plugins.Timers",
-    # "plugins.Anilist",
-    # "plugins.DataHandler",
-    # "plugins.Notification",
+    "plugins.Timers",
+    "plugins.Anilist",
+    "plugins.DataHandler",
+    "plugins.Notification",
 ]
 
 

@@ -51,8 +51,7 @@ def _load_languages() -> None:
 def _(locale: discord.Locale, key: str | bool, **kwargs) -> str:
     """Returns the message for the given locale. Currently, only german and english are available.
     If the user has a language that is not available it will fall back to english."""
-    # locale = "de" if locale == discord.Locale.german else "en"
-    locale = "de" if locale == discord.Locale.german else "de"
+    locale = "de" if locale == discord.Locale.german else "en"
 
     return get_key(locale, key, **kwargs)
 

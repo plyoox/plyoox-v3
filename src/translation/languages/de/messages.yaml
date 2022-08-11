@@ -48,10 +48,10 @@ user_info:
     user_information: "User Informationen"
     public_badges: "Öffentliche Abzeichen"
     account: "Account"
-    no_nick: "Kein Nickname"
-    no_flags: "Keine Abzeichen"
+    no_nick: "*Kein Nickname*"
+    no_flags: "*Keine Abzeichen*"
     server_avatar: "Server Avatar"
-    no_server_avatar: "Kein Server Avatar"
+    no_server_avatar: "*Kein Server Avatar*"
     member_verification: "Regeln akzeptiert"
     premium_subscriber: "Boostet Server"
     bot: "Bot"
@@ -63,7 +63,7 @@ guild_info:
     owner: "Besitzer"
     emojis: "Emojis"
     stickers: "Stickers"
-    no_emojis: "Keine anzeigbaren Emojis"
+    no_emojis: "*Keine Emojis*"
     more_infos: "Weitere Informationen"
     premium_level: "Boost-Level"
     vanity_url: "Custom Invite"
@@ -105,17 +105,17 @@ level:
     no_users: "Auf diesem Server hat der Bot noch keine Level registriert."
     title: "Server Ranking"
     level: "Level"
-    xp: "Xp"
+    xp: "XP"
 moderation:
   moderator: "Moderator"
   invalid_duration: "Die angegebene Zeit ist nicht gültig."
-  tempban_expired: "Tempban abgelaufen"
+  tempban_expired: "Tempbann abgelaufen"
   successful_execution: "Der Command wurde erfolgreich ausgeführt."
   hierarchy_not_permitted: "Der Benutzer muss in der Hierarchie unter dir sein."
-  bot_cannot_punish: "Der Benutzer muss in der Hierarchie unter dem Bot sein."
+  bot_cannot_punish: "The user must be below the bot in the hierarchy."
   kick:
-    log_title: "User wurde gekickt"
-    log_description: "Der Benutzer {target} ({target.id}) wurde von {moderator} gekickt."
+    log_title: "Benutzer wurde gekickt"
+    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} gekickt."
     successfully_kicked: "Der Benutzer wurde erfolgreich gekickt."
     user_message: "Du wurdest vom Server {guild.name} für {reason} gekickt."
   clear:
@@ -123,34 +123,34 @@ moderation:
     deleted_messages: "Gelöschte Nachrichten"
     affected_users: "Betroffene Mitglieder"
   ban:
-    log_title: "User wurde gebannt"
+    log_title: "Benutzer wurde gebannt"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} permanent gebannt."
     successfully_banned: "Der Benutzer wurde erfolgreich für gebannt."
     user_message: "Du wurdest vom Server {guild.name} für {reason} permanent gebannt."
   tempban:
-    log_title: "User wurde temporär gebannt"
+    log_title: "Benutzer wurde temporär gebannt"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} temporär gebannt."
     successfully_banned: "Der Benutzer wurde erfolgreich temporär gebannt."
     too_long: "Der angegebene Zeitraum ist zu lang. Es ist maximal 1 Jahr möglich."
     user_message: "Du wurdest vom Server {guild.name} für {reason} bis {timestamp} gebannt."
   tempmute:
-    log_title: "User wurde temporär gemutet"
-    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} temporär gemutet."
+    log_title: "Benutzer wurde temporär gesperrt"
+    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} temporär gesperrt."
     too_long: "Der angegebene Zeitraum ist zu lang. Derzeit sind maximal 28 Tage möglich."
-    successfully_muted: "Der Benutzer wurde erfolgreich temporär gemutet."
-    user_message: "Du wurdest im Server {guild.name} für {reason} bis {timestamp} gemutet."
+    successfully_muted: "Der Benutzer wurde erfolgreich temporär gesperrt."
+    user_message: "Du wurdest im Server {guild.name} für {reason} bis {timestamp} gesperrt."
   unban:
-    log_title: "User wurde entbannt"
+    log_title: "Benutzer wurde entbannt"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} entbannt."
     successfully_unbanned: "Der Benutzer wurde erfolgreich entbannt."
     not_banned: "Der Benutzer ist nicht gebannt."
   softban:
-    log_title: "User wurde gekickt (softban)"
+    log_title: "Benutzer wurde gekickt (softban)"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} gekickt (softban)."
     successfully_kicked: "Der Benutzer wurde erfolgreich gekickt (softban)."
     user_message: "Du wurdest vom Server {guild.name} für {reason} gekickt (softban)."
   unmute:
-    log_title: "User wurde entmutet"
+    log_title: "Benutzer wurde entsperrt"
     log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} entmutet."
     successfully_unmuted: "Der Benutzer wurde erfolgreich entmutet."
     user_message: "Du wurdest vom Server {guild.name} für {reason} entmutet."
@@ -205,7 +205,7 @@ automod:
     description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod gekickt."
     user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` gekickt."
   ban:
-    title: "Automod: Ban"
+    title: "Automod: Bann"
     description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod gebannt."
     user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` gebannt."
   delete:
@@ -217,7 +217,7 @@ automod:
     description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod temporär gebannt."
     user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` bis {timestamp} gebannt."
   tempmute:
-    title: "Automod: Temporärer Mute"
+    title: "Automod: Temporäre Sperre"
     description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod temporär gesperrt."
     user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` bis {timestamp} gesperrt."
   points:
@@ -225,7 +225,7 @@ automod:
     description: "Der Benutzer **{target}** ({target.id}) hat Punkte für einen Verstoß erhalten."
     user_message: "Du hast für `{reason}` automatisch **{points}** Punkte erhalten."
   final:
-    title: "Automod: Maximale Punkte"
+    title: "Automod: Maximale Punkte erreicht"
     description: "Der Benutzer **{target}** ({target.id}) hat die maximale Anzahl von Punkten erreicht."
     action: "Aktion"
     reason: "Maximale Punkteanzahl erreicht"
@@ -246,22 +246,20 @@ fun:
     title: "Meine zufällig gewählte Antwort"
 logging:
   member_id: "Mitglied-ID"
-  user_id: "Mitglied-ID"
+  user_id: "User-ID"
   no_content: "*Diese Nachricht enthält keinen Inhalt.*"
   no_attachments: "*Diese Nachricht hat keine Anhänge.*"
   member_join:
     title: "Mitglied beigetreten"
-    description: "Der User {member.name} ist dem Server beigetreten."
+    description: "Der Benutzer {member.name} ist dem Server beigetreten."
   member_leave:
     title: "Mitglied verlassen"
-    description: "Der User {member.name} hat den Server verlassen."
-  member_remove:
-    title: "Mitglied verlassen"
+    description: "Der Benutzer {member.name} hat den Server verlassen."
   member_ban:
     title_member: "Mitglied gebannt"
-    title_user: "User gebannt"
+    title_user: "Benutzer gebannt"
   member_unban:
-    title: "User entbannt"
+    title: "Benutzer entbannt"
   message_delete:
     title: "Nachricht gelöscht"
     description_raw: "Eine Nachricht aus {channel} wurde gelöscht."
@@ -274,7 +272,7 @@ logging:
     old_message: "Vorherige Nachricht"
     new_message: "Neue Nachricht"
   member_role_change:
-    title: "Rolle geändert"
+    title: "Rollen geändert"
     new_roles: "Neue Rolle(n)"
     old_roles: "Alte Rolle(n)"
   member_rename:

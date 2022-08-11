@@ -62,8 +62,8 @@ user-info:
   joined:
     description: "Zeigt Beitrittsinformationen über einen Benutzer an."
     position:
-      description: "Zeigt den Benutzer auf einer Beitrittsposition an."
-      position: "Die Position die du abfragen willst."
+      position: "Die Position dessen Benutzer abgefragt werden soll."
+      description: "Zeigt die Beitrittsinformation eines Users an."
     member:
       description: "Zeigt die Beitrittsinformationen von einen Benutzer an."
       member: "Der Benutzer von dem du die Beitrittsinformationen sehen willst."
@@ -154,3 +154,6 @@ massban:
   sent_before: "Nur Nachrichten zählen, die vor dieser geschrieben wurden (ID)."
   account_younger_days: "Nur Benutzer, die jünger sind (Tage)."
   joined_before_days: "Nur Benutzer, die davor beigetreten sind (Tage)."
+  amount: "Die Anzahl der Nachrichten die durchsucht werden sollen."
+guild-registration:
+  description: "Registriert den Server für den Bot (wenn der Bot eingeladen wurde, während er offline war)."

@@ -2,7 +2,6 @@ import logging
 
 import discord
 from discord import app_commands
-from discord.ext import commands
 
 from translation import get_command_key
 
@@ -18,17 +17,12 @@ class Translator(app_commands.Translator):
     @staticmethod
     def _command_to_locale_key(command: app_commands.Command) -> list[str]:
         locale_keys = []
+        cmd = command
 
-        if isinstance(command.binding, commands.GroupCog):
-            locale_keys.append(str(command.binding.__cog_group_name__))
-        elif isinstance(command.binding, app_commands.Command):
-            if hasattr(command.binding, "binding"):
-                if isinstance(command.binding.binding, commands.GroupCog):
-                    locale_keys.append(str(command.binding.binding.__cog_group_name__))
-                else:
-                    locale_keys.append(str(command.binding.binding.name))
-            else:
-                locale_keys.append(str(command.binding.name))
+        while cmd.parent is not None:
+            if isinstance(cmd.parent, (app_commands.Command, app_commands.Group)):
+                locale_keys.insert(0, str(cmd.parent.name))
+                cmd = cmd.parent
 
         locale_keys.append(str(command.name))
 
@@ -45,7 +39,7 @@ class Translator(app_commands.Translator):
             locale_keys = Translator._command_to_locale_key(context.data)
             locale_keys.append("description")
         elif location is Location.group_description:
-            locale_keys.append(str(obj.name))
+            locale_keys = Translator._command_to_locale_key(context.data)
             locale_keys.append("description")
         elif location is Location.parameter_description:
             locale_keys = Translator._command_to_locale_key(obj.command)

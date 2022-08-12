@@ -186,3 +186,4 @@ class GuildConfig(Base):
     __tablename__ = "guild_config"
 
     id = _Column(pg.BIGINT, primary_key=True)
+    slash_migration = _Column(pg.BOOLEAN, server_default=True)

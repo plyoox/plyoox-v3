@@ -36,6 +36,7 @@ plugins = [
     "plugins.Anilist",
     "plugins.DataHandler",
     "plugins.Notification",
+    "plugins.Migration",
 ]
 
 

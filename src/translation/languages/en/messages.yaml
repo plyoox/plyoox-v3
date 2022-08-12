@@ -307,3 +307,5 @@ views:
   creator_only: "Only the creator can use this action."
 notifications:
   twitch_button: "To Stream"
+disable-migration-notification:
+  successfully_disabled: "The messages has been disabled."

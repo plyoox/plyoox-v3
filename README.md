@@ -11,6 +11,5 @@
 4. Create a `.env` file and set the following environment variables:
     - `POSTGRES` (postgresql://`USER`:@`SERVER`:`PORT`/`DATABASE`)
     - `TOKEN` (discord bot token)
-    - `TEST_GUILD` (discord test guild id)
 5. `python3 launcher.py --generate-db`
 6. `python3 launcher.py --sync-commands`

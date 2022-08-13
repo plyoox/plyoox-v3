@@ -43,7 +43,6 @@ plugins = [
 class Plyoox(commands.Bot):
     db: asyncpg.Pool = None
     cache: CacheManager
-    test_guild: discord.Object = None
     start_time: datetime
     session: aiohttp.ClientSession
 
@@ -61,12 +60,8 @@ class Plyoox(commands.Bot):
             application_id=int(os.getenv("CLIENT_ID")),
         )
 
-        if os.getenv("TEST_GUILD"):
-            self.test_guild = discord.Object(int(os.getenv("TEST_GUILD")))
-
     async def setup_hook(self) -> None:
         self.loop.create_task(self._refresh_presence())
-        # self.owner_id = self.application.owner.id
 
         await self.tree.set_translator(extensions.Translator())
 
@@ -76,17 +71,9 @@ class Plyoox(commands.Bot):
 
         logger.info("Plugins loaded")
 
-        if self.test_guild is not None:
-            self.tree.copy_global_to(guild=self.test_guild)
-
         if self.sync_commands:
             # Sync commands with discord
             logger.debug("Sync commands with discord...")
-
-            if self.test_guild is not None:
-                await self.tree.sync(guild=self.test_guild)
-            else:
-                await self.tree.sync()
 
             await self.close()
             logger.info("Commands successfully synced")

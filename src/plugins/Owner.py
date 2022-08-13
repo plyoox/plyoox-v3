@@ -18,6 +18,49 @@ if TYPE_CHECKING:
     from main import Plyoox
 
 
+class ExecuteModal(ui.Modal):
+    def __init__(self):
+        super().__init__(title="Execute Code")
+
+    code = ui.TextInput(label="Python Code", required=True, style=discord.TextStyle.paragraph)
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        await interaction.response.defer()
+
+        env = {
+            "bot": interaction.client,
+            "interaction": interaction,
+        }
+
+        env.update(globals())
+
+        body = self.code.value
+        stdout = io.StringIO()
+        to_compile = f'async def func():\n{textwrap.indent(body, "  ")}'
+
+        try:
+            exec(to_compile, env)
+        except Exception as e:
+            await interaction.followup.send(f"```py\n{e.__class__.__name__}: {e}\n```")
+            return
+
+        func = env["func"]
+        try:
+            with contextlib.redirect_stdout(stdout):
+                ret = await func()
+        except Exception:
+            value = stdout.getvalue()
+            await interaction.followup.send(f"```py\n{value}{traceback.format_exc()}\n```")
+        else:
+            value = stdout.getvalue()
+
+            if ret is None:
+                if value:
+                    await interaction.followup.send(f"```py\n{value}\n```")
+            else:
+                await interaction.followup.send(f"```py\n{value}{ret}\n```")
+
+
 @checks.owner_only()
 class Owner(commands.GroupCog, group_name="owner", group_description="Owner only commands for managing the bot."):
     def __init__(self, bot: Plyoox):
@@ -77,6 +120,10 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
         languages._load_languages()
 
         await interaction.response.send_message("Language files successfully reloaded.", ephemeral=True)
+
+    @app_commands.command(name="execute", description="Executes python code.", auto_locale_strings=False)
+    async def execute(self, interaction: discord.Interaction):
+        await interaction.response.send_modal(ExecuteModal())
 
 
 async def setup(bot: Plyoox):

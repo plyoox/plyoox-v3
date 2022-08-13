@@ -58,7 +58,7 @@ class Plyoox(commands.Bot):
             max_messages=2000,
             command_prefix=[],
             tree_cls=extensions.CommandTree,
-            application_id=503993633641332737,
+            application_id=int(os.getenv("CLIENT_ID")),
         )
 
         if os.getenv("TEST_GUILD"):

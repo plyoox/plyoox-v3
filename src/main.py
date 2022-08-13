@@ -75,6 +75,12 @@ class Plyoox(commands.Bot):
             # Sync commands with discord
             logger.debug("Sync commands with discord...")
 
+            await self.tree.sync()
+
+            if owner_guild_id := os.getenv("OWNER_GUILD"):
+                owner_guild = discord.Object(int(owner_guild_id))
+                await self.tree.sync(guild=owner_guild)
+
             await self.close()
             logger.info("Commands successfully synced")
             sys.exit(0)

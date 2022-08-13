@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import contextlib
+import io
 import os
+import textwrap
 import traceback
 from typing import TYPE_CHECKING
 
 import discord
-from discord import app_commands
+from discord import app_commands, ui
 from discord.ext import commands
 
 from lib import checks, extensions
@@ -20,9 +23,11 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
-    plugin_group = app_commands.Group(name="plugin", description="Managing the Plugin system.")
+    plugin_group = app_commands.Group(
+        name="plugin", description="Managing the Plugin system.", auto_locale_strings=False
+    )
 
-    @plugin_group.command(name="load", description="Loads a plugin")
+    @plugin_group.command(name="load", description="Loads a plugin", auto_locale_strings=False)
     async def plugin_load(self, interaction: discord.Interaction, plugin: str):
         bot: Plyoox = interaction.client  # type: ignore
 
@@ -37,7 +42,7 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
         else:
             await interaction.response.send_message("Plugin successfully loaded.", ephemeral=True)
 
-    @plugin_group.command(name="unload", description="Unloads a plugin")
+    @plugin_group.command(name="unload", description="Unloads a plugin", auto_locale_strings=False)
     async def plugin_load(self, interaction: discord.Interaction, plugin: str):
         bot: Plyoox = interaction.client  # type: ignore
 
@@ -52,7 +57,7 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
         else:
             await interaction.response.send_message("Plugin successfully unloaded.", ephemeral=True)
 
-    @plugin_group.command(name="reload", description="Reloads a plugin")
+    @plugin_group.command(name="reload", description="Reloads a plugin", auto_locale_strings=False)
     async def plugin_reload(self, interaction: discord.Interaction, plugin: str):
         bot: Plyoox = interaction.client  # type: ignore
 
@@ -67,7 +72,7 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
         else:
             await interaction.response.send_message("Plugin successfully reloaded.", ephemeral=True)
 
-    @app_commands.command(name="reload-language", description="Reloads the language files.")
+    @app_commands.command(name="reload-language", description="Reloads the language files.", auto_locale_strings=False)
     async def reload_language(self, interaction: discord.Interaction):
         languages._load_languages()
 

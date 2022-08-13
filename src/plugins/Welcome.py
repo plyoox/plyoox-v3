@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from lib import formatting, helper
+from lib import formatting
 from main import Plyoox
 
 

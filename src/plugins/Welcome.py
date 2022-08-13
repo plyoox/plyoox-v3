@@ -22,14 +22,18 @@ class Welcome(commands.Cog):
             return
 
         # only add role if the bot has the permissions
-        if cache.join_role and guild.me.guild_permissions.manage_roles:
+        if cache.join_roles and guild.me.guild_permissions.manage_roles:
             if member.pending:
                 return
 
-            role = guild.get_role(cache.join_role)
+            roles = []
+            for role_id in cache.join_roles:
+                role = guild.get_role(role_id)
+                if role is not None:
+                    roles.append(role)
 
-            if role is not None:
-                await member.add_roles(role, reason="Adding join role")
+            if roles:
+                await member.add_roles(*roles, reason="Adding join role")
 
         # format message and send it
         if cache.join_message:
@@ -72,11 +76,15 @@ class Welcome(commands.Cog):
         if cache is None:
             return
 
-        if cache.join_role and guild.me.guild_permissions.manage_roles:
-            role = guild.get_role(cache.join_role)
+        if cache.join_roles and guild.me.guild_permissions.manage_roles:
+            roles = []
+            for role_id in cache.join_roles:
+                role = guild.get_role(role_id)
+                if role is not None:
+                    roles.append(role)
 
-            if role is not None:
-                await after.add_roles(role, reason="Adding join role")
+            if roles:
+                await after.add_roles(*roles, reason="Adding join role")
 
 
 async def setup(bot: Plyoox):

@@ -26,8 +26,10 @@ class Welcome(commands.Cog):
             channel = guild.get_channel(cache.join_channel)
             message = formatting.format_welcome_message(cache.join_message, member)
 
-            # send message and handle permission check
-            await helper.permission_check(channel, content=message)
+            if channel and channel.permissions_for(channel.guild.me).send_messages:
+                await channel.send(
+                    content=message, allowed_mentions=discord.AllowedMentions(users=True, roles=True, everyone=True)
+                )
 
         # only add role if the bot has the permissions
         if cache.join_roles and guild.me.guild_permissions.manage_roles:
@@ -63,7 +65,9 @@ class Welcome(commands.Cog):
                 message = formatting.format_welcome_message(cache.leave_message, member)
 
                 # send message and handle permission check
-                await channel.send(message)
+                await channel.send(
+                    message, allowed_mentions=discord.AllowedMentions(users=True, roles=True, everyone=True)
+                )
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):

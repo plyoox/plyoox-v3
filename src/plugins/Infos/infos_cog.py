@@ -31,7 +31,7 @@ class Infos(commands.Cog):
         )
 
         view = ui.View()
-        view.add_item(ui.Button(label="GitHub", url="https://github.com/plyoox/plyoox-v3"))
+        view.add_item(ui.Button(label="GitHub", url="https://gitlab.com/plyoox/plyoox-v3"))
         view.add_item(ui.Button(label="Dashboard", url="https://plyoox.net"))
         view.add_item(ui.Button(label="Support", url="https://discord.gg/5qPPvQe"))
         view.add_item(

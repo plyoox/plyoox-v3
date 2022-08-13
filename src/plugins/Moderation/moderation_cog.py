@@ -273,7 +273,7 @@ class Moderation(commands.Cog):
     @app_commands.command(name="invite-info", description="Shows information about a invite.")
     @app_commands.describe(invite="The invite you want to get information about.")
     @app_commands.checks.bot_has_permissions()
-    @app_commands.checks.cooldown(2, 30, key=lambda i: (i.guild.id, i.author.id))
+    @app_commands.checks.cooldown(2, 30, key=lambda i: (i.guild.id, i.user.id))
     @app_commands.default_permissions(manage_messages=True)
     @app_commands.guild_only
     async def invite_info(self, interaction: discord.Interaction, invite: str):
@@ -296,15 +296,15 @@ class Moderation(commands.Cog):
 
         embed.add_field(
             name=_(lc, "moderation.invite_info.creator"),
-            value=f"> **{_(lc, 'id')}:** {invite.inviter.id}\n"
-            f"> **{_(lc, 'name')}:** {invite.inviter}\n"
-            f"> **{_(lc, 'moderation.invite_info.mention')}:** {invite.inviter.mention}",
+            value=f"> __{_(lc, 'id')}:__ {invite.inviter.id}\n"
+            f"> __{_(lc, 'name')}:__ {invite.inviter}\n"
+            f"> __{_(lc, 'moderation.invite_info.mention')}:__{invite.inviter.mention}",
         )
         embed.add_field(
             name=_(lc, "guild"),
-            value=f"> **{_(lc, 'name')}:** {invite.guild.name}\n"
-            f"> **{_(lc, 'id')}:** {invite.guild.id}\n"
-            f"> **{_(lc, 'guild_info.about.vanity_url')}:** {invite.guild.vanity_url or _(lc, 'guild_info.about.no_vanity_url')}\n",
+            value=f"> __{_(lc, 'name')}:__ {invite.guild.name}\n"
+            f"> __{_(lc, 'id')}:__ {invite.guild.id}\n"
+            f"> __{_(lc, 'guild_info.about.vanity_url')}:__ {invite.guild.vanity_url or _(lc, 'guild_info.about.no_vanity_url')}\n",
         )
 
         await interaction.response.send_message(embed=embed)

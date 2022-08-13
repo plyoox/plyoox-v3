@@ -32,12 +32,12 @@ class UserGroup(app_commands.Group):
 
         embed = extensions.Embed(title=_(locale, "user_info.joined.title"))
         embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
-        embed.add_field(name=_(locale, "user_info.joined.position"), value=f"> `{position}`")
+        embed.add_field(name=_(locale, "user_info.joined.position"), value=f"> {position}")
         embed.add_field(
             name=_(locale, "user_info.joined.days_since"),
-            value=f"> `{(datetime.datetime.now(tz=datetime.timezone.utc) - member.joined_at).days}`",
+            value=f"> {(datetime.datetime.now(tz=datetime.timezone.utc) - member.joined_at).days}",
         )
-        embed.add_field(name=_(locale, "joined_at"), value=f"> {discord.utils.format_dt(member.joined_at)}")
+        embed.add_field(name=_(locale, "joined_at"), value=helper.embed_timestamp_format(member.joined_at))
 
         await interaction.response.send_message(embed=embed)
 

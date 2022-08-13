@@ -234,7 +234,7 @@ automod:
     user_message_tempban: "You have reached the maximum number of points and therefore have been automatically banned from `{guild.name}` until {timestamp}."
     user_message_tempmute: "You have reached the maximum number of points and therefore have been automatically banned from `{guild.name}` until {timestamp}."
 fun:
-  color: "Random color:\nHEX:`{hex}`\nRGB: (`{rgb}`)"
+  color: "Random color:\nHEX: `{hex}`\nRGB: `{rgb}`"
   slot:
     win: ":tada: Won!"
     lose: "Unfortunately lost!"

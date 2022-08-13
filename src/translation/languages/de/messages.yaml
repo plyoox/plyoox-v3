@@ -234,7 +234,7 @@ automod:
     user_message_tempban: "Du hast die maximale Anzahl an Punkten erreicht und wurdest deshalb automatisch vom Server `{guild.name}` bis {timestamp} gebannt."
     user_message_tempmute: "Du hast die maximale Anzahl an Punkten erreicht und wurdest deshalb automatisch vom Server `{guild.name}` bis {timestamp} gesperrt."
 fun:
-  color: "Zufällige Farbe:\nHEX:`{hex}`\nRGB: (`{rgb}`)"
+  color: "Zufällige Farbe:\nHEX: `{hex}`\nRGB: `{rgb}`"
   slot:
     win: ":tada: Gewonnen!"
     lose: "Leider verloren!"

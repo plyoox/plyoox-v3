@@ -61,7 +61,6 @@ class ExecuteModal(ui.Modal):
                 await interaction.followup.send(f"```py\n{value}{ret}\n```")
 
 
-@checks.owner_only()
 class Owner(commands.GroupCog, group_name="owner", group_description="Owner only commands for managing the bot."):
     def __init__(self, bot: Plyoox):
         self.bot = bot
@@ -71,6 +70,7 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
     )
 
     @plugin_group.command(name="load", description="Loads a plugin", auto_locale_strings=False)
+    @checks.owner_only()
     async def plugin_load(self, interaction: discord.Interaction, plugin: str):
         bot: Plyoox = interaction.client  # type: ignore
 
@@ -86,6 +86,7 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
             await interaction.response.send_message("Plugin successfully loaded.", ephemeral=True)
 
     @plugin_group.command(name="unload", description="Unloads a plugin", auto_locale_strings=False)
+    @checks.owner_only()
     async def plugin_load(self, interaction: discord.Interaction, plugin: str):
         bot: Plyoox = interaction.client  # type: ignore
 
@@ -101,6 +102,7 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
             await interaction.response.send_message("Plugin successfully unloaded.", ephemeral=True)
 
     @plugin_group.command(name="reload", description="Reloads a plugin", auto_locale_strings=False)
+    @checks.owner_only()
     async def plugin_reload(self, interaction: discord.Interaction, plugin: str):
         bot: Plyoox = interaction.client  # type: ignore
 
@@ -116,12 +118,14 @@ class Owner(commands.GroupCog, group_name="owner", group_description="Owner only
             await interaction.response.send_message("Plugin successfully reloaded.", ephemeral=True)
 
     @app_commands.command(name="reload-language", description="Reloads the language files.", auto_locale_strings=False)
+    @checks.owner_only()
     async def reload_language(self, interaction: discord.Interaction):
         languages._load_languages()
 
         await interaction.response.send_message("Language files successfully reloaded.", ephemeral=True)
 
     @app_commands.command(name="execute", description="Executes python code.", auto_locale_strings=False)
+    @checks.owner_only()
     async def execute(self, interaction: discord.Interaction):
         await interaction.response.send_modal(ExecuteModal())
 

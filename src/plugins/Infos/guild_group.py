@@ -33,7 +33,7 @@ class GuildGroup(app_commands.Group):
         )
         embed.add_field(name=_(lc, "guild_info.about.members"), value=f"> {str(guild.member_count)}")
 
-        embed.add_field(name=_(lc, "roles"), value=f"> {helper.format_roles(roles) or _(lc, 'no_roles')}")
+        embed.add_field(name=_(lc, "roles"), value=f"> {helper.format_roles(list(roles)) or _(lc, 'no_roles')}")
         embed.add_field(
             name=_(lc, "guild_info.about.more_infos"),
             value=f"> __{_(lc, 'guild_info.about.premium_level')}:__ {guild.premium_tier} ({guild.premium_subscription_count})\n"

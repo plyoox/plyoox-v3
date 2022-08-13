@@ -73,7 +73,7 @@ class CacheManager:
 
     async def get_leveling(self, id: int) -> LevelingModel | None:
         """Returns the cache for the leveling plugin."""
-        guild_cache = self._welcome.get(id, False)
+        guild_cache = self._leveling.get(id, False)
         if guild_cache is not False:
             return guild_cache
 
@@ -100,7 +100,7 @@ class CacheManager:
 
     async def get_moderation(self, id: int) -> ModerationModel | None:
         """Returns the cache for the moderation plugin."""
-        guild_cache = self._welcome.get(id, False)
+        guild_cache = self._moderation.get(id, False)
         if guild_cache is not False:
             return guild_cache
 
@@ -150,7 +150,7 @@ class CacheManager:
 
     async def get_logging(self, id: int) -> LoggingModel | None:
         """Returns the cache for the logging plugin."""
-        guild_cache = self._welcome.get(id, False)
+        guild_cache = self._logging.get(id, False)
         if guild_cache is not False:
             return guild_cache
 

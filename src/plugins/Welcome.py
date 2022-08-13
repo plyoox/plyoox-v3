@@ -11,8 +11,8 @@ class Welcome(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        cache = await self.bot.cache.get_welcome(member.id)
         guild = member.guild
+        cache = await self.bot.cache.get_welcome(guild.id)
 
         if cache is None:
             return
@@ -20,6 +20,14 @@ class Welcome(commands.Cog):
         # check if the settings have been disabled
         if not cache.active or not cache.join_active:
             return
+
+        # format message and send it
+        if cache.join_message:
+            channel = guild.get_channel(cache.join_channel)
+            message = formatting.format_welcome_message(cache.join_message, member)
+
+            # send message and handle permission check
+            await helper.permission_check(channel, content=message)
 
         # only add role if the bot has the permissions
         if cache.join_roles and guild.me.guild_permissions.manage_roles:
@@ -34,14 +42,6 @@ class Welcome(commands.Cog):
 
             if roles:
                 await member.add_roles(*roles, reason="Adding join role")
-
-        # format message and send it
-        if cache.join_message:
-            channel = guild.get_channel(cache.join_channel)
-            message = formatting.format_welcome_message(cache.join_message, member)
-
-            # send message and handle permission check
-            await helper.permission_check(channel, content=message)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
@@ -63,7 +63,7 @@ class Welcome(commands.Cog):
                 message = formatting.format_welcome_message(cache.leave_message, member)
 
                 # send message and handle permission check
-                await helper.permission_check(channel, content=message)
+                await channel.send(message)
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):

@@ -58,6 +58,7 @@ class Plyoox(commands.Bot):
             command_prefix=[],
             tree_cls=extensions.CommandTree,
             application_id=int(os.getenv("CLIENT_ID")),
+            owner_id=int(os.getenv("OWNER_ID")),
         )
 
     async def setup_hook(self) -> None:

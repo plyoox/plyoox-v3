@@ -61,7 +61,12 @@ class ExecuteModal(ui.Modal):
                 await interaction.followup.send(f"```py\n{value}{ret}\n```")
 
 
-class Owner(commands.GroupCog, group_name="owner", group_description="Owner only commands for managing the bot."):
+class Owner(
+    commands.GroupCog,
+    group_name="owner",
+    group_description="Owner only commands for managing the bot.",
+    group_auto_locale_strings=False,
+):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 

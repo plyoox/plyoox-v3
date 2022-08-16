@@ -18,25 +18,25 @@ from cache import CacheManager
 from lib import database, extensions
 
 if TYPE_CHECKING:
-    from plugins.Timers import Timer
-    from plugins.Notification import Notification
-    from plugins.Anilist import Anilist
+    from extensions.Timers import Timer
+    from extensions.Notification import Notification
+    from extensions.Anilist import Anilist
 
 logger = logging.getLogger(__name__)
 
 plugins = [
-    "plugins.Infos",
-    "plugins.Leveling",
-    "plugins.Welcome",
-    "plugins.Owner",
-    "plugins.Moderation",
-    "plugins.Logging",
-    "plugins.Fun",
-    "plugins.Timers",
-    "plugins.Anilist",
-    "plugins.DataHandler",
-    "plugins.Notification",
-    "plugins.Migration",
+    "extensions.Infos",
+    "extensions.Leveling",
+    "extensions.Welcome",
+    "extensions.Owner",
+    "extensions.Moderation",
+    "extensions.Logging",
+    "extensions.Fun",
+    "extensions.Timers",
+    "extensions.Anilist",
+    "extensions.DataHandler",
+    "extensions.Notification",
+    "extensions.Migration",
 ]
 
 

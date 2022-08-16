@@ -23,7 +23,7 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
         self.bot = bot
 
     async def cog_load(self) -> None:
-        with open("src/plugins/Fun/gifs.json") as f:
+        with open("src/extensions/Fun/gifs.json") as f:
             self.gifs = json.load(f)
 
     @app_commands.command(name="coinflip", description="Flips a coin.")

@@ -76,7 +76,9 @@ class Migration(commands.Cog):
                 command_mention = await self._get_migration_command_mention()
                 embed = extensions.Embed(
                     title="New Slash Commands",
-                    description="**Plyoox now supports Slash Commands!**\n\nSlash Commands can be viewed by typing `/` (A list of commands should pop up). *You can read more about app commands [here](https://discord.com/blog/welcome-to-the-new-era-of-discord-apps)*.\n\n"
+                    description="**Plyoox now supports Slash Commands!**\n\n"
+                    "Slash Commands can be viewed by typing `/` (A list of commands should pop up). "
+                    "*You can read more about app commands [here](https://discord.com/blog/welcome-to-the-new-era-of-discord-apps)*.\n\n"
                     "If no commands show up, just invite the bot a again, no need to remove. "
                     f"Invite by clicking [here](https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=274945403966).\n\n"
                     f"*You can disable this message by using {command_mention}.*",

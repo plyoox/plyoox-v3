@@ -25,6 +25,7 @@ class Notification(commands.Cog):
         self.twitch_access_token = {}
 
     async def _get_access_token(self) -> str | None:
+        """Returns an app access token from twitch."""
         valid_until = self.twitch_access_token.get("valid_until")
         if valid_until is not None and valid_until > discord.utils.utcnow():
             return self.twitch_access_token["access_token"]
@@ -47,10 +48,7 @@ class Notification(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
-        await self.bot.db.execute(
-            "DELETE FROM twitch_notifications WHERE guild_id = $1 RETURNING user_id",
-            guild.id,
-        )
+        await self.bot.db.execute("DELETE FROM twitch_notifications WHERE guild_id = $1", guild.id)
 
         event_sub_ids = await self.bot.db.fetch(
             "DELETE FROM twitch_users WHERE (SELECT count(user_id) FROM twitch_notifications) = 0 RETURNING eventsub_id",
@@ -60,6 +58,7 @@ class Notification(commands.Cog):
         app_token = await self._get_access_token()
         if app_token is None:
             _log.error("Could not fetch Twitch access token.")
+            return
 
         headers = {
             "Client-Id": os.getenv("TWITCH_CLIENT_ID"),

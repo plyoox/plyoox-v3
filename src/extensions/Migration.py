@@ -46,6 +46,7 @@ class Migration(commands.Cog):
         self.migration_command_id = None
 
     async def _get_migration_command_mention(self):
+        """Returns the command mention for the migration command. If not set, the id is fetched."""
         if self.migration_command_id is None:
             bot_commands = await self.bot.tree.fetch_commands()
             for cmd in bot_commands:
@@ -56,6 +57,7 @@ class Migration(commands.Cog):
         return f"</disable-migration-notification:{self.migration_command_id}>"
 
     async def _get_guild_status(self, id: int) -> bool:
+        """Returns the status for the migration message"""
         if self.migration_guilds.has_key(id):
             return self.migration_guilds[id]
 

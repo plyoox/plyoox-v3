@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 
-from discord.client import _ColourFormatter
+import discord.utils
 from dotenv import load_dotenv
 
 if sys.platform == "linux":
@@ -23,21 +23,12 @@ group.add_argument("--prod", action="store_true", help="Sync commands with disco
 args = parser.parse_args()
 
 # Set up logging
+discord.utils.setup_logging(root=True)
 if args.prod:
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    logging.getLogger("discord.gateway").setLevel(logging.INFO)
     handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
     handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
     logger.addHandler(handler)
-else:
-    logger = logging.getLogger()
-    log_handler = logging.StreamHandler()
-    log_formatter = _ColourFormatter()
-
-    log_handler.setFormatter(log_formatter)
-    logger.setLevel(logging.INFO)
-    logger.addHandler(log_handler)
 
 
 async def generate_db():

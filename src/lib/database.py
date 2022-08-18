@@ -138,6 +138,9 @@ class Moderation(Base):
     caps_whitelist_roles = _Column(pg.ARRAY(pg.BIGINT))
     caps_actions = _Column(pg.JSON)
 
+    blacklist_active = _Column(pg.BIGINT, server_default=False)
+    blacklist_actions = _Column(pg.JSON)
+
 
 class AutomodUsers(Base):
     __tablename__ = "automod_users"

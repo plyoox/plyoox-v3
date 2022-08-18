@@ -53,6 +53,15 @@ class AutomodExecutionModel(RecordClass):
     duration: int
 
 
+class AutomodDiscordExecutionModel(RecordClass):
+    rule_id: int
+    action: AutomodAction
+    check: AutomodChecks
+    days: int
+    points: int
+    duration: int
+
+
 class ModerationModel(RecordClass):
     active: bool
     mod_roles: list[int] | None
@@ -83,6 +92,8 @@ class ModerationModel(RecordClass):
     caps_actions: list[AutomodExecutionModel] | None
     caps_whitelist_channels: list[int] | None
     caps_whitelist_roles: list[int] | None
+    blacklist_active: bool
+    blacklist_action: list[AutomodDiscordExecutionModel]
 
 
 class TimerModel(RecordClass):

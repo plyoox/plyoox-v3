@@ -7,13 +7,14 @@ import discord
 from discord import utils
 
 from lib import helper, extensions
-from lib.enums import AutomodAction, AutomodFinalAction
+from lib.enums import AutomodFinalAction
 from translation import _
 
 if TYPE_CHECKING:
     from main import Plyoox
     from cache.models import ModerationModel
-    from lib.types import AutomodExecutionReason, ModerationExecutedCommand
+    from lib.types import ModerationExecutedCommand
+    from .automod import AutomodActionData
 
 
 async def _get_logchannel(bot: Plyoox, cache: ModerationModel) -> discord.Webhook | None:
@@ -89,15 +90,14 @@ async def log_simple_punish_command(
 
 async def automod_log(
     bot: Plyoox,
-    message: discord.Message,
-    action: AutomodAction,
-    type: AutomodExecutionReason,
+    data: AutomodActionData,
     *,
     until: datetime.datetime | None = None,
     points: str | None = None,
 ) -> None:
-    guild = message.guild
-    member = message.author
+    guild = data.guild
+    member = data.member
+    action = data.trigger_action
     lc = guild.preferred_locale
 
     cache = await bot.cache.get_moderation(guild.id)
@@ -121,11 +121,11 @@ async def automod_log(
 
         embeds.append(embed)
 
-        if message.content:
-            if len(message.content) <= 1024:
-                embed.add_field(name=_(lc, "message"), value=message.content)
+        if data.trigger_content:
+            if len(data.trigger_content) <= 1024:
+                embed.add_field(name=_(lc, "message"), value=data.trigger_content)
             else:
-                message_embed = extensions.Embed(title=_(lc, "message"), description=message.content)
+                message_embed = extensions.Embed(title=_(lc, "message"), description=data.trigger_content)
                 embeds.append(message_embed)
 
         await _send_webhook(bot, guild.id, webhook, embeds=embeds)

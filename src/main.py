@@ -47,7 +47,14 @@ class Plyoox(commands.Bot):
     session: aiohttp.ClientSession
 
     def __init__(self, *, sync_commands: bool = False):
-        intents = discord.Intents(bans=True, message_content=True, guild_messages=True, guilds=True, members=True)
+        intents = discord.Intents(
+            bans=True,
+            message_content=True,
+            guild_messages=True,
+            guilds=True,
+            members=True,
+            auto_moderation_execution=True,
+        )
         allowed_mentions = discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=True)
         self.sync_commands = sync_commands
 

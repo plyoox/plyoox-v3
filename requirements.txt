@@ -4,7 +4,7 @@ aiohttp~=3.8.1
 sqlalchemy~=1.4.36
 PyYAML~=6.0
 lru-dict
-discord.py[speed] @ git+https://github.com/Rapptz/discord.py.git@1c7747fe9d7fed9818019608fbcfb73a3ea50b72
+discord.py[speed]
 recordclass~=0.17.2
 python-dateutil~=2.8.2
 tornado~=6.1

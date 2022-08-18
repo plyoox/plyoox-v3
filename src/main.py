@@ -41,7 +41,7 @@ plugins = [
 
 
 class Plyoox(commands.Bot):
-    db: asyncpg.Pool = None
+    db: asyncpg.Pool
     cache: CacheManager
     start_time: datetime
     session: aiohttp.ClientSession
@@ -59,6 +59,7 @@ class Plyoox(commands.Bot):
             tree_cls=extensions.CommandTree,
             application_id=int(os.getenv("CLIENT_ID")),
             owner_id=int(os.getenv("OWNER_ID")),
+            chunk_guilds_at_startup=False,
         )
 
     async def setup_hook(self) -> None:

@@ -57,6 +57,9 @@ class GuildGroup(app_commands.Group):
         guild = interaction.guild
         lc = interaction.locale
 
+        if not guild.chunked:
+            await guild.chunk(cache=True)
+
         joined = 0
 
         for member in guild.members:

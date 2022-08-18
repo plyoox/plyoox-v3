@@ -62,7 +62,10 @@ def get_badges(flags: discord.PublicUserFlags) -> list[str]:
 
 async def interaction_send(interaction: discord.Interaction, key: str, /, ephemeral=True, **kwargs) -> None:
     """Responds to an interaction with a locale string as ephemeral. This is mostly used to respond to errors."""
-    await interaction.response.send_message(_(interaction.locale, key, **kwargs), ephemeral=ephemeral)
+    if interaction.extras.get("deferred"):
+        await interaction.followup.send(_(interaction.locale, key, **kwargs), ephemeral=ephemeral)
+    else:
+        await interaction.response.send_message(_(interaction.locale, key, **kwargs), ephemeral=ephemeral)
 
 
 async def permission_check(

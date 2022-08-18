@@ -39,14 +39,23 @@ class UserGroup(app_commands.Group):
         )
         embed.add_field(name=_(locale, "joined_at"), value=helper.embed_timestamp_format(member.joined_at))
 
-        await interaction.response.send_message(embed=embed)
+        if interaction.extras.get("deferred"):
+            await interaction.followup.send(embed=embed)
+        else:
+            await interaction.response.send_message(embed=embed)
 
     @joined_group.command(name="position", description="Shows the user on a join position")
     @app_commands.describe(position="Join position on the guild")
     async def joined_position(self, interaction: discord.Interaction, position: app_commands.Range[int, 1]):
         """Provides join information based on the join position."""
         if interaction.guild.member_count is not None and position > interaction.guild.member_count:
-            return helper.interaction_send(interaction, "user_info.joined.number_to_high")
+            await interaction.response.send_message(_(interaction.locale, "user_info.joined.number_to_high"))
+            return
+
+        if not interaction.guild.chunked:
+            interaction.extras["deferred"] = True
+            await interaction.response.defer()
+            await interaction.guild.chunk()
 
         members = [member for member in interaction.guild.members]
         members.sort(key=self.sort)
@@ -65,6 +74,11 @@ class UserGroup(app_commands.Group):
         the command will be used.
         """
         current_member = member or interaction.user
+
+        if not interaction.guild.chunked:
+            interaction.extras["deferred"] = True
+            await interaction.response.defer(ephemeral=True)
+            await interaction.guild.chunk(cache=True)
 
         members = [member for member in interaction.guild.members]
         members.sort(key=self.sort)

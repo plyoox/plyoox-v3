@@ -37,3 +37,9 @@ class AutomodChecks(str, enum.Enum):
 
 class TimerType(str, enum.Enum):
     tempban = "tempban"
+
+
+class HelperPermissionEnum(str, enum.Enum):
+    none = "none"
+    view = "view"
+    full = "full"

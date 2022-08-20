@@ -8,7 +8,7 @@ import sqlalchemy as sql
 import sqlalchemy.dialects.postgresql as pg
 import sqlalchemy.orm as orm
 
-from lib.enums import MentionSettings, TimerType
+from lib import enums
 
 if TYPE_CHECKING:
     import asyncpg
@@ -130,7 +130,7 @@ class Moderation(Base):
     mention_active = _Column(pg.BOOLEAN, server_default=False)
     mention_whitelist_channels = _Column(pg.ARRAY(pg.BIGINT))
     mention_whitelist_roles = _Column(pg.ARRAY(pg.BIGINT))
-    mention_settings = _Column(pg.ENUM(MentionSettings), server_default=MentionSettings.member)
+    mention_settings = _Column(pg.ENUM(enums.MentionSettings), server_default=enums.MentionSettings.member)
     mention_count = _Column(pg.SMALLINT, server_default=5)
     mention_actions = _Column(pg.JSON)
 
@@ -160,7 +160,7 @@ class Timers(Base):
     id = _Column(pg.INTEGER, primary_key=True, autoincrement=True)
     guild_id = _Column(pg.BIGINT, nullable=False)
     target_id = _Column(pg.BIGINT, nullable=False)
-    type = _Column(pg.ENUM(TimerType), nullable=False)
+    type = _Column(pg.ENUM(enums.TimerType), nullable=False)
     expires = _Column(pg.TIMESTAMP(timezone=True), nullable=False)
     data = _Column(pg.JSON)
 
@@ -191,3 +191,5 @@ class GuildConfig(Base):
 
     id = _Column(pg.BIGINT, primary_key=True)
     slash_migration = _Column(pg.BOOLEAN, server_default=True)
+    premium_until = _Column(pg.TIMESTAMP(timezone=True))
+    helper_permission = _Column(pg.ENUM(enums.HelperPermissionEnum), server_default=enums.HelperPermissionEnum.none)

@@ -159,3 +159,4 @@ guild-registration:
   description: "Registriert den Server für den Bot (wenn der Bot eingeladen wurde, während er offline war)."
 disable-migration-notification:
   description: "Deaktiviert die Migrations-Nachrichten wenn die alten Commands verwendet werden."
+view-rank: "Level anzeigen"

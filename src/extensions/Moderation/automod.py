@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 _log = logging.getLogger(__name__)
 
-DISCORD_INVITE = re.compile(r"\b(https?://)?discord(?:(app)?\.com/invite?|\.gg)/([a-zA-Z0-9-]{2,32})\b", re.IGNORECASE)
+DISCORD_INVITE = re.compile(r"\bdiscord(?:(app)?\.com/invite?|\.gg)/([a-zA-Z0-9-]{2,32})\b", re.IGNORECASE)
 EVERYONE_MENTION = re.compile("@(here|everyone)")
 LINK_REGEX = re.compile(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]", re.IGNORECASE)
 
@@ -40,6 +40,10 @@ class AutomodActionData(object):
         self.trigger_action = action
         self.trigger_content = content
         self.trigger_reason = reason
+
+    def __repr__(self) -> str:
+        name = self.__class__.__name__
+        return f"<{name} member={self.member} trigger_action={self.trigger_action!r} trigger_content={self.trigger_content!r} trigger_reason={self.trigger_reason!r}>"
 
     @classmethod
     def _from_message(
@@ -69,6 +73,8 @@ class Automod(commands.Cog):
 
         if found_invites := DISCORD_INVITE.findall(message.content):
             cache = await self.bot.cache.get_moderation(guild.id)
+            if cache is None:
+                return
 
             if not self._is_affected(message, cache, "invite"):
                 return
@@ -89,6 +95,8 @@ class Automod(commands.Cog):
 
         if found_links := LINK_REGEX.findall(message.content):
             cache = await self.bot.cache.get_moderation(guild.id)
+            if cache is None:
+                return
 
             if not self._is_affected(message, cache, "link"):
                 return
@@ -111,6 +119,8 @@ class Automod(commands.Cog):
         mass_mentions = EVERYONE_MENTION.findall(message.content)
         if len(message.raw_mentions) + len(message.raw_role_mentions) + len(mass_mentions) > 3:
             cache = await self.bot.cache.get_moderation(guild.id)
+            if cache is None:
+                return
 
             mentions = len([m for m in message.mentions if not m.bot or m.id != author.id])
 
@@ -138,6 +148,8 @@ class Automod(commands.Cog):
                 return
 
             cache = await self.bot.cache.get_moderation(guild.id)
+            if cache is None:
+                return
 
             if not self._is_affected(message, cache, "caps"):
                 return
@@ -173,7 +185,7 @@ class Automod(commands.Cog):
         if member is None:
             return
 
-        if any(role.id in (cache.mod_roles or []) + (cache.ignored_roles or []) for role in member._roles):
+        if any(role.id in cache.mod_roles + cache.ignored_roles for role in member._roles):
             return
 
         automod_actions = getattr(cache, automod_type + "_actions")
@@ -198,6 +210,7 @@ class Automod(commands.Cog):
         actions: list[AutomodExecutionModel],
         reason: AutomodExecutionReason,
     ):
+
         for action in actions:
             if Automod._handle_checks(message.author, action):
                 data = AutomodActionData._from_message(message=message, reason=reason, action_taken=action)
@@ -270,23 +283,28 @@ class Automod(commands.Cog):
         automod_action = data.trigger_action
 
         if message is not None:
-            if automod_action in [AutomodAction.kick, AutomodAction.tempmute, AutomodAction.points]:
+            if automod_action.action in [
+                AutomodAction.kick,
+                AutomodAction.tempmute,
+                AutomodAction.points,
+                AutomodAction.delete,
+            ]:
                 if message.channel.permissions_for(guild.me).manage_messages:
                     await message.delete()
 
-        if automod_action == AutomodAction.ban:
+        if automod_action.action == AutomodAction.ban:
             if guild.me.guild_permissions.ban_members:
                 await guild.ban(member, reason=_(lc, f"automod.reason.{data.trigger_reason}"))
                 await _logging.automod_log(self.bot, data)
-        elif automod_action == AutomodAction.kick:
+        elif automod_action.action == AutomodAction.kick:
             if guild.me.guild_permissions.kick_members:
                 await guild.kick(member, reason=_(lc, f"automod.reason.{data.trigger_reason}"))
                 await _logging.automod_log(self.bot, data)
-        elif automod_action == AutomodAction.delete:
+        elif automod_action.action == AutomodAction.delete:
             await _logging.automod_log(self.bot, data)
-        elif automod_action == AutomodAction.tempban:
+        elif automod_action.action == AutomodAction.tempban:
             if guild.me.guild_permissions.ban_members:
-                banned_until = utils.utcnow() + datetime.timedelta(seconds=data.trigger_action.duration)
+                banned_until = utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
 
                 timers = self.bot.timer
                 if timers is not None:
@@ -296,13 +314,13 @@ class Automod(commands.Cog):
                 else:
                     _log.error("Timer Plugin is not initialized")
 
-        elif automod_action == AutomodAction.tempmute:
+        elif automod_action.action == AutomodAction.tempmute:
             if guild.me.guild_permissions.mute_members:
-                muted_until = utils.utcnow() + datetime.timedelta(seconds=data.trigger_action.duration)
+                muted_until = utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
 
                 await member.timeout(muted_until)
                 await _logging.automod_log(self.bot, data, until=muted_until)
-        elif automod_action == AutomodAction.points:
+        elif automod_action.action == AutomodAction.points:
             await self._handle_points(data)
 
     @staticmethod
@@ -321,13 +339,13 @@ class Automod(commands.Cog):
         if not getattr(cache, f"{reason}_active") or not getattr(cache, f"{reason}_actions"):
             return False
 
-        if any(role.id in (cache.mod_roles or []) + (cache.ignored_roles or []) for role in roles):
+        if any(role in cache.mod_roles + cache.ignored_roles for role in roles):
             return False
 
         if channel.id in getattr(cache, f"{reason}_whitelist_channels"):
             return False
 
-        if any(role.id in getattr(cache, f"{reason}_whitelist_roles") for role in roles):
+        if any(role in getattr(cache, f"{reason}_whitelist_roles") for role in roles):
             return False
 
         return True

@@ -195,11 +195,11 @@ moderation:
 automod:
   points_added: "Points added"
   reason:
-    link: "external link"
-    mention: "mention spam"
-    invite: "discord invite"
-    caps: "caps spam"
-    points: "maximum points reached"
+    link: "External link"
+    mention: "Mention spam"
+    invite: "Discord invite"
+    caps: "Caps spam"
+    points: "Maximum points reached"
   kick:
     title: "Automod: Kick"
     description: "The user **{target}** ({target.id}) has been kicked by the automod."

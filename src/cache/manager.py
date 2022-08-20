@@ -142,6 +142,8 @@ class CacheManager:
             mod_roles=result["mod_roles"] or [],
             notify_user=result["notify_user"],
             ignored_roles=result["ignored_roles"] or [],
+            blacklist_active=result["blacklist_active"],
+            blacklist_actions=result["blacklist_actions"] or [],
         )
 
         self._moderation[id] = model

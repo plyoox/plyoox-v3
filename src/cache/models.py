@@ -94,7 +94,7 @@ class ModerationModel(RecordClass):
     caps_whitelist_channels: list[int] | None
     caps_whitelist_roles: list[int] | None
     blacklist_active: bool
-    blacklist_action: list[AutomodDiscordExecutionModel]
+    blacklist_actions: list[AutomodDiscordExecutionModel]
 
 
 class TimerModel(RecordClass):

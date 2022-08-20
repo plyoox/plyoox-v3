@@ -157,6 +157,8 @@ class Automod(commands.Cog):
 
         if execution.rule_trigger_type == discord.AutoModRuleTriggerType.keyword:
             automod_type = "blacklist"
+        elif execution.rule_trigger_type == discord.AutoModRuleTriggerType.mention_spam:
+            automod_type = "mention"
 
         if automod_type is None:
             return

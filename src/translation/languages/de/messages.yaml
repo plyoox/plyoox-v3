@@ -232,7 +232,7 @@ automod:
     user_message_kick: "Du hast die maximale Anzahl an Punkten erreicht und wurdest deshalb automatisch vom Server `{guild.name}` gekickt."
     user_message_ban: "Du hast die maximale Anzahl an Punkten erreicht und wurdest deshalb automatisch vom Server `{guild.name}` permanent gebannt."
     user_message_tempban: "Du hast die maximale Anzahl an Punkten erreicht und wurdest deshalb automatisch vom Server `{guild.name}` bis {timestamp} gebannt."
-    user_message_tempmute: "Du hast die maximale Anzahl an Punkten erreicht und wurdest deshalb automatisch vom Server `{guild.name}` bis {timestamp} gesperrt."
+    user_message_tempmute: "Du hast die maximale Anzahl an Punkten erreicht und wurdest deshalb automatisch auf dem Server `{guild.name}` bis {timestamp} gesperrt."
 fun:
   color: "Zufällige Farbe:\nHEX: `{hex}`\nRGB: `{rgb}`"
   slot:

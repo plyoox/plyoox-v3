@@ -97,7 +97,6 @@ async def automod_log(
 ) -> None:
     guild = data.guild
     member = data.member
-    action = data.trigger_action
     lc = guild.preferred_locale
 
     cache = await bot.cache.get_moderation(guild.id)
@@ -108,9 +107,9 @@ async def automod_log(
     if webhook is not None:
         embeds = []
 
-        embed = extensions.Embed(description=_(lc, f"automod.{action}.description", target=member))
-        embed.set_author(name=_(lc, f"automod.{action}.title"), icon_url=member.display_avatar)
-        embed.add_field(name=_(lc, "reason"), value="> " + _(lc, f"automod.reason.{type}"))
+        embed = extensions.Embed(description=_(lc, f"automod.{data.trigger_action.action}.description", target=member))
+        embed.set_author(name=_(lc, f"automod.{data.trigger_action.action}.title"), icon_url=member.display_avatar)
+        embed.add_field(name=_(lc, "reason"), value="> " + _(lc, f"automod.reason.{data.trigger_reason}"))
         embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
         embed.set_footer(text=f"{_(lc, 'id')}: {member.id}")
 
@@ -135,7 +134,7 @@ async def automod_log(
             await member.send(
                 _(
                     lc,
-                    f"automod.{action}.user_message",
+                    f"automod.{data.trigger_action.action}.user_message",
                     reason=_(lc, f"automod.reason.{type}"),
                     timestamp=discord.utils.format_dt(until) if until is not None else None,
                     guild=guild,

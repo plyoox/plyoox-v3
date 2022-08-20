@@ -29,7 +29,7 @@ class Translator(app_commands.Translator):
         return locale_keys
 
     @staticmethod
-    def _to_locale_key(context: app_commands.TranslationContext):
+    def _to_locale_key(context: app_commands.TranslationContext) -> str | None:
         obj = context.data
         location = context.location
 
@@ -45,18 +45,25 @@ class Translator(app_commands.Translator):
             locale_keys = Translator._command_to_locale_key(obj.command)
             locale_keys.append(str(obj.name))
 
+        if not locale_keys:
+            return
+
         return ".".join(locale_keys)
 
     async def translate(
         self, string: app_commands.locale_str, locale: discord.Locale, context: app_commands.TranslationContext
     ) -> str | None:
-        if locale != discord.Locale.german or str(context.location).endswith("_name"):
+        if locale != discord.Locale.german:
+            return
+
+        if str(context.location).endswith("_name") and not isinstance(context.data, app_commands.ContextMenu):
             return
 
         locale_key = self._to_locale_key(context)
-        text = get_command_key(locale, locale_key)
-        if text is not None:
-            return text
+        if locale_key is not None:
+            text = get_command_key(locale, locale_key)
+            if text is not None:
+                return text
 
         alternative_key = string.extras.get("key")
         alternative_string = get_command_key(locale, alternative_key)

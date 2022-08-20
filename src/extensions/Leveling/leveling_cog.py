@@ -104,6 +104,9 @@ class Leveling(commands.Cog):
         message_xp = random.randint(15, 25)  # generate a random amount of xp between 15 and 25
         member_data = await self._fetch_member_data(member)
 
+        if member.premium_since is not None and cache.booster_xp_multiplicator is not None:
+            message_xp *= cache.booster_xp_multiplicator
+
         # member has no data saved
         if member_data is None:
             await self._create_member_data(member, message_xp)

@@ -28,6 +28,7 @@ class LevelingModel(RecordClass):
     no_xp_role: int | None
     remove_roles: bool
     no_xp_channels: list[int] | None
+    booster_xp_multiplicator: int | None
 
 
 class LoggingModel(RecordClass):

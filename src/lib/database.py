@@ -54,6 +54,7 @@ class Leveling(Base):
     no_xp_channels = _Column(pg.ARRAY(sql.BIGINT))
     no_xp_role = _Column(pg.BIGINT)
     remove_roles = _Column(pg.BOOLEAN, server_default=False)
+    booster_xp_multiplicator = _Column(pg.SMALLINT)
 
 
 class LevelingUsers(Base):
@@ -138,7 +139,7 @@ class Moderation(Base):
     caps_whitelist_roles = _Column(pg.ARRAY(pg.BIGINT))
     caps_actions = _Column(pg.JSON)
 
-    blacklist_active = _Column(pg.BIGINT, server_default=False)
+    blacklist_active = _Column(pg.BOOLEAN, server_default=False)
     blacklist_actions = _Column(pg.JSON)
 
 

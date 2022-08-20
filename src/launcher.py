@@ -38,6 +38,7 @@ async def generate_db():
 
     # Create database engine
     engine = async_sql.create_async_engine(os.getenv("POSTGRES").replace("postgresql://", "postgresql+asyncpg://"))
+    logger = logging.getLogger()
 
     async with engine.begin() as conn:
         logger.debug("Setup database...")

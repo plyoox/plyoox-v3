@@ -124,34 +124,34 @@ moderation:
     affected_users: "Affected users"
   ban:
     log_title: "Member has been banned"
-    log_description: "The user **{target}** ({target.id}) has been banned by {moderator}."
+    log_description: "The user {target.mention} ({target}) has been banned by {moderator}."
     successfully_banned: "Der user was successfully banned."
     user_message: "You have been banned from {guild.name} for {reason}."
   tempban:
     log_title: "Member has been temporary banned"
-    log_description: "The user **{target}** ({target.id}) has been temporarily banned by {moderator}."
+    log_description: "The user {target.mention} ({target}) has been temporarily banned by {moderator}."
     successfully_banned: "Der user was successfully banned."
     too_long: "The specified period is too long. A maximum of 1 year is possible."
     user_message: "You have been banned from {guild.name} for {reason} until {timestamp}."
   tempmute:
     log_title: "Member has been temporary muted"
-    log_description: "The user **{target}** ({target.id}) has been temporarily muted by {moderator}."
+    log_description: "The user {target.mention} ({target}) has been temporarily muted by {moderator}."
     too_long: "The specified period is too long. Currently, a maximum of 28 days is possible."
     successfully_muted: "The user has been successfully temporarily muted."
     user_message: "You have been muted from {guild.name} for {reason}."
   unban:
     log_title: "User has been unbanned"
-    log_description: "The user **{target}** ({target.id}) has been unbanned by {moderator}."
+    log_description: "The user {target.mention} ({target}) has been unbanned by {moderator}."
     successfully_unbanned: "The user has been successfully unbanned."
     not_banned: "The user is not banned."
   softban:
     log_title: "Member has been kicked (softban)"
-    log_description: "The user **{target}** ({target.id}) has been kicked (softban) by {moderator}."
+    log_description: "The user {target.mention} ({target}) has been kicked (softban) by {moderator}."
     successfully_kicked: "The user has been successfully kicked (softban)."
     user_message: "You have been kicked from {guild.name} for {reason}."
   unmute:
     log_title: "User has been unmuted"
-    log_description: "The user **{target}** ({target.id}) has been unmuted by {moderator}."
+    log_description: "The user {target.mention} ({target}) has been unmuted by {moderator}."
     successfully_unmuted: "The user has been successfully unmuted."
     user_message: "You have been unmuted from {guild.name} for {reason}."
   slowmode:
@@ -202,31 +202,31 @@ automod:
     points: "Maximum points reached"
   kick:
     title: "Automod: Kick"
-    description: "The user **{target}** ({target.id}) has been kicked by the automod."
+    description: "The user {target.mention} ({target}) has been kicked by the automod."
     user_message: "You were automatically kicked from `{guild.name}` for `{reason}`."
   ban:
     title: "Automod: Ban"
-    description: "The user **{target}** ({target.id}) has been banned by automod."
+    description: "The user {target.mention} ({target}) has been banned by the automod."
     user_message: "You have been automatically banned from `{guild.name}` for `{reason}`."
   delete:
     title: "Automod: Message deleted"
-    description: "A message from **{target}** ({target.id}) was deleted by automod."
+    description: "A message from {target.mention} ({target}) was deleted by the automod."
     user_message: "Your message was automatically deleted because of `{reason}`."
   tempban:
     title: "Automod: Temporary ban"
-    description: "The user **{target}** ({target.id}) has been temporarily banned by automod."
+    description: "The user {target.mention} ({target}) has been temporarily banned by the automod."
     user_message: "You have been automatically banned for `{reason}` from `{guild.name}` until {timestamp}."
   tempmute:
     title: "Automod: Temporary mute"
-    description: "The user **{target}** ({target.id}) has been temporarily banned by automod."
+    description: "The user {target.mention} ({target}) has been temporarily banned by the automod."
     user_message: "You have been automatically banned for `{reason}` from `{guild.name}` until {timestamp}."
   points:
     title: "Automod: points added"
-    description: "The user **{target}** ({target.id}) has received points for a violation."
+    description: "The user {target.mention} ({target}) has received points for a violation."
     user_message: "You automatically received **{points}** for `{reason}`."
   final:
     title: "Automod: Maximum points reached"
-    description: "The user **{target}** ({target.id}) has reached the maximum number of points."
+    description: "The user {target.mention} ({target}) has reached the maximum number of points."
     action: "Action"
     reason: "Maximum number of points reached"
     user_message_kick: "You have reached the maximum number of points and therefore were automatically kicked from `{guild.name}`."

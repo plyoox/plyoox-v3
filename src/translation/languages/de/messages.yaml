@@ -115,7 +115,7 @@ moderation:
   bot_cannot_punish: "The user must be below the bot in the hierarchy."
   kick:
     log_title: "Benutzer wurde gekickt"
-    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} gekickt."
+    log_description: "Der Benutzer {target.mention} ({target}) wurde von {moderator} gekickt."
     successfully_kicked: "Der Benutzer wurde erfolgreich gekickt."
     user_message: "Du wurdest vom Server {guild.name} für {reason} gekickt."
   clear:
@@ -124,34 +124,34 @@ moderation:
     affected_users: "Betroffene Mitglieder"
   ban:
     log_title: "Benutzer wurde gebannt"
-    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} permanent gebannt."
+    log_description: "Der Benutzer {target.mention} ({target}) wurde von {moderator} permanent gebannt."
     successfully_banned: "Der Benutzer wurde erfolgreich für gebannt."
     user_message: "Du wurdest vom Server {guild.name} für {reason} permanent gebannt."
   tempban:
     log_title: "Benutzer wurde temporär gebannt"
-    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} temporär gebannt."
+    log_description: "Der Benutzer {target.mention} ({target}) wurde von {moderator} temporär gebannt."
     successfully_banned: "Der Benutzer wurde erfolgreich temporär gebannt."
     too_long: "Der angegebene Zeitraum ist zu lang. Es ist maximal 1 Jahr möglich."
     user_message: "Du wurdest vom Server {guild.name} für {reason} bis {timestamp} gebannt."
   tempmute:
     log_title: "Benutzer wurde temporär gesperrt"
-    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} temporär gesperrt."
+    log_description: "Der Benutzer {target.mention} ({target}) wurde von {moderator} temporär gesperrt."
     too_long: "Der angegebene Zeitraum ist zu lang. Derzeit sind maximal 28 Tage möglich."
     successfully_muted: "Der Benutzer wurde erfolgreich temporär gesperrt."
     user_message: "Du wurdest im Server {guild.name} für {reason} bis {timestamp} gesperrt."
   unban:
     log_title: "Benutzer wurde entbannt"
-    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} entbannt."
+    log_description: "Der Benutzer {target.mention} ({target}) wurde von {moderator} entbannt."
     successfully_unbanned: "Der Benutzer wurde erfolgreich entbannt."
     not_banned: "Der Benutzer ist nicht gebannt."
   softban:
     log_title: "Benutzer wurde gekickt (softban)"
-    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} gekickt (softban)."
+    log_description: "Der Benutzer {target.mention} ({target}) wurde von {moderator} gekickt (softban)."
     successfully_kicked: "Der Benutzer wurde erfolgreich gekickt (softban)."
     user_message: "Du wurdest vom Server {guild.name} für {reason} gekickt (softban)."
   unmute:
     log_title: "Benutzer wurde entsperrt"
-    log_description: "Der Benutzer **{target}** ({target.id}) wurde von {moderator} entmutet."
+    log_description: "Der Benutzer {target.mention} ({target}) wurde von {moderator} entmutet."
     successfully_unmuted: "Der Benutzer wurde erfolgreich entmutet."
     user_message: "Du wurdest vom Server {guild.name} für {reason} entmutet."
   slowmode:
@@ -202,31 +202,31 @@ automod:
     points: "Maximale Punkteanzahl erreicht"
   kick:
     title: "Automod: Kick"
-    description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod gekickt."
+    description: "Der Benutzer {target.mention} ({target}) wurde vom Automod gekickt."
     user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` gekickt."
   ban:
     title: "Automod: Bann"
-    description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod gebannt."
+    description: "Der Benutzer {target.mention} ({target}) wurde vom Automod gebannt."
     user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` gebannt."
   delete:
     title: "Automod: Nachricht gelöscht"
-    description: "Eine Nachricht von **{target}** ({target.id}) wurde vom Automod gelöscht."
+    description: "Eine Nachricht von {target.mention} ({target}) wurde vom Automod gelöscht."
     user_message: "Deine Nachricht wurde automatisch wegen `{reason}` gelöscht."
   tempban:
     title: "Automod: Temporärer Bann"
-    description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod temporär gebannt."
+    description: "Der Benutzer {target.mention} ({target}) wurde vom Automod temporär gebannt."
     user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` bis {timestamp} gebannt."
   tempmute:
     title: "Automod: Temporäre Sperre"
-    description: "Der Benutzer **{target}** ({target.id}) wurde vom Automod temporär gesperrt."
+    description: "Der Benutzer {target.mention} ({target}) wurde vom Automod temporär gesperrt."
     user_message: "Du wurdest für `{reason}` automatisch vom Server `{guild.name}` bis {timestamp} gesperrt."
   points:
     title: "Automod: Punkte hinzugefügt"
-    description: "Der Benutzer **{target}** ({target.id}) hat Punkte für einen Verstoß erhalten."
+    description: "Der Benutzer {target.mention} ({target}) hat Punkte für einen Verstoß erhalten."
     user_message: "Du hast für `{reason}` automatisch **{points}** Punkte erhalten."
   final:
     title: "Automod: Maximale Punkte erreicht"
-    description: "Der Benutzer **{target}** ({target.id}) hat die maximale Anzahl von Punkten erreicht."
+    description: "Der Benutzer {target.mention} ({target}) hat die maximale Anzahl von Punkten erreicht."
     action: "Aktion"
     reason: "Maximale Punkteanzahl erreicht"
     user_message_kick: "Du hast die maximale Anzahl an Punkten erreicht und wurdest deshalb automatisch vom Server `{guild.name}` gekickt."

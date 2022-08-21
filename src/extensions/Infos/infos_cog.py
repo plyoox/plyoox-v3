@@ -8,9 +8,19 @@ from translation import _
 from . import guild_group, user_group
 
 
+_T = app_commands.locale_str
+
+
 class Infos(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
+
+        self.ctx_menu = app_commands.ContextMenu(
+            name=_T("View user info", key="view-user-info"),
+            callback=self.about_context_menu,
+        )
+
+        self.bot.tree.add_command(self.ctx_menu)
 
     guild_commands = guild_group.GuildGroup()
     user_commands = user_group.UserGroup()
@@ -42,3 +52,7 @@ class Infos(commands.Cog):
         )
 
         await interaction.response.send_message(embed=embed, view=view)
+
+    async def about_context_menu(self, interaction: discord.Interaction, member: discord.Member):
+        """Shows basic information about a user. This can is context menu command."""
+        await self.user_commands._send_about_response(interaction, member=member, ephemeral=True)

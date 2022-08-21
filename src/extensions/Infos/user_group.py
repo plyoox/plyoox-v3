@@ -44,6 +44,49 @@ class UserGroup(app_commands.Group):
         else:
             await interaction.response.send_message(embed=embed)
 
+    @staticmethod
+    async def _send_about_response(
+        interaction: discord.Interaction, *, member: discord.Member, ephemeral: bool = False
+    ):
+        roles = member.roles
+        lc = interaction.locale
+        public_flags = helper.get_badges(member.public_flags)
+
+        embed = extensions.Embed(
+            title=_(lc, "user_info.about.user_information"),
+            color=member.accent_color or colors.DISCORD_DEFAULT,
+        )  # accent color is not provided in the default member object
+
+        embed.set_author(name=str(member), icon_url=member.display_avatar.url)
+        embed.set_thumbnail(url=member.avatar.url)
+        embed.add_field(
+            name=_(lc, "user"),
+            value=f"> __{_(lc, 'id')}:__ {member.id}\n"
+            f"> __{_(lc, 'nick')}:__ {member.nick or _(lc, 'user_info.about.no_nick')}\n"
+            f"> __{_(lc, 'user_info.about.server_avatar')}:__ {_(lc, bool(member.guild_avatar))}",
+        )
+        embed.add_field(
+            name=_(lc, "guild"),
+            value=f"> __{_(lc, 'joined_at')}:__ {utils.format_dt(member.joined_at)}\n"
+            f"> __{_(lc, 'user_info.about.member_verification')}:__ {_(lc, member.pending)}\n"
+            f"> __{_(lc, 'user_info.about.premium_subscriber')}:__ "
+            f"{utils.format_dt(member.premium_since) if member.premium_since else _(lc, False)}",
+        )
+        embed.add_field(
+            name=_(lc, "user_info.about.account"),
+            value=f"> __{_(lc, 'created_at')}:__ {utils.format_dt(member.created_at)}\n"
+            f"> __{_(lc, 'user_info.about.bot')}:__ {_(lc, member.bot)}",
+        )
+        embed.add_field(
+            name=f"{_(lc, 'roles')} ({len(roles) - 1})", value=f"> {helper.format_roles(roles) or _(lc, 'no_roles')}"
+        )
+        embed.add_field(
+            name=f"{_(lc, 'user_info.about.public_badges')} ({len(public_flags)})",
+            value=f"> {''.join(public_flags) if len(public_flags) else _(lc, 'user_info.about.no_flags')}",
+        )
+
+        await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
+
     @joined_group.command(name="position", description="Shows the user on a join position")
     @app_commands.describe(position="Join position on the guild")
     async def joined_position(self, interaction: discord.Interaction, position: app_commands.Range[int, 1]):
@@ -92,45 +135,7 @@ class UserGroup(app_commands.Group):
         """Shows basic information about a user. If no member is provided, the user
         that executed the command will be used.
         """
-        current_member = member or interaction.user
-        roles = current_member.roles
-        lc = interaction.locale
-        public_flags = helper.get_badges(current_member.public_flags)
-
-        embed = extensions.Embed(
-            title=_(lc, "user_info.about.user_information"),
-            color=current_member.accent_color or colors.DISCORD_DEFAULT,
-        )  # accent color is not provided in the default member object
-
-        embed.set_author(name=str(current_member), icon_url=current_member.display_avatar.url)
-        embed.set_thumbnail(url=current_member.avatar.url)
-        embed.add_field(
-            name=_(lc, "user"),
-            value=f"> __{_(lc, 'id')}:__ {current_member.id}\n"
-            f"> __{_(lc, 'nick')}:__ {current_member.nick or _(lc, 'user_info.about.no_nick')}\n"
-            f"> __{_(lc, 'user_info.about.server_avatar')}:__ {_(lc, bool(current_member.guild_avatar))}",
-        )
-        embed.add_field(
-            name=_(lc, "guild"),
-            value=f"> __{_(lc, 'joined_at')}:__ {utils.format_dt(current_member.joined_at)}\n"
-            f"> __{_(lc, 'user_info.about.member_verification')}:__ {_(lc, current_member.pending)}\n"
-            f"> __{_(lc, 'user_info.about.premium_subscriber')}:__ "
-            f"{utils.format_dt(current_member.premium_since) if current_member.premium_since else _(lc, False)}",
-        )
-        embed.add_field(
-            name=_(lc, "user_info.about.account"),
-            value=f"> __{_(lc, 'created_at')}:__ {utils.format_dt(current_member.created_at)}\n"
-            f"> __{_(lc, 'user_info.about.bot')}:__ {_(lc, current_member.bot)}",
-        )
-        embed.add_field(
-            name=f"{_(lc, 'roles')} ({len(roles) - 1})", value=f"> {helper.format_roles(roles) or _(lc, 'no_roles')}"
-        )
-        embed.add_field(
-            name=f"{_(lc, 'user_info.about.public_badges')} ({len(public_flags)})",
-            value=f"> {''.join(public_flags) if len(public_flags) else _(lc, 'user_info.about.no_flags')}",
-        )
-
-        await interaction.response.send_message(embed=embed)
+        await self._send_about_response(interaction, member=member or interaction.user)
 
     @app_commands.command(name="avatar", description="Shows the avatar of a user.")
     @app_commands.describe(member="The member you want the avatar from.")

@@ -65,8 +65,8 @@ class Translator(app_commands.Translator):
             if text is not None:
                 return text
 
-        alternative_key = string.extras.get("key")
-        alternative_string = get_command_key(locale, alternative_key)
+        locale_key = string.extras.get("key")
+        alternative_string = get_command_key(locale, locale_key)
 
         if alternative_string is None:
             _log.warning(f"No translation for key: {locale_key}")

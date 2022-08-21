@@ -161,3 +161,4 @@ disable-migration-notification:
   description: "Deaktiviert die Migrations-Nachrichten wenn die alten Commands verwendet werden."
 view-rank: "Level anzeigen"
 view-user-info: "User Info"
+view-invite-info: "Invite Info"

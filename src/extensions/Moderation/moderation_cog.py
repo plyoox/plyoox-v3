@@ -18,6 +18,12 @@ if TYPE_CHECKING:
 
 
 _T = app_commands.locale_str
+DISCORD_INVITE_SINGLE = re.compile(
+    r"^(https?://)?discord(?:(app)?\.com/invite?|\.gg)/([a-zA-Z0-9-]{2,32})$", re.IGNORECASE
+)
+DISCORD_INVITE_MULTI = re.compile(
+    r"\b(https?://)?discord(?:(app)?\.com/invite?|\.gg)/([a-zA-Z0-9-]{2,32})\b", re.IGNORECASE
+)
 
 
 def can_execute_action(interaction: discord.Interaction, user: discord.Member, target: discord.Member):
@@ -27,6 +33,13 @@ def can_execute_action(interaction: discord.Interaction, user: discord.Member, t
 class Moderation(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
+
+        self.ctx_menu = app_commands.ContextMenu(
+            name=_T("Invite info", key="view-invite-info"),
+            callback=self.invite_info_context_menu,
+        )
+
+        self.bot.tree.add_command(self.ctx_menu)
 
     clear_group = clear_group.ClearGroup()
     warn_group = app_commands.Group(
@@ -51,6 +64,51 @@ class Moderation(commands.Cog):
             return False
 
         return True
+
+    @staticmethod
+    async def _view_invite_info(interaction: discord.Interaction, *, invite: discord.Invite):
+        lc = interaction.locale
+
+        print(invite.uses)
+
+        embed = extensions.Embed(
+            description=_(lc, "moderation.invite_info.description", code=invite.code),
+            title=_(lc, "moderation.invite_info.title"),
+        )
+        embed.set_thumbnail(url=invite.guild.icon)
+
+        embed.add_field(
+            name=_(lc, "moderation.invite_info.info"),
+            value=f"> __{_(lc, 'moderation.invite_info.url')}:__ {invite.url}\n"
+            f"> __{_(lc, 'moderation.invite_info.uses')}:__ {invite.uses or 0}/{invite.max_uses or '∞'}\n"
+            f"> __{_(lc, 'created_at')}:__ {discord.utils.format_dt(invite.created_at) if invite.created_at else _(lc, 'moderation.invite_info.no_date')}\n"
+            f"> __{_(lc, 'moderation.invite_info.expires_at')}:__ {discord.utils.format_dt(invite.expires_at) if invite.expires_at else _(lc, 'moderation.invite_info.no_date')}",
+        )
+
+        if invite.inviter is not None:
+            embed.add_field(
+                name=_(lc, "moderation.invite_info.creator"),
+                value=f"> __{_(lc, 'id')}:__ {invite.inviter.id}\n"
+                f"> __{_(lc, 'name')}:__ {invite.inviter}\n"
+                f"> __{_(lc, 'moderation.invite_info.mention')}:__{invite.inviter.mention}",
+            )
+        else:
+            embed.add_field(
+                name=_(lc, "moderation.invite_info.creator"),
+                value=_(lc, "moderation.invite_info.no_creator"),
+            )
+
+        embed.add_field(
+            name=_(lc, "guild"),
+            value=f"> __{_(lc, 'name')}:__ {invite.guild.name}\n"
+            f"> __{_(lc, 'id')}:__ {invite.guild.id}\n"
+            f"> __{_(lc, 'guild_info.about.vanity_url')}:__ {invite.guild.vanity_url or _(lc, 'guild_info.about.no_vanity_url')}\n"
+            f"> __{_(lc, 'moderation.invite_info.member_count')}:__ {invite.approximate_member_count}",
+        )
+
+        await interaction.response.send_message(
+            embed=embed,
+        )
 
     @app_commands.command(name="ban", description="Bans an user from the guild.")
     @app_commands.describe(member="The member that should be banned.", reason="Why the member should be banned.")
@@ -279,35 +337,36 @@ class Moderation(commands.Cog):
     async def invite_info(self, interaction: discord.Interaction, invite: str):
         lc = interaction.locale
 
-        if not automod.DISCORD_INVITE.match(invite):
+        if not DISCORD_INVITE_SINGLE.match(invite):
             await interaction.response.send_message(_(lc, "moderation.invite_info.invalid_invite"), ephemeral=True)
             return
 
-        invite = await self.bot.fetch_invite(invite)
+        invite = await self.bot.fetch_invite(invite, with_counts=True, with_expiration=True)
         if invite is None:
             await interaction.response.send_message(_(lc, "moderation.invite_info.not_found"), ephemeral=True)
             return
 
-        embed = extensions.Embed(
-            description=_(lc, "moderation.invite_info.description", code=invite.code),
-            title=_(lc, "moderation.invite_info.title"),
-        )
-        embed.set_thumbnail(url=invite.guild.icon)
+        await self._view_invite_info(interaction, invite=invite)
 
-        embed.add_field(
-            name=_(lc, "moderation.invite_info.creator"),
-            value=f"> __{_(lc, 'id')}:__ {invite.inviter.id}\n"
-            f"> __{_(lc, 'name')}:__ {invite.inviter}\n"
-            f"> __{_(lc, 'moderation.invite_info.mention')}:__{invite.inviter.mention}",
-        )
-        embed.add_field(
-            name=_(lc, "guild"),
-            value=f"> __{_(lc, 'name')}:__ {invite.guild.name}\n"
-            f"> __{_(lc, 'id')}:__ {invite.guild.id}\n"
-            f"> __{_(lc, 'guild_info.about.vanity_url')}:__ {invite.guild.vanity_url or _(lc, 'guild_info.about.no_vanity_url')}\n",
-        )
+    @app_commands.guild_only
+    @app_commands.default_permissions(manage_messages=True)
+    async def invite_info_context_menu(self, interaction: discord.Interaction, message: discord.Message):
+        lc = interaction.locale
 
-        await interaction.response.send_message(embed=embed)
+        invites = DISCORD_INVITE_MULTI.findall(message.content)
+
+        if not invites:
+            await interaction.response.send_message(
+                _(lc, "moderation.invite_info.invalid_invite_message"), ephemeral=True
+            )
+            return
+
+        invite = await self.bot.fetch_invite(invites[0][-1], with_expiration=True, with_counts=True)
+        if invite is None:
+            await interaction.response.send_message(_(lc, "moderation.invite_info.not_found"), ephemeral=True)
+            return
+
+        await self._view_invite_info(interaction, invite=invite)
 
     @app_commands.command(name="massban", description="Bans users based on a multiple factors.")
     @app_commands.describe(

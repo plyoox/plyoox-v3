@@ -80,7 +80,7 @@ class Owner(
         bot: Plyoox = interaction.client  # type: ignore
 
         if "." in plugin:
-            plugin = f"plugins.{plugin}"
+            plugin = f"extensions.{plugin}"
 
         try:
             await bot.load_extension(plugin)
@@ -96,7 +96,7 @@ class Owner(
         bot: Plyoox = interaction.client  # type: ignore
 
         if "." not in plugin:
-            plugin = f"plugins.{plugin}"
+            plugin = f"extensions.{plugin}"
 
         try:
             await bot.unload_extension(plugin)
@@ -112,7 +112,7 @@ class Owner(
         bot: Plyoox = interaction.client  # type: ignore
 
         if "." not in plugin:
-            plugin = f"plugins.{plugin}"
+            plugin = f"extensions.{plugin}"
 
         try:
             await bot.reload_extension(plugin)

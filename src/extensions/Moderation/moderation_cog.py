@@ -69,8 +69,6 @@ class Moderation(commands.Cog):
     async def _view_invite_info(interaction: discord.Interaction, *, invite: discord.Invite, ephemeral: bool = False):
         lc = interaction.locale
 
-        print(invite.uses)
-
         embed = extensions.Embed(
             description=_(lc, "moderation.invite_info.description", code=invite.code),
             title=_(lc, "moderation.invite_info.title"),

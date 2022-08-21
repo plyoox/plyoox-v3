@@ -66,7 +66,7 @@ class Moderation(commands.Cog):
         return True
 
     @staticmethod
-    async def _view_invite_info(interaction: discord.Interaction, *, invite: discord.Invite):
+    async def _view_invite_info(interaction: discord.Interaction, *, invite: discord.Invite, ephemeral: bool = False):
         lc = interaction.locale
 
         print(invite.uses)
@@ -106,9 +106,7 @@ class Moderation(commands.Cog):
             f"> __{_(lc, 'moderation.invite_info.member_count')}:__ {invite.approximate_member_count}",
         )
 
-        await interaction.response.send_message(
-            embed=embed,
-        )
+        await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
 
     @app_commands.command(name="ban", description="Bans an user from the guild.")
     @app_commands.describe(member="The member that should be banned.", reason="Why the member should be banned.")
@@ -366,7 +364,7 @@ class Moderation(commands.Cog):
             await interaction.response.send_message(_(lc, "moderation.invite_info.not_found"), ephemeral=True)
             return
 
-        await self._view_invite_info(interaction, invite=invite)
+        await self._view_invite_info(interaction, invite=invite, ephemeral=True)
 
     @app_commands.command(name="massban", description="Bans users based on a multiple factors.")
     @app_commands.describe(

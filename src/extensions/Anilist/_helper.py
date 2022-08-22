@@ -54,7 +54,13 @@ def get_title(title: _AnilistTitle, language: Literal["romaji", "english", "nati
 
 def to_description(description: str):
     """Converts Anilist's description to a discord-usable description"""
-    description = description.replace("<br>", "").replace("<i>", "*").replace("</i>", "*")
+    description = (
+        description.replace("<br>", "")
+        .replace("<i>", "*")
+        .replace("</i>", "*")
+        .replace("<strong>", "**")
+        .replace("</strong>", "**")
+    )
 
     if len(description) > 1024:
         return description[:1021] + "..."
@@ -105,7 +111,7 @@ async def paginate_search(interaction: discord.Interaction, view: _views.Anilist
     )
     view._update_buttons(has_next_page=data["pageInfo"]["hasNextPage"])
 
-    await interaction.followup.send(embed=embed, view=view)
+    await interaction.edit_original_response(embed=embed, view=view)
 
 
 def generate_info_embed(data: AnilistDetailedResponse, lc: discord.Locale) -> discord.Embed:

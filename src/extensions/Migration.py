@@ -35,6 +35,14 @@ OLD_COMMANDS = [
     "slot",
     "joined",
     "check",
+    "resetpoints",
+    "check",
+    "softban",
+    "points",
+    "warn",
+    "highfive",
+    "minesweeper",
+    "tempban",
 ]
 
 
@@ -92,8 +100,6 @@ class Migration(commands.Cog):
         name="disable-migration-notification", description="Disables the Migration-Messages when using a command."
     )
     async def disable_migration_notification(self, integration: discord.Interaction):
-        await integration.response.defer(ephemeral=True)
-
         await self.bot.db.execute(
             "INSERT INTO guild_config VALUES ($1, False) ON CONFLICT (id) DO UPDATE SET slash_migration = FALSE",
             integration.guild_id,
@@ -101,7 +107,9 @@ class Migration(commands.Cog):
 
         self.migration_guilds[integration.guild_id] = False
 
-        await integration.followup.send(_(integration.locale, "disable-migration-notification.successfully_disabled"))
+        await integration.response.send_message(
+            _(integration.locale, "disable-migration-notification.successfully_disabled"), ephemeral=True
+        )
 
 
 async def setup(bot: Plyoox):

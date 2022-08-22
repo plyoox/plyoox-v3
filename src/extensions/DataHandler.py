@@ -19,7 +19,7 @@ class EventHandlerCog(commands.Cog):
         await self.bot.db.execute("INSERT INTO guild_config (id) VALUES ($1) ON CONFLICT DO NOTHING", guild.id)
 
     @app_commands.command(
-        name="guild-registration",
+        name="register-guild",
         description="Registers the guild for the bot. This is only needed when the bot was invited while it was offline.",
     )
     @app_commands.guild_only

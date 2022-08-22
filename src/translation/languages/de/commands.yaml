@@ -155,7 +155,7 @@ massban:
   account_younger_days: "Nur Benutzer, die jünger sind (Tage)."
   joined_before_days: "Nur Benutzer, die davor beigetreten sind (Tage)."
   amount: "Die Anzahl der Nachrichten die durchsucht werden sollen."
-guild-registration:
+register-guild:
   description: "Registriert den Server für den Bot (wenn der Bot eingeladen wurde, während er offline war)."
 disable-migration-notification:
   description: "Deaktiviert die Migrations-Nachrichten wenn die alten Commands verwendet werden."

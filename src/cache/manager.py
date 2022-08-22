@@ -93,6 +93,7 @@ class CacheManager:
             roles=result["roles"] or [],
             message=result["message"],
             channel=result["channel"],
+            booster_xp_multiplicator=result["booster_xp_multiplicator"],
         )
         self._leveling[id] = model
 

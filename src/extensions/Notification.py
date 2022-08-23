@@ -51,7 +51,7 @@ class Notification(commands.Cog):
         await self.bot.db.execute("DELETE FROM twitch_notifications WHERE guild_id = $1", guild.id)
 
         event_sub_ids = await self.bot.db.fetch(
-            "DELETE FROM twitch_users WHERE (SELECT count(user_id) FROM twitch_notifications) = 0 RETURNING eventsub_id",
+            "DELETE FROM twitch_users WHERE (SELECT count(*) FROM twitch_notifications) = 0 RETURNING eventsub_id",
             guild.id,
         )
 

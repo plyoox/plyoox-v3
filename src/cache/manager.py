@@ -7,16 +7,15 @@ from .models import WelcomeModel, LevelingModel, LoggingModel, ModerationModel, 
 
 
 class CacheManager:
-    __slots__ = ("_pool",)
+    __slots__ = ("_pool", "_leveling", "_welcome", "_moderation", "_logging")
 
-    _welcome = LRU(128)
-    _leveling = LRU(128)
-    _moderation = LRU(128)
-    _logging = LRU(128)
-    _pool: asyncpg.Pool
-
-    def __init__(self, pool: asyncpg.Pool):
+    def __init__(self, pool: asyncpg.Pool, cache_size: int = 128):
         self._pool = pool
+
+        self._leveling = LRU(cache_size)
+        self._welcome = LRU(cache_size)
+        self._moderation = LRU(cache_size)
+        self._logging = LRU(cache_size)
 
     @staticmethod
     def __to_moderation_actions(actions: list[dict] | None) -> list[AutomodExecutionModel]:

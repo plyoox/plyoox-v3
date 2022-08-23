@@ -37,6 +37,7 @@ plugins = [
     "extensions.DataHandler",
     "extensions.Notification",
     "extensions.Migration",
+    "extensions.Statistics",
 ]
 
 
@@ -62,11 +63,12 @@ class Plyoox(commands.Bot):
             intents=intents,
             allowed_mentions=allowed_mentions,
             max_messages=2000,
-            command_prefix=[],
+            command_prefix="-",
             tree_cls=extensions.CommandTree,
             application_id=int(os.getenv("CLIENT_ID")),
             owner_id=int(os.getenv("OWNER_ID")),
             chunk_guilds_at_startup=False,
+            help_command=None,
         )
 
     async def setup_hook(self) -> None:
@@ -97,9 +99,6 @@ class Plyoox(commands.Bot):
     async def on_ready(self) -> None:
         logger.info("Ready")
         self.start_time = utils.utcnow()
-
-    async def on_message(self, message: discord.Message) -> None:
-        pass
 
     async def _create_db_pool(self) -> None:
         try:

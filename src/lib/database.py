@@ -193,3 +193,14 @@ class GuildConfig(Base):
     slash_migration = _Column(pg.BOOLEAN, server_default=True)
     premium_until = _Column(pg.TIMESTAMP(timezone=True))
     helper_permission = _Column(pg.ENUM(enums.HelperPermissionEnum), server_default=enums.HelperPermissionEnum.none)
+
+
+class CommandStatistics(Base):
+    __tablename__ = "command_statistics"
+
+    id = _Column(pg.INTEGER, primary_key=True, autoincrement=True)
+    guild_id = _Column(pg.BIGINT, nullable=False)
+    used_at = _Column(pg.TIMESTAMP, nullable=True)
+    name = _Column(pg.VARCHAR(length=32), nullable=False)
+    author_id = _Column(pg.BIGINT)
+    failed = _Column(pg.BOOLEAN)

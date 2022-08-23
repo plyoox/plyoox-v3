@@ -23,9 +23,13 @@ group.add_argument("--prod", action="store_true", help="Sync commands with disco
 args = parser.parse_args()
 
 # Set up logging
+
+logger = logging.getLogger()
 discord.utils.setup_logging(root=True)
+
+logging.getLogger("tornado.access").setLevel(logging.ERROR)
+
 if args.prod:
-    logger = logging.getLogger()
     handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
     handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
     logger.addHandler(handler)
@@ -38,7 +42,6 @@ async def generate_db():
 
     # Create database engine
     engine = async_sql.create_async_engine(os.getenv("POSTGRES").replace("postgresql://", "postgresql+asyncpg://"))
-    logger = logging.getLogger()
 
     async with engine.begin() as conn:
         logger.debug("Setup database...")

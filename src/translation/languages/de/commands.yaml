@@ -37,9 +37,9 @@ fun:
   dice:
     description: "Rollt einen Würfel."
   cat:
-    description: "Zeigt eine süße Katze."
+    description: "Zeigt eine zufällige Katze."
   dog:
-    description: "Zeigt einen süßen Hund."
+    description: "Zeigt einen zufälligen Hund."
   cry:
     description: "Ich glaub ich muss heulen :("
   hug:

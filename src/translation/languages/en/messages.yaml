@@ -252,6 +252,10 @@ fun:
     same: "You can't ship a user with himself!"
   thisorthat:
     title: "My random answer"
+  cat:
+    bad_response: "Could not get a cat :("
+  dog:
+    bad_response: "Could not get a dog :("
 logging:
   member_id: "Member id"
   user_id: "User id"

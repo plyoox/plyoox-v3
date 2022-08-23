@@ -101,13 +101,28 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
             random.choice((":one:", ":two:", ":three:", ":four:", ":five:", ":six:"))
         )
 
-    @app_commands.command(name="cat", description="Shows a cute cat.")
+    @app_commands.command(name="cat", description="Shows a random cat.")
     async def cat(self, interaction: discord.Interaction):
-        await interaction.response.send_message(random.choice(self.gifs["cat"]))
+        lc = interaction.locale
 
-    @app_commands.command(name="dog", description="Shows a cute dog.")
+        async with self.bot.session.get("https://api.thecatapi.com/v1/images/search") as res:
+            if res.status != 200:
+                await interaction.response.send_message(_(lc, "fun.cat.bad_response"))
+                return
+
+            js = await res.json()
+            await interaction.response.send_message(embed=discord.Embed().set_image(url=js[0]["url"]))
+
+    @app_commands.command(name="dog", description="Shows a random dog.")
     async def dog(self, interaction: discord.Interaction):
-        await interaction.response.send_message(random.choice(self.gifs["dog"]))
+        async with self.bot.session.get("https://random.dog/woof") as resp:
+            if resp.status != 200:
+                await interaction.response.send_message("No dog found :(")
+                return
+
+            filename = await resp.text()
+            url = f"https://random.dog/{filename}"
+            await interaction.response.send_message(embed=discord.Embed().set_image(url=url))
 
     @app_commands.command(name="cry", description="Cries.")
     async def cry(self, interaction: discord.Interaction):

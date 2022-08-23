@@ -252,6 +252,10 @@ fun:
     same: "Du kannst einen Benutzer nicht mit sich selber shippen!"
   thisorthat:
     title: "Meine zufällig gewählte Antwort"
+  cat:
+    bad_response: "Es konnte keine Katze gefunden werden :("
+  dog:
+    bad_response: "Es konnte kein Hund gefunden werden :("
 logging:
   member_id: "Mitglied-ID"
   user_id: "User-ID"

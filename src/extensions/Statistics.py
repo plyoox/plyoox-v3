@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import io
 from typing import TYPE_CHECKING, Optional
 
 import discord
@@ -129,6 +130,25 @@ class Statistics(commands.Cog):
             embed.description = "No commands executed."
 
         await ctx.reply(embed=embed)
+
+    @commands.command(name="servers")
+    @commands.is_owner()
+    async def servers(self, ctx: commands.Context):
+        count = 0
+        msg = f"Count,Id,Members,Bots,Name,Owner,Chunked\n"
+
+        guilds = [guild for guild in self.bot.guilds]
+        guilds.sort(key=lambda g: g.member_count, reverse=True)
+
+        for guild in guilds:
+            bots = len([m.bot for m in guild.members if m.bot])
+            count += 1
+            msg += f"{count},{guild.id},{guild.member_count}s,{bots},{guild.name},{guild.owner},{guild.chunked}\n"
+
+        data = io.BytesIO(msg.encode())
+        file = discord.File(data, filename="guilds.csv")
+
+        await ctx.reply(file=file)
 
 
 async def setup(bot: Plyoox):

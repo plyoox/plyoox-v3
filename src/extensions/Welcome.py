@@ -31,6 +31,12 @@ class Welcome(commands.Cog):
                     content=message, allowed_mentions=discord.AllowedMentions(users=True, roles=True, everyone=True)
                 )
 
+            if cache.join_dm:
+                try:
+                    await member.send(message)
+                except discord.Forbidden:
+                    pass
+
         # only add role if the bot has the permissions
         if cache.join_roles and guild.me.guild_permissions.manage_roles:
             if member.pending:

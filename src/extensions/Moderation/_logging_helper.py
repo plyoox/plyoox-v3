@@ -17,8 +17,15 @@ if TYPE_CHECKING:
     from .automod import AutomodActionData
 
 
-async def _get_logchannel(bot: Plyoox, cache: ModerationModel) -> discord.Webhook | None:
+async def _get_logchannel(bot: Plyoox, cache: ModerationModel, guild: discord.Guild) -> discord.Webhook | None:
     if cache.log_channel is None:
+        return None
+
+    if cache.log_id is None:
+        channel = guild.get_channel(cache.log_channel)
+        if channel is not None and channel.permissions_for(guild.me).send_messages:
+            return channel
+
         return None
 
     return discord.Webhook.partial(cache.log_id, cache.log_token, session=bot.session)
@@ -103,7 +110,7 @@ async def automod_log(
     if cache is None or not cache.active:
         return
 
-    webhook = await _get_logchannel(bot, cache)
+    webhook = await _get_logchannel(bot, cache, guild)
     if webhook is not None:
         embeds = []
 
@@ -159,7 +166,7 @@ async def automod_final_log(
     if cache is None or not cache.active:
         return
 
-    webhook = await _get_logchannel(bot, cache)
+    webhook = await _get_logchannel(bot, cache, guild)
     if webhook is not None:
         embed = extensions.Embed(description=_(lc, f"automod.final.description", target=member))
         embed.set_author(name=_(lc, f"automod.final.title"), icon_url=member.display_avatar)
@@ -195,7 +202,7 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
     if cache is None or not cache.active:
         return
 
-    webhook = await _get_logchannel(bot, cache)
+    webhook = await _get_logchannel(bot, cache, guild)
     if webhook is not None:
         embed = extensions.Embed(description=_(lc, "moderation.warn.description", target=member, moderator=moderator))
         embed.set_author(name=_(lc, "moderation.warn.title"), icon_url=member.display_avatar)

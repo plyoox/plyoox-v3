@@ -4,3 +4,4 @@ venv/
 __pycache__/
 discord.log
 .vscode
+src/migrate_database.py

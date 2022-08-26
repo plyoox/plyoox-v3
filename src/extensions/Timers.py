@@ -41,8 +41,8 @@ class Timer(commands.Cog):
     async def call_timer(self, timer: TimerModel) -> None:
         await self.bot.db.execute("DELETE FROM timers WHERE id = $1", timer.id)
 
-        func = getattr(self, f"on_{timer.type}_expire")
-        if func:
+        func = getattr(self, f"on_{timer.type}_expire", None)
+        if func is not None:
             await func(timer)
         else:
             _log.error(f"Could not dispatch timer {timer.type} with id {timer.id}")

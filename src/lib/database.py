@@ -201,7 +201,7 @@ class CommandStatistics(Base):
 
     id = _Column(pg.INTEGER, primary_key=True, autoincrement=True)
     guild_id = _Column(pg.BIGINT, nullable=False)
-    used_at = _Column(pg.TIMESTAMP, nullable=True)
+    used_at = _Column(pg.TIMESTAMP(timezone=True), nullable=True)
     name = _Column(pg.VARCHAR(length=32), nullable=False)
     author_id = _Column(pg.BIGINT)
     failed = _Column(pg.BOOLEAN)

@@ -199,7 +199,9 @@ moderation:
     success: "The user was successfully warned."
     no_bots: "This action cannot be applied to bots."
     successfully_removed: "The warning has been successfully removed."
+    successfully_removed_all: "All warnings have been successfully removed"
     not_found: "A warning with this ID could not be found."
+    no_warnings_found: "This user has no warnings."
 automod:
   points_added: "Points added"
   reason:

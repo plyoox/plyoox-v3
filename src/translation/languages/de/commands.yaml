@@ -104,6 +104,9 @@ warn:
     description: "Entfernt eine Warnung von einem Benutzer."
     member: "Der Benutzer, von dem die Warnung entfernt werden soll."
     id: "Die ID der Warnung, die entfernt werden soll."
+  remove-all:
+    description: "Entfernt alle Warnungen von einem Benutzer."
+    member: "Der Benutzer, von dem die Warnungen entfernt werden sollen."
 ban:
   description: "Bannt einen Benutzer vom Server."
   member: "Der Benutzer, der gebannt werden soll."

@@ -199,7 +199,9 @@ moderation:
     success: "Der Benutzer wurde erfolgreich gewarnt."
     no_bots: "Diese Aktion kann nicht auf Bots angewendet werden."
     successfully_removed: "Die Verwarnung wurde erfolgreich entfernt."
+    successfully_removed_all: "Die Verwarnungen wurden erfolgreich entfernt."
     not_found: "Eine Verwarnung mit dieser ID konnte nicht gefunden werden."
+    no_warnings_found: "Der Benutzer hat keine Verwarnungen."
 automod:
   points_added: "Punkte hinzugefügt"
   reason:

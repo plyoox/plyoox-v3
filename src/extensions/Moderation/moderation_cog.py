@@ -600,8 +600,6 @@ class Moderation(commands.Cog):
         if not await self._can_execute_on(interaction, member):
             return
 
-        await interaction.response.defer(ephemeral=True)
-
         query_response = await self.bot.db.execute(
             "DELETE FROM automod_users WHERE id = $1 and guild_id = $2 AND user_id = $3",
             id,
@@ -610,9 +608,32 @@ class Moderation(commands.Cog):
         )
 
         if query_response == "DELETE 1":
-            await interaction.followup.send(_(lc, "moderation.warn.successfully_removed"), ephemeral=True)
+            await interaction.response.send_message(_(lc, "moderation.warn.successfully_removed"), ephemeral=True)
         else:
-            await interaction.followup.send(_(lc, "moderation.warn.not_found"), ephemeral=True)
+            await interaction.followup.send_message(_(lc, "moderation.warn.not_found"), ephemeral=True)
+
+    @warn_group.command(name="remove-all", description="Removes all warnings from a user.")
+    @app_commands.describe(member="The user to remove all warnings from.")
+    async def warn_remove_all(self, interaction: discord.Interaction, member: discord.Member):
+        lc = interaction.locale
+        if member.bot:
+            await interaction.response.send_message(_(lc, "moderation.warn.no_bots"), ephemeral=True)
+            return
+
+        if not await self._can_execute_on(interaction, member):
+            return
+
+        query_response = await self.bot.db.execute(
+            "DELETE FROM automod_users WHERE id = $1 and guild_id = $2 AND user_id = $3",
+            id,
+            interaction.guild_id,
+            member.id,
+        )
+
+        if int(query_response.split(" ")[1]) >= 1:
+            await interaction.response.send_message(_(lc, "moderation.warn.successfully_removed_all"), ephemeral=True)
+        else:
+            await interaction.response.send_message(_(lc, "moderation.warn.no_warnings_found"), ephemeral=True)
 
     @tempmute.autocomplete("duration")
     @tempban.autocomplete("duration")

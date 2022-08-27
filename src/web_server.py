@@ -18,9 +18,6 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class CacheUpdater(BaseHandler):
     async def get(self):
-        if self.request.remote_ip not in ["::1", "127.0.0.1"]:
-            return self.set_status(403)
-
         update = self.get_arguments("type")
         guild_id = self.get_argument("guild")
 
@@ -52,9 +49,6 @@ class CacheUpdater(BaseHandler):
 
 class TwitchNotifier(BaseHandler):
     async def get(self):
-        if self.request.remote_ip not in ["::1", "127.0.0.1"]:
-            return self.set_status(403)
-
         user_id = int(self.get_argument("user_id"))
         user_name = self.get_argument("user_name")
 
@@ -73,4 +67,4 @@ async def start_webserver(bot: Plyoox):
         ]
     )
 
-    web.listen(8888)
+    web.listen(8888, "127.0.0.1")

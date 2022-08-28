@@ -58,3 +58,7 @@ class AutomodCache(commands.Cog):
         self._automod_rules[guild.id] = {r.id: r for r in rules}
 
         return [r.to_dict() for r in rules]
+
+
+async def setup(bot: Plyoox):
+    await bot.add_cog(AutomodCache(bot))

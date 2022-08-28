@@ -65,18 +65,17 @@ class AutomodState(BaseHandler):
     async def get(self):
         guild_id = self.get_argument("guild")
 
-        if guild_id is None:
-            return self.set_status(400)
-
         try:
             guild_id = int(guild_id)
         except ValueError:
-            return self.set_status(400)
+            raise tornado.web.HTTPError(status_code=400, log_message="Could not convert guild to integer")
 
         cache: AutomodCache = self.bot.get_cog("AutomodCache")  # type: ignore
 
         try:
-            return json.dumps(await cache.get_automod_rules(guild_id))
+            automod_data = await cache.get_automod_rules(guild_id)
+            self.write(json.dumps(automod_data))
+            self.set_status(200)
         except discord.Forbidden:
             return self.set_status(403)
 
@@ -86,7 +85,7 @@ async def start_webserver(bot: Plyoox):
         [
             (r"/update/cache", CacheUpdater, {"bot": bot}),
             (r"/notification/twitch", TwitchNotifier, {"bot": bot}),
-            (r"/fetch/automod", AutomodState, {"bot": bot}),
+            (r"/data/automod", AutomodState, {"bot": bot}),
         ]
     )
 

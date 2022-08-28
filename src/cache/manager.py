@@ -3,7 +3,14 @@ from typing import Literal
 import asyncpg
 from lru import LRU
 
-from .models import WelcomeModel, LevelingModel, LoggingModel, ModerationModel, AutomodExecutionModel
+from .models import (
+    WelcomeModel,
+    LevelingModel,
+    LoggingModel,
+    ModerationModel,
+    AutomodExecutionModel,
+    AutomodDiscordExecutionModel,
+)
 
 
 class CacheManager:
@@ -29,6 +36,23 @@ class CacheManager:
                 points=action.get("p"),
                 days=action.get("d"),
                 duration=action.get("t"),
+            )
+            for action in actions
+        ]
+
+    @staticmethod
+    def __to_automod_moderation_actions(actions: list[dict] | None) -> list[AutomodDiscordExecutionModel]:
+        if actions is None:
+            return []
+
+        return [
+            AutomodDiscordExecutionModel(
+                action=action["a"],
+                check=action.get("c"),
+                points=action.get("p"),
+                days=action.get("d"),
+                duration=action.get("t"),
+                rule_id=int(action["r"]),
             )
             for action in actions
         ]
@@ -143,7 +167,7 @@ class CacheManager:
             notify_user=result["notify_user"],
             ignored_roles=result["ignored_roles"] or [],
             blacklist_active=result["blacklist_active"],
-            blacklist_actions=result["blacklist_actions"] or [],
+            blacklist_actions=self.__to_automod_moderation_actions(result["blacklist_actions"]),
         )
 
         self._moderation[id] = model

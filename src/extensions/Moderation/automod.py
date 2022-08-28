@@ -185,7 +185,7 @@ class Automod(commands.Cog):
         if member is None:
             return
 
-        if any(role.id in cache.mod_roles + cache.ignored_roles for role in member._roles):
+        if any(role in cache.mod_roles + cache.ignored_roles for role in member._roles):
             return
 
         automod_actions = getattr(cache, automod_type + "_actions")

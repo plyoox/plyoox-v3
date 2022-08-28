@@ -54,8 +54,12 @@ class AutomodCache(commands.Cog):
         if existing_rules is not None:
             return [r.to_dict() for r in existing_rules.values()]
 
-        rules = await guild.fetch_automod_rules()
-        self._automod_rules[guild.id] = {r.id: r for r in rules}
+        try:
+            rules = await guild.fetch_automod_rules()
+            self._automod_rules[guild.id] = {r.id: r for r in rules}
+        except discord.NotFound:
+            self._automod_rules[guild.id] = {}
+            rules = {}
 
         return [r.to_dict() for r in rules]
 

@@ -203,6 +203,7 @@ class Automod(commands.Cog):
                         action=action, member=member, reason=automod_type, content=execution.matched_content
                     )
                 )
+                return
 
     async def _handle_action(
         self,

@@ -210,6 +210,7 @@ automod:
     invite: "Discord invite"
     caps: "Caps spam"
     points: "Maximum points reached"
+    blacklist: "Discord automod blacklist"
   kick:
     title: "Automod: Kick"
     description: "The user {target.mention} ({target}) has been kicked by the automod."
@@ -231,7 +232,7 @@ automod:
     description: "The user {target.mention} ({target}) has been temporarily banned by the automod."
     user_message: "You have been automatically banned for `{reason}` from `{guild.name}` until {timestamp}."
   points:
-    title: "Automod: points added"
+    title: "Automod: Points added"
     description: "The user {target.mention} ({target}) has received points for a violation."
     user_message: "You automatically received **{points}** for `{reason}`."
   final:

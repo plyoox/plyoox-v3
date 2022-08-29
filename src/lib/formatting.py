@@ -18,6 +18,9 @@ class LevelFormatObject:
     def __repr__(self):
         return self.level
 
+    def __str__(self):
+        return str(self.level)
+
 
 def format_welcome_message(message: str, member: discord.Member) -> str:
     """Formats a join or leave message."""

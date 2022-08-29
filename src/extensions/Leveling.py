@@ -232,70 +232,67 @@ class Leveling(commands.Cog):
 
         before_level = get_level_from_xp(member_data["xp"])[0]  # level with the current xp
         after_level = get_level_from_xp(member_data["xp"] + message_xp)[0]  # level with the added xp
+        highest_add_role = None
 
         if before_level != after_level:
-            # highest role that will be added
-            # only needed for the leveling message
-            highest_add_role = None
-
             # only add role if available and the bot has proper permissions
             if len(cache.roles) and guild.me.guild_permissions.manage_roles:
                 add_role_id = list(filter(lambda r: r[1] == after_level, cache.roles))
-                highest_add_role = guild.get_role(add_role_id[0][0])
+                if add_role_id:
+                    highest_add_role = guild.get_role(add_role_id[0][0])
 
-                if cache.remove_roles and highest_add_role:
-                    try:
-                        await member.add_roles(highest_add_role, reason="Add new level role")
+                    if cache.remove_roles and highest_add_role:
+                        try:
+                            await member.add_roles(highest_add_role, reason="Add new level role")
 
-                        remove_roles = []
+                            remove_roles = []
 
-                        # adds the roles that should be removed to a list
-                        # that are all roles that are not for the current level
-                        for [role_id, level] in cache.roles:
-                            if level == after_level:
+                            # adds the roles that should be removed to a list
+                            # that are all roles that are not for the current level
+                            for [role_id, level] in cache.roles:
+                                if level == after_level:
+                                    continue
+
+                                new_role = guild.get_role(role_id)
+                                if new_role is not None:
+                                    remove_roles.append(new_role)
+
+                            await member.remove_roles(*remove_roles, reason="Remove old level roles")
+                        except discord.Forbidden:
+                            pass
+                    else:
+                        add_lvl_roles = []
+
+                        # adds all roles that are for the current level or below
+                        for [role_id, role_level] in cache.roles:
+                            if role_id in member._roles:
+                                continue
+
+                            if role_level > after_level:
                                 continue
 
                             new_role = guild.get_role(role_id)
                             if new_role is not None:
-                                remove_roles.append(new_role)
+                                add_lvl_roles.append(new_role)
 
-                        await member.remove_roles(*remove_roles, reason="Remove old level roles")
-                    except discord.Forbidden:
-                        pass
-                else:
-                    add_lvl_roles = []
+                        try:
+                            await member.add_roles(*add_lvl_roles, reason="Add new level roles")
+                        except discord.Forbidden:
+                            pass
 
-                    # adds all roles that are for the current level or below
-                    for [role_id, role_level] in cache.roles:
-                        if role_id in member._roles:
-                            continue
+        if cache.message:
+            # format the messages with the variables
+            f_level = formatting.LevelFormatObject(level=after_level, role=highest_add_role)
 
-                        if role_level > after_level:
-                            continue
+            level_message = formatting.format_leveling_message(cache.message, member=member, level=f_level)
 
-                        new_role = guild.get_role(role_id)
-                        if new_role is not None:
-                            add_lvl_roles.append(new_role)
-
-                    try:
-                        await member.add_roles(*add_lvl_roles, reason="Add new level roles")
-                    except discord.Forbidden:
-                        pass
-
-            if cache.message:
-                # format the messages with the variables
-                f_level = formatting.LevelFormatObject(level=after_level, role=highest_add_role)
-
-                level_message = formatting.format_leveling_message(cache.message, member=member, level=f_level)
-
-                # if a channel is given send the message to it
-                # else the message will be sent to the current channel
-                if cache.channel is None:
-                    await helper.permission_check(channel, content=level_message)
-                else:
-                    level_channel = guild.get_channel(cache.channel)
-
-                    await helper.permission_check(level_channel, content=level_message)
+            # if a channel is given send the message to it
+            # else the message will be sent to the current channel
+            if cache.channel is None:
+                await helper.permission_check(channel, content=level_message)
+            else:
+                level_channel = guild.get_channel(cache.channel)
+                await helper.permission_check(level_channel, content=level_message)
 
     async def rank_context_menu(self, interaction: discord.Interaction, member: discord.Member):
         """Shows the current ranking information about a member. This can is context menu command."""

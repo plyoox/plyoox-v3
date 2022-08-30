@@ -33,7 +33,7 @@ def format_welcome_message(message: str, member: discord.Member) -> str:
         .replace("{user.discriminator}", member.discriminator)
         .replace("{user.id}", str(member.id))
         .replace("{guild.name}", guild.name)
-        .replace("{guild.members}", str(guild.member_count))
+        .replace("{guild.member_count}", str(guild.member_count))
         .replace("{guild.id}", str(guild.id))
     )
 
@@ -52,7 +52,8 @@ def format_leveling_message(message: str, member: discord.Member, level: LevelFo
         .replace("{user.discriminator}", member.discriminator)
         .replace("{user.id}", str(member.id))
         .replace("{guild.name}", guild.name)
-        .replace("{guild.members}", str(guild.member_count))
+        .replace("{guild.id}", str(guild.id))
+        .replace("{guild.member_count}", str(guild.member_count))
         .replace("{level}", str(level))
         .replace("{level.role}", str(guild.id))
     )

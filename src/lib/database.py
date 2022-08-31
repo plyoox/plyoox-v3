@@ -118,7 +118,7 @@ class Moderation(Base):
     invite_active = _Column(pg.BOOLEAN, server_default=False)
     invite_whitelist_channels = _Column(pg.ARRAY(pg.BIGINT))
     invite_whitelist_roles = _Column(pg.ARRAY(pg.BIGINT))
-    invite_allowed = _Column(pg.ARRAY(pg.ARRAY(pg.BIGINT)))
+    invite_allowed = _Column(pg.ARRAY(pg.BIGINT))
     invite_actions = _Column(pg.JSON)
 
     link_active = _Column(pg.BOOLEAN, server_default=False)

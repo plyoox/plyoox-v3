@@ -274,12 +274,11 @@ class LoggingEvents(commands.Cog):
                 content_embed = extensions.Embed(description=message.content)
                 embeds.append(content_embed)
 
-            log_embed.add_field(
-                name=_(lc, "logging.message_delete.attachment_count"),
-                value=", ".join([f"`{attachment.filename}`" for attachment in message.attachments])
-                if message.attachments
-                else _(lc, "logging.no_attachments"),
-            )
+            if message.attachments:
+                log_embed.add_field(
+                    name=_(lc, "logging.message_delete.attachments"),
+                    value=", ".join([f"`{attachment.filename}`" for attachment in message.attachments]),
+                )
         else:
             log_embed.description = _(lc, "logging.message_delete.description_raw", channel=f"<#{payload.channel_id}>")
 

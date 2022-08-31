@@ -263,7 +263,6 @@ logging:
   member_id: "Member id"
   user_id: "User id"
   no_content: "*This message contains no content.*"
-  no_attachments: "*This message has no attachments.*"
   member_join:
     title: "Member joined"
     description: "The user {member.name} has joined the guild."
@@ -280,7 +279,7 @@ logging:
     description_raw: "A message from {channel} has been deleted."
     description_cached: "A message from **{member}** was deleted from {channel.mention}."
     message_content: "Message Content"
-    attachment_count: "Number of attachments"
+    attachments: "Attachments"
   message_edit:
     title: "Message edited"
     description: "**{member}** edited a message in {channel}."

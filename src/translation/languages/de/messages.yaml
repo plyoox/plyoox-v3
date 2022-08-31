@@ -263,7 +263,6 @@ logging:
   member_id: "Mitglied-ID"
   user_id: "User-ID"
   no_content: "*Diese Nachricht enthält keinen Inhalt.*"
-  no_attachments: "*Diese Nachricht hat keine Anhänge.*"
   member_join:
     title: "Mitglied beigetreten"
     description: "Der Benutzer {member.name} ist dem Server beigetreten."
@@ -280,7 +279,7 @@ logging:
     description_raw: "Eine Nachricht aus {channel} wurde gelöscht."
     description_cached: "Eine Nachricht von **{member}** wurde aus {channel.mention} gelöscht."
     message_content: "Inhalt der Nachricht"
-    attachment_count: "Anzahl der Anhänge"
+    attachments: "Anhänge"
   message_edit:
     title: "Nachricht bearbeitet"
     description: "**{member}** hat eine Nachricht in {channel} bearbeitet."

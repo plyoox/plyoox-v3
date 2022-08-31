@@ -45,6 +45,8 @@ class Notification(commands.Cog):
                     "valid_until": discord.utils.utcnow() + datetime.timedelta(seconds=data["expires_in"]),
                 }
                 return data["access_token"]
+            else:
+                _log.error(f"Could not get Twitch access token ({res.status}):\n{data}")
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
@@ -56,6 +58,9 @@ class Notification(commands.Cog):
         event_sub_ids = await self.bot.db.fetch(
             "DELETE FROM twitch_users WHERE (SELECT count(*) FROM twitch_notifications) = 0 RETURNING eventsub_id"
         )
+
+        if not event_sub_ids:
+            return
 
         app_token = await self._get_access_token()
         if app_token is None:

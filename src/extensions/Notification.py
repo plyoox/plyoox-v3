@@ -31,12 +31,14 @@ class Notification(commands.Cog):
             return self.twitch_access_token["access_token"]
 
         body = {
-            "Client-Id": os.getenv("TWITCH_CLIENT_ID"),
-            "Client-Secret": os.getenv("TWITCH_CLIENT_SECRET"),
-            "Grant-Type": "client_credentials",
+            "client_id": os.getenv("TWITCH_CLIENT_ID"),
+            "client_secret": os.getenv("TWITCH_CLIENT_SECRET"),
+            "grant_type": "client_credentials",
         }
 
-        async with self.bot.session.post("https://id.twitch.tv/oauth2/token", data=body) as res:
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
+        async with self.bot.session.post("https://id.twitch.tv/oauth2/token", data=body, headers=headers) as res:
             data = await res.json()
 
             if res.status == 200:

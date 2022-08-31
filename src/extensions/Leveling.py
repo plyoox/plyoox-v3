@@ -362,7 +362,7 @@ class Leveling(commands.Cog):
                     if len(top_users) >= 10:
                         break
 
-            if len(level_users) != 15:
+            if len(level_users) != 25:
                 break
 
         if len(top_users) == 0:

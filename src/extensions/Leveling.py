@@ -338,6 +338,9 @@ class Leveling(commands.Cog):
 
         await interaction.response.defer(ephemeral=True)
 
+        if not guild.chunked:
+            await guild.chunk(cache=True)
+
         top_users = []
 
         while len(top_users) >= 10:

@@ -343,7 +343,7 @@ class Leveling(commands.Cog):
 
         top_users = []
 
-        while len(top_users) >= 10:
+        while len(top_users) <= 10:
             level_users = await bot.db.fetch(
                 "SELECT user_id, xp FROM leveling_users WHERE guild_id = $1 ORDER BY xp DESC LIMIT 25", guild.id
             )
@@ -381,7 +381,7 @@ class Leveling(commands.Cog):
                 inline=True,
             )
 
-        await interaction.followup.send_message(embed=embed)
+        await interaction.followup.send(embed=embed)
 
     @app_commands.command(name="reset-level", description="Resets the level of a member. This action cannot be undone.")
     @app_commands.describe(member="The member from whom you want to reset rank.")

@@ -34,7 +34,7 @@ class LoggingEvents(commands.Cog):
         cache: LoggingModel,
         *,
         embed: discord.Embed = utils.MISSING,
-        file: discord.File = None,
+        file: discord.File = utils.MISSING,
         embeds: list[discord.Embed] = utils.MISSING,
     ):
         webhook = discord.Webhook.partial(cache.webhook_id, cache.webhook_token, session=self.bot.session)

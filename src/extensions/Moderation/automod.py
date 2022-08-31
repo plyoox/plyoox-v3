@@ -9,7 +9,7 @@ import discord
 from discord import utils
 from discord.ext import commands
 
-from lib.enums import AutomodAction, AutomodChecks, MentionSettings, TimerType, AutomodFinalAction
+from lib.enums import AutomodAction, AutomodChecks, TimerType, AutomodFinalAction
 from translation import _
 from . import _logging_helper as _logging
 
@@ -116,29 +116,6 @@ class Automod(commands.Cog):
                 await self._handle_action(message, cache.link_actions, "link")
                 return
 
-        mass_mentions = EVERYONE_MENTION.findall(message.content)
-        if len(message.raw_mentions) + len(message.raw_role_mentions) + len(mass_mentions) > 3:
-            cache = await self.bot.cache.get_moderation(guild.id)
-            if cache is None:
-                return
-
-            mentions = len([m for m in message.mentions if not m.bot or m.id != author.id])
-
-            if cache.mention_settings == MentionSettings.include_roles:
-                mentions += len(message.role_mentions)
-            elif cache.mention_settings == MentionSettings.include_mass:
-                mentions += len(message.role_mentions)
-                mentions += len(mass_mentions)
-
-            if mentions < cache.mention_count:
-                return
-
-            if not self._is_affected(message, cache, "mention"):
-                return
-
-            await self._handle_action(message, cache.mention_actions, "mention")
-            return
-
         if len(message.content) > 15 and not message.content.islower():
             len_caps = len(re.findall(r"[A-ZÄÖÜ]", message.content))
             percent = len_caps / len(message.content)
@@ -165,14 +142,11 @@ class Automod(commands.Cog):
         if cache is None or not cache.active:
             return
 
-        automod_type: AutomodExecutionReason | None = None
-
         if execution.rule_trigger_type == discord.AutoModRuleTriggerType.keyword:
-            automod_type = "blacklist"
-        # elif execution.rule_trigger_type == discord.AutoModRuleTriggerType.mention_spam:
-        #     automod_type = "mention"
-
-        if automod_type is None:
+            automod_type: AutomodExecutionReason = "blacklist"
+        elif execution.rule_trigger_type == discord.AutoModRuleTriggerType.mention_spam:
+            automod_type: AutomodExecutionReason = "mention"
+        else:
             return
 
         if not getattr(cache, automod_type + "_active"):

@@ -155,7 +155,6 @@ class CacheManager:
             mention_whitelist_roles=result["mention_whitelist_roles"] or [],
             mention_whitelist_channels=result["mention_whitelist_channels"] or [],
             mention_count=result["mention_count"],
-            mention_settings=result["mention_settings"],
             automod_actions=self.__to_moderation_actions(result["automod_actions"]),
             link_list=result["link_list"] or [],
             link_active=result["link_active"],

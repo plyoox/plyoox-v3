@@ -129,10 +129,6 @@ class Moderation(Base):
     link_actions = _Column(pg.JSON)
 
     mention_active = _Column(pg.BOOLEAN, server_default=False)
-    mention_whitelist_channels = _Column(pg.ARRAY(pg.BIGINT))
-    mention_whitelist_roles = _Column(pg.ARRAY(pg.BIGINT))
-    mention_settings = _Column(pg.ENUM(enums.MentionSettings), server_default=enums.MentionSettings.member)
-    mention_count = _Column(pg.SMALLINT, server_default=5)
     mention_actions = _Column(pg.JSON)
 
     caps_active = _Column(pg.BOOLEAN, server_default=False)

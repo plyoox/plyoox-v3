@@ -6,7 +6,7 @@ from recordclass import RecordClass
 
 if TYPE_CHECKING:
     from datetime import datetime
-    from lib.enums import MentionSettings, AutomodAction, AutomodChecks, TimerType
+    from lib.enums import AutomodAction, AutomodChecks, TimerType
 
 
 class WelcomeModel(RecordClass):
@@ -88,7 +88,6 @@ class ModerationModel(RecordClass):
     mention_actions: list[AutomodExecutionModel] | None
     mention_whitelist_channels: list[int] | None
     mention_whitelist_roles: list[int] | None
-    mention_settings: MentionSettings
     mention_count: int
     caps_active: bool
     caps_actions: list[AutomodExecutionModel] | None

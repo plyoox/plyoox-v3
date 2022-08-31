@@ -21,13 +21,6 @@ class AutomodFinalAction(str, enum.Enum):
     tempmute = "tempmute"
 
 
-class MentionSettings(str, enum.Enum):
-    member = "member"
-    include_roles = "include_roles"
-    include_mass = "include_mass"
-    include_all = "include_all"
-
-
 class AutomodChecks(str, enum.Enum):
     no_role = "no_role"
     no_avatar = "no_avatar"

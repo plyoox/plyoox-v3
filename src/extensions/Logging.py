@@ -204,7 +204,7 @@ class LoggingEvents(commands.Cog):
             edit_member_id = payload.data["author"]["id"]
             user_name = payload.data["author"]["id"]
             user_discriminator = payload.data["author"]["discriminator"]
-            user_avatar = payload.data["author"].get("avatar", str(user_discriminator % len(discord.DefaultAvatar)))
+            user_avatar = payload.data["author"].get("avatar", int(user_discriminator) % len(discord.DefaultAvatar))
 
             avatar = f"{discord.Asset.BASE}/avatars/{edit_member_id}/{user_avatar}.webp?size=1024"
             edit_member = f"{user_name}#{user_discriminator}"

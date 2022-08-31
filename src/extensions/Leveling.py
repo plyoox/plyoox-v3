@@ -344,7 +344,7 @@ class Leveling(commands.Cog):
             )
 
             for level_user in level_users:
-                member = guild.get_member(level_user["userId"])
+                member = guild.get_member(level_user["user_id"])
 
                 if member is not None:
                     current_level, current_xp = get_level_from_xp(level_user["xp"])

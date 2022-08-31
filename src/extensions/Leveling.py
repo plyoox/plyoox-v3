@@ -137,7 +137,6 @@ class Leveling(commands.Cog):
         name="level",
         description="Commands that are needed to interact with the level-system.",
         guild_only=True,
-        default_permissions=discord.Permissions(),
     )
 
     async def _fetch_member_data(self, member: discord.Member) -> LevelUserData:

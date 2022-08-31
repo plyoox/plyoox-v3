@@ -48,11 +48,13 @@ class Notification(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
+        if guild.id is None:
+            return
+
         await self.bot.db.execute("DELETE FROM twitch_notifications WHERE guild_id = $1", guild.id)
 
         event_sub_ids = await self.bot.db.fetch(
-            "DELETE FROM twitch_users WHERE (SELECT count(*) FROM twitch_notifications) = 0 RETURNING eventsub_id",
-            guild.id,
+            "DELETE FROM twitch_users WHERE (SELECT count(*) FROM twitch_notifications) = 0 RETURNING eventsub_id"
         )
 
         app_token = await self._get_access_token()

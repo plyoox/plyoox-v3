@@ -62,7 +62,7 @@ async def create_level_image(
     locale = interaction.locale
     bot: Plyoox = interaction.client  # type: ignore
 
-    avatar_image_raw = await member.display_avatar.with_size(128).read()
+    avatar_image_raw = await member.display_avatar.with_format("jpeg").with_size(128).read()
     avatar_image = Image.open(io.BytesIO(avatar_image_raw))
 
     return await bot.loop.run_in_executor(

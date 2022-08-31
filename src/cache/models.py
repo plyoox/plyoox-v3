@@ -86,9 +86,6 @@ class ModerationModel(RecordClass):
     link_is_whitelist: bool
     mention_active: bool
     mention_actions: list[AutomodExecutionModel] | None
-    mention_whitelist_channels: list[int] | None
-    mention_whitelist_roles: list[int] | None
-    mention_count: int
     caps_active: bool
     caps_actions: list[AutomodExecutionModel] | None
     caps_whitelist_channels: list[int] | None

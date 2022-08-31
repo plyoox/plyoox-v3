@@ -336,11 +336,13 @@ class Leveling(commands.Cog):
         guild = interaction.guild
         bot: Plyoox = interaction.client  # type: ignore
 
+        await interaction.response.defer(ephemeral=True)
+
         top_users = []
 
-        while len(top_users) != 10:
+        while len(top_users) >= 10:
             level_users = await bot.db.fetch(
-                "SELECT user_id, xp FROM leveling_users WHERE guild_id = $1 ORDER BY xp DESC LIMIT 15", guild.id
+                "SELECT user_id, xp FROM leveling_users WHERE guild_id = $1 ORDER BY xp DESC LIMIT 25", guild.id
             )
 
             for level_user in level_users:
@@ -354,11 +356,14 @@ class Leveling(commands.Cog):
                         {"member": member, "level": current_level, "xp_progress": f"{current_xp}/{required_xp}"}
                     )
 
+                    if len(top_users) >= 10:
+                        break
+
             if len(level_users) != 15:
                 break
 
         if len(top_users) == 0:
-            await helper.interaction_send(interaction, "level.top.no_users")
+            await interaction.followup.send(_(lc, "level.top.no_users"))
             return
 
         embed = extensions.Embed(
@@ -373,7 +378,7 @@ class Leveling(commands.Cog):
                 inline=True,
             )
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.followup.send_message(embed=embed)
 
     @app_commands.command(name="reset-level", description="Resets the level of a member. This action cannot be undone.")
     @app_commands.describe(member="The member from whom you want to reset rank.")

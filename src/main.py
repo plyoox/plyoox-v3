@@ -119,7 +119,7 @@ class Plyoox(commands.Bot):
             if not self.is_ready():
                 await asyncio.sleep(30)
 
-            activity = discord.Activity(name="plyoox.net | /help", type=discord.ActivityType.listening)
+            activity = discord.Activity(name="plyoox.net", type=discord.ActivityType.listening)
             status = discord.Status.online
 
             await self.change_presence(status=status, activity=activity)

@@ -18,6 +18,12 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
+ERROR_COLOR = discord.Color.red()
+WARN_COLOR = discord.Color.orange()
+SUCCESS_COLOR = discord.Color.green()
+INFO_COLOR = discord.Color.blue()
+
+
 class LoggingEvents(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
@@ -57,7 +63,9 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_join:
             return
 
-        embed = extensions.Embed(description=_(lc, "logging.member_join.description", member=member))
+        embed = extensions.Embed(
+            description=_(lc, "logging.member_join.description", member=member), color=SUCCESS_COLOR
+        )
         embed.set_author(name=_(lc, "logging.member_join.title"), icon_url=member.display_avatar)
         embed.add_field(
             name=_(lc, "account_created"),
@@ -76,7 +84,9 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_join:
             return
 
-        embed = extensions.Embed(description=_(lc, "logging.member_leave.description", member=member))
+        embed = extensions.Embed(
+            description=_(lc, "logging.member_leave.description", member=member), color=ERROR_COLOR
+        )
         embed.set_author(name=_(lc, "logging.member_leave.title"), icon_url=member.display_avatar)
         embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {member.id}")
         embed.add_field(name=_(lc, "account_created"), value=helper.embed_timestamp_format(member.created_at))
@@ -93,7 +103,7 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_ban:
             return
 
-        embed = extensions.Embed()
+        embed = extensions.Embed(color=ERROR_COLOR)
         embed.add_field(name=_(lc, "account_created"), value=helper.embed_timestamp_format(user.created_at))
         if isinstance(user, discord.Member):
             embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {user.id}")
@@ -114,7 +124,7 @@ class LoggingEvents(commands.Cog):
         if cache is None or not cache.member_unban:
             return
 
-        embed = extensions.Embed()
+        embed = extensions.Embed(color=WARN_COLOR)
         embed.set_author(name=_(lc, "logging.member_unban.title"), icon_url=user.display_avatar)
         embed.set_footer(text=f"{_(lc, 'logging.user_id')}: {user.id}")
         embed.add_field(name=_(lc, "account_created"), value=helper.embed_timestamp_format(user.created_at))
@@ -130,7 +140,7 @@ class LoggingEvents(commands.Cog):
         if cache.member_role_change and before.roles != after.roles:
             lc = before.guild.preferred_locale
 
-            embed = extensions.Embed()
+            embed = extensions.Embed(color=INFO_COLOR)
             embed.set_author(name=_(lc, "logging.member_role_change.title"), icon_url=before.display_avatar)
             embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {before.id}")
 
@@ -148,7 +158,7 @@ class LoggingEvents(commands.Cog):
         elif cache.member_rename and before.display_name != after.display_name:
             lc = before.guild.preferred_locale
 
-            embed = extensions.Embed()
+            embed = extensions.Embed(color=INFO_COLOR)
             embed.set_author(name=_(lc, "logging.member_rename.title"), icon_url=before.display_avatar)
             embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {before.id}")
 
@@ -181,7 +191,7 @@ class LoggingEvents(commands.Cog):
         lc = guild.preferred_locale
         message = payload.cached_message
 
-        log_embed = extensions.Embed()
+        log_embed = extensions.Embed(color=WARN_COLOR)
         embeds = [log_embed]
 
         if message is not None:
@@ -198,7 +208,7 @@ class LoggingEvents(commands.Cog):
                     name=_(lc, "logging.message_edit.old_message"), value=message.content or _(lc, "logging.no_content")
                 )
             else:
-                old_message_embed = extensions.Embed(description=message.content)
+                old_message_embed = extensions.Embed(description=message.content, color=WARN_COLOR)
                 embeds.append(old_message_embed)
         else:
             edit_member_id = payload.data["author"]["id"]
@@ -222,7 +232,7 @@ class LoggingEvents(commands.Cog):
                 name=_(lc, "logging.message_edit.new_message"), value=content or _(lc, "logging.no_content")
             )
         else:
-            new_message_embed = extensions.Embed(description=content)
+            new_message_embed = extensions.Embed(description=content, color=WARN_COLOR)
             embeds.append(new_message_embed)
 
         await self._send_message(guild.id, cache, embeds=embeds)
@@ -247,7 +257,7 @@ class LoggingEvents(commands.Cog):
         message = payload.cached_message
         member = message.author if message else None
 
-        log_embed = extensions.Embed()
+        log_embed = extensions.Embed(color=ERROR_COLOR)
         embeds = [log_embed]
 
         log_embed.set_author(
@@ -271,7 +281,7 @@ class LoggingEvents(commands.Cog):
                     value=message.content or _(lc, "logging.no_content"),
                 )
             else:
-                content_embed = extensions.Embed(description=message.content)
+                content_embed = extensions.Embed(description=message.content, color=ERROR_COLOR)
                 embeds.append(content_embed)
 
             if message.attachments:
@@ -304,6 +314,7 @@ class LoggingEvents(commands.Cog):
 
         embed = extensions.Embed(
             title=_(lc, "logging.bulk_delete.title"),
+            color=ERROR_COLOR,
             description=_(
                 lc,
                 "logging.bulk_delete.description",

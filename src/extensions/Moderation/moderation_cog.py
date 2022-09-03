@@ -229,7 +229,7 @@ class Moderation(commands.Cog):
             interaction, target=member, until=banned_until, reason=reason, type="tempmute"
         )
 
-        await interaction.followup.send(_(lc, "moderation.tempban.successfully_muted"), ephemeral=True)
+        await interaction.followup.send(_(lc, "moderation.tempmute.successfully_muted"), ephemeral=True)
 
     @app_commands.command(name="unban", description="Unbans an user from the guild.")
     @app_commands.describe(user="The member that should be unbanned.", reason="Why the member has been unbanned.")

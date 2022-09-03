@@ -37,7 +37,7 @@ class Infos(commands.Cog):
         embed.add_field(name=_(lc, "infos.bot.uptime"), value=f"> {utils.format_dt(self.bot.start_time, 'R')}")
         embed.add_field(
             name=_(lc, "infos.bot.privacy_policy"),
-            value=f"> [canary.plyoox.net](https://canary.plyoox.net/privacy-discord)",
+            value=f"> [plyoox.net](https://plyoox.net/privacy-discord)",
         )
 
         view = ui.View()

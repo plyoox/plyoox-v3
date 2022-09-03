@@ -224,7 +224,7 @@ class LoggingEvents(commands.Cog):
         log_embed.set_author(name=_(lc, "logging.message_edit.title"), icon_url=avatar)
         log_embed.set_footer(text=f"{_(lc, 'logging.member_id')}: {edit_member_id}")
 
-        content = payload.data.get("content", _(lc, "logging.no_content"))
+        content = payload.data.get("content") or _(lc, "logging.no_content")
 
         # messages longer than 1024 characters receive their own embed
         if len(content) <= 1024:

@@ -341,11 +341,16 @@ class Leveling(commands.Cog):
             await guild.chunk(cache=True)
 
         top_users = []
+        offset = 0
 
-        while len(top_users) <= 10:
+        while len(top_users) < 10:
             level_users = await bot.db.fetch(
-                "SELECT user_id, xp FROM leveling_users WHERE guild_id = $1 ORDER BY xp DESC LIMIT 25", guild.id
+                "SELECT user_id, xp FROM leveling_users WHERE guild_id = $1 ORDER BY xp DESC LIMIT 25 OFFSET $2",
+                guild.id,
+                offset,
             )
+
+            offset += 25
 
             for level_user in level_users:
                 member = guild.get_member(level_user["user_id"])
@@ -372,9 +377,9 @@ class Leveling(commands.Cog):
             title=_(lc, "level.top.title"),
         )
 
-        for index, top_user in enumerate(top_users):
+        for index, top_user in enumerate(top_users, start=1):
             embed.add_field(
-                name=f"{index + 1}. {top_user['member'].display_name}",
+                name=f"{index}. {top_user['member'].display_name}",
                 value=f"> {_(lc, 'level.top.level')} {top_user['level']}\n"
                 f"> {top_user['xp_progress']} {_(lc, 'level.top.xp')}",
                 inline=True,

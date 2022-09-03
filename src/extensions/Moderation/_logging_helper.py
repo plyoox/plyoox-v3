@@ -17,7 +17,9 @@ if TYPE_CHECKING:
     from .automod import AutomodActionData
 
 
-async def _get_logchannel(bot: Plyoox, cache: ModerationModel, guild: discord.Guild) -> discord.Webhook | None:
+async def _get_logchannel(
+    bot: Plyoox, cache: ModerationModel, guild: discord.Guild
+) -> discord.Webhook | discord.TextChannel | None:
     if cache.log_channel is None:
         return None
 
@@ -61,7 +63,7 @@ async def log_simple_punish_command(
     if cache is None or not cache.active:
         return
 
-    webhook = await _get_logchannel(interaction.client, cache)  # type: ignore
+    webhook = await _get_logchannel(interaction.client, cache, interaction.guild)
     if webhook is not None:
         lc = interaction.guild_locale
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import contextlib
+import importlib
 import io
 import os
 import textwrap
@@ -133,6 +134,21 @@ class Owner(
     @checks.owner_only()
     async def execute(self, interaction: discord.Interaction):
         await interaction.response.send_modal(ExecuteModal())
+
+    @app_commands.command(name="reload-util", description="Reloads a Python file.", auto_locale_strings=False)
+    @checks.owner_only()
+    async def reload_utils(self, interaction: discord.Interaction, path: str):
+        try:
+            module_name = importlib.import_module(path)
+            importlib.reload(module_name)
+        except ModuleNotFoundError:
+            await interaction.response.send_message(f"Couldn't find module named **`{path}`**")
+            return
+        except Exception as e:
+            await interaction.response.send_message(f"```py\n{e}{traceback.format_exc()}\n```")
+            return
+
+        await interaction.response.send_message(f"Reloaded module **{path}**")
 
 
 async def setup(bot: Plyoox):

@@ -68,6 +68,9 @@ class Automod(commands.Cog):
         if author.bot:
             return
 
+        if isinstance(author, discord.User):
+            return
+
         if author.guild_permissions.administrator:
             return
 

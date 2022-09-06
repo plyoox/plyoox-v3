@@ -103,4 +103,9 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
 
         embed = _helper.generate_info_embed(lc=interaction.locale, data=data[0])
 
-        await interaction.followup.send(embed=embed, view=_views.AnilistInfoView(data[0], interaction))
+        if data[0]["trailer"] is not None:
+            view = _views.AnilistInfoView(data[0], interaction)
+        else:
+            view = discord.utils.MISSING
+
+        await interaction.followup.send(embed=embed, view=view)

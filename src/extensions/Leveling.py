@@ -187,6 +187,36 @@ class Leveling(commands.Cog):
 
         await interaction.response.send_message(file=image, ephemeral=ephemeral)
 
+    async def _add_level_roles(self, member: discord.Member):
+        guild = member.guild
+
+        if not guild.me.guild_permissions.manage_roles:
+            return
+
+        cache = await self.bot.cache.get_leveling(guild.id)
+        if cache is None or not cache.active or not cache.roles:
+            return
+
+        user_data = await self._fetch_member_data(member)
+        if user_data is None:
+            return
+
+        level, _ = get_level_from_xp(user_data["xp"])
+
+        roles = []
+
+        for level_role in cache.roles:
+            if level_role[1] > level:
+                continue
+
+            role = guild.get_role(level_role[0])
+            if role is None:
+                continue
+
+            roles.append(role)
+
+        await member.add_roles(*roles)
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         # ignore dm's and other bots
@@ -292,6 +322,16 @@ class Leveling(commands.Cog):
             else:
                 level_channel = guild.get_channel(cache.channel)
                 await helper.permission_check(level_channel, content=level_message)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        if not member.pending:
+            await self._add_level_roles(member)
+
+    @commands.Cog.listener()
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        if before.pending and not after.pending:
+            await self._add_level_roles(after)
 
     async def rank_context_menu(self, interaction: discord.Interaction, member: discord.Member):
         """Shows the current ranking information about a member. This can is context menu command."""

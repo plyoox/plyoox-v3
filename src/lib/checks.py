@@ -5,22 +5,15 @@ from typing import TYPE_CHECKING
 import discord
 
 from lib.enums import PlyooxModule
-from lib.errors import ModuleDisabled, OwnerOnly
+from lib.errors import ModuleDisabled
 from translation import _
 
 if TYPE_CHECKING:
-    from main import Plyoox
     from cache import CacheManager
 
 
-def owner_only_check(interaction: discord.Interaction) -> bool:
-    """Raise an error if the user is not the owner of the bot."""
-    bot: Plyoox = interaction.client  # type: ignore
-
-    if interaction.user.id != bot.owner_id:
-        raise OwnerOnly
-
-    return True
+async def owner_only_check(interaction: discord.Interaction) -> bool:
+    return interaction.client.is_owner(interaction.user)  # type: ignore
 
 
 async def module_enabled_check(interaction: discord.Interaction, module: PlyooxModule) -> bool:

@@ -67,7 +67,6 @@ class Plyoox(commands.Bot):
             max_messages=2000,
             command_prefix="-",
             tree_cls=extensions.CommandTree,
-            owner_id=int(os.getenv("OWNER_ID")),
             chunk_guilds_at_startup=False,
             help_command=None,
         )

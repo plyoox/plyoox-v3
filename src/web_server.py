@@ -51,7 +51,7 @@ class CacheUpdater(BaseHandler):
 
 class TwitchNotifier(BaseHandler):
     async def get(self):
-        user_id = int(self.get_argument("user_id"))
+        user_id = self.get_argument("user_id")
         user_name = self.get_argument("user_name")
 
         self.set_status(200)

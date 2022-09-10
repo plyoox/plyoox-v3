@@ -321,5 +321,8 @@ views:
   creator_only: "Only the creator can use this action."
 notifications:
   twitch_button: "To Stream"
+  viewer_count: "Viewer Count"
+  game: "Game"
+  started_at: "Stream started at"
 disable-migration-notification:
   successfully_disabled: "The messages has been disabled."

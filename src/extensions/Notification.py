@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 import discord
 from discord.ext import commands
 
-from lib import emojis
+from lib import emojis, extensions, helper
 from translation import _
 
 if TYPE_CHECKING:
@@ -50,23 +50,58 @@ class Notification(commands.Cog):
             else:
                 _log.error(f"Could not get Twitch access token ({res.status}):\n{data}")
 
+    async def _get_stream_info(self, user_id: str) -> dict[str, ...] | None:
+        app_token = await self._get_access_token()
+        if app_token is None:
+            return
+
+        async with self.bot.session.get(f"https://api.twitch.tv/helix/streams?user_id={user_id}") as res:
+            data = await res.json()
+
+            if res.status == 200:
+                if len(data["data"]) >= 1:
+                    return data["data"][0]
+                else:
+                    _log.warning(f"Could not get twitch stream data for user {user_id}")
+            else:
+                _log.error(
+                    f"Could not get twitch stream data for user {user_id}. Twitch responded with ({res.status}):\n{data}"
+                )
+
+    @staticmethod
+    async def _get_stream_embed(data: dict[str, ...], lc: discord.Locale) -> discord.Embed:
+        embed = extensions.Embed(
+            color=0x6441A5,
+            title=data["title"],
+            url=f"https://twitch.tv/{data['user_name']}",
+            timestamp=datetime.datetime.fromtimestamp(data["started_at"], datetime.timezone.utc),
+        )
+        embed.add_field(name=_(lc, "notifications.game"), value=f"> {data['game_name']}")
+        embed.add_field(name=_(lc, "notifications.viewer_count"), value=f"> {data['viewer_count']}")
+        embed.add_field(name=_(lc, "notifications.started_at"), value=helper.embed_timestamp_format(data["started_at"]))
+
+        embed.set_thumbnail(url=data["thumbnail_url"])
+
+        return embed
+
     @commands.Cog.listener()
     async def on_guild_remove(self, guild: discord.Guild):
         if guild.id is None:
             return
 
-        await self.bot.db.execute("DELETE FROM twitch_notifications WHERE guild_id = $1", guild.id)
+        async with self.bot.db.acquire() as con:
+            async with con.transaction() as tr:
+                await tr.execute("DELETE FROM twitch_notifications WHERE guild_id = $1", guild.id)
 
-        event_sub_ids = await self.bot.db.fetch(
-            "DELETE FROM twitch_users WHERE (SELECT count(*) FROM twitch_notifications) = 0 RETURNING eventsub_id"
-        )
+                event_sub_ids = await tr.fetch(
+                    "DELETE FROM twitch_users WHERE (SELECT count(*) FROM twitch_notifications) = 0 RETURNING eventsub_id"
+                )
 
         if not event_sub_ids:
             return
 
         app_token = await self._get_access_token()
         if app_token is None:
-            _log.error("Could not fetch Twitch access token.")
             return
 
         headers = {
@@ -81,11 +116,12 @@ class Notification(commands.Cog):
                 if res.status != 200:
                     _log.error(f"Deleting event subscription {event_sub} failed with status {res.status}.")
 
-    async def send_twitch_notification(self, user_id: int, user_name: str):
+    async def send_twitch_notification(self, user_id: str, user_name: str):
         notifications = await self.bot.db.fetch(
             "SELECT id, guild_id, channel_id, message FROM twitch_notifications WHERE user_id = $1", user_id
         )
 
+        stream_data = await self._get_stream_info(user_id)
         for notification in notifications:
             if notification["message"] is None:
                 continue
@@ -100,6 +136,7 @@ class Notification(commands.Cog):
 
             if channel.permissions_for(guild.me).send_messages:
                 message = notification["message"].replace("{link}", f"https://twitch.tv/{user_name}")
+                embed = await self._get_stream_embed(stream_data, guild.preferred_locale)
 
                 view = discord.ui.View()
                 view.add_item(
@@ -112,7 +149,10 @@ class Notification(commands.Cog):
                 )
 
                 await channel.send(
-                    message, allowed_mentions=discord.AllowedMentions(everyone=True, roles=True, users=True), view=view
+                    message,
+                    allowed_mentions=discord.AllowedMentions(everyone=True, roles=True, users=True),
+                    view=view,
+                    embed=embed,
                 )
                 await asyncio.sleep(0.2)
 

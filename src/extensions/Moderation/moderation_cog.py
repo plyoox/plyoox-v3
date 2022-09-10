@@ -27,7 +27,7 @@ DISCORD_INVITE_MULTI = re.compile(
 
 
 def can_execute_action(interaction: discord.Interaction, user: discord.Member, target: discord.Member):
-    return user.id == interaction.client.owner_id or user == interaction.guild.owner or user.top_role > target.top_role  # type: ignore
+    return user == interaction.guild.owner or user.top_role > target.top_role
 
 
 class Moderation(commands.Cog):

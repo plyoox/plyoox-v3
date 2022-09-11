@@ -12,10 +12,6 @@ if TYPE_CHECKING:
     from cache import CacheManager
 
 
-async def owner_only_check(interaction: discord.Interaction) -> bool:
-    return interaction.client.is_owner(interaction.user)  # type: ignore
-
-
 async def module_enabled_check(interaction: discord.Interaction, module: PlyooxModule) -> bool:
     """Raise an error if the module is not enabled."""
     manager: CacheManager = interaction.client.cache  # type: ignore
@@ -34,7 +30,3 @@ async def module_enabled_check(interaction: discord.Interaction, module: PlyooxM
 
 def module_active(module: PlyooxModule):
     return discord.app_commands.check(lambda i: module_enabled_check(i, module))
-
-
-def owner_only():
-    return discord.app_commands.check(owner_only_check)

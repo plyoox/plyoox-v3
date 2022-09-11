@@ -27,10 +27,6 @@ class Statistics(commands.Cog):
         self._command_statistics: list[CommandStatistic] = []
         self._insert_command_statistics.start()
 
-    # statistics_group = commands.Group(
-    #     name="stats", description="Basic stats about the Bot command usage.", guild_only=True, auto_locale_strings=False
-    # )
-
     async def cog_unload(self) -> None:
         self._insert_command_statistics.stop()
 
@@ -52,10 +48,6 @@ class Statistics(commands.Cog):
             "INSERT INTO command_statistics (name, guild_id, author_id, failed, used_at) VALUES ($1, $2, $3, $4, $5)",
             values,
         )
-
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
-        pass
 
     @commands.Cog.listener()
     async def on_app_command_completion(

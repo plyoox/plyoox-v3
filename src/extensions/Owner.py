@@ -44,7 +44,7 @@ class Owner(commands.Cog):
             await ctx.message.add_reaction("✅")
 
     @plugin.command(name="unload")
-    async def plugin_load(self, ctx: commands.Context, plugin: str):
+    async def plugin_unload(self, ctx: commands.Context, plugin: str):
         bot = ctx.bot
 
         if "." not in plugin:
@@ -52,7 +52,7 @@ class Owner(commands.Cog):
 
         try:
             await bot.unload_extension(plugin)
-        except commands.ExtensionNotFound:
+        except commands.ExtensionNotLoaded:
             await ctx.message.add_reaction("❓")
         except Exception:
             embed = extensions.Embed(description=f"```py\n{traceback.format_exc()}```")
@@ -69,7 +69,7 @@ class Owner(commands.Cog):
 
         try:
             await bot.reload_extension(plugin)
-        except commands.ExtensionNotFound:
+        except commands.ExtensionNotLoaded:
             await ctx.message.add_reaction("❓")
         except Exception:
             embed = extensions.Embed(description=f"```py\n{traceback.format_exc()}```")
@@ -77,14 +77,14 @@ class Owner(commands.Cog):
         else:
             await ctx.message.add_reaction("✅")
 
-    @commands.command(name="reload-language", description="Reloads the language files.", auto_locale_strings=False)
+    @commands.command(name="reload-language")
     @commands.is_owner()
     async def reload_language(self, ctx: commands.Context):
         languages._load_languages()
 
         await ctx.message.add_reaction("✅")
 
-    @commands.command(name="execute", description="Executes python code.", auto_locale_strings=False)
+    @commands.command(name="execute")
     @commands.is_owner()
     async def execute(self, ctx: commands.Context, *, code: str):
         env = {

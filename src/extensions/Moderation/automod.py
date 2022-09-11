@@ -62,6 +62,59 @@ class Automod(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        await self._run_automod(message)
+
+    @commands.Cog.listener()
+    async def on_message_edit(self, before: discord.Message, after: discord.Message):
+        if after.content and after.content != before.content:
+            await self._run_automod(after)
+
+    @commands.Cog.listener()
+    async def on_automod_action(self, execution: discord.AutoModAction):
+        guild = execution.guild
+
+        cache = await self.bot.cache.get_moderation(guild.id)
+        if cache is None or not cache.active:
+            return
+
+        if execution.rule_trigger_type == discord.AutoModRuleTriggerType.keyword:
+            automod_type: AutomodExecutionReason = "blacklist"
+        elif execution.rule_trigger_type == discord.AutoModRuleTriggerType.mention_spam:
+            automod_type: AutomodExecutionReason = "mention"
+        else:
+            return
+
+        if not getattr(cache, automod_type + "_active"):
+            return
+
+        if not guild.chunked:
+            await guild.chunk(cache=True)
+
+        member = guild.get_member(execution.user_id)
+        if member is None:
+            return
+
+        if any(role in cache.mod_roles + cache.ignored_roles for role in member._roles):
+            return
+
+        automod_actions = getattr(cache, automod_type + "_actions")
+        if not automod_actions:
+            return
+
+        rule_actions = list(filter(lambda a: a.rule_id == execution.rule_id, automod_actions))
+        if not rule_actions:
+            return
+
+        for action in rule_actions:
+            if Automod._handle_checks(member, action):
+                await self._execute_discord_automod(
+                    data=AutomodActionData(
+                        action=action, member=member, reason=automod_type, content=execution.matched_content
+                    )
+                )
+                return
+
+    async def _run_automod(self, message: discord.Message):
         guild = message.guild
         author = message.author
 
@@ -136,51 +189,6 @@ class Automod(commands.Cog):
 
             await self._handle_action(message, cache.caps_actions, "caps")
             return
-
-    @commands.Cog.listener()
-    async def on_automod_action(self, execution: discord.AutoModAction):
-        guild = execution.guild
-
-        cache = await self.bot.cache.get_moderation(guild.id)
-        if cache is None or not cache.active:
-            return
-
-        if execution.rule_trigger_type == discord.AutoModRuleTriggerType.keyword:
-            automod_type: AutomodExecutionReason = "blacklist"
-        elif execution.rule_trigger_type == discord.AutoModRuleTriggerType.mention_spam:
-            automod_type: AutomodExecutionReason = "mention"
-        else:
-            return
-
-        if not getattr(cache, automod_type + "_active"):
-            return
-
-        if not guild.chunked:
-            await guild.chunk(cache=True)
-
-        member = guild.get_member(execution.user_id)
-        if member is None:
-            return
-
-        if any(role in cache.mod_roles + cache.ignored_roles for role in member._roles):
-            return
-
-        automod_actions = getattr(cache, automod_type + "_actions")
-        if not automod_actions:
-            return
-
-        rule_actions = list(filter(lambda a: a.rule_id == execution.rule_id, automod_actions))
-        if not rule_actions:
-            return
-
-        for action in rule_actions:
-            if Automod._handle_checks(member, action):
-                await self._execute_discord_automod(
-                    data=AutomodActionData(
-                        action=action, member=member, reason=automod_type, content=execution.matched_content
-                    )
-                )
-                return
 
     async def _handle_action(
         self,

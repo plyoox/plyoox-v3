@@ -48,7 +48,7 @@ class Plyoox(commands.Bot):
     start_time: datetime
     session: aiohttp.ClientSession
 
-    def __init__(self, *, sync_commands: bool = False):
+    def __init__(self):
         intents = discord.Intents(
             bans=True,
             message_content=True,
@@ -59,13 +59,12 @@ class Plyoox(commands.Bot):
             auto_moderation_configuration=True,
         )
         allowed_mentions = discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=True)
-        self.sync_commands = sync_commands
 
         super().__init__(
             intents=intents,
             allowed_mentions=allowed_mentions,
             max_messages=2000,
-            command_prefix="-",
+            command_prefix=commands.when_mentioned,
             tree_cls=extensions.CommandTree,
             chunk_guilds_at_startup=False,
             help_command=None,
@@ -81,20 +80,6 @@ class Plyoox(commands.Bot):
             await self.load_extension(plugin)
 
         logger.info("Plugins loaded")
-
-        if self.sync_commands:
-            # Sync commands with discord
-            logger.debug("Sync commands with discord...")
-
-            await self.tree.sync()
-
-            if owner_guild_id := os.getenv("OWNER_GUILD"):
-                owner_guild = discord.Object(int(owner_guild_id))
-                await self.tree.sync(guild=owner_guild)
-
-            await self.close()
-            logger.info("Commands successfully synced")
-            sys.exit(0)
 
     async def on_ready(self) -> None:
         logger.info("Ready")

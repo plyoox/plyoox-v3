@@ -12,4 +12,3 @@
     - `POSTGRES` (postgresql://`USER`:@`SERVER`:`PORT`/`DATABASE`)
     - `TOKEN` (discord bot token)
 5. `python3 launcher.py --generate-db`
-6. `python3 launcher.py --sync-commands`

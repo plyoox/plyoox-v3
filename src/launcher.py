@@ -18,7 +18,6 @@ load_dotenv()
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group()
 group.add_argument("--generate-db", action="store_true", help="Generate database")
-group.add_argument("--sync-commands", action="store_true", help="Sync commands with discord")
 group.add_argument("--prod", action="store_true", help="Sync commands with discord")
 args = parser.parse_args()
 
@@ -54,13 +53,11 @@ async def main():
     import web_server
     from main import Plyoox
 
-    bot = Plyoox(sync_commands=args.sync_commands)
+    bot = Plyoox()
 
-    if not args.sync_commands:
-        await bot._create_db_pool()
-        await bot._create_http_client()
-
-        await web_server.start_webserver(bot)
+    await bot._create_db_pool()
+    await bot._create_http_client()
+    await web_server.start_webserver(bot)
 
     async with bot:
         await bot.start(os.getenv("TOKEN"))

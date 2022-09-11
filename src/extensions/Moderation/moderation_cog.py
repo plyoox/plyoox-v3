@@ -326,7 +326,6 @@ class Moderation(commands.Cog):
 
     @app_commands.command(name="invite-info", description="Shows information about a invite.")
     @app_commands.describe(invite="The invite you want to get information about.")
-    @app_commands.checks.bot_has_permissions()
     @app_commands.checks.cooldown(2, 30, key=lambda i: (i.guild.id, i.user.id))
     @app_commands.default_permissions(manage_messages=True)
     @app_commands.guild_only

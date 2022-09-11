@@ -54,9 +54,8 @@ class Statistics(commands.Cog):
         )
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx: commands.Context, error):
-        if isinstance(error, commands.CommandInvokeError):
-            await ctx.reply(f"```py\n{error}```")
+    async def on_command_error(self, ctx: commands.Context, error: commands.CommandError):
+        pass
 
     @commands.Cog.listener()
     async def on_app_command_completion(

@@ -52,7 +52,7 @@ user_info:
     no_flags: "*Keine Abzeichen*"
     server_avatar: "Server Avatar"
     no_server_avatar: "*Kein Server Avatar*"
-    member_verification: "Regeln akzeptiert"
+    member_verification: "Verifizierung abgeschlossen"
     premium_subscriber: "Boostet Server"
     bot: "Bot"
 guild_info:

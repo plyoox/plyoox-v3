@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Optional
+from typing import Optional, Union
 
 import discord
 from discord import utils, app_commands
@@ -46,9 +46,8 @@ class UserGroup(app_commands.Group):
 
     @staticmethod
     async def _send_about_response(
-        interaction: discord.Interaction, *, member: discord.Member, ephemeral: bool = False
+        interaction: discord.Interaction, *, member: Union[discord.Member, discord.User], ephemeral: bool = False
     ):
-        roles = member.roles
         lc = interaction.locale
         public_flags = helper.get_badges(member.public_flags)
 
@@ -60,30 +59,45 @@ class UserGroup(app_commands.Group):
         embed.set_author(name=str(member), icon_url=member.display_avatar.url)
         embed.set_thumbnail(url=member.avatar.url)
         embed.add_field(
-            name=_(lc, "user"),
-            value=f"> __{_(lc, 'id')}:__ {member.id}\n"
-            f"> __{_(lc, 'nick')}:__ {member.nick or _(lc, 'user_info.about.no_nick')}\n"
-            f"> __{_(lc, 'user_info.about.server_avatar')}:__ {_(lc, bool(member.guild_avatar))}",
-        )
-        embed.add_field(
-            name=_(lc, "guild"),
-            value=f"> __{_(lc, 'joined_at')}:__ {utils.format_dt(member.joined_at)}\n"
-            f"> __{_(lc, 'user_info.about.member_verification')}:__ {_(lc, member.pending)}\n"
-            f"> __{_(lc, 'user_info.about.premium_subscriber')}:__ "
-            f"{utils.format_dt(member.premium_since) if member.premium_since else _(lc, False)}",
-        )
-        embed.add_field(
             name=_(lc, "user_info.about.account"),
-            value=f"> __{_(lc, 'created_at')}:__ {utils.format_dt(member.created_at)}\n"
+            value=f"> __{_(lc, 'id')}:__ {member.id}\n"
+            f"> __{_(lc, 'created_at')}:__ {utils.format_dt(member.created_at)}\n"
             f"> __{_(lc, 'user_info.about.bot')}:__ {_(lc, member.bot)}",
         )
-        embed.add_field(
-            name=f"{_(lc, 'roles')} ({len(roles) - 1})", value=f"> {helper.format_roles(roles) or _(lc, 'no_roles')}"
-        )
+
         embed.add_field(
             name=f"{_(lc, 'user_info.about.public_badges')} ({len(public_flags)})",
-            value=f"> {''.join(public_flags) if len(public_flags) else _(lc, 'user_info.about.no_flags')}",
+            value=f"> {''.join(public_flags)}" if len(public_flags) else _(lc, "user_info.about.no_flags"),
         )
+
+        if isinstance(member, discord.Member):
+            roles = member.roles
+
+            embed.insert_field_at(
+                0,
+                name=_(lc, "user"),
+                value=f"> __{_(lc, 'nick')}:__ {member.nick or _(lc, 'user_info.about.no_nick')}\n"
+                f"> __{_(lc, 'user_info.about.server_avatar')}:__ {_(lc, bool(member.guild_avatar))}",
+            )
+            embed.insert_field_at(
+                1,
+                name=_(lc, "guild"),
+                value=f"> __{_(lc, 'joined_at')}:__ {utils.format_dt(member.joined_at)}\n"
+                + (
+                    f"> __{_(lc, 'user_info.about.member_verification')}:__ {_(lc, not member.pending)}\n"
+                    if "MEMBER_VERIFICATION_GATE_ENABLED" in member.guild.features
+                    else ""
+                )
+                + f"> __{_(lc, 'user_info.about.premium_subscriber')}:__ "
+                f"{utils.format_dt(member.premium_since) if member.premium_since else _(lc, False)}",
+            )
+
+            formatted_roles = helper.format_roles(roles)
+            embed.insert_field_at(
+                3,
+                name=f"{_(lc, 'roles')} ({len(roles) - 1})",
+                value=f"> {helper.format_roles(roles)}" if len(formatted_roles) else _(lc, "no_roles"),
+            )
 
         await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
 

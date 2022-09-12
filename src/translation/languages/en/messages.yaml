@@ -52,8 +52,8 @@ user_info:
     no_flags: "*No public flags*"
     server_avatar: "Guild avatar"
     no_server_avatar: "*No guild avatar*"
-    member_verification: "Completed member verification"
-    premium_subscriber: "Nitro user"
+    member_verification: "Completed verification"
+    premium_subscriber: "Boosts guild"
     bot: "Bot"
 guild_info:
   about:

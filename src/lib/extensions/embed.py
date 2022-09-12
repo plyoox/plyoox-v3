@@ -14,5 +14,5 @@ class Embed(discord.Embed):
     def set_field_at(self, index: int, *, name: str, value: str, inline: bool = False) -> None:
         super().set_field_at(index, name=name, value=value, inline=inline)
 
-    def insert_field_at(self, index: int, *, name: str, value: str, inline: bool = True) -> None:
+    def insert_field_at(self, index: int, *, name: str, value: str, inline: bool = False) -> None:
         super().insert_field_at(index, name=name, value=value, inline=inline)

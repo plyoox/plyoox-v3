@@ -68,9 +68,7 @@ class GuildGroup(app_commands.Group):
             if (discord.utils.utcnow() - member.joined_at).total_seconds() <= 86400:
                 joined += 1
 
-        embed = extensions.Embed(description=_(lc, "guild_info.today_joined", members=joined))
-
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(_(lc, "guild_info.today_joined", members=joined))
 
     @app_commands.command(name="members", description="Shows how many members are currently in the guild.")
     async def members(self, interaction: discord.Interaction):
@@ -78,6 +76,4 @@ class GuildGroup(app_commands.Group):
         guild = interaction.guild
         lc = interaction.locale
 
-        embed = extensions.Embed(description=_(lc, "guild_info.members", members=guild.member_count))
-
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(_(lc, "guild_info.members", members=guild.member_count))

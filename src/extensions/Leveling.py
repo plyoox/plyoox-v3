@@ -65,6 +65,9 @@ async def create_level_image(
     avatar_image_raw = await member.display_avatar.with_format("png").with_size(128).read()
     avatar_image = Image.open(io.BytesIO(avatar_image_raw))
 
+    if avatar_image.size != (128, 128):
+        avatar_image = avatar_image.resize((128, 128))
+
     return await bot.loop.run_in_executor(
         None, _generate_image, locale, str(member), avatar_image, level, current_xp, needed_xp, rank
     )

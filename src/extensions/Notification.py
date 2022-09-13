@@ -118,7 +118,7 @@ class Notification(commands.Cog):
 
     async def send_twitch_notification(self, user_id: str, user_name: str):
         notifications = await self.bot.db.fetch(
-            "SELECT id, guild_id, channel_id, message FROM twitch_notifications WHERE user_id = $1", user_id
+            "SELECT id, guild_id, channel_id, message FROM twitch_notifications WHERE user_id = $1", int(user_id)
         )
 
         stream_data = await self._get_stream_info(user_id)

@@ -55,7 +55,14 @@ class Notification(commands.Cog):
         if app_token is None:
             return
 
-        async with self.bot.session.get(f"https://api.twitch.tv/helix/streams?user_id={user_id}") as res:
+        headers = {
+            "Client-Id": os.getenv("TWITCH_CLIENT_ID"),
+            "Authorization": f"Bearer {app_token}",
+        }
+
+        async with self.bot.session.get(
+            f"https://api.twitch.tv/helix/streams?user_id={user_id}", headers=headers
+        ) as res:
             data = await res.json()
 
             if res.status == 200:

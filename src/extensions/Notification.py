@@ -77,15 +77,16 @@ class Notification(commands.Cog):
 
     @staticmethod
     async def _get_stream_embed(data: dict[str, ...], lc: discord.Locale) -> discord.Embed:
+        time = datetime.datetime.strptime(data["started_at"], "%Y-%m-%dT%H:%M:%SZ").replace(
+            tzinfo=datetime.timezone.utc
+        )
+
         embed = extensions.Embed(
-            color=0x6441A5,
-            title=data["title"],
-            url=f"https://twitch.tv/{data['user_name']}",
-            timestamp=datetime.datetime.fromtimestamp(data["started_at"], datetime.timezone.utc),
+            color=0x6441A5, title=data["title"], url=f"https://twitch.tv/{data['user_name']}", timestamp=time
         )
         embed.add_field(name=_(lc, "notifications.game"), value=f"> {data['game_name']}")
         embed.add_field(name=_(lc, "notifications.viewer_count"), value=f"> {data['viewer_count']}")
-        embed.add_field(name=_(lc, "notifications.started_at"), value=helper.embed_timestamp_format(data["started_at"]))
+        embed.add_field(name=_(lc, "notifications.started_at"), value=helper.embed_timestamp_format(time))
 
         embed.set_thumbnail(url=data["thumbnail_url"])
 

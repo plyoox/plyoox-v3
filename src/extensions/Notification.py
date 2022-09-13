@@ -84,11 +84,12 @@ class Notification(commands.Cog):
         embed = extensions.Embed(
             color=0x6441A5, title=data["title"], url=f"https://twitch.tv/{data['user_name']}", timestamp=time
         )
-        embed.add_field(name=_(lc, "notifications.game"), value=f"> {data['game_name']}")
+        if data["game_name"]:
+            embed.add_field(name=_(lc, "notifications.game"), value=f"> {data['game_name']}")
         embed.add_field(name=_(lc, "notifications.viewer_count"), value=f"> {data['viewer_count']}")
         embed.add_field(name=_(lc, "notifications.started_at"), value=helper.embed_timestamp_format(time))
 
-        embed.set_thumbnail(url=data["thumbnail_url"])
+        embed.set_image(url=data["thumbnail_url"])
 
         return embed
 

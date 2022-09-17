@@ -519,9 +519,6 @@ class Moderation(commands.Cog):
             await interaction.response.send_message(_(lc, "moderation.warn.no_bots"), ephemeral=True)
             return
 
-        if not await self._can_execute_on(interaction, member):
-            return
-
         await interaction.response.defer(ephemeral=True)
 
         warnings = await self.bot.db.fetch(
@@ -618,8 +615,7 @@ class Moderation(commands.Cog):
             return
 
         query_response = await self.bot.db.execute(
-            "DELETE FROM automod_users WHERE id = $1 and guild_id = $2 AND user_id = $3",
-            id,
+            "DELETE FROM automod_users WHERE guild_id = $2 AND user_id = $3",
             interaction.guild_id,
             member.id,
         )

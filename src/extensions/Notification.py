@@ -31,8 +31,8 @@ class Notification(commands.Cog):
             return self.twitch_access_token["access_token"]
 
         body = {
-            "client_id": os.getenv("TWITCH_CLIENT_ID"),
-            "client_secret": os.getenv("TWITCH_CLIENT_SECRET"),
+            "client_id": os.getenv("TWITCH_ID"),
+            "client_secret": os.getenv("TWITCH_SECRET"),
             "grant_type": "client_credentials",
         }
 
@@ -56,7 +56,7 @@ class Notification(commands.Cog):
             return
 
         headers = {
-            "Client-Id": os.getenv("TWITCH_CLIENT_ID"),
+            "Client-Id": os.getenv("TWITCH_ID"),
             "Authorization": f"Bearer {app_token}",
         }
 
@@ -114,7 +114,7 @@ class Notification(commands.Cog):
             return
 
         headers = {
-            "Client-Id": os.getenv("TWITCH_CLIENT_ID"),
+            "Client-Id": os.getenv("TWITCH_ID"),
             "Authorization": f"Bearer {app_token}",
         }
 

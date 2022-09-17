@@ -1,18 +1,87 @@
 from __future__ import annotations
 
+import datetime
+import logging
+import os
 from typing import TYPE_CHECKING
 
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 if TYPE_CHECKING:
     from main import Plyoox
 
+LOGGING_COLORS = {
+    logging.INFO: discord.Color.blue(),
+    logging.ERROR: discord.Color.red(),
+    logging.WARNING: discord.Color.yellow(),
+    logging.CRITICAL: discord.Color.dark_red(),
+    logging.DEBUG: discord.Color.dark_gray(),
+}
+
+
+class DiscordNotificationLoggingHandler(logging.Handler):
+    def __init__(self, cog: EventHandlerCog):
+        self.cog = cog
+        super().__init__(logging.INFO)
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        if record.name.startswith("tornado."):
+            return False
+
+        return "Shard ID None has successfully RESUMED" not in record.message
+
+    def emit(self, record: logging.LogRecord) -> None:
+        self.cog.add_logging_record(record)
+
 
 class EventHandlerCog(commands.Cog):
-    def __init__(self, bot: Plyoox):
+    def __init__(self, bot: Plyoox, webhook: discord.Webhook | None):
         self.bot = bot
+        self._logging_data: list[logging.LogRecord] = []
+        self._logging_webhook = webhook
+
+        if webhook is not None:
+            self.send_logging_data.start()
+
+    def cog_unload(self):
+        self.send_logging_data.cancel()
+
+    def add_logging_record(self, record: logging.LogRecord) -> None:
+        self._logging_data.append(record)
+
+    @tasks.loop(seconds=60)
+    async def send_logging_data(self):
+        if not self._logging_data:
+            return
+
+        embeds = []
+        message_length = 0
+
+        for record in self._logging_data[:10]:
+            embed = discord.Embed(
+                title=record.name,
+                color=LOGGING_COLORS[record.levelno],
+                timestamp=datetime.datetime.fromtimestamp(record.created, datetime.timezone.utc),
+            )
+
+            if record.levelno == logging.ERROR:
+                embed.description = f"```py\n{record.message}```"
+            else:
+                embed.description = record.message
+
+            if message_length + len(embed) <= 6000:
+                embeds.append(embed)
+                self._logging_data.remove(record)
+            else:
+                break
+
+        await self._logging_webhook.send(embeds=embeds)
+
+    @send_logging_data.before_loop
+    async def before_send_logging_data(self):
+        await self.bot.wait_until_ready()
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild: discord.Guild):
@@ -32,4 +101,17 @@ class EventHandlerCog(commands.Cog):
 
 
 async def setup(bot: Plyoox):
-    await bot.add_cog(EventHandlerCog(bot))
+    webhook = None
+
+    webhook_id = int(os.getenv("LOGGING_WEBHOOK_ID"))
+    webhook_token = os.getenv("LOGGING_WEBHOOK_TOKEN")
+
+    if webhook_id is not None and webhook_token is not None:
+        webhook = discord.Webhook.partial(webhook_id, webhook_token, session=bot.session)
+
+    cog = EventHandlerCog(bot, webhook)
+
+    if webhook is not None:
+        logging.getLogger().addHandler(DiscordNotificationLoggingHandler(cog))
+
+    await bot.add_cog(cog)

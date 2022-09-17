@@ -103,11 +103,11 @@ class EventHandlerCog(commands.Cog):
 async def setup(bot: Plyoox):
     webhook = None
 
-    webhook_id = int(os.getenv("LOGGING_WEBHOOK_ID"))
+    webhook_id = os.getenv("LOGGING_WEBHOOK_ID")
     webhook_token = os.getenv("LOGGING_WEBHOOK_TOKEN")
 
     if webhook_id is not None and webhook_token is not None:
-        webhook = discord.Webhook.partial(webhook_id, webhook_token, session=bot.session)
+        webhook = discord.Webhook.partial(int(webhook_id), webhook_token, session=bot.session)
 
     cog = EventHandlerCog(bot, webhook)
 

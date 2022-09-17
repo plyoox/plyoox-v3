@@ -101,11 +101,12 @@ class Automod(commands.Cog):
         if not automod_actions:
             return
 
-        rule_actions = list(filter(lambda a: a.rule_id == execution.rule_id, automod_actions))
-        if not rule_actions:
-            return
+        if execution.rule_trigger_type == discord.AutoModRuleTriggerType.keyword:
+            automod_actions = list(filter(lambda a: a.rule_id == execution.rule_id, automod_actions))
+            if not automod_actions:
+                return
 
-        for action in rule_actions:
+        for action in automod_actions:
             if Automod._handle_checks(member, action):
                 await self._execute_discord_automod(
                     data=AutomodActionData(

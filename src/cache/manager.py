@@ -150,7 +150,7 @@ class CacheManager:
             log_id=result["log_id"],
             log_channel=result["log_channel"],
             log_token=result["log_token"],
-            mention_actions=self.__to_automod_moderation_actions(result["mention_actions"]),
+            mention_actions=self.__to_moderation_actions(result["mention_actions"]),
             mention_active=result["mention_active"],
             automod_actions=self.__to_moderation_actions(result["automod_actions"]),
             link_list=result["link_list"] or [],

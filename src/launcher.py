@@ -28,11 +28,6 @@ discord.utils.setup_logging(root=True)
 
 logging.getLogger("tornado.access").setLevel(logging.ERROR)
 
-if args.prod:
-    handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="w")
-    handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
-    logger.addHandler(handler)
-
 
 async def generate_db():
     import sqlalchemy.ext.asyncio as async_sql

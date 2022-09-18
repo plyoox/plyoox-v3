@@ -89,4 +89,4 @@ async def start_webserver(bot: Plyoox):
         ]
     )
 
-    web.listen(3002, "127.0.0.1")
+    web.listen(3002)

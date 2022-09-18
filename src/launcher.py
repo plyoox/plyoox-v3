@@ -55,7 +55,7 @@ async def main():
     await web_server.start_webserver(bot)
 
     async with bot:
-        await bot.start(os.getenv("TOKEN"))
+        await bot.start(os.getenv("DISCORD_TOKEN"))
 
 
 if args.generate_db:

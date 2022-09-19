@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import contextlib
 import importlib
 import io
@@ -170,6 +171,37 @@ class Owner(commands.Cog):
                 ret += 1
 
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
+
+    @commands.group()
+    @commands.is_owner()
+    async def git(self, ctx: commands.Context):
+        pass
+
+    @git.command()
+    @commands.is_owner()
+    async def config(self, ctx: commands.Context):
+        await asyncio.create_subprocess_shell(
+            'git config --global url."https://gitlab.com/".insteadOf git@gitlab.com:',
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+
+        await ctx.message.add_reaction("✅")
+
+    @git.command()
+    @commands.is_owner()
+    async def pull(self, ctx: commands.Context):
+
+        proc = await asyncio.create_subprocess_shell(
+            "git pull --no-rebase", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        )
+
+        stdout, stderr = await proc.communicate()
+
+        if stderr:
+            await ctx.send(f"Error: ```{stderr.decode()}```")
+        if stdout:
+            await ctx.send(stdout.decode())
 
 
 async def setup(bot: Plyoox):

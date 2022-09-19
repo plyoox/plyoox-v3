@@ -12,8 +12,11 @@ FROM python:3.10-slim
 
 WORKDIR /usr/app
 
+RUN apt-get update -y && apt-get install -y git
+
 COPY --from=builder /usr/app /usr/app
 COPY ./src ./src
+COPY .git .git
 
 ENV PATH="/usr/app/venv/bin:$PATH"
 

@@ -67,7 +67,7 @@ class EventHandlerCog(commands.Cog):
             )
 
             if record.levelno == logging.ERROR:
-                embed.description = f"```py\n{record.message}```"
+                embed.description = f"{record.message}: ```py\n{record.stack_info}```"
             else:
                 embed.description = record.message
 

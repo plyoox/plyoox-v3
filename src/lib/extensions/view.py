@@ -22,7 +22,10 @@ class PrivateView(ui.View):
         if self._last_interaction.is_expired():
             await self._last_interaction.message.edit(view=None)
         else:
-            await self._last_interaction.edit_original_response(view=None)
+            try:
+                await self._last_interaction.edit_original_response(view=None)
+            except discord.NotFound:
+                pass
 
 
 class EphemeralView(ui.View):

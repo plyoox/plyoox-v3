@@ -77,6 +77,9 @@ class Migration(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.content.startswith("+"):
+            if not message.channel.permissions_for(message.guild.me).send_messages:
+                return
+
             if not await self._get_guild_status(message.guild.id):
                 return
 

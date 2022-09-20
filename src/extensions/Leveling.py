@@ -222,9 +222,6 @@ class Leveling(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if message.guild.id != 505438986672537620:
-            return
-
         # ignore dm's and other bots
         if message.guild is None or message.author.bot:
             return
@@ -315,26 +312,21 @@ class Leveling(commands.Cog):
                         except discord.Forbidden:
                             pass
 
-        if cache.message:
-            # format the messages with the variables
-            f_level = formatting.LevelFormatObject(level=after_level, role=highest_add_role)
+            if cache.message:
+                # format the messages with the variables
+                f_level = formatting.LevelFormatObject(level=after_level, role=highest_add_role)
+                level_message = formatting.format_leveling_message(cache.message, member=member, level=f_level)
 
-            level_message = formatting.format_leveling_message(cache.message, member=member, level=f_level)
+                if level_message is None:  # can be none when {level.role} is used and no role was given to the user
+                    return
 
-            # if a channel is given send the message to it
-            # else the message will be sent to the current channel
-            if cache.channel is None:
-                await helper.permission_check(channel, content=level_message)
-            else:
-                level_channel = guild.get_channel(cache.channel)
-                try:
+                # if a channel is given send the message to it
+                # else the message will be sent to the current channel
+                if cache.channel is None:
+                    await helper.permission_check(channel, content=level_message)
+                else:
+                    level_channel = guild.get_channel(cache.channel)
                     await helper.permission_check(level_channel, content=level_message)
-                except discord.HTTPException as err:
-                    print("GuildID", message.guild.id)
-                    print("Raw message", cache.message)
-                    print("Formatted message", level_message)
-
-                    raise err
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):

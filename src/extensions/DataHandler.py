@@ -69,9 +69,7 @@ class EventHandlerCog(commands.Cog):
 
             if record.exc_info:
                 errType, errValue, errTraceback = record.exc_info
-                embed.description = (
-                    f"{record.message}: ```py\n{traceback.format_exception(errType, errValue, errTraceback)}```"
-                )
+                embed.description = f"{record.message}: ```py\n{''.join(traceback.format_exception(errType, errValue, errTraceback))}```"
             else:
                 embed.description = record.message
 

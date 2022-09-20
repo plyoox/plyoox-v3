@@ -31,7 +31,7 @@ class Owner(commands.Cog):
     async def plugin_load(self, ctx: commands.Context, plugin: str):
         bot = ctx.bot
 
-        if "." in plugin:
+        if "." not in plugin:
             plugin = f"extensions.{plugin}"
 
         try:

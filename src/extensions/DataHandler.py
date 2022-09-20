@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import logging
 import os
+import traceback
 from typing import TYPE_CHECKING
 
 import discord
@@ -30,7 +31,7 @@ class DiscordNotificationLoggingHandler(logging.Handler):
         if record.name.startswith("tornado."):
             return False
 
-        return "Shard ID None has successfully RESUMED" not in record.message
+        return True
 
     def emit(self, record: logging.LogRecord) -> None:
         self.cog.add_logging_record(record)
@@ -66,8 +67,11 @@ class EventHandlerCog(commands.Cog):
                 timestamp=datetime.datetime.fromtimestamp(record.created, datetime.timezone.utc),
             )
 
-            if record.levelno == logging.ERROR:
-                embed.description = f"{record.message}: ```py\n{record.stack_info}```"
+            if record.exc_info:
+                errType, errValue, errTraceback = record.exc_info
+                embed.description = (
+                    f"{record.message}: ```py\n{traceback.format_exception(errType, errValue, errTraceback)}```"
+                )
             else:
                 embed.description = record.message
 

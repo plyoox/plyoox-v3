@@ -324,7 +324,14 @@ class Leveling(commands.Cog):
                 await helper.permission_check(channel, content=level_message)
             else:
                 level_channel = guild.get_channel(cache.channel)
-                await helper.permission_check(level_channel, content=level_message)
+                try:
+                    await helper.permission_check(level_channel, content=level_message)
+                except discord.HTTPException as err:
+                    print("GuildID", message.guild.id)
+                    print("Raw message", cache.message)
+                    print("Formatted message", level_message)
+
+                    raise err
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):

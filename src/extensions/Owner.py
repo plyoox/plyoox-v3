@@ -4,6 +4,7 @@ import asyncio
 import contextlib
 import importlib
 import io
+import re
 import textwrap
 import traceback
 from typing import TYPE_CHECKING, Literal, Optional
@@ -18,17 +19,28 @@ if TYPE_CHECKING:
     from main import Plyoox
 
 
+GIT_PULL_REGEX = re.compile(r"src/extensions/([A-Z][a-z]+)(.py|/.+)")
+
+
 class Owner(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
-    @commands.group(name="plugin")
+    @staticmethod
+    async def _git_pull():
+        proc = await asyncio.create_subprocess_shell(
+            "git pull --no-rebase", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+        )
+
+        return await proc.communicate()
+
+    @commands.group(name="extension")
     @commands.is_owner()
-    async def plugin(self, ctx: commands.Context):
+    async def extension(self, ctx: commands.Context):
         pass
 
-    @plugin.command(name="load")
-    async def plugin_load(self, ctx: commands.Context, plugin: str):
+    @extension.command(name="load")
+    async def extension_load(self, ctx: commands.Context, plugin: str):
         bot = ctx.bot
 
         if "." not in plugin:
@@ -38,14 +50,13 @@ class Owner(commands.Cog):
             await bot.load_extension(plugin)
         except commands.ExtensionNotFound:
             await ctx.message.add_reaction("❓")
-        except Exception:
-            embed = extensions.Embed(description=f"```py\n{traceback.format_exc()}```")
-            await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(embed=extensions.Embed(description=f"```py\n{e}{traceback.format_exc()}\n```"))
         else:
             await ctx.message.add_reaction("✅")
 
-    @plugin.command(name="unload")
-    async def plugin_unload(self, ctx: commands.Context, plugin: str):
+    @extension.command(name="unload")
+    async def extension_unload(self, ctx: commands.Context, plugin: str):
         bot = ctx.bot
 
         if "." not in plugin:
@@ -55,14 +66,13 @@ class Owner(commands.Cog):
             await bot.unload_extension(plugin)
         except commands.ExtensionNotLoaded:
             await ctx.message.add_reaction("❓")
-        except Exception:
-            embed = extensions.Embed(description=f"```py\n{traceback.format_exc()}```")
-            await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(embed=extensions.Embed(description=f"```py\n{e}{traceback.format_exc()}\n```"))
         else:
             await ctx.message.add_reaction("✅")
 
-    @plugin.command(name="reload")
-    async def plugin_reload(self, ctx: commands.Context, plugin: str):
+    @extension.command(name="reload")
+    async def extension_reload(self, ctx: commands.Context, plugin: str):
         bot = ctx.bot
 
         if "." not in plugin:
@@ -72,9 +82,8 @@ class Owner(commands.Cog):
             await bot.reload_extension(plugin)
         except commands.ExtensionNotLoaded:
             await ctx.message.add_reaction("❓")
-        except Exception:
-            embed = extensions.Embed(description=f"```py\n{traceback.format_exc()}```")
-            await ctx.send(embed=embed)
+        except Exception as e:
+            await ctx.send(embed=extensions.Embed(description=f"```py\n{e}{traceback.format_exc()}\n```"))
         else:
             await ctx.message.add_reaction("✅")
 
@@ -177,9 +186,9 @@ class Owner(commands.Cog):
     async def git(self, ctx: commands.Context):
         pass
 
-    @git.command()
+    @git.command(name="config")
     @commands.is_owner()
-    async def config(self, ctx: commands.Context):
+    async def git_config(self, ctx: commands.Context):
         await asyncio.create_subprocess_shell(
             'git config --global url."https://gitlab.com/".insteadOf git@gitlab.com:',
             stdout=asyncio.subprocess.PIPE,
@@ -188,20 +197,37 @@ class Owner(commands.Cog):
 
         await ctx.message.add_reaction("✅")
 
-    @git.command()
+    @git.command(name="pull")
     @commands.is_owner()
-    async def pull(self, ctx: commands.Context):
-
-        proc = await asyncio.create_subprocess_shell(
-            "git pull --no-rebase", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-        )
-
-        stdout, stderr = await proc.communicate()
+    async def git_pull(self, ctx: commands.Context):
+        stdout, stderr = await self._git_pull()
 
         if stderr:
             await ctx.send(f"Error: ```{stderr.decode()}```")
         if stdout:
             await ctx.send(stdout.decode())
+
+    @git.command(name="update-extensions")
+    async def git_update_extensions(self, ctx: commands.Context):
+        stdout, stderr = await self._git_pull()
+
+        response = ""
+
+        if stdout:
+            out = stdout.decode()
+            modules = GIT_PULL_REGEX.findall(out)
+
+            for module in modules:
+                try:
+                    await self.bot.reload_extension(f"extensions.{module}")
+                    response += f"Reloaded module `extensions.{module}`\n\n"
+                except Exception as e:
+                    response += f"```py\n{e}{traceback.format_exc()}\n\n```"
+
+            response += out
+
+        for index in range(0, len(response), 2000):
+            await ctx.send(response[index : index + 2000])
 
 
 async def setup(bot: Plyoox):

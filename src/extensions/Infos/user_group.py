@@ -96,7 +96,7 @@ class UserGroup(app_commands.Group):
             embed.insert_field_at(
                 3,
                 name=f"{_(lc, 'roles')} ({len(roles) - 1})",
-                value=f"> {helper.format_roles(roles)}" if formatted_roles else _(lc, "no_roles"),
+                value=f"> {formatted_roles}" if formatted_roles else _(lc, "no_roles"),
             )
 
         await interaction.response.send_message(embed=embed, ephemeral=ephemeral)

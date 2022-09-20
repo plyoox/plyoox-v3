@@ -34,7 +34,8 @@ class GuildGroup(app_commands.Group):
         embed.add_field(name=_(lc, "guild_info.about.members"), value=f"> {str(guild.member_count)}")
 
         embed.add_field(
-            name=_(lc, "roles"), value=f"> {helper.format_roles(list(roles))}" if guild._roles else _(lc, "no_roles")
+            name=f"{_(lc, 'roles')} ({len(roles) - 1})",
+            value=f"> {helper.format_roles(list(roles))}" if guild._roles else _(lc, "no_roles"),
         )
         embed.add_field(
             name=_(lc, "guild_info.about.more_infos"),
@@ -45,7 +46,9 @@ class GuildGroup(app_commands.Group):
         )
         embed.add_field(
             name=_(lc, "guild_info.about.features"),
-            value=f"> {', '.join(f'`{feature}`' for feature in guild.features) or _(lc, 'guild_info.about.no_features')}",
+            value=f"> {', '.join(f'`{feature}`' for feature in guild.features)}"
+            if guild.features
+            else _(lc, "guild_info.about.no_features"),
         )
 
         await interaction.response.send_message(embed=embed)

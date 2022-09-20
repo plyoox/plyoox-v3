@@ -19,14 +19,16 @@ def format_roles(roles: list[discord.Role]) -> str | None:
     if len(roles) == 1:
         return None
 
-    result = []
-    roles.reverse()
-    roles.pop()
+    _roles = roles.copy()
 
-    for role in roles[:44]:
+    result = []
+    _roles.reverse()
+    _roles.pop()
+
+    for role in _roles[:44]:  # max 1024 characters
         result.append(role.mention)
 
-    if len(roles) > 44:
+    if len(_roles) > 44:
         return " ".join(result) + "..."
 
     return " ".join(result)

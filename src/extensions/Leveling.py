@@ -222,6 +222,9 @@ class Leveling(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        if message.guild.id != 505438986672537620:
+            return
+
         # ignore dm's and other bots
         if message.guild is None or message.author.bot:
             return

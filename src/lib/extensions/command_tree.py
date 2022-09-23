@@ -14,8 +14,6 @@ class CommandTree(app_commands.CommandTree):
     async def on_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
         if isinstance(error, app_commands.CommandNotFound):
             await interaction.response.send_message(_(interaction.locale, "errors.command_not_found"), ephemeral=True)
-        elif isinstance(error, errors.OwnerOnly):
-            await interaction.response.send_message(_(interaction.locale, "errors.owner_only"), ephemeral=True)
         elif isinstance(error, errors.ModuleDisabled):
             await interaction.response.send_message(error, ephemeral=True)
         elif isinstance(error, app_commands.BotMissingPermissions):

@@ -81,8 +81,7 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
             await interaction.response.send_message(_(lc, "fun.ship.same"), ephemeral=True)
             return
 
-        random.seed(f"{user1}{user2}")
-        percent = random.randint(0, 100)
+        percent = random.Random(f"{user1}{user2}").randint(0, 100)
         embed = extensions.Embed(
             title=f"{user1.name} :heart: {user2.name}", description=f"**`{('█' * (percent // 10)):10}` {percent}%**"
         )

@@ -29,7 +29,7 @@ class Owner(commands.Cog):
     @staticmethod
     async def _git_pull():
         proc = await asyncio.create_subprocess_shell(
-            "git pull --no-rebase", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+            "git pull origin main --no-rebase", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
         )
 
         return await proc.communicate()

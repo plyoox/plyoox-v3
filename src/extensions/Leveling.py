@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import logging
 import random
 from typing import TYPE_CHECKING, Optional
 
@@ -22,6 +23,8 @@ BACKGROUND = Image.open("./src/assets/level_card.png")
 FONT = easy_pil.Font.poppins(size=24)
 FONT_sm = easy_pil.Font.poppins(size=18)
 FONT_xs = easy_pil.Font.poppins(size=16)
+
+_log = logging.getLogger(__name__)
 
 
 def get_xp_from_lvl(lvl: int):
@@ -317,7 +320,10 @@ class Leveling(commands.Cog):
                 f_level = formatting.LevelFormatObject(level=after_level, role=highest_add_role)
                 level_message = formatting.format_leveling_message(cache.message, member=member, level=f_level)
 
-                if level_message is None:  # can be none when {level.role} is used and no role was given to the user
+                if not level_message:  # can be none when {level.role} is used and no role was given to the user
+                    if level_message is not None:  # currently only for debugging
+                        _log.warning(f'Message is empty after formatting: "{cache.message}" -> "{level_message}"')
+
                     return
 
                 # if a channel is given send the message to it

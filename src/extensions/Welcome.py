@@ -86,11 +86,14 @@ class Welcome(commands.Cog):
         if cache is None:
             return
 
+        if not cache.active or not cache.join_active:
+            return
+
         if cache.join_roles and guild.me.guild_permissions.manage_roles:
             roles = []
             for role_id in cache.join_roles:
                 role = guild.get_role(role_id)
-                if role is not None:
+                if role is not None and guild.me.top_role > role:
                     roles.append(role)
 
             if roles:

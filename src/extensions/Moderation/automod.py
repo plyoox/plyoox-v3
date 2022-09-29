@@ -6,9 +6,9 @@ import re
 from typing import TYPE_CHECKING
 
 import discord
-from discord import utils
 from discord.ext import commands
 
+from lib import utils
 from lib.enums import AutomodAction, AutomodChecks, TimerType, AutomodFinalAction
 from translation import _
 from . import _logging_helper as _logging
@@ -59,6 +59,7 @@ class AutomodActionData(object):
 class Automod(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
+        self.invite_cache: dict[str, discord.Invite] = utils.ExpiringCache(seconds=600)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -136,12 +137,24 @@ class Automod(commands.Cog):
             if not self._is_affected(message, cache, "invite"):
                 return
 
-            invites = set([invite[1] for invite in found_invites])
+            invites: set[str] = set([invite[1] for invite in found_invites])
+
             for invite in invites:
-                try:
-                    invite = await self.bot.fetch_invite(invite)
-                    if invite.guild.id == guild.id or invite.guild.id in cache.invite_allowed:
+                cached_invite = self.invite_cache.get(invite)
+
+                if cached_invite is not None:
+                    if cached_invite.guild.id == guild.id or cached_invite.guild.id in cache.invite_allowed:
                         continue
+
+                    await self._handle_action(message, cache.invite_actions, "invite")
+                    return
+
+                try:
+                    fetched_invite = await self.bot.fetch_invite(invite)
+                    if fetched_invite.guild.id == guild.id or fetched_invite.guild.id in cache.invite_allowed:
+                        continue
+
+                    self.invite_cache[fetched_invite.code] = fetched_invite
 
                     await self._handle_action(message, cache.invite_actions, "invite")
                     return
@@ -223,11 +236,11 @@ class Automod(commands.Cog):
         elif check == AutomodChecks.join_date:
             days = action.days
 
-            return (utils.utcnow() - member.joined_at).days <= days
+            return (discord.utils.utcnow() - member.joined_at).days <= days
         elif check == AutomodChecks.account_age:
             days = action.days
 
-            return (utils.utcnow() - member.created_at).days <= days
+            return (discord.utils.utcnow() - member.created_at).days <= days
 
     async def _execute_final_action(self, member: discord.Member, action: AutomodExecutionModel):
         guild = member.guild
@@ -244,7 +257,7 @@ class Automod(commands.Cog):
 
         elif action.action == AutomodFinalAction.tempban:
             if guild.me.guild_permissions.ban_members:
-                banned_until = utils.utcnow() + datetime.timedelta(seconds=action.duration)
+                banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
 
                 timers = self.bot.timer
                 if timers is not None:
@@ -260,7 +273,7 @@ class Automod(commands.Cog):
 
         elif action.action == AutomodAction.tempmute:
             if guild.me.guild_permissions.mute_members:
-                muted_until = utils.utcnow() + datetime.timedelta(seconds=action.duration)
+                muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
                 await member.timeout(muted_until)
 
     async def _execute_discord_automod(self, data: AutomodActionData, message: discord.Message = None) -> None:
@@ -291,7 +304,7 @@ class Automod(commands.Cog):
             await _logging.automod_log(self.bot, data)
         elif automod_action.action == AutomodAction.tempban:
             if guild.me.guild_permissions.ban_members:
-                banned_until = utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
+                banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
 
                 timers = self.bot.timer
                 if timers is not None:
@@ -303,7 +316,7 @@ class Automod(commands.Cog):
 
         elif automod_action.action == AutomodAction.tempmute:
             if guild.me.guild_permissions.mute_members:
-                muted_until = utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
+                muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
 
                 await member.timeout(muted_until)
                 await _logging.automod_log(self.bot, data, until=muted_until)
@@ -389,7 +402,7 @@ class Automod(commands.Cog):
             "INSERT INTO automod_users (guild_id, user_id, timestamp, points, reason) VALUES ($1, $2, $3, $4, $5)",
             guild.id,
             member.id,
-            utils.utcnow(),
+            discord.utils.utcnow(),
             points,
             reason,
         )

@@ -20,7 +20,7 @@ class ExpiringCache(dict):
 
     def __getitem__(self, key):
         self.__verify_cache_integrity()
-        return super().__getitem__(key)
+        return super().__getitem__(key)[0]
 
     def __setitem__(self, key, value):
         super().__setitem__(key, (value, time.monotonic()))

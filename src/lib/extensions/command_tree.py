@@ -26,7 +26,8 @@ class CommandTree(app_commands.CommandTree):
             await interaction.response.send_message(error, ephemeral=True)
         elif isinstance(error, app_commands.CommandOnCooldown):
             await interaction.response.send_message(
-                _(interaction.locale, "errors.command_on_cooldown", retry_after=error.retry_after)
+                _(interaction.locale, "errors.command_on_cooldown", retry_after=round(error.retry_after)),
+                ephemeral=True,
             )
         else:
             traceback.print_exc()

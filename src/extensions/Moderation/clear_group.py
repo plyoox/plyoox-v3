@@ -3,6 +3,7 @@ from typing import Optional
 
 import discord
 from discord import app_commands
+from discord.ext import commands
 
 from lib import extensions
 from translation import _
@@ -10,6 +11,14 @@ from translation import _
 
 _T = app_commands.locale_str
 LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
+
+
+class CooldownByInteraction(commands.CooldownMapping):
+    def _bucket_key(self, interaction: discord.Interaction) -> tuple[int, int]:
+        return interaction.guild_id, interaction.user.id
+
+
+_cooldown_by_user = CooldownByInteraction.from_cooldown(3, 60, commands.BucketType.member)
 
 
 @app_commands.checks.bot_has_permissions(manage_messages=True)
@@ -21,6 +30,17 @@ class ClearGroup(app_commands.Group):
             guild_only=True,
             default_permissions=discord.Permissions(manage_messages=True),
         )
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        bucket = _cooldown_by_user.get_bucket(interaction)
+        if bucket is None:
+            return True
+
+        retry_after = bucket.update_rate_limit(interaction.created_at.timestamp())
+        if retry_after is None:
+            return True
+
+        raise app_commands.CommandOnCooldown(bucket, retry_after)
 
     @staticmethod
     async def do_removal(interaction: discord.Interaction, limit, *, reason, predicate):

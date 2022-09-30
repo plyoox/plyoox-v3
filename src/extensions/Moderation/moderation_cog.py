@@ -386,6 +386,7 @@ class Moderation(commands.Cog):
     @app_commands.guild_only
     @app_commands.checks.bot_has_permissions(read_messages=True)
     @app_commands.default_permissions(administrator=True)
+    @app_commands.checks.cooldown(2, 60, key=lambda i: (i.guild.id, i.user.id))
     async def massban(
         self,
         interaction: discord.Interaction,

@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import logging
 import os
+import re
 import traceback
 from typing import TYPE_CHECKING
 
@@ -22,6 +23,9 @@ LOGGING_COLORS = {
 }
 
 
+RESUME_REGEX = re.compile("Shard ID (\d|None) has successfully RESUMED session.+")
+
+
 class DiscordNotificationLoggingHandler(logging.Handler):
     def __init__(self, cog: EventHandlerCog):
         self.cog = cog
@@ -29,6 +33,9 @@ class DiscordNotificationLoggingHandler(logging.Handler):
 
     def filter(self, record: logging.LogRecord) -> bool:
         if record.name.startswith("tornado."):
+            return False
+
+        elif RESUME_REGEX.match(record.message):
             return False
 
         return True

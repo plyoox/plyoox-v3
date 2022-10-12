@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 
 
 MESSAGE_REGEX = re.compile(r"\bhttps://(canary.)?discord.com/channels/\d{17,20}/\d{17,20}/\d{17,20}\b")
+MAX_SELECT_OPTIONS = 25  # max options in a select
 
 
 def url_conversion(url: str) -> str | None:
@@ -183,8 +184,6 @@ class SelectView(ui.View):
         self.add_item(self.back_button)
 
     def set_select_options(self, options: list[discord.SelectOption]):
-        MAX_OPTIONS = 25  # max options in a select
-
         if len(options) > 25:
             if self.has_page_buttons is False:
                 self.add_item(self.left_button)
@@ -193,7 +192,9 @@ class SelectView(ui.View):
 
                 self.has_page_buttons = True
 
-            self.options_list = [options[i : i + MAX_OPTIONS] for i in range(0, len(options), MAX_OPTIONS)]
+            self.options_list = [
+                options[i : i + MAX_SELECT_OPTIONS] for i in range(0, len(options), MAX_SELECT_OPTIONS)
+            ]
             self.dynamic_select.options = self.options_list[0]
             self.page_index = 0
 
@@ -1139,7 +1140,7 @@ class BaseView(extensions.PrivateView):
         await self._last_interaction.channel.send(error)
 
 
-class MessageMaker(commands.Cog):
+class EmbedCreator(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -1154,4 +1155,4 @@ class MessageMaker(commands.Cog):
 
 
 async def setup(bot):
-    await bot.add_cog(MessageMaker(bot))
+    await bot.add_cog(EmbedCreator(bot))

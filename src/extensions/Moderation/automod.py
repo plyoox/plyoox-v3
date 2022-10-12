@@ -60,6 +60,7 @@ class Automod(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
         self.invite_cache: dict[str, discord.Invite] = utils.ExpiringCache(seconds=600)
+        self.punished_members: dict[tuple[int, int], bool] = utils.ExpiringCache(seconds=5)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -249,6 +250,11 @@ class Automod(commands.Cog):
         guild = member.guild
         lc = guild.preferred_locale
 
+        if self.punished_members.get((member.id, member.guild.id)):
+            return
+        else:
+            self.punished_members[(member.id, member.guild.id)] = True
+
         await _logging.automod_final_log(self.bot, member, action.action)  # type: ignore
 
         if action.action == AutomodFinalAction.kick:
@@ -257,7 +263,6 @@ class Automod(commands.Cog):
         elif action.action == AutomodFinalAction.ban:
             if guild.me.guild_permissions.ban_members:
                 await guild.ban(member, reason=_(lc, "automod.final.reason"))
-
         elif action.action == AutomodFinalAction.tempban:
             if guild.me.guild_permissions.ban_members:
                 banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
@@ -272,8 +277,7 @@ class Automod(commands.Cog):
                     )
                     await guild.ban(member, reason=_(lc, "automod.final.reason"))
                 else:
-                    _log.error("Timer Plugin is not initialized")
-
+                    _log.warning("Timer Plugin is not initialized")
         elif action.action == AutomodAction.tempmute:
             if guild.me.guild_permissions.mute_members:
                 muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
@@ -295,6 +299,12 @@ class Automod(commands.Cog):
                 if message.channel.permissions_for(guild.me).manage_messages:
                     await message.delete()
 
+        if automod_action.action != AutomodAction.delete:
+            if self.punished_members.get((member.id, member.guild.id)):
+                return
+            else:
+                self.punished_members[(member.id, member.guild.id)] = True
+
         if automod_action.action == AutomodAction.ban:
             if guild.me.guild_permissions.ban_members:
                 await guild.ban(member, reason=_(lc, f"automod.reason.{data.trigger_reason}"))
@@ -315,8 +325,7 @@ class Automod(commands.Cog):
                     await _logging.automod_log(self.bot, data)
                     await guild.ban(member, reason=_(lc, f"automod.reason.{automod_action}"))
                 else:
-                    _log.error("Timer Plugin is not initialized")
-
+                    _log.warning("Timer Plugin is not initialized")
         elif automod_action.action == AutomodAction.tempmute:
             if guild.me.guild_permissions.mute_members:
                 muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)

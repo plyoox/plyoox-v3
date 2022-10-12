@@ -32,7 +32,7 @@ def url_conversion(url: str) -> str | None:
     if not url:
         return None
 
-    if not url.startswith(("http.//", "https://")):
+    if not url.startswith(("http://", "https://")):
         raise errors.ConversionError("embed-creator.url_conversion_error")
 
     return url

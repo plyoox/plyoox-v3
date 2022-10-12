@@ -23,19 +23,22 @@ class PrivateView(ui.View):
         if (message := self._last_interaction.message) is not None:
             has_content = len(message.content) or len(message.embeds) or len(message.attachments)
 
-        if self._last_interaction.is_expired():
-            if self._last_interaction.message is None:
-                return
+        try:
+            if self._last_interaction.is_expired():
+                if self._last_interaction.message is None:
+                    return
 
-            if has_content:
-                await self._last_interaction.message.edit(view=None)
+                if has_content:
+                    await self._last_interaction.message.edit(view=None)
+                else:
+                    await self._last_interaction.message.delete()
             else:
-                await self._last_interaction.message.delete()
-        else:
-            if has_content:
-                await self._last_interaction.edit_original_response(view=None)
-            else:
-                await self._last_interaction.delete_original_response()
+                if has_content:
+                    await self._last_interaction.edit_original_response(view=None)
+                else:
+                    await self._last_interaction.delete_original_response()
+        except discord.NotFound:
+            pass
 
 
 class EphemeralView(ui.View):

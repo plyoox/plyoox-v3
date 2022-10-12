@@ -348,6 +348,9 @@ class Automod(commands.Cog):
         roles = message.author._roles
         channel = message.channel
 
+        if not cache.active:
+            return False
+
         if not getattr(cache, f"{reason}_active") or not getattr(cache, f"{reason}_actions"):
             return False
 

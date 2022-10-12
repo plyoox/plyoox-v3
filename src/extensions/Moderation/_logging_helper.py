@@ -48,7 +48,7 @@ async def _send_webhook(
             guild_id,
         )
 
-        bot.cache.edit_cache("mod", guild_id, log_channel=None, log_id=None, log_token=None)
+        bot.cache.edit_cache(guild_id, "mod", log_channel=None, log_id=None, log_token=None)
 
 
 async def log_simple_punish_command(

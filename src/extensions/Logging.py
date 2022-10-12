@@ -52,7 +52,7 @@ class LoggingEvents(commands.Cog):
                 "UPDATE logging SET webhook_id = NULL, webhook_token = NULL WHERE id = $1", guild_id
             )
 
-            self.bot.cache.edit_cache("log", guild_id, webhook_token=None, webhook_id=None)
+            self.bot.cache.edit_cache(guild_id, "log", webhook_token=None, webhook_id=None)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):

@@ -189,17 +189,24 @@ class CacheManager:
 
         return model
 
-    def edit_cache(self, cache: Literal["wel", "log", "lvl", "mod"], id: int, **kwargs) -> None:
-        guild_cache = None
-
+    def _get_store(self, cache: Literal["wel", "log", "lvl", "mod"]) -> LRU:
         if cache == "wel":
-            guild_cache = self._welcome.get(id, None)
+            return self._welcome
         elif cache == "log":
-            guild_cache = self._logging.get(id, None)
+            return self._logging
         elif cache == "lvl":
-            guild_cache = self._leveling.get(id, None)
+            return self._leveling
         elif cache == "mod":
-            guild_cache = self._moderation.get(id, None)
+            return self._moderation
+
+    def remove_cache(self, id: int, store: Literal["wel", "log", "lvl", "mod"]) -> None:
+        store = self._get_store(store)
+        if store.get(id, None):
+            del store[id]
+
+    def edit_cache(self, id: int, store: Literal["wel", "log", "lvl", "mod"], **kwargs) -> None:
+        store = self._get_store(store)
+        guild_cache = store.get(id, None)
 
         if guild_cache is not None:
             for key, value in kwargs.items():

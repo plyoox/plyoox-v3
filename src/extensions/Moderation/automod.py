@@ -72,6 +72,25 @@ class Automod(commands.Cog):
             await self._run_automod(after)
 
     @commands.Cog.listener()
+    async def on_automod_rule_delete(self, rule: discord.AutoModRule) -> None:
+        guild_id = rule.guild.id
+
+        rules: list = await self.bot.db.fetchval("SELECT blacklist_actions FROM moderation WHERE id = $1", guild_id)
+        if not rules:
+            return
+
+        changed = False
+        for _rule in rules:
+            if _rule["r"] == rule.id:
+                changed = True
+                rules.remove(_rule)
+
+        if changed:
+            await self.bot.db.execute("UPDATE moderation SET blacklist_actions = $1 WHERE id = $1", rules, guild_id)
+            self.bot.cache.remove_cache(guild_id, "mod")
+
+
+    @commands.Cog.listener()
     async def on_automod_action(self, execution: discord.AutoModAction):
         guild = execution.guild
 

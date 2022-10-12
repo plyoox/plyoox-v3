@@ -86,7 +86,7 @@ class Automod(commands.Cog):
                 rules.remove(_rule)
 
         if changed:
-            await self.bot.db.execute("UPDATE moderation SET blacklist_actions = $1 WHERE id = $1", rules, guild_id)
+            await self.bot.db.execute("UPDATE moderation SET blacklist_actions = $1 WHERE id = $1", rules or None, guild_id)
             self.bot.cache.remove_cache(guild_id, "mod")
 
 

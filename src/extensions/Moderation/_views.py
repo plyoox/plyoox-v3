@@ -13,7 +13,7 @@ async def _change_member_view(interaction: discord.Interaction, view: MemberView
     view.current_index += index_change
 
     embed = extensions.Embed(title=_(lc, "moderation.massban.view_member_title"))
-    embed.set_footer(text=f"{_(lc, 'moderation.massban.page')}: {view.current_index + 1}")
+    embed.set_footer(text=f"{_(lc, 'page')}: {view.current_index + 1}")
 
     members = view.members[
         view.current_index * MemberView.MEMBERS_PER_PAGE : MemberView.MEMBERS_PER_PAGE * (view.current_index + 1)

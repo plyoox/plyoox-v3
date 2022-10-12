@@ -165,3 +165,5 @@ disable-migration-notification:
 view-rank: "Level anzeigen"
 view-user-info: "User Info"
 view-invite-info: "Invite Info"
+embed-creator:
+  description: "Einfaches Tool um schnell Embeds zu erstellen."

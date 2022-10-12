@@ -74,6 +74,9 @@ class Automod(commands.Cog):
     async def on_automod_action(self, execution: discord.AutoModAction):
         guild = execution.guild
 
+        if execution.action.type != discord.AutoModRuleActionType.block_message:
+            return
+
         cache = await self.bot.cache.get_moderation(guild.id)
         if cache is None or not cache.active:
             return

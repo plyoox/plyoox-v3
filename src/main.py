@@ -39,6 +39,7 @@ plugins = [
     "extensions.Migration",
     "extensions.Statistics",
     "extensions.AutomodCache",
+    "extensions.EmbedCreator",
 ]
 
 

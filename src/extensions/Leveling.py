@@ -4,6 +4,7 @@ import io
 import logging
 import os
 import random
+import time
 from typing import TYPE_CHECKING, Optional
 
 import aiohttp
@@ -123,8 +124,6 @@ class Leveling(commands.Cog):
             )
             return
 
-        await interaction.response.defer(ephemeral=ephemeral)
-
         guild = interaction.guild
         bot: Plyoox = interaction.client  # type: ignore
 
@@ -157,11 +156,13 @@ class Leveling(commands.Cog):
                 fp = io.BytesIO(await res.read())
                 image = discord.File(fp, filename="level_card.png")
 
-                await interaction.followup.send(file=image, ephemeral=ephemeral)
+                await interaction.response.send_message(file=image, ephemeral=ephemeral)
         except aiohttp.ClientConnectionError as err:
             _log.error("Could not fetch level card", err)
 
-            await interaction.followup.send(_(interaction.locale, "level.infrastructure_offline"), ephemeral=True)
+            await interaction.response.send_message(
+                _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
+            )
             return
 
     async def _add_level_roles(self, member: discord.Member):

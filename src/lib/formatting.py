@@ -55,7 +55,7 @@ def format_leveling_message(message: str, member: discord.Member, level: LevelFo
         .replace("{guild.id}", str(guild.id))
         .replace("{guild.member_count}", str(guild.member_count))
         .replace("{level}", str(level))
-        .replace("{level.role}", str(guild.id))
+        .replace("{level.role}", level.role.mention)
     )
 
 

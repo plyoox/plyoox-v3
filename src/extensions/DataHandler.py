@@ -35,7 +35,7 @@ class DiscordNotificationLoggingHandler(logging.Handler):
         if record.name.startswith("tornado."):
             return False
 
-        elif RESUME_REGEX.match(record.message):
+        elif hasattr(record, "message") and RESUME_REGEX.match(record.message):
             return False
 
         return True

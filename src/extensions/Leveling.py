@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import io
 import logging
+import os
 import random
 from typing import TYPE_CHECKING, Optional
 
+import aiohttp
 import discord
-import easy_pil
-from PIL import Image, ImageDraw, ImageChops
 from discord import app_commands, ui
 from discord.ext import commands
 
@@ -19,11 +19,6 @@ if TYPE_CHECKING:
     from lib.types import LevelUserData
 
 _T = app_commands.locale_str
-BACKGROUND = Image.open("./src/assets/level_card.png")
-FONT = easy_pil.Font.poppins(size=24)
-FONT_sm = easy_pil.Font.poppins(size=18)
-FONT_xs = easy_pil.Font.poppins(size=16)
-
 _log = logging.getLogger(__name__)
 
 
@@ -47,59 +42,6 @@ def get_level_from_xp(xp: int) -> tuple[int, int]:
         xp -= get_level_xp(level)
         level += 1
     return level, xp
-
-
-def crop_to_circle(avatar: Image):
-    big_size = (128 * 3, 128 * 3)
-
-    mask = Image.new("L", big_size, 0)
-    ImageDraw.Draw(mask).ellipse((0, 0) + big_size, fill=255)
-    mask = mask.resize((128, 128))
-    mask = ImageChops.darker(mask, avatar.split()[-1])
-    avatar.putalpha(mask)
-
-
-async def create_level_image(
-    interaction: discord.Interaction, member: discord.Member, level: int, current_xp: int, needed_xp: int, rank: int
-) -> discord.File:
-    locale = interaction.locale
-    bot: Plyoox = interaction.client  # type: ignore
-
-    avatar_image_raw = await member.display_avatar.with_format("png").with_size(128).read()
-    avatar_image = Image.open(io.BytesIO(avatar_image_raw))
-
-    if avatar_image.size != (128, 128):
-        avatar_image = avatar_image.resize((128, 128))
-
-    return await bot.loop.run_in_executor(
-        None, _generate_image, locale, str(member), avatar_image, level, current_xp, needed_xp, rank
-    )
-
-
-def _generate_image(
-    locale: discord.Locale, username: str, avatar: Image, level: int, current_xp: int, needed_xp: int, rank: int
-) -> Image:
-    background = easy_pil.Editor(BACKGROUND.copy())
-
-    crop_to_circle(avatar)
-
-    percentage = min(current_xp / needed_xp, 1)
-
-    background.paste(avatar, (30, 36))
-    background.rectangle((190, 100), width=int(250 * percentage), height=19, fill="#24C689", radius=10)
-    background.text((190, 70), username, font=FONT, color="white")
-    background.text((190, 130), _(locale, "level.rank.level"), font=FONT_sm, color="#dedede")
-    background.text((280, 130), _(locale, "level.rank.xp"), font=FONT_sm, color="#dedede")
-    background.text((370, 130), _(locale, "level.rank.rank"), font=FONT_sm, color="#dedede")
-    background.text((190, 150), str(level), font=FONT_xs, color="gray")
-    background.text((280, 150), f"{current_xp}/{needed_xp}", font=FONT_xs, color="gray")
-    background.text((370, 150), f"#{rank}", font=FONT_xs, color="gray")
-
-    buffer = io.BytesIO()
-    background.image.save(buffer, format="PNG")
-    buffer.seek(0)
-
-    return discord.File(buffer, filename=f"{username.split('#')[0]}.png")
 
 
 class ResetGuildModal(ui.Modal):
@@ -138,6 +80,7 @@ class Leveling(commands.Cog):
         )
 
         self.bot.tree.add_command(self.ctx_menu)
+        self.imager_url = os.getenv("IMAGER_URL")
 
     level_group = app_commands.Group(
         name="level",
@@ -172,7 +115,18 @@ class Leveling(commands.Cog):
     async def _view_rank(
         self, interaction: discord.Interaction, *, member: discord.Member = None, ephemeral: bool = False
     ):
+        if self.imager_url is None:
+            _log.warning("No imager url given set, aborting...")
+
+            await interaction.response.send_message(
+                _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
+            )
+            return
+
+        await interaction.response.defer(ephemeral=ephemeral)
+
         guild = interaction.guild
+        bot: Plyoox = interaction.client  # type: ignore
 
         user_data: LevelUserData = await self.bot.db.fetchrow(
             "WITH users AS (SELECT xp, user_id, row_number() OVER (ORDER BY xp DESC) AS rank FROM leveling_users WHERE guild_id = $1) SELECT xp, rank FROM users WHERE user_id = $2",
@@ -187,11 +141,28 @@ class Leveling(commands.Cog):
         current_level, remaining_xp = get_level_from_xp(user_data["xp"])
         required_xp = get_level_xp(current_level)
 
-        image = await create_level_image(
-            interaction, member, current_level, remaining_xp, required_xp, user_data["rank"]  # type: ignore
-        )
+        params = {
+            "language": "de" if interaction.locale == "de" else "en",
+            "xp": remaining_xp,
+            "required-xp": required_xp,
+            "level": current_level,
+            "username": member.name,
+            "avatar": member.display_avatar.with_size(512).with_format("png").url,
+            "discriminator": member.discriminator,
+            "rank": user_data["rank"],
+        }
 
-        await interaction.response.send_message(file=image, ephemeral=ephemeral)
+        try:
+            async with bot.session.get(f"{self.imager_url}/api/level-card", params=params) as res:
+                fp = io.BytesIO(await res.read())
+                image = discord.File(fp, filename="level_card.png")
+
+                await interaction.followup.send(file=image, ephemeral=ephemeral)
+        except aiohttp.ClientConnectionError as err:
+            _log.error("Could not fetch level card", err)
+
+            await interaction.followup.send(_(interaction.locale, "level.infrastructure_offline"), ephemeral=True)
+            return
 
     async def _add_level_roles(self, member: discord.Member):
         guild = member.guild

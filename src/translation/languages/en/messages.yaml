@@ -82,6 +82,7 @@ infos:
     uptime: "Uptime"
     privacy_policy: "Privacy policy"
 level:
+  infrastructure_offline: "This command is currently unavailable due to infrastructure issues."
   rank:
     no_data: "This user has no xp."
     level: "Level"

@@ -219,8 +219,8 @@ class Owner(commands.Cog):
 
             for module in modules:
                 try:
-                    await self.bot.reload_extension(f"extensions.{module}")
-                    response += f"Reloaded module `extensions.{module}`\n\n"
+                    await self.bot.reload_extension(f"extensions.{module[0]}")
+                    response += f"Reloaded module `extensions.{module[0]}`\n\n"
                 except Exception as e:
                     response += f"```py\n{e}{traceback.format_exc()}\n\n```"
 

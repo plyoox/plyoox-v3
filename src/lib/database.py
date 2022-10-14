@@ -201,3 +201,16 @@ class CommandStatistics(Base):
     name = _Column(pg.VARCHAR(length=32), nullable=False)
     author_id = _Column(pg.BIGINT)
     failed = _Column(pg.BOOLEAN)
+
+
+class Tags(Base):
+    __tablename__ = "tags"
+
+    id = _Column(pg.INTEGER, primary_key=True, autoincrement=True)
+    guild_id = _Column(pg.BIGINT, nullable=False)
+    author_id = _Column(pg.BIGINT, nullable=False)
+    created_at = _Column(pg.TIMESTAMP(timezone=True), nullable=False)
+    usages = _Column(pg.INTEGER, default=0, nullable=False)
+    name = _Column(pg.VARCHAR(length=32), nullable=False)
+    description = _Column(pg.VARCHAR(length=2000))
+    sql.UniqueConstraint(guild_id, name, name="uix_tag")

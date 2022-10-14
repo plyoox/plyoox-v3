@@ -153,6 +153,13 @@ class Leveling(commands.Cog):
 
         try:
             async with bot.session.get(f"{self.imager_url}/api/level-card", params=params) as res:
+                if res.status != 200:
+                    text = await res.text()
+                    _log.warning(f"Received status code {res.status} and data `{text}` while fetching level card.")
+                    await interaction.response.send_message(
+                        _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
+                    )
+                    
                 fp = io.BytesIO(await res.read())
                 image = discord.File(fp, filename="level_card.png")
 

@@ -323,7 +323,8 @@ class Automod(commands.Cog):
             if self.punished_members.get((member.id, member.guild.id)):
                 return
             else:
-                self.punished_members[(member.id, member.guild.id)] = True
+                if automod_action.action != AutomodAction.points:
+                    self.punished_members[(member.id, member.guild.id)] = True
 
         if automod_action.action == AutomodAction.ban:
             if guild.me.guild_permissions.ban_members:

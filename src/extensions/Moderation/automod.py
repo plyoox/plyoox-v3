@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import datetime
 import logging
 import re
@@ -61,6 +62,7 @@ class Automod(commands.Cog):
         self.bot = bot
         self.invite_cache: dict[str, discord.Invite] = utils.ExpiringCache(seconds=600)
         self.punished_members: dict[tuple[int, int], bool] = utils.ExpiringCache(seconds=5)
+        self._invite_requests: dict[str, asyncio.Event] = {}
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -164,26 +166,16 @@ class Automod(commands.Cog):
             invites: set[str] = set([invite[1] for invite in found_invites])
 
             for invite in invites:
-                cached_invite = self.invite_cache.get(invite)
-
-                if cached_invite is not None:
-                    if cached_invite.guild.id == guild.id or cached_invite.guild.id in cache.invite_allowed:
-                        continue
-
-                    await self._handle_action(message, cache.invite_actions, "invite")
-                    return
-
                 try:
-                    fetched_invite = await self.bot.fetch_invite(invite)
-                    if fetched_invite.guild.id == guild.id or fetched_invite.guild.id in cache.invite_allowed:
-                        continue
+                    fetched_invite = await self._fetch_invite(invite)
 
-                    self.invite_cache[fetched_invite.code] = fetched_invite
+                    if fetched_invite is not None and (
+                        fetched_invite.guild.id == guild.id or fetched_invite.guild.id in cache.invite_allowed
+                    ):
+                        continue
 
                     await self._handle_action(message, cache.invite_actions, "invite")
                     return
-                except discord.NotFound:
-                    continue
                 except discord.HTTPException:
                     break
 
@@ -227,6 +219,33 @@ class Automod(commands.Cog):
 
             await self._handle_action(message, cache.caps_actions, "caps")
             return
+
+    async def _fetch_invite(self, code: str) -> discord.Invite | None:
+        if (invite := self.invite_cache.get(code)) is not None:
+            return invite
+
+        if (request := self._invite_requests.get(code)) is not None:
+            await request.wait()
+            return self.invite_cache[code]
+
+        self._invite_requests[code] = event = asyncio.Event()
+
+        try:
+            invite = await self.bot.fetch_invite(code, with_counts=False, with_expiration=False)
+        except discord.NotFound:
+            invite = False
+        except discord.HTTPException as exc:
+            _log.error("Could not fetch invite", exc)
+
+            event.set()
+            self._invite_requests.pop(code)
+            raise exc
+
+        self.invite_cache[code] = invite
+        event.set()
+        self._invite_requests.pop(code)
+
+        return invite
 
     async def _handle_action(
         self,

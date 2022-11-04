@@ -417,8 +417,8 @@ class Automod(commands.Cog):
             _log.warning(f"{member.id} has no points in {guild.id}...")
             return
 
-        # await message.delete()
-        await _logging.automod_log(self.bot, data, points=f"{points}/10 [+{data.trigger_action.points}]")
+        if points - data.trigger_action.points < 10:
+            await _logging.automod_log(self.bot, data, points=f"{points}/10 [+{data.trigger_action.points}]")
 
         if points >= 10:
             cache = await self.bot.cache.get_moderation(guild.id)

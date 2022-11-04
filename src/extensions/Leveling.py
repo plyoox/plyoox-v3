@@ -4,7 +4,6 @@ import io
 import logging
 import os
 import random
-import time
 from typing import TYPE_CHECKING, Optional
 
 import aiohttp

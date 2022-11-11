@@ -11,7 +11,7 @@ from discord import utils
 from discord.ext import commands
 
 from cache.models import TimerModel
-from lib.enums import TimerType
+from lib.enums import TimerEnum
 from translation import _
 
 if TYPE_CHECKING:
@@ -70,7 +70,7 @@ class Timer(commands.Cog):
             self._task = self.bot.loop.create_task(self.dispatch_timers())
 
     async def create_timer(
-        self, target_id: int, guild_id: int, type: TimerType, expires: datetime.datetime, data: dict[str, Any] = None
+        self, target_id: int, guild_id: int, type: TimerEnum, expires: datetime.datetime, data: dict[str, Any] = None
     ) -> None:
         timer_id = await self.bot.db.fetchval(
             "INSERT INTO timers (target_id, guild_id, type, expires, data) VALUES ($1, $2, $3, $4, $5) RETURNING id",

@@ -9,7 +9,7 @@ from discord import app_commands
 from discord.ext import commands
 
 from lib import parsers, extensions
-from lib.enums import TimerType
+from lib.enums import TimerEnum
 from translation import _
 from . import _views, _logging_helper, clear_group, automod
 
@@ -165,7 +165,7 @@ class Moderation(commands.Cog):
         await _logging_helper.log_simple_punish_command(
             interaction, target=member, until=banned_until, reason=reason, type="tempban"
         )
-        await self.bot.timer.create_timer(member.id, guild.id, type=TimerType.tempban, expires=banned_until)
+        await self.bot.timer.create_timer(member.id, guild.id, type=TimerEnum.tempban, expires=banned_until)
         await guild.ban(member, reason=reason, delete_message_days=1)
 
         await interaction.followup.send(_(lc, "moderation.tempban.successfully_banned"), ephemeral=True)

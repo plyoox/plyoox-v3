@@ -6,7 +6,7 @@ from recordclass import RecordClass
 
 if TYPE_CHECKING:
     from datetime import datetime
-    from lib.enums import AutomodAction, AutomodChecks, TimerType
+    from lib.enums import AutomodActionEnum, AutomodChecksEnum, TimerEnum
 
 
 class WelcomeModel(RecordClass):
@@ -48,8 +48,8 @@ class LoggingModel(RecordClass):
 
 
 class AutomodExecutionModel(RecordClass):
-    action: AutomodAction
-    check: AutomodChecks
+    action: AutomodActionEnum
+    check: AutomodChecksEnum
     days: int
     points: int
     duration: int
@@ -57,8 +57,8 @@ class AutomodExecutionModel(RecordClass):
 
 class AutomodDiscordExecutionModel(RecordClass):
     rule_id: int
-    action: AutomodAction
-    check: AutomodChecks
+    action: AutomodActionEnum
+    check: AutomodChecksEnum
     days: int
     points: int
     duration: int
@@ -98,6 +98,6 @@ class TimerModel(RecordClass):
     id: int
     guild_id: int
     target_id: int
-    type: TimerType
+    type: TimerEnum
     expires: datetime
     data: dict[str, Any] | None

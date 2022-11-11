@@ -7,7 +7,7 @@ import discord
 from discord import utils
 
 from lib import helper, extensions
-from lib.enums import AutomodFinalAction
+from lib.enums import AutomodFinalActionEnum
 from translation import _
 
 if TYPE_CHECKING:
@@ -157,7 +157,7 @@ async def automod_log(
 async def automod_final_log(
     bot: Plyoox,
     member: discord.Member,
-    action: AutomodFinalAction,
+    action: AutomodFinalActionEnum,
     *,
     until: datetime.datetime | None = None,
 ) -> None:

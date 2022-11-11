@@ -114,14 +114,15 @@ class Moderation(commands.Cog):
     async def ban(
         self,
         interaction: discord.Interaction,
-        member: discord.Member,
+        member: Union[discord.Member, discord.User],
         reason: Optional[app_commands.Range[str, None, 512]],
     ):
         lc = interaction.locale
         guild = interaction.guild
 
-        if not await Moderation._can_execute_on(interaction, member):
-            return
+        if isinstance(member, discord.Member):
+            if not await Moderation._can_execute_on(interaction, member):
+                return
 
         await interaction.response.defer(ephemeral=True)
 

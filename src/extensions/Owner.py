@@ -4,6 +4,7 @@ import asyncio
 import contextlib
 import importlib
 import io
+import json
 import re
 import textwrap
 import traceback
@@ -93,6 +94,32 @@ class Owner(commands.Cog):
         languages._load_languages()
 
         await ctx.message.add_reaction("✅")
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def loadfrommee6(self, ctx: commands.Context, guild_id: int):
+        if not len(ctx.message.attachments):
+            await ctx.send("Kein Attachment gegeben.")
+            return
+
+        if self.bot.get_guild(guild_id) is None:
+            await ctx.send("Server nicht gefunden.")
+            return
+
+        attachment = ctx.message.attachments[0]
+        data = await attachment.read()
+        data = data.decode("utf-8")
+        users = json.loads(data)
+
+        async with self.bot.db.acquire() as con:
+            async with con.transaction():
+                for user in users:
+                    await con.execute(
+                        "INSERT INTO leveling_users (guild_id, user_id, xp) VALUES ($1, $2, $3) ON CONFLICT DO UPDATE SET xp = $3",
+                        guild_id, user["uid"], user["xp"]
+                    )
+
+        await ctx.send("Level gespeichert")
 
     @commands.command(name="execute")
     @commands.is_owner()

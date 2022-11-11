@@ -27,6 +27,10 @@ class Owner(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
+    @commands.Cog.listener()
+    async def cog_command_error(self, ctx: commands.Context, error):
+        await ctx.send(error)
+
     @staticmethod
     async def _git_pull():
         proc = await asyncio.create_subprocess_shell(

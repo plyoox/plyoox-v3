@@ -118,7 +118,7 @@ class Owner(commands.Cog):
             async with con.transaction():
                 for user in users:
                     await con.execute(
-                        "INSERT INTO leveling_users (guild_id, user_id, xp) VALUES ($1, $2, $3) ON CONFLICT (guild_id, user_id) DO UPDATE SET xp = $3",
+                        "INSERT INTO leveling_users (guild_id, user_id, xp) VALUES ($1, $2, $3) ON CONFLICT (uix_user) DO UPDATE SET xp = $3",
                         guild_id, user["uid"], user["xp"]
                     )
 

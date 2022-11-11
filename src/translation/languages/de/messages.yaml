@@ -127,7 +127,7 @@ moderation:
   ban:
     log_title: "Benutzer wurde gebannt"
     log_description: "Der Benutzer {target.mention} ({target}) wurde von {moderator} permanent gebannt."
-    successfully_banned: "Der Benutzer wurde erfolgreich für gebannt."
+    successfully_banned: "Der Benutzer wurde erfolgreich gebannt."
     user_message: "Du wurdest vom Server {guild.name} für {reason} permanent gebannt."
   tempban:
     log_title: "Benutzer wurde temporär gebannt"

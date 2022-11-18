@@ -145,7 +145,7 @@ class UserGroup(app_commands.Group):
 
     @app_commands.command(name="about", description="Shows information's about a Discord member.")
     @app_commands.describe(member="The member you want the information about.")
-    async def about(self, interaction: discord.Interaction, member: Optional[discord.Member, discord.User]):
+    async def about(self, interaction: discord.Interaction, member: Optional[Union[discord.Member, discord.User]]):
         """Shows basic information about a user. If no member is provided, the user
         that executed the command will be used.
         """

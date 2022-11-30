@@ -38,7 +38,6 @@ plugins = [
     "extensions.Notification",
     "extensions.Migration",
     "extensions.Statistics",
-    "extensions.AutomodCache",
     "extensions.EmbedCreator",
 ]
 

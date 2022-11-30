@@ -1,14 +1,11 @@
 from __future__ import annotations
 
-import json
 from typing import TYPE_CHECKING
 
-import discord
 import tornado.web
 
 if TYPE_CHECKING:
     from main import Plyoox
-    from extensions.AutomodCache import AutomodCache
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -61,31 +58,11 @@ class TwitchNotifier(BaseHandler):
             await notifications.send_twitch_notification(user_id, user_name)
 
 
-class AutomodState(BaseHandler):
-    async def get(self):
-        guild_id = self.get_argument("guild")
-
-        try:
-            guild_id = int(guild_id)
-        except ValueError:
-            raise tornado.web.HTTPError(status_code=400, log_message="Could not convert guild to integer")
-
-        cache: AutomodCache = self.bot.get_cog("AutomodCache")  # type: ignore
-
-        try:
-            automod_data = await cache.get_automod_rules(guild_id)
-            self.write(json.dumps(automod_data))
-            self.set_status(200)
-        except discord.Forbidden:
-            return self.set_status(403)
-
-
 async def start_webserver(bot: Plyoox):
     web = tornado.web.Application(
         [
             (r"/update/cache", CacheUpdater, {"bot": bot}),
             (r"/notification/twitch", TwitchNotifier, {"bot": bot}),
-            (r"/data/automod", AutomodState, {"bot": bot}),
         ]
     )
 

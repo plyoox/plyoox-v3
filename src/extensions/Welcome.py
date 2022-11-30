@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+from cache import WelcomeModel
 from lib import formatting
 from main import Plyoox
 
@@ -37,19 +38,8 @@ class Welcome(commands.Cog):
                 except discord.Forbidden:
                     pass
 
-        # only add role if the bot has the permissions
-        if cache.join_roles and guild.me.guild_permissions.manage_roles:
-            if member.pending:
-                return
-
-            roles = []
-            for role_id in cache.join_roles:
-                role = guild.get_role(role_id)
-                if role is not None:
-                    roles.append(role)
-
-            if roles:
-                await member.add_roles(*roles, reason="Adding join role")
+        if not member.pending:
+            await self._add_join_roles(cache, member)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
@@ -80,14 +70,18 @@ class Welcome(commands.Cog):
         if before.pending == after.pending:
             return
 
-        guild = before.guild
-        cache = await self.bot.cache.get_welcome(guild.id)
-
+        cache = await self.bot.cache.get_welcome(before.guild.id)
         if cache is None:
             return
 
         if not cache.active or not cache.join_active:
             return
+
+        await self._add_join_roles(cache, after)
+
+    @staticmethod
+    async def _add_join_roles(cache: WelcomeModel, member: discord.Member):
+        guild = member.guild
 
         if cache.join_roles and guild.me.guild_permissions.manage_roles:
             roles = []
@@ -97,7 +91,7 @@ class Welcome(commands.Cog):
                     roles.append(role)
 
             if roles:
-                await after.add_roles(*roles, reason="Adding join role")
+                await member.add_roles(*roles, reason="Adding join role")
 
 
 async def setup(bot: Plyoox):

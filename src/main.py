@@ -47,6 +47,7 @@ class Plyoox(commands.Bot):
     cache: CacheManager
     start_time: datetime
     session: aiohttp.ClientSession
+    imager_url: str | None
 
     def __init__(self):
         intents = discord.Intents(
@@ -69,6 +70,8 @@ class Plyoox(commands.Bot):
             chunk_guilds_at_startup=False,
             help_command=None,
         )
+
+        self.imager_url = os.getenv("IMAGER_URL")
 
     async def setup_hook(self) -> None:
         self.loop.create_task(self._refresh_presence())

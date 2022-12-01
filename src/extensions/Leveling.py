@@ -80,7 +80,6 @@ class Leveling(commands.Cog):
         )
 
         self.bot.tree.add_command(self.ctx_menu)
-        self.imager_url = os.getenv("IMAGER_URL")
 
     level_group = app_commands.Group(
         name="level",
@@ -151,7 +150,7 @@ class Leveling(commands.Cog):
         }
 
         try:
-            async with bot.session.get(f"{self.imager_url}/api/level-card", params=params) as res:
+            async with bot.session.get(f"{self.bot.imager_url}/api/level-card", params=params) as res:
                 if res.status != 200:
                     text = await res.text()
                     _log.warning(f"Received status code {res.status} and data `{text}` while fetching level card.")

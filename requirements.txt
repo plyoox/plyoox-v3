@@ -9,6 +9,4 @@ recordclass~=0.17.2
 python-dateutil~=2.8.2
 tornado~=6.1
 aiolimiter
-uvloop~=0.16.0
-Pillow
-easy-pil~=0.1.9
+uvloop~=0.16.0; platform_system == "Linux"

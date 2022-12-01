@@ -22,7 +22,7 @@ class _AnilistTag(TypedDict):
     name: str
 
 
-class _AnilistRaking(TypedDict):
+class _AnilistRanking(TypedDict):
     type: Literal["POPULAR", "RATED"]
     allTime: bool
 
@@ -53,7 +53,7 @@ class AnilistDetailedResponse(TypedDict):
     season: Literal["WINTER", "SPRING", "SUMMER", "FALL"]
     seasonYear: int
     coverImage: dict[str, str]
-    rankings: list[_AnilistRaking]
+    rankings: list[_AnilistRanking]
     countryOfOrigin: str
     averageScore: int
     meanScore: int

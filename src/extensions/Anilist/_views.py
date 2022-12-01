@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import io
+import logging
 from typing import TYPE_CHECKING
 
+import aiohttp
 import discord
 from discord import ui
 
@@ -11,6 +14,9 @@ from . import _helper
 
 if TYPE_CHECKING:
     from main import Plyoox
+
+
+_log = logging.getLogger(__name__)
 
 
 class SiteBackButton(ui.Button):
@@ -100,9 +106,30 @@ class ViewScoreButton(ui.Button):
 
         await interaction.response.defer()
 
-        image = await bot.loop.run_in_executor(
-            None, _helper.generate_score_image, self.anilist_view.data["stats"]["scoreDistribution"]
-        )
+        params = {
+            "ratings": ",".join(str(_r["amount"]) for _r in self.anilist_view.data["stats"]["scoreDistribution"])
+        }
+
+        try:
+            async with bot.session.get(f"{bot.imager_url}/api/level-card", params=params) as res:
+                if res.status != 200:
+                    text = await res.text()
+                    _log.warning(f"Received status code {res.status} and data `{text}` while fetching anilist rating.")
+
+                    await interaction.response.send_message(
+                        _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
+                    )
+                    return
+
+                fp = io.BytesIO(await res.read())
+                image = discord.File(fp, filename="anilist_score.png")
+        except aiohttp.ClientConnectionError as err:
+            _log.error("Could not fetch anilist score", err)
+
+            await interaction.response.send_message(
+                _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
+            )
+            return
 
         embed = extensions.Embed(
             title=_(lc, "anilist.view.score_title", title=self.anilist_view.data["title"]["romaji"]),

@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 
-import discord.utils
+import discord
 from dotenv import load_dotenv
 
 if sys.platform == "linux":

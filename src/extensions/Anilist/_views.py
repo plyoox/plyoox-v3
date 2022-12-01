@@ -111,12 +111,12 @@ class ViewScoreButton(ui.Button):
         }
 
         try:
-            async with bot.session.get(f"{bot.imager_url}/api/level-card", params=params) as res:
+            async with bot.session.get(f"{bot.imager_url}/api/anilist-rating", params=params) as res:
                 if res.status != 200:
                     text = await res.text()
                     _log.warning(f"Received status code {res.status} and data `{text}` while fetching anilist rating.")
 
-                    await interaction.response.send_message(
+                    await interaction.followup.send(
                         _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
                     )
                     return
@@ -126,7 +126,7 @@ class ViewScoreButton(ui.Button):
         except aiohttp.ClientConnectionError as err:
             _log.error("Could not fetch anilist score", err)
 
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
             )
             return

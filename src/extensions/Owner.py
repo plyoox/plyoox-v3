@@ -28,7 +28,7 @@ class Owner(commands.Cog):
         self.bot = bot
 
     async def cog_command_error(self, ctx: commands.Context, error):
-        await ctx.send(error)
+        await ctx.send((str(error)))
 
     @staticmethod
     async def _git_pull():

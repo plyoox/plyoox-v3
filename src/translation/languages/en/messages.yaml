@@ -126,12 +126,12 @@ moderation:
   ban:
     log_title: "Member has been banned"
     log_description: "The user {target.mention} ({target}) has been banned by {moderator}."
-    successfully_banned: "Der user was successfully banned."
+    successfully_banned: "The user was successfully banned."
     user_message: "You have been banned from {guild.name} for {reason}."
   tempban:
     log_title: "Member has been temporary banned"
     log_description: "The user {target.mention} ({target}) has been temporarily banned by {moderator}."
-    successfully_banned: "Der user was successfully banned."
+    successfully_banned: "The user was successfully banned."
     too_long: "The specified period is too long. A maximum of 1 year is possible."
     user_message: "You have been banned from {guild.name} for {reason} until {timestamp}."
   tempmute:

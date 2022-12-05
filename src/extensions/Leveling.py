@@ -153,12 +153,12 @@ class Leveling(commands.Cog):
                 if res.status != 200:
                     text = await res.text()
                     _log.warning(f"Received status code {res.status} and data `{text}` while fetching level card.")
-                    
+
                     await interaction.response.send_message(
                         _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
                     )
                     return
-                    
+
                 fp = io.BytesIO(await res.read())
                 image = discord.File(fp, filename="level_card.png")
 

@@ -114,7 +114,7 @@ class Leveling(commands.Cog):
     async def _view_rank(
         self, interaction: discord.Interaction, *, member: discord.Member = None, ephemeral: bool = False
     ):
-        if self.imager_url is None:
+        if self.bot.imager_url is None:
             _log.warning("No imager url given set, aborting...")
 
             await interaction.response.send_message(

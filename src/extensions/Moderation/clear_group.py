@@ -14,11 +14,11 @@ LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
 
 
 class CooldownByInteraction(commands.CooldownMapping):
-    def _bucket_key(self, interaction: discord.Interaction) -> tuple[int, int]:
-        return interaction.guild_id, interaction.user.id
+    def _bucket_key(self, interaction: discord.Interaction) -> tuple[int, int, int]:
+        return interaction.guild_id, interaction.user.id, interaction.channel.id
 
 
-_cooldown_by_user = CooldownByInteraction.from_cooldown(3, 60, commands.BucketType.member)
+_cooldown_by_user = CooldownByInteraction.from_cooldown(1, 15, commands.BucketType.member)
 
 
 @app_commands.checks.bot_has_permissions(manage_messages=True)

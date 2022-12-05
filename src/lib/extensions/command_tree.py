@@ -1,10 +1,12 @@
-import traceback
+import logging
 
 import discord
 from discord import app_commands
 
 from lib import errors
 from translation import _
+
+_log = logging.getLogger(__name__)
 
 
 class CommandTree(app_commands.CommandTree):
@@ -28,4 +30,17 @@ class CommandTree(app_commands.CommandTree):
                 ephemeral=True,
             )
         else:
-            traceback.print_exc()
+            if isinstance(interaction.command, app_commands.Command):
+                namespace = [interaction.command.name]
+                command = interaction.command
+
+                for _i in range(2):
+                    if getattr(command, "parent", None):
+                        namespace.append(command.parent.name)
+                        command = command.parent
+
+                namespace.reverse()
+
+                _log.error(f"Ignoring exception in command `{' '.join(namespace)}`", exc_info=error)
+            elif isinstance(interaction.command, app_commands.ContextMenu):
+                _log.error(f"Ignoring exception in context menu `{interaction.command.name}`", exc_info=error)

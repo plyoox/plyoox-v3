@@ -88,9 +88,6 @@ class Plyoox(commands.Bot):
         logger.info("Ready")
         self.start_time = utils.utcnow()
 
-    async def on_command_error(self, context, exception) -> None:
-        pass
-
     async def _create_db_pool(self) -> None:
         try:
             self.db = await asyncpg.create_pool(os.getenv("POSTGRES_DSN"), init=database._init_db_connection)

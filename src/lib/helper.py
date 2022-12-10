@@ -58,6 +58,8 @@ def get_badges(flags: discord.PublicUserFlags) -> list[str]:
         flag_list.append(emojis.botdev)
     if flags.bug_hunter_level_2:
         flag_list.append(emojis.bughunter2)
+    if flags.active_developer:
+        flag_list.append(emojis.active_developer)
 
     return flag_list
 

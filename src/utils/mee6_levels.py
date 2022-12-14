@@ -21,6 +21,8 @@ async def get_level():
             async with session.get(LEVEL_API_URL + str(counter)) as res:
                 data = await res.json()
                 users = data["players"]
+                if not users:
+                    break
 
                 counter += 1
 
@@ -39,7 +41,7 @@ async def main():
     await get_level()
     print(len(user_list))
 
-    with open("users.json_files", "w") as f:
+    with open("users.json", "w") as f:
         json.dump(user_list, fp=f)
 
 

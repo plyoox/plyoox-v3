@@ -116,8 +116,9 @@ class Owner(commands.Cog):
 
         async with self.bot.db.acquire() as con:
             async with con.transaction():
+                await con.execute("DELETE FROM leveling_users WHERE guild_id = $1", guild_id)
+
                 for user in users:
-                    await con.execute("DELETE FROM leveling_users WHERE guild_id = $1", guild_id)
                     await con.execute(
                         "INSERT INTO leveling_users (guild_id, user_id, xp) VALUES ($1, $2, $3)",
                         guild_id, user["uid"], user["xp"]

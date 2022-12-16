@@ -124,6 +124,7 @@ moderation:
     success_title: "Clear - Ergebnis"
     deleted_messages: "Gelöschte Nachrichten"
     affected_users: "Betroffene Mitglieder"
+    messages_to_old: "Bots können keine Nachrichten löschen, die älter als 14 Tage sind."
   ban:
     log_title: "Benutzer wurde gebannt"
     log_description: "Der Benutzer {target.mention} ({target}) wurde von {moderator} permanent gebannt."

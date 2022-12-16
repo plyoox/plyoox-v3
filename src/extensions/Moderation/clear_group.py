@@ -1,5 +1,7 @@
+import asyncio
 import re
-from typing import Optional
+import time
+from typing import Optional, Callable, Union
 
 import discord
 from discord import app_commands
@@ -7,7 +9,6 @@ from discord.ext import commands
 
 from lib import extensions
 from translation import _
-
 
 _T = app_commands.locale_str
 LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
@@ -18,7 +19,7 @@ class CooldownByInteraction(commands.CooldownMapping):
         return interaction.guild_id, interaction.user.id, interaction.channel.id
 
 
-_cooldown_by_user = CooldownByInteraction.from_cooldown(1, 15, commands.BucketType.member)
+_cooldown_by_channel = CooldownByInteraction.from_cooldown(1, 15, commands.BucketType.channel)
 
 
 @app_commands.checks.bot_has_permissions(manage_messages=True)
@@ -32,7 +33,7 @@ class ClearGroup(app_commands.Group):
         )
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        bucket = _cooldown_by_user.get_bucket(interaction)
+        bucket = _cooldown_by_channel.get_bucket(interaction)
         if bucket is None:
             return True
 
@@ -43,15 +44,57 @@ class ClearGroup(app_commands.Group):
         raise app_commands.CommandOnCooldown(bucket, retry_after)
 
     @staticmethod
-    async def do_removal(interaction: discord.Interaction, limit, *, reason, predicate):
+    async def _purge_helper(
+        channel: Union[discord.TextChannel],
+        *,
+        limit: Optional[int] = 100,
+        check: Callable[[discord.Message], bool],
+        reason: Optional[str] = None,
+    ) -> list[discord.Message]:
+
+        oldest_message_id = int((time.time() - 14 * 24 * 60 * 60) * 1000.0 - 1420070400000) << 22
+
+        iterator = channel.history(limit=limit, after=discord.Object(id=oldest_message_id))
+        ret: list[discord.Message] = []
+        count = 0
+
+        async for message in iterator:
+            if count == 100:
+                to_delete = ret[-100:]
+                await channel.delete_messages(to_delete, reason=reason)
+                count = 0
+                await asyncio.sleep(1)
+
+            if not check(message):
+                continue
+
+            count += 1
+            ret.append(message)
+
+        if count >= 2:
+            to_delete = ret[-count:]
+            await channel.delete_messages(to_delete, reason=reason)
+        elif count == 1:
+            await ret[-1].delete()
+
+        return ret
+
+    async def do_removal(
+        self, interaction: discord.Interaction, limit: int, *, reason: str, predicate: Callable[[discord.Message], bool]
+    ):
         """This function is a helper to clear messages in an interaction channel.
         predicate must be a function (lambda) to specify the messages the bot should remove"""
         channel: discord.TextChannel = interaction.channel  # type: ignore
         lc = interaction.locale
 
         # delete the messages
-        deleted_messages = await channel.purge(limit=limit, check=predicate, reason=reason)
+        deleted_messages = await self._purge_helper(channel, limit=limit, check=predicate, reason=reason)
         deleted_count = len(deleted_messages)
+
+        if deleted_count == 0:
+            await interaction.followup.send(_(lc, "moderation.clear.messages_to_old"))
+            return
+
         affected_users = set(m.author.id for m in deleted_messages)  # list of affected users
 
         embed = extensions.Embed(title=_(lc, "moderation.clear.success_title"))
@@ -122,7 +165,9 @@ class ClearGroup(app_commands.Group):
         self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]
     ):
         await interaction.response.defer(ephemeral=True)
-        await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: LINK_REGEX.search(m.content))
+        await self.do_removal(
+            interaction, amount, reason=reason, predicate=lambda m: bool(LINK_REGEX.search(m.content))
+        )
 
     @app_commands.command(name="files", description="Deletes all messages that contains files.")
     @app_commands.describe(
@@ -133,4 +178,4 @@ class ClearGroup(app_commands.Group):
         self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]
     ):
         await interaction.response.defer(ephemeral=True)
-        await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: len(m.attachments))
+        await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: bool(len(m.attachments)))

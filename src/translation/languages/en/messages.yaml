@@ -123,6 +123,7 @@ moderation:
     success_title: "Messages cleared"
     deleted_messages: "Deleted messages"
     affected_users: "Affected users"
+    messages_to_old: "Bots cannot purge messages older than 14 days."
   ban:
     log_title: "Member has been banned"
     log_description: "The user {target.mention} ({target}) has been banned by {moderator}."

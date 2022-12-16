@@ -22,7 +22,6 @@ LOGGING_COLORS = {
     logging.DEBUG: discord.Color.dark_gray(),
 }
 
-
 RESUME_REGEX = re.compile("Shard ID (\d|None) has successfully RESUMED session.+")
 
 
@@ -75,8 +74,8 @@ class EventHandlerCog(commands.Cog):
             )
 
             if record.exc_info:
-                errType, errValue, errTraceback = record.exc_info
-                embed.description = f"{record.message}: ```py\n{''.join(traceback.format_exception(errType, errValue, errTraceback))}```"
+                err_type, err_value, err_traceback = record.exc_info
+                embed.description = f"{record.message}: ```py\n{''.join(traceback.format_exception(err_type, err_value, err_traceback))}```"
             else:
                 embed.description = record.message
 

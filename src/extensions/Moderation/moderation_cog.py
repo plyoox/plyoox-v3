@@ -337,8 +337,9 @@ class Moderation(commands.Cog):
             await interaction.response.send_message(_(lc, "moderation.invite_info.invalid_invite"), ephemeral=True)
             return
 
-        invite = await self.bot.fetch_invite(invite, with_counts=True, with_expiration=True)
-        if invite is None:
+        try:
+            invite = await self.bot.fetch_invite(invite, with_counts=True, with_expiration=True)
+        except discord.NotFound:
             await interaction.response.send_message(_(lc, "moderation.invite_info.not_found"), ephemeral=True)
             return
 
@@ -357,8 +358,9 @@ class Moderation(commands.Cog):
             )
             return
 
-        invite = await self.bot.fetch_invite(invites[0][-1], with_expiration=True, with_counts=True)
-        if invite is None:
+        try:
+            invite = await self.bot.fetch_invite(invites[0][-1], with_expiration=True, with_counts=True)
+        except discord.NotFound:
             await interaction.response.send_message(_(lc, "moderation.invite_info.not_found"), ephemeral=True)
             return
 

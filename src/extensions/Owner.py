@@ -33,7 +33,9 @@ class Owner(commands.Cog):
     @staticmethod
     async def _git_pull():
         proc = await asyncio.create_subprocess_shell(
-            "git pull origin main --no-rebase", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+            "git pull https://github.com/plyoox/plyoox-v3.git main --no-rebase",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
         )
 
         return await proc.communicate()
@@ -121,7 +123,9 @@ class Owner(commands.Cog):
                 for user in users:
                     await con.execute(
                         "INSERT INTO leveling_users (guild_id, user_id, xp) VALUES ($1, $2, $3)",
-                        guild_id, user["uid"], user["xp"]
+                        guild_id,
+                        user["uid"],
+                        user["xp"],
                     )
 
         await ctx.send("Level gespeichert")

@@ -130,7 +130,7 @@ class Owner(commands.Cog):
 
         await ctx.send("Level gespeichert")
 
-    @commands.command(name="execute")
+    @commands.command(name="execute", aliases=["exec"])
     @commands.is_owner()
     async def execute(self, ctx: commands.Context, *, code: str):
         env = {

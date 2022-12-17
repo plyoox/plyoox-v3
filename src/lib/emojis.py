@@ -1,10 +1,6 @@
 hypesquad_balance = "<:balance:820728032775372821>"
 hypesquad_brilliance = "<:brilliance:820728032590692373>"
 hypesquad_bravery = "<:bravery:820728032817709107>"
-booster = "<:booster:703906501382766612>"
-booster2 = "<:booster2:703906512246145044>"
-booster3 = "<:booster3:703906523092484177>"
-booster4 = "<:booster4:703906534534414346>"
 
 early_supporter = "<:supporter:703906781859938364>"
 partner = "<:partner:703906812348334130>"

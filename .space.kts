@@ -9,7 +9,6 @@ job("Build and push Docker") {
         dockerBuildPush {
             file = "Dockerfile"
             labels["vendor"] = "Plyoox"
-            args["HTTP_PROXY"] = "http://10.20.30.1:123"
 
             val spaceRepo = "plyoox.registry.jetbrains.space/p/plyoox/plyoox/bot"
             // image tags for 'docker push'

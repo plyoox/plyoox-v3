@@ -54,7 +54,7 @@ class ClearGroup(app_commands.Group):
 
         oldest_message_id = int((time.time() - 14 * 24 * 60 * 60) * 1000.0 - 1420070400000) << 22
 
-        iterator = channel.history(limit=limit, after=discord.Object(id=oldest_message_id))
+        iterator = channel.history(limit=limit, after=discord.Object(id=oldest_message_id), oldest_first=False)
         ret: list[discord.Message] = []
         count = 0
 

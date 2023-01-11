@@ -294,17 +294,18 @@ class Automod(commands.Cog):
         else:
             self.punished_members[(member.id, member.guild.id)] = True
 
-        await _logging.automod_final_log(self.bot, member, action.action)  # type: ignore
-
         if action.action == AutomodFinalActionEnum.kick:
             if guild.me.guild_permissions.kick_members:
+                await _logging.automod_final_log(self.bot, member, action.action)  # type: ignore
                 await guild.kick(member, reason=_(lc, "automod.final.reason"))
         elif action.action == AutomodFinalActionEnum.ban:
+            await _logging.automod_final_log(self.bot, member, action.action)  # type: ignore
             if guild.me.guild_permissions.ban_members:
                 await guild.ban(member, reason=_(lc, "automod.final.reason"))
         elif action.action == AutomodFinalActionEnum.tempban:
             if guild.me.guild_permissions.ban_members:
                 banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
+                await _logging.automod_final_log(self.bot, member, action.action, until=banned_until)  # type: ignore
 
                 timers = self.bot.timer
                 if timers is not None:
@@ -320,6 +321,8 @@ class Automod(commands.Cog):
         elif action.action == AutomodActionEnum.tempmute:
             if guild.me.guild_permissions.mute_members:
                 muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
+                await _logging.automod_final_log(self.bot, member, action.action, until=muted_until)  # type: ignore
+
                 await member.timeout(muted_until)
 
     async def _execute_discord_automod(self, data: AutomodActionData, message: discord.Message = None) -> None:

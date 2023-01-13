@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import asyncio
 import contextlib
 import importlib
 import io
 import json
-import re
 import textwrap
 import traceback
 from typing import TYPE_CHECKING, Literal, Optional
@@ -20,25 +18,12 @@ if TYPE_CHECKING:
     from main import Plyoox
 
 
-GIT_PULL_REGEX = re.compile(r"src/extensions/([A-Z][a-z]+)(.py|/.+)")
-
-
 class Owner(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
     async def cog_command_error(self, ctx: commands.Context, error):
         await ctx.send((str(error)))
-
-    @staticmethod
-    async def _git_pull():
-        proc = await asyncio.create_subprocess_shell(
-            "git pull https://github.com/plyoox/plyoox-v3.git main --no-rebase",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-
-        return await proc.communicate()
 
     @commands.group(name="extension")
     @commands.is_owner()
@@ -216,54 +201,6 @@ class Owner(commands.Cog):
                 ret += 1
 
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
-
-    @commands.group()
-    @commands.is_owner()
-    async def git(self, ctx: commands.Context):
-        pass
-
-    @git.command(name="config")
-    @commands.is_owner()
-    async def git_config(self, ctx: commands.Context):
-        await asyncio.create_subprocess_shell(
-            'git config --global url."https://gitlab.com/".insteadOf git@gitlab.com:',
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-        )
-
-        await ctx.message.add_reaction("✅")
-
-    @git.command(name="pull")
-    @commands.is_owner()
-    async def git_pull(self, ctx: commands.Context):
-        stdout, stderr = await self._git_pull()
-
-        if stderr:
-            await ctx.send(f"Error: ```{stderr.decode()}```")
-        if stdout:
-            await ctx.send(stdout.decode())
-
-    @git.command(name="update-extensions")
-    async def git_update_extensions(self, ctx: commands.Context):
-        stdout, stderr = await self._git_pull()
-
-        response = ""
-
-        if stdout:
-            out = stdout.decode()
-            modules = GIT_PULL_REGEX.findall(out)
-
-            for module in modules:
-                try:
-                    await self.bot.reload_extension(f"extensions.{module[0]}")
-                    response += f"Reloaded module `extensions.{module[0]}`\n\n"
-                except Exception as e:
-                    response += f"```py\n{e}{traceback.format_exc()}\n\n```"
-
-            response += out
-
-        for index in range(0, len(response), 2000):
-            await ctx.send(response[index : index + 2000])
 
 
 async def setup(bot: Plyoox):

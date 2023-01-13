@@ -212,7 +212,7 @@ class LoggingEvents(commands.Cog):
                 embeds.append(old_message_embed)
         else:
             edit_member_id = payload.data["author"]["id"]
-            user_name = payload.data["author"]["id"]
+            user_name = payload.data["author"]["username"]
             user_discriminator = payload.data["author"]["discriminator"]
             user_avatar = payload.data["author"].get("avatar", int(user_discriminator) % len(discord.DefaultAvatar))
 

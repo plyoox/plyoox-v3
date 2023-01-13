@@ -57,7 +57,6 @@ class Plyoox(commands.Bot):
             guilds=True,
             members=True,
             auto_moderation_execution=True,
-            auto_moderation_configuration=True,
         )
         allowed_mentions = discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=True)
 

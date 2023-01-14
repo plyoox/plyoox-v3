@@ -45,8 +45,17 @@ async def generate_db():
 
 
 async def main():
+    import signal
+    import yarl
+
     import web_server
     from main import Plyoox
+
+    if gateway_url := os.getenv("GATEWAY_URL"):
+        from discord.gateway import DiscordWebSocket
+
+        logger.info(f"Using own gateway url: {gateway_url}")
+        DiscordWebSocket.DEFAULT_GATEWAY = yarl.URL(gateway_url)
 
     bot = Plyoox()
 
@@ -55,6 +64,7 @@ async def main():
     await web_server.start_webserver(bot)
 
     async with bot:
+        bot.loop.add_signal_handler(signal.SIGTERM, lambda: bot.loop.create_task(bot.close()))
         await bot.start(os.getenv("DISCORD_TOKEN"))
 
 

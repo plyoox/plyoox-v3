@@ -110,6 +110,11 @@ class Plyoox(commands.Bot):
             await self.change_presence(status=status, activity=activity)
             await asyncio.sleep(60 * 60 * 12)  # 12 hours
 
+    async def close(self):
+        logger.info("Stopping bot...")
+        await super().close()
+        logger.info("Plyoox has been successfully stopped.")
+
     @property
     def timer(self) -> Timer | None:
         return self.get_cog("Timer")

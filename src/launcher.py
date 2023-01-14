@@ -64,7 +64,8 @@ async def main():
     await web_server.start_webserver(bot)
 
     async with bot:
-        bot.loop.add_signal_handler(signal.SIGTERM, lambda: bot.loop.create_task(bot.close()))
+        if sys.platform == "linux":
+            bot.loop.add_signal_handler(signal.SIGTERM, lambda: bot.loop.create_task(bot.close()))
         await bot.start(os.getenv("DISCORD_TOKEN"))
 
 

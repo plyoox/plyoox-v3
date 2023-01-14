@@ -42,7 +42,7 @@ plugins = [
 ]
 
 
-class Plyoox(commands.Bot):
+class Plyoox(commands.AutoShardedBot):
     db: asyncpg.Pool
     cache: CacheManager
     start_time: datetime
@@ -73,8 +73,6 @@ class Plyoox(commands.Bot):
         self.imager_url = os.getenv("IMAGER_URL")
 
     async def setup_hook(self) -> None:
-        self.loop.create_task(self._refresh_presence())
-
         await self.tree.set_translator(extensions.Translator())
 
         for plugin in plugins:
@@ -98,17 +96,6 @@ class Plyoox(commands.Bot):
 
     async def _create_http_client(self) -> None:
         self.session = aiohttp.ClientSession()
-
-    async def _refresh_presence(self) -> None:
-        while True:
-            if not self.is_ready():
-                await asyncio.sleep(30)
-
-            activity = discord.Activity(name="plyoox.net", type=discord.ActivityType.listening)
-            status = discord.Status.online
-
-            await self.change_presence(status=status, activity=activity)
-            await asyncio.sleep(60 * 60 * 12)  # 12 hours
 
     async def close(self):
         logger.info("Stopping bot...")

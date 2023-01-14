@@ -1,4 +1,4 @@
-FROM python:3.10 AS builder
+FROM python:3.11 AS builder
 
 WORKDIR /usr/app
 
@@ -8,13 +8,12 @@ ENV PATH="/usr/app/venv/bin:$PATH"
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 WORKDIR /usr/app
 
 COPY --from=builder /usr/app /usr/app
 COPY ./src ./src
-COPY .git .git
 
 ENV PATH="/usr/app/venv/bin:$PATH"
 

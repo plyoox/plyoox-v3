@@ -169,7 +169,7 @@ class Automod(commands.Cog):
                 try:
                     fetched_invite = await self._fetch_invite(invite)
 
-                    if fetched_invite is not None and (
+                    if fetched_invite is not False and (
                         fetched_invite.guild.id == guild.id or fetched_invite.guild.id in cache.invite_allowed
                     ):
                         continue
@@ -220,7 +220,7 @@ class Automod(commands.Cog):
             await self._handle_action(message, cache.caps_actions, "caps")
             return
 
-    async def _fetch_invite(self, code: str) -> discord.Invite | None:
+    async def _fetch_invite(self, code: str) -> discord.Invite | False:
         if (invite := self.invite_cache.get(code)) is not None:
             return invite
 

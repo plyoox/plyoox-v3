@@ -300,7 +300,6 @@ logging:
     description: "There were {count} messages deleted from {channel}."
 anilist:
   score: "Rating"
-  cog_not_loaded: "An internal error has occurred (plugin not loaded)."
   rate_limit: "The rate limit of the API has been reached. Please try again later."
   search:
     no_result: "No result found."

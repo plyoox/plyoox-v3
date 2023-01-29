@@ -50,12 +50,24 @@ class TwitchNotifier(BaseHandler):
     async def get(self):
         user_id = self.get_argument("user_id")
         user_name = self.get_argument("user_name")
+        viewer_count = self.get_argument("viewer_count")
+        game_name = self.get_argument("game_name")
+        started_at = self.get_argument("started_at")
+        thumbnail_url = self.get_argument("thumbnail_url")
+        title = self.get_argument("title")
+
+        stream_data = {
+            "viewer_count": viewer_count,
+            "game_name": game_name,
+            "started_at": started_at,
+            "thumbnail_url": thumbnail_url,
+            "title": title,
+            "user_name": user_name,
+        }
 
         self.set_status(200)
 
-        notifications = self.bot.notification
-        if notifications is not None:
-            await notifications.send_twitch_notification(user_id, user_name)
+        await self.bot.notification.send_twitch_notification(user_id, stream_data)
 
 
 async def start_webserver(bot: Plyoox):

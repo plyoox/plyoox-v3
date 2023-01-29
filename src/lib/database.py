@@ -175,14 +175,12 @@ class TwitchNotifications(Base):
 class TwitchUsers(Base):
     __tablename__ = "twitch_users"
 
-    id = _Column(pg.INTEGER, primary_key=True)
+    id = _Column(pg.INTEGER, primary_key=True, autoincrement=False)
     username = _Column(pg.VARCHAR(length=32), nullable=False)
-    discord_id = _Column(pg.BIGINT, nullable=False)
     avatar = _Column(pg.VARCHAR(length=128))
     eventsub_id = _Column(pg.VARCHAR(length=64), nullable=False)
 
 
-# Only base columns that are needed for the bot to function.
 class GuildConfig(Base):
     __tablename__ = "guild_config"
 

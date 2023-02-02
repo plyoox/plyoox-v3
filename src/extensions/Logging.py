@@ -262,7 +262,7 @@ class LoggingEvents(commands.Cog):
             name=_(lc, "logging.message_delete.title"), icon_url=member.display_avatar if member else None
         )
 
-        if message is not None:
+        if message is not None and isinstance(member, discord.Member):
             # do not log empty messages
             if not message.content and not message.attachments:
                 return

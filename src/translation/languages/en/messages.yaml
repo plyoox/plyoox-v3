@@ -326,7 +326,7 @@ notifications:
   game: "Game"
   started_at: "Stream started at"
 disable-migration-notification:
-  successfully_disabled: "The messages has been disabled."
+  successfully_disabled: "The message has been disabled."
 embed-creator:
   new_embed: "Embed {index}"
   remove_embed_select: "Select embed to remove..."

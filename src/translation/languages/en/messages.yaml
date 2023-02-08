@@ -35,7 +35,7 @@ errors:
   guild_only: "This command can only be used in a guild."
   owner_only: "This command can only be used by the owner of the bot."
   module_disabled: "The module {module} is deactivated on this guild."
-  bot_missing_permission: "The bot needs the following permission to execute this command: {permissions}"
+  bot_missing_permissions: "The bot needs the following permission to execute this command: {permissions}"
   command_on_cooldown: "This command is on cooldown. Please try again in {retry_after} seconds."
 user_info:
   joined:

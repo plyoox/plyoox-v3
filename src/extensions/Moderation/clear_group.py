@@ -22,7 +22,6 @@ class CooldownByInteraction(commands.CooldownMapping):
 _cooldown_by_channel = CooldownByInteraction.from_cooldown(1, 15, commands.BucketType.channel)
 
 
-@app_commands.checks.bot_has_permissions(manage_messages=True)
 class ClearGroup(app_commands.Group):
     def __init__(self):
         super().__init__(
@@ -33,6 +32,9 @@ class ClearGroup(app_commands.Group):
         )
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if not interaction.app_permissions.manage_messages:
+            raise app_commands.BotMissingPermissions(["manage_messages"])
+
         bucket = _cooldown_by_channel.get_bucket(interaction)
         if bucket is None:
             return True

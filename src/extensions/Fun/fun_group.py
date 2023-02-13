@@ -127,9 +127,10 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
     async def cry(self, interaction: discord.Interaction):
         lc = interaction.locale
 
-        await interaction.response.send_message(
-            f"{_(lc, 'fun.cry', user=interaction.user)} {random.choice(self.gifs['cry'])}"
-        )
+        embed = extensions.Embed(description=_(lc, "fun.cry", user=interaction.user))
+        embed.set_image(url=random.choice(self.gifs["cry"]))
+
+        await interaction.response.send_message(embed=embed)
 
     @app_commands.command(name="hug", description="Hugs a user.")
     @app_commands.describe(member="The user to hug.")
@@ -142,6 +143,7 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
             )
             return
 
-        await interaction.response.send_message(
-            f"{_(lc, 'fun.hug', user=interaction.user, target=member)} {random.choice(self.gifs['hug'])}"
-        )
+        embed = extensions.Embed(description=_(lc, "fun.hug", user=interaction.user, target=member))
+        embed.set_image(url=random.choice(self.gifs["hug"]))
+
+        await interaction.response.send_message(embed=embed)

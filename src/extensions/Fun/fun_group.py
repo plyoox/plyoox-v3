@@ -114,14 +114,22 @@ class Fun(commands.GroupCog, group_name="fun", group_description="Provides fun c
 
     @app_commands.command(name="dog", description="Shows a random dog.")
     async def dog(self, interaction: discord.Interaction):
-        async with self.bot.session.get("https://random.dog/woof") as resp:
-            if resp.status != 200:
-                await interaction.response.send_message("No dog found :(")
-                return
+        await interaction.response.defer()
 
-            filename = await resp.text()
-            url = f"https://random.dog/{filename}"
-            await interaction.response.send_message(embed=discord.Embed().set_image(url=url))
+        for _ in range(3):
+            async with self.bot.session.get("https://random.dog/woof") as resp:
+                if resp.status != 200:
+                    await interaction.followup.send("No dog found :(")
+                    return
+
+                filename = await resp.text()
+
+                if not filename.endswith(".mp4"):
+                    url = f"https://random.dog/{filename}"
+                    await interaction.followup.send(embed=discord.Embed().set_image(url=url))
+                    return
+
+        await interaction.followup.send("No dog found :(")
 
     @app_commands.command(name="cry", description="Cries.")
     async def cry(self, interaction: discord.Interaction):

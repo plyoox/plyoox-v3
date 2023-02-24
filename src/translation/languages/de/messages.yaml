@@ -300,7 +300,6 @@ logging:
     description: "Es wurden {count} Nachrichten aus {channel} gelöscht."
 anilist:
   score: "Bewertung"
-  cog_not_loaded: "Ein interner Fehler ist aufgetreten (Plugin nicht geladen)."
   rate_limit: "Das Ratelimit der API wurde erreicht. Bitte versuche es später erneut."
   search:
     no_result: "Kein Ergebnis gefunden."

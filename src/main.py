@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
 import sys
@@ -47,7 +46,8 @@ class Plyoox(commands.AutoShardedBot):
     cache: CacheManager
     start_time: datetime
     session: aiohttp.ClientSession
-    imager_url: str | None
+    imager_url: str
+    notificator_url: str
 
     def __init__(self):
         intents = discord.Intents(
@@ -71,6 +71,15 @@ class Plyoox(commands.AutoShardedBot):
         )
 
         self.imager_url = os.getenv("IMAGER_URL")
+        if self.imager_url is None:
+            plugins.remove("plugins.Leveling")
+            plugins.remove("plugins.Anilist")
+            logger.warning("IMAGER_URL is not set. Level and Anilist extension will not be loaded.")
+
+        self.notificator_url = os.getenv("NOTIFICATOR_URL")
+        if self.notificator_url is None:
+            plugins.remove("plugins.Notification")
+            logger.warning("NOTIFICATOR_URL is not set. Notification extension will not be loaded.")
 
     async def setup_hook(self) -> None:
         await self.tree.set_translator(extensions.Translator())

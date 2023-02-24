@@ -73,11 +73,6 @@ def generate_search_embed(
 
 async def paginate_search(interaction: discord.Interaction, view: _views.AnilistSearchView) -> None:
     bot: Plyoox = interaction.client  # type: ignore
-    if bot.anilist is None:
-        await interaction.response.send_message(_(interaction.locale, "anilist.cog_not_loaded"))
-        _log.warning("Anilist cog not loaded")
-        return
-
     await interaction.response.defer()
 
     data = await bot.anilist._fetch_query(query=queries.SEARCH_QUERY, page=view.current_page, search=view.query)

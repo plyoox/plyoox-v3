@@ -157,7 +157,7 @@ class Timers(Base):
     id = _Column(pg.INTEGER, primary_key=True, autoincrement=True)
     guild_id = _Column(pg.BIGINT, nullable=False)
     target_id = _Column(pg.BIGINT, nullable=False)
-    type = _Column(pg.ENUM(enums.TimerEnum), nullable=False)
+    type = _Column(pg.ENUM(enums.TimerEnum, name="timer_type"), nullable=False)
     expires = _Column(pg.TIMESTAMP(timezone=True), nullable=False)
     data = _Column(pg.JSON)
 
@@ -189,7 +189,9 @@ class GuildConfig(Base):
     id = _Column(pg.BIGINT, primary_key=True)
     slash_migration = _Column(pg.BOOLEAN, server_default=True)
     premium_until = _Column(pg.TIMESTAMP(timezone=True))
-    helper_permission = _Column(pg.ENUM(enums.HelperPermissionEnum), server_default=enums.HelperPermissionEnum.none)
+    helper_permission = _Column(
+        pg.ENUM(enums.HelperPermissionEnum, name="helper_permission"), server_default=enums.HelperPermissionEnum.none
+    )
 
 
 class CommandStatistics(Base):

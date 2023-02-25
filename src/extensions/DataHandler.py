@@ -114,11 +114,10 @@ async def setup(bot: Plyoox):
     webhook_id = os.getenv("LOGGING_WEBHOOK_ID")
     webhook_token = os.getenv("LOGGING_WEBHOOK_TOKEN")
 
-    if webhook_id is not None and webhook_token is not None:
+    if not webhook_id and not webhook_token:
         webhook = discord.Webhook.partial(int(webhook_id), webhook_token, session=bot.session)
 
     cog = EventHandlerCog(bot, webhook)
-
     if webhook is not None:
         logging.getLogger().addHandler(DiscordNotificationLoggingHandler(cog))
 

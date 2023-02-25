@@ -72,13 +72,13 @@ class Plyoox(commands.AutoShardedBot):
 
         self.imager_url = os.getenv("IMAGER_URL")
         if self.imager_url is None:
-            plugins.remove("plugins.Leveling")
-            plugins.remove("plugins.Anilist")
+            plugins.remove("extensions.Leveling")
+            plugins.remove("extensions.Anilist")
             logger.warning("IMAGER_URL is not set. Level and Anilist extension will not be loaded.")
 
         self.notificator_url = os.getenv("NOTIFICATOR_URL")
         if self.notificator_url is None:
-            plugins.remove("plugins.Notification")
+            plugins.remove("extensions.Notification")
             logger.warning("NOTIFICATOR_URL is not set. Notification extension will not be loaded.")
 
     async def setup_hook(self) -> None:

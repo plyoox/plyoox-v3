@@ -32,8 +32,8 @@ class ClearGroup(app_commands.Group):
         )
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
-        if not interaction.app_permissions.manage_messages:
-            raise app_commands.BotMissingPermissions(["manage_messages"])
+        if not interaction.app_permissions.manage_messages or not interaction.app_permissions.read_message_history:
+            raise app_commands.BotMissingPermissions(["manage_messages", "read_message_history"])
 
         bucket = _cooldown_by_channel.get_bucket(interaction)
         if bucket is None:

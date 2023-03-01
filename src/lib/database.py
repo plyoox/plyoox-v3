@@ -54,7 +54,7 @@ class Leveling(Base):
     no_xp_channels = _Column(pg.ARRAY(sql.BIGINT))
     no_xp_role = _Column(pg.BIGINT)
     remove_roles = _Column(pg.BOOLEAN, server_default=False)
-    booster_xp_multiplicator = _Column(pg.SMALLINT)
+    booster_xp_multiplicator = _Column(pg.REAL)
 
 
 class LevelingUsers(Base):

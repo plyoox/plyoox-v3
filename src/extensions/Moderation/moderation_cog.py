@@ -188,7 +188,7 @@ class Moderation(commands.Cog):
         if not await Moderation._can_execute_on(interaction, member):
             return
 
-        await interaction.followup.defer(ephemeral=True)
+        await interaction.response.defer(ephemeral=True)
         await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="kick")
         await guild.kick(member, reason=reason)
 

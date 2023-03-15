@@ -50,7 +50,7 @@ class Leveling(Base):
     active = _Column(pg.BOOLEAN, server_default=False)
     channel = _Column(pg.BIGINT)
     message = _Column(pg.VARCHAR(length=2000))
-    roles = _Column(pg.ARRAY(sql.BIGINT))
+    roles = _Column(pg.ARRAY(sql.BIGINT, dimensions=2))
     no_xp_channels = _Column(pg.ARRAY(sql.BIGINT))
     no_xp_role = _Column(pg.BIGINT)
     remove_roles = _Column(pg.BOOLEAN, server_default=False)

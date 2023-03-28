@@ -20,7 +20,12 @@ class CommandTree(app_commands.CommandTree):
             await interaction.response.send_message(error, ephemeral=True)
         elif isinstance(error, app_commands.BotMissingPermissions):
             await interaction.response.send_message(
-                _(interaction.locale, "errors.bot_missing_permissions", errors=", ".join(error.missing_permissions))
+                _(
+                    interaction.locale,
+                    "errors.bot_missing_permissions",
+                    permissions=", ".join(error.missing_permissions),
+                ),
+                ephemeral=True,
             )
         elif isinstance(error, app_commands.TransformerError):
             await interaction.response.send_message(error, ephemeral=True)

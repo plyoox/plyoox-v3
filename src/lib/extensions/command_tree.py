@@ -29,6 +29,8 @@ class CommandTree(app_commands.CommandTree):
             )
         elif isinstance(error, app_commands.TransformerError):
             await interaction.response.send_message(error, ephemeral=True)
+        elif isinstance(error, app_commands.CheckFailure):
+            pass
         elif isinstance(error, app_commands.CommandOnCooldown):
             await interaction.response.send_message(
                 _(interaction.locale, "errors.command_on_cooldown", retry_after=round(error.retry_after)),

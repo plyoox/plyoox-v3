@@ -83,6 +83,7 @@ infos:
     uptime: "Zuletzt gestartet"
     privacy_policy: "Datenschutzrichtlinie"
 level:
+  disabled: "Das Levelsystem ist auf diesem Server deaktiviert."
   infrastructure_offline: "Dieser Befehl ist derzeit aufgrund von Infrastrukturproblemen nicht verfügbar."
   rank:
     no_data: "Der User hat derzeit keine XP. Versuche es erneut, nachdem der User etwas geschrieben hat."

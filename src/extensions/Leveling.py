@@ -110,6 +110,14 @@ class Leveling(commands.Cog):
     async def cog_unload(self) -> None:
         self.bot.tree.remove_command(self.ctx_menu.name, type=self.ctx_menu.type)
 
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        cache = await self.bot.cache.get_leveling(interaction.guild_id)
+        if cache is None or not cache.active:
+            await interaction.response.send_message(_(interaction.locale, "level.disabled"), ephemeral=True)
+            return False
+
+        return True
+
     async def _view_rank(
         self, interaction: discord.Interaction, *, member: discord.Member = None, ephemeral: bool = False
     ):

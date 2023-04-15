@@ -57,7 +57,7 @@ class UserGroup(app_commands.Group):
         )  # accent color is not provided in the default member object
 
         embed.set_author(name=str(member), icon_url=member.display_avatar.url)
-        embed.set_thumbnail(url=member.avatar.url)
+        embed.set_thumbnail(url=member.display_avatar.url)
         embed.add_field(
             name=_(lc, "user_info.about.account"),
             value=f"> __{_(lc, 'id')}:__ {member.id}\n"

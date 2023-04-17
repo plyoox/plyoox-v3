@@ -1,1 +1,0 @@
-docker build "https://gitlab.com/plyoox/plyoox-v3.git#main" -t plyoox/bot

@@ -6,6 +6,13 @@
 
 job("Build and push Docker") {
     host("Build artifacts and a Docker image") {
+        requirements {
+            os {
+                type = OSType.Linux
+                arch = "aarch64"
+            }
+        }
+
         dockerBuildPush {
             file = "Dockerfile"
             labels["vendor"] = "Plyoox"
@@ -14,6 +21,7 @@ job("Build and push Docker") {
             // image tags for 'docker push'
             tags {
                 +"$spaceRepo:latest"
+                +"$spaceRepo:arm"
             }
         }
     }

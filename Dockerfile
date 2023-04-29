@@ -1,4 +1,4 @@
-FROM python:3.11 AS builder
+FROM registry.ipv6.docker.com/library/python:3.11 AS builder
 
 WORKDIR /usr/app
 
@@ -8,7 +8,7 @@ ENV PATH="/usr/app/venv/bin:$PATH"
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
 
-FROM python:3.11-slim
+FROM registry.ipv6.docker.com/library/python:3.11-slim
 
 WORKDIR /usr/app
 

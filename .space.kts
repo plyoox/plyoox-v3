@@ -46,7 +46,7 @@ job("Run API Job") {
             file = "Dockerfile"
             labels["vendor"] = "Plyoox"
 
-            val spaceRepo = "plyoox.registry.jetbrains.space/p/plyoox/plyoox/bot"
+            val spaceRepo = "plyoox.registry.jetbrains.space/p/plyoox/plyoox/{{ run:job.repository }}"
             tags {
                 +"${spaceRepo}:latest"
                 +"${spaceRepo}:{{ channel }}"

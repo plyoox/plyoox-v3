@@ -1,12 +1,12 @@
 asyncpg~=0.27.0
-python-dotenv~=0.21.0
-aiohttp~=3.8.3
-sqlalchemy~=1.4.46
-PyYAML~=6.0
+python-dotenv~=1.0
+aiohttp~=3.8
+sqlalchemy~=2.0
+PyYAML~=6
 lru-dict~=1.1.8
-discord.py[speed]~=2.1.1
-recordclass~=0.18.1.1
-python-dateutil~=2.8.2
-tornado~=6.2
+discord.py[speed]~=2.2.3
+recordclass~=0.18.4
+# python-dateutil~=2.8.2
+tornado~=6.3
 aiolimiter~=1.0.0
 uvloop~=0.17.0; platform_system == "Linux"

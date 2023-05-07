@@ -4,7 +4,7 @@
  * For more info, see https://www.jetbrains.com/help/space/automation.html
  */
 
-job("Run API Job") {
+job("Run Bot Job") {
     startOn {
         gitPush {
             anyRefMatching {
@@ -62,11 +62,13 @@ job("Run API Job") {
         }
 
         kotlinScript { api ->
-            api.space().projects.automation.deployments.schedule(
+           if (api.parameters["channel"] == "stable") {
+                api.space().projects.automation.deployments.schedule(
                     project = api.projectIdentifier(),
-                    targetIdentifier = TargetIdentifier.Key("api"),
+                    targetIdentifier = TargetIdentifier.Key("bot"),
                     version = api.parameters["version"],
-            )
+                )
+            }
         }
     }
 }

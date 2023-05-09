@@ -22,13 +22,22 @@ class GuildGroup(app_commands.Group):
         guild = interaction.guild
         roles = guild.roles
 
+        # Due to not chunking the guild, the owner might not be cached.
+        if guild.owner is None:
+            if (owner := interaction.client.get_user(guild.owner_id)) is None:
+                # guild.query_members uses the gateway, so members are cached.
+                queried_user = await guild.query_members(user_ids=[guild.owner_id])
+                owner = queried_user[0] if queried_user else None
+        else:
+            owner = guild.owner
+
         embed = extensions.Embed(title=_(lc, "guild_info.about.title"))
         embed.set_thumbnail(url=guild.icon)
         embed.add_field(
             name=_(lc, "guild_info.about.general_information"),
             value=f"> __{_(lc, 'name')}:__ {guild.name}\n"
             f"> __{_(lc, 'id')}:__ {guild.id}\n"
-            f"> __{_(lc, 'guild_info.about.owner')}:__ {guild.owner}\n"
+            f"> __{_(lc, 'guild_info.about.owner')}:__ {owner}\n"
             f"> __{_(lc, 'created_at')}:__ {discord.utils.format_dt(guild.created_at)}",
         )
         embed.add_field(name=_(lc, "guild_info.about.members"), value=f"> {str(guild.member_count)}")
@@ -41,7 +50,7 @@ class GuildGroup(app_commands.Group):
             name=_(lc, "guild_info.about.more_infos"),
             value=f"> __{_(lc, 'guild_info.about.premium_level')}:__ {guild.premium_tier} ({guild.premium_subscription_count})\n"
             f"> __{_(lc, 'guild_info.about.vanity_url')}:__ {guild.vanity_url or _(lc, 'guild_info.about.no_vanity_url')}\n"
-            f"> __{_(lc, 'guild_info.about.emojis')}:__ {len(guild.emojis)}/{guild.emoji_limit}\n"
+            f"> __{_(lc, 'guild_info.about.emojis')}:__ {len(guild.emojis)}/{guild.emoji_limit * 2}\n"  # normal + animated
             f"> __{_(lc, 'guild_info.about.stickers')}:__ {len(guild.stickers)}/{guild.sticker_limit}",
         )
         embed.add_field(

@@ -106,9 +106,7 @@ class ViewScoreButton(ui.Button):
 
         await interaction.response.defer()
 
-        params = {
-            "ratings": ",".join(str(_r["amount"]) for _r in self.anilist_view.data["stats"]["scoreDistribution"])
-        }
+        params = {"ratings": ",".join(str(_r["amount"]) for _r in self.anilist_view.data["stats"]["scoreDistribution"])}
 
         try:
             async with bot.session.get(f"{bot.imager_url}/api/anilist-rating", params=params) as res:
@@ -126,9 +124,7 @@ class ViewScoreButton(ui.Button):
         except aiohttp.ClientConnectionError as err:
             _log.error("Could not fetch anilist score", err)
 
-            await interaction.followup.send(
-                _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
-            )
+            await interaction.followup.send(_(interaction.locale, "level.infrastructure_offline"), ephemeral=True)
             return
 
         embed = extensions.Embed(

@@ -4,21 +4,22 @@ from typing import Literal
 import asyncpg
 from lru import LRU
 
-from .models import (
-    ModerationRule,
-    WelcomeModel,
-    LevelingModel,
-    LoggingModel,
-    ModerationModel,
-    AutomodExecutionModel
-)
+from .models import ModerationRule, WelcomeModel, LevelingModel, LoggingModel, ModerationModel, AutomodExecutionModel
 
 
 CacheType = Literal["wel", "log", "lvl", "mod", "automod"]
 
 
 class CacheManager:
-    __slots__ = ("_pool", "_leveling", "_welcome", "_moderation", "_logging", "_automoderation", "_automoderation_queue")
+    __slots__ = (
+        "_pool",
+        "_leveling",
+        "_welcome",
+        "_moderation",
+        "_logging",
+        "_automoderation",
+        "_automoderation_queue",
+    )
 
     def __init__(self, pool: asyncpg.Pool, cache_size: int = 128):
         self._pool = pool
@@ -170,30 +171,34 @@ class CacheManager:
         self._logging[id] = model
 
         return model
-    
+
     async def get_moderation_rule(self, rule_id: int) -> ModerationRule | None:
         """Returns the cache for the moderation rule."""
         rule_cache = self._automoderation.get(rule_id, False)
         if rule_cache is not False:
             return rule_cache
-        
+
         if event := self._automoderation_queue.get(rule_id):
             await event.wait()
             return self._automoderation.get(rule_id, None)
-        
+
         self._automoderation_queue[rule_id] = event = asyncio.Event()
 
-        result = await self._pool.fetchrow("SELECT actions, guild_id, reason FROM automod_rules WHERE rule_id = $1", rule_id)
+        result = await self._pool.fetchrow(
+            "SELECT actions, guild_id, reason FROM automod_rules WHERE rule_id = $1", rule_id
+        )
         if result is None:
             self._automoderation[rule_id] = None
             del self._automoderation_queue[rule_id]
             event.set()
 
             return None
-        
+
         rule_actions = self.__to_moderation_actions(result["actions"])
 
-        self._automoderation[rule_id] = rule = ModerationRule(guild_id=result["guild_id"], actions=rule_actions, reason=result["reason"])
+        self._automoderation[rule_id] = rule = ModerationRule(
+            guild_id=result["guild_id"], actions=rule_actions, reason=result["reason"]
+        )
 
         del self._automoderation_queue[rule_id]
         event.set()

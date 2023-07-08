@@ -45,8 +45,15 @@ class AutomodActionData(object):
         return f"<{name} member={self.member} trigger_action={self.trigger_action!r} trigger_content={self.trigger_content!r} trigger_reason={self.trigger_reason!r}>"
 
     @classmethod
-    def _from_message(cls, *, message: discord.Message, action_taken: AutomodExecutionModel, reason: AutomodExecutionReason):
-        return cls(member=message.author, action=action_taken, content=message.content, reason=_(message.guild.preferred_locale, f"automod.reason.{reason}"))
+    def _from_message(
+        cls, *, message: discord.Message, action_taken: AutomodExecutionModel, reason: AutomodExecutionReason
+    ):
+        return cls(
+            member=message.author,
+            action=action_taken,
+            content=message.content,
+            reason=_(message.guild.preferred_locale, f"automod.reason.{reason}"),
+        )
 
     @property
     def guild(self):
@@ -401,7 +408,9 @@ class Automod(commands.Cog):
 
             await self._handle_final_action(member, cache.automod_actions)
             await self.bot.db.execute(
-                "UPDATE automod_users SET expires = now() WHERE user_id = $1 AND guild_id = $2 AND expires > now()", member.id, guild.id
+                "UPDATE automod_users SET expires = now() WHERE user_id = $1 AND guild_id = $2 AND expires > now()",
+                member.id,
+                guild.id,
             )
 
     async def add_warn_points(self, member: discord.Member, moderator: discord.Member, add_points: int, reason: str):

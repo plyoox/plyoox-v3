@@ -519,7 +519,7 @@ class Moderation(commands.Cog):
     @app_commands.describe(user="The user to list warnings for.")
     async def warn_list(self, interaction: discord.Interaction, user: discord.User):
         lc = interaction.locale
-        
+
         if user.bot:
             await interaction.response.send_message(_(lc, "moderation.warn.no_bots"), ephemeral=True)
             return

@@ -30,9 +30,8 @@ class MemberView(extensions.PaginatedEphemeralView):
         embed.set_footer(text=f"{_(lc, 'page')}: {self.current_page + 1}/{self.last_page + 1}")
 
         members = self.members[
-                  self.current_page * MemberView.MEMBERS_PER_PAGE: MemberView.MEMBERS_PER_PAGE * (
-                      self.current_page + 1)
-                  ]
+            self.current_page * MemberView.MEMBERS_PER_PAGE : MemberView.MEMBERS_PER_PAGE * (self.current_page + 1)
+        ]
 
         embed.description = "\n".join(f"{m} ({m.id})" for m in members)
 
@@ -73,9 +72,7 @@ class MassbanView(extensions.EphemeralView):
     async def ban_button(self, interaction: discord.Interaction, _b: discord.Button):
         lc = interaction.locale
 
-        await interaction.response.send_message(
-            _(lc, "moderation.massban.ban_users", member_count=len(self.members))
-        )
+        await interaction.response.send_message(_(lc, "moderation.massban.ban_users", member_count=len(self.members)))
 
         error_count = 0
         ban_count = 0
@@ -153,9 +150,7 @@ class WarnView(extensions.PaginatedEphemeralView):
             infraction = dict(infraction)
 
             expires_at = (
-                discord.utils.format_dt(infraction["expires"])
-                if infraction["expires"]
-                else _(lc, "no_expiration")
+                discord.utils.format_dt(infraction["expires"]) if infraction["expires"] else _(lc, "no_expiration")
             )
 
             embed.add_field(
@@ -165,7 +160,7 @@ class WarnView(extensions.PaginatedEphemeralView):
                     f"**{_(lc, 'expires_at')}:** {expires_at}\n"
                     f"**{_(lc, 'reason')}:** {infraction['reason']}"
                 ),
-                inline=True
+                inline=True,
             )
 
         return embed
@@ -195,8 +190,9 @@ class WarnView(extensions.PaginatedEphemeralView):
         self.current_page = 0
         self.view_expired = not self.view_expired
 
-        button.label = _(interaction.locale,
-                         "moderation.warn.view." + ("view_active" if self.view_expired else "view_expired"))
+        button.label = _(
+            interaction.locale, "moderation.warn.view." + ("view_active" if self.view_expired else "view_expired")
+        )
 
         self.last_page = await self.get_page_count()
         embed = await self.generate_embed(self.current_page)

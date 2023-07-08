@@ -98,4 +98,3 @@ class PaginatedEphemeralView(EphemeralView):
 
     async def next(self, interaction: discord.Interaction):
         pass
-

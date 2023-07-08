@@ -1,6 +1,7 @@
 import discord
 from discord import ui
 
+from lib import emojis
 from translation import _
 
 
@@ -67,23 +68,25 @@ class PaginatedEphemeralView(EphemeralView):
         self.last_page = last_page
         self.update_button_state()
 
+        self.stop_button.label = _(original_interaction.locale, "abort")
+
     def update_button_state(self):
         self.back_button.disabled = self.current_page == 0
         self.next_button.disabled = self.current_page == self.last_page
 
-    @ui.button(custom_id="back_page", emoji="<:chevron_left:1002630301136212071>")
+    @ui.button(custom_id="back_page", emoji=emojis.chevron_left)
     async def back_button(self, interaction: discord.Interaction, _: ui.Button):
         self.current_page -= 1
         self.update_button_state()
         await self.back(interaction)
 
-    @ui.button(custom_id="next_page", emoji="<:chevron_right:1003696502092337303>")
+    @ui.button(custom_id="next_page", emoji=emojis.chevron_right)
     async def next_button(self, interaction: discord.Interaction, _: ui.Button):
         self.current_page += 1
         self.update_button_state()
         await self.next(interaction)
 
-    @ui.button(custom_id="stop", emoji="<:close:1001946992940953621>", style=discord.ButtonStyle.red)
+    @ui.button(emoji=emojis.close, style=discord.ButtonStyle.red)
     async def stop_button(self, interaction: discord.Interaction, _: ui.Button):
         self.stop()
 

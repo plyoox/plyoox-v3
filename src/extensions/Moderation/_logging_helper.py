@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import logging
 from typing import TYPE_CHECKING
 
 import discord
@@ -15,6 +16,9 @@ if TYPE_CHECKING:
     from cache.models import ModerationModel
     from lib.types import ModerationExecutedCommand
     from .automod import AutomodActionData
+
+
+_log = logging.getLogger(__name__)
 
 
 async def _get_logchannel(
@@ -42,13 +46,20 @@ async def _send_webhook(
 ) -> None:
     try:
         await webhook.send(embed=embed, embeds=embeds)
+        return
     except discord.Forbidden:
-        await bot.db.execute(
-            "UPDATE moderation SET log_channel = NULL, log_id = NULL, log_token = NULL WHERE id = $1",
-            guild_id,
-        )
+        _log.info(f"Not allowed to send log message in {webhook.id} ({type(webhook)})")
+    except discord.NotFound:
+        _log.info(f"Log channel {webhook.id} ({type(webhook)}) not found")
+    except discord.HTTPException as e:
+        _log.error(f"Error while sending log message in {webhook.id} ({type(webhook)}): {e}")
 
-        bot.cache.edit_cache(guild_id, "mod", log_channel=None, log_id=None, log_token=None)
+    await bot.db.execute(
+        "UPDATE moderation SET log_channel = NULL, log_id = NULL, log_token = NULL WHERE id = $1",
+        guild_id,
+    )
+
+    bot.cache.edit_cache(guild_id, "mod", log_channel=None, log_id=None, log_token=None)
 
 
 async def log_simple_punish_command(
@@ -56,7 +67,7 @@ async def log_simple_punish_command(
     target: discord.User | discord.Member,
     *,
     reason: str,
-    type: ModerationExecutedCommand,
+    kind: ModerationExecutedCommand,
     until: datetime.datetime | None = None,
 ) -> None:
     cache: ModerationModel = await interaction.client.cache.get_moderation(interaction.guild.id)  # type: ignore
@@ -68,9 +79,9 @@ async def log_simple_punish_command(
         lc = interaction.guild_locale
 
         embed = extensions.Embed(
-            description=_(lc, f"moderation.{type}.log_description", target=target, moderator=interaction.user)
+            description=_(lc, f"moderation.{kind}.log_description", target=target, moderator=interaction.user)
         )
-        embed.set_author(name=_(lc, f"moderation.{type}.log_title"), icon_url=target.display_avatar)
+        embed.set_author(name=_(lc, f"moderation.{kind}.log_title"), icon_url=target.display_avatar)
         embed.add_field(name=_(lc, "reason"), value="> " + (reason or _(lc, "no_reason")))
         embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
         embed.set_footer(text=f"{_(lc, 'id')}: {target.id}")
@@ -87,7 +98,7 @@ async def log_simple_punish_command(
             await target.send(
                 _(
                     lc,
-                    f"moderation.{type}.user_message",
+                    f"moderation.{kind}.user_message",
                     reason=reason or _(lc, "no_reason"),
                     timestamp=discord.utils.format_dt(until) if until is not None else None,
                     guild=interaction.guild,
@@ -109,7 +120,7 @@ async def automod_log(
     lc = guild.preferred_locale
 
     cache = await bot.cache.get_moderation(guild.id)
-    if cache is None or not cache.active:
+    if cache is None:
         return
 
     webhook = await _get_logchannel(bot, cache, guild)
@@ -118,7 +129,7 @@ async def automod_log(
 
         embed = extensions.Embed(description=_(lc, f"automod.{data.trigger_action.action}.description", target=member))
         embed.set_author(name=_(lc, f"automod.{data.trigger_action.action}.title"), icon_url=member.display_avatar)
-        embed.add_field(name=_(lc, "reason"), value="> " + _(lc, f"automod.reason.{data.trigger_reason}"))
+        embed.add_field(name=_(lc, "reason"), value=f"> {data.trigger_reason}")
         embed.add_field(name=_(lc, "executed_at"), value="> " + utils.format_dt(utils.utcnow()))
         embed.set_footer(text=f"{_(lc, 'id')}: {member.id}")
 
@@ -144,7 +155,7 @@ async def automod_log(
                 _(
                     lc,
                     f"automod.{data.trigger_action.action}.user_message",
-                    reason=_(lc, f"automod.reason.{type}"),
+                    reason=data.trigger_reason,
                     timestamp=discord.utils.format_dt(until) if until is not None else None,
                     guild=guild,
                     points=points,

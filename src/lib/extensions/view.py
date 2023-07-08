@@ -53,4 +53,46 @@ class EphemeralView(ui.View):
 
     async def on_timeout(self) -> None:
         if not self._last_interaction.is_expired():
-            await self._last_interaction.edit_original_response(view=None)
+            await self._last_interaction.delete_original_response()
+
+
+class PaginatedEphemeralView(EphemeralView):
+    current_page: int
+    last_page: int
+
+    def __init__(self, original_interaction: discord.Interaction, last_page: int):
+        super().__init__(original_interaction)
+
+        self.current_page = 0
+        self.last_page = last_page
+        self.update_button_state()
+
+    def update_button_state(self):
+        self.back_button.disabled = self.current_page == 0
+        self.next_button.disabled = self.current_page == self.last_page
+
+    @ui.button(custom_id="back_page", emoji="<:chevron_left:1002630301136212071>")
+    async def back_button(self, interaction: discord.Interaction, _: ui.Button):
+        self.current_page -= 1
+        self.update_button_state()
+        await self.back(interaction)
+
+    @ui.button(custom_id="next_page", emoji="<:chevron_right:1003696502092337303>")
+    async def next_button(self, interaction: discord.Interaction, _: ui.Button):
+        self.current_page += 1
+        self.update_button_state()
+        await self.next(interaction)
+
+    @ui.button(custom_id="stop", emoji="<:close:1001946992940953621>", style=discord.ButtonStyle.red)
+    async def stop_button(self, interaction: discord.Interaction, _: ui.Button):
+        self.stop()
+
+        await interaction.response.defer()
+        await interaction.delete_original_response()
+
+    async def back(self, interaction: discord.Interaction):
+        pass
+
+    async def next(self, interaction: discord.Interaction):
+        pass
+

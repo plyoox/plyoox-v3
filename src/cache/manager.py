@@ -1,20 +1,24 @@
+import asyncio
 from typing import Literal
 
 import asyncpg
 from lru import LRU
 
 from .models import (
+    ModerationRule,
     WelcomeModel,
     LevelingModel,
     LoggingModel,
     ModerationModel,
-    AutomodExecutionModel,
-    AutomodDiscordExecutionModel,
+    AutomodExecutionModel
 )
 
 
+CacheType = Literal["wel", "log", "lvl", "mod", "automod"]
+
+
 class CacheManager:
-    __slots__ = ("_pool", "_leveling", "_welcome", "_moderation", "_logging")
+    __slots__ = ("_pool", "_leveling", "_welcome", "_moderation", "_logging", "_automoderation", "_automoderation_queue")
 
     def __init__(self, pool: asyncpg.Pool, cache_size: int = 128):
         self._pool = pool
@@ -23,6 +27,8 @@ class CacheManager:
         self._welcome = LRU(cache_size)
         self._moderation = LRU(cache_size)
         self._logging = LRU(cache_size)
+        self._automoderation = LRU(cache_size * 10)
+        self._automoderation_queue: dict[int, asyncio.Event] = dict()
 
     @staticmethod
     def __to_moderation_actions(actions: list[dict] | None) -> list[AutomodExecutionModel]:
@@ -36,23 +42,6 @@ class CacheManager:
                 points=action.get("p"),
                 days=action.get("d"),
                 duration=action.get("t"),
-            )
-            for action in actions
-        ]
-
-    @staticmethod
-    def __to_automod_moderation_actions(actions: list[dict] | None) -> list[AutomodDiscordExecutionModel]:
-        if actions is None:
-            return []
-
-        return [
-            AutomodDiscordExecutionModel(
-                action=action["a"],
-                check=action.get("c"),
-                points=action.get("p"),
-                days=action.get("d"),
-                duration=action.get("t"),
-                rule_id=int(action["r"]),
             )
             for action in actions
         ]
@@ -133,9 +122,6 @@ class CacheManager:
             self._moderation[id] = None
             return None
 
-        result = dict(result)
-        del result["id"]
-
         model = ModerationModel(
             active=result["active"],
             invite_actions=self.__to_moderation_actions(result["invite_actions"]),
@@ -150,8 +136,6 @@ class CacheManager:
             log_id=result["log_id"],
             log_channel=result["log_channel"],
             log_token=result["log_token"],
-            mention_actions=self.__to_moderation_actions(result["mention_actions"]),
-            mention_active=result["mention_active"],
             automod_actions=self.__to_moderation_actions(result["automod_actions"]),
             link_list=result["link_list"] or [],
             link_active=result["link_active"],
@@ -162,8 +146,6 @@ class CacheManager:
             mod_roles=result["mod_roles"] or [],
             notify_user=result["notify_user"],
             ignored_roles=result["ignored_roles"] or [],
-            blacklist_active=result["blacklist_active"],
-            blacklist_actions=self.__to_automod_moderation_actions(result["blacklist_actions"]),
         )
 
         self._moderation[id] = model
@@ -188,8 +170,37 @@ class CacheManager:
         self._logging[id] = model
 
         return model
+    
+    async def get_moderation_rule(self, rule_id: int) -> ModerationRule | None:
+        """Returns the cache for the moderation rule."""
+        rule_cache = self._automoderation.get(rule_id, False)
+        if rule_cache is not False:
+            return rule_cache
+        
+        if event := self._automoderation_queue.get(rule_id):
+            await event.wait()
+            return self._automoderation.get(rule_id, None)
+        
+        self._automoderation_queue[rule_id] = event = asyncio.Event()
 
-    def _get_store(self, cache: Literal["wel", "log", "lvl", "mod"]) -> LRU:
+        result = await self._pool.fetchrow("SELECT actions, guild_id, reason FROM automod_rules WHERE rule_id = $1", rule_id)
+        if result is None:
+            self._automoderation[rule_id] = None
+            del self._automoderation_queue[rule_id]
+            event.set()
+
+            return None
+        
+        rule_actions = self.__to_moderation_actions(result["actions"])
+
+        self._automoderation[rule_id] = rule = ModerationRule(guild_id=result["guild_id"], actions=rule_actions, reason=result["reason"])
+
+        del self._automoderation_queue[rule_id]
+        event.set()
+
+        return rule
+
+    def _get_store(self, cache: CacheType) -> LRU:
         if cache == "wel":
             return self._welcome
         elif cache == "log":
@@ -198,8 +209,10 @@ class CacheManager:
             return self._leveling
         elif cache == "mod":
             return self._moderation
+        elif cache == "automod":
+            return self._automoderation
 
-    def remove_cache(self, id: int, store: Literal["wel", "log", "lvl", "mod"]) -> None:
+    def remove_cache(self, id: int, store: CacheType) -> None:
         store = self._get_store(store)
         if store.get(id, None):
             del store[id]

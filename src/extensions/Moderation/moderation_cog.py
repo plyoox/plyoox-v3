@@ -11,7 +11,7 @@ from discord.ext import commands
 from lib import parsers, extensions
 from lib.enums import TimerEnum
 from translation import _
-from . import _views, _logging_helper, clear_group, automod
+from . import _views as views, _logging_helper, clear_group, automod
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -80,7 +80,7 @@ class Moderation(commands.Cog):
             value=f"> __{_(lc, 'moderation.invite_info.url')}:__ {invite.url}\n"
             f"> __{_(lc, 'moderation.invite_info.uses')}:__ {invite.uses or 0}/{invite.max_uses or '∞'}\n"
             f"> __{_(lc, 'created_at')}:__ {discord.utils.format_dt(invite.created_at) if invite.created_at else _(lc, 'moderation.invite_info.no_date')}\n"
-            f"> __{_(lc, 'moderation.invite_info.expires_at')}:__ {discord.utils.format_dt(invite.expires_at) if invite.expires_at else _(lc, 'moderation.invite_info.no_date')}",
+            f"> __{_(lc, 'expires_at')}:__ {discord.utils.format_dt(invite.expires_at) if invite.expires_at else _(lc, 'moderation.invite_info.no_date')}",
         )
 
         if invite.inviter is not None:
@@ -126,7 +126,7 @@ class Moderation(commands.Cog):
 
         await interaction.response.defer(ephemeral=True)
 
-        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="ban")
+        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, kind="ban")
         await guild.ban(member, reason=reason, delete_message_days=1)
         await interaction.followup.send(_(lc, "moderation.ban.successfully_banned"), ephemeral=True)
 
@@ -164,7 +164,7 @@ class Moderation(commands.Cog):
         await interaction.response.defer(ephemeral=True)
 
         await _logging_helper.log_simple_punish_command(
-            interaction, target=member, until=banned_until, reason=reason, type="tempban"
+            interaction, target=member, until=banned_until, reason=reason, kind="tempban"
         )
         await self.bot.timer.create_timer(member.id, guild.id, type=TimerEnum.tempban, expires=banned_until)
         await guild.ban(member, reason=reason, delete_message_days=1)
@@ -189,7 +189,7 @@ class Moderation(commands.Cog):
             return
 
         await interaction.response.defer(ephemeral=True)
-        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="kick")
+        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, kind="kick")
         await guild.kick(member, reason=reason)
 
         await interaction.followup.send(_(lc, "moderation.kick.successfully_kicked"), ephemeral=True)
@@ -227,7 +227,7 @@ class Moderation(commands.Cog):
         await interaction.response.defer(ephemeral=True)
         await member.timeout(banned_until, reason=reason)
         await _logging_helper.log_simple_punish_command(
-            interaction, target=member, until=banned_until, reason=reason, type="tempmute"
+            interaction, target=member, until=banned_until, reason=reason, kind="tempmute"
         )
 
         await interaction.followup.send(_(lc, "moderation.tempmute.successfully_muted"), ephemeral=True)
@@ -250,7 +250,7 @@ class Moderation(commands.Cog):
             return
 
         await interaction.response.defer(ephemeral=True)
-        await _logging_helper.log_simple_punish_command(interaction, target=user, reason=reason, type="unban")
+        await _logging_helper.log_simple_punish_command(interaction, target=user, reason=reason, kind="unban")
 
         await self.bot.db.execute(
             "DELETE FROM timers WHERE target_id = $1 AND guild_id = $2 AND type = 'tempban'", user.id, guild.id
@@ -280,7 +280,7 @@ class Moderation(commands.Cog):
 
         await interaction.response.defer(ephemeral=True)
 
-        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="softban")
+        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, kind="softban")
         await guild.ban(member, reason=reason, delete_message_days=1)
         await guild.unban(member, reason=reason)
 
@@ -321,7 +321,7 @@ class Moderation(commands.Cog):
         await interaction.response.defer(ephemeral=True)
 
         await member.timeout(None, reason=_(lc, "moderation.unmute.reason"))
-        await _logging_helper.log_simple_punish_command(interaction, target=member, type="unmute", reason=reason)
+        await _logging_helper.log_simple_punish_command(interaction, target=member, kind="unmute", reason=reason)
 
         await interaction.followup.send(_(lc, "moderation.unmute.successfully_unmuted"), ephemeral=True)
 
@@ -513,35 +513,21 @@ class Moderation(commands.Cog):
             return
 
         embed = extensions.Embed(description=_(lc, "moderation.massban.overview_description"))
-        await interaction.followup.send(embed=embed, view=_views.MassbanView(interaction, list(members), reason))
+        await interaction.followup.send(embed=embed, view=views.MassbanView(interaction, list(members), reason))
 
     @warn_group.command(name="list", description="Lists current warnings for a user.")
-    @app_commands.describe(member="The user to list warnings for.")
-    async def warn_list(self, interaction: discord.Interaction, member: discord.Member):
+    @app_commands.describe(user="The user to list warnings for.")
+    async def warn_list(self, interaction: discord.Interaction, user: discord.User):
         lc = interaction.locale
-        if member.bot:
+        
+        if user.bot:
             await interaction.response.send_message(_(lc, "moderation.warn.no_bots"), ephemeral=True)
             return
 
-        await interaction.response.defer(ephemeral=True)
+        warn_view = views.WarnView(interaction, user)
 
-        warnings = await self.bot.db.fetch(
-            "SELECT id, points, reason, timestamp FROM automod_users WHERE user_id = $1 AND guild_id = $2",
-            member.id,
-            interaction.guild_id,
-        )
-
-        if not warnings:
-            await interaction.followup.send(_(lc, "moderation.warn.no_warnings"), ephemeral=True)
-            return
-
-        embed = extensions.Embed(title=_(lc, "moderation.warn.list_title"))
-        embed.description = ""
-
-        for warning in warnings:
-            embed.description += f"`{warning['id']}`. {warning['points']} {_(lc, f'moderation.warn.point' + ('s' if warning['points'] != 1 else ''))} - {warning['reason']} - {discord.utils.format_dt(warning['timestamp'])}\n"
-
-        await interaction.followup.send(embed=embed, ephemeral=True)
+        embed = await warn_view.initialize()
+        await interaction.response.send_message(view=warn_view, embed=embed, ephemeral=True)
 
     @warn_group.command(name="add", description="Adds a warning to a user.")
     @app_commands.describe(
@@ -608,7 +594,7 @@ class Moderation(commands.Cog):
         if query_response == "DELETE 1":
             await interaction.response.send_message(_(lc, "moderation.warn.successfully_removed"), ephemeral=True)
         else:
-            await interaction.followup.send_message(_(lc, "moderation.warn.not_found"), ephemeral=True)
+            await interaction.response.send_message(_(lc, "moderation.warn.not_found"), ephemeral=True)
 
     @warn_group.command(name="remove-all", description="Removes all warnings from a user.")
     @app_commands.describe(member="The user to remove all warnings from.")

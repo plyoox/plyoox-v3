@@ -47,21 +47,19 @@ class LoggingModel(RecordClass):
     message_delete: bool
 
 
+class ModerationRule(RecordClass):
+    guild_id: int
+    reason: str
+    actions: list[AutomodExecutionModel]
+
+
 class AutomodExecutionModel(RecordClass):
     action: AutomodActionEnum
     check: AutomodChecksEnum
     days: int
     points: int
     duration: int
-
-
-class AutomodDiscordExecutionModel(RecordClass):
-    rule_id: int
-    action: AutomodActionEnum
-    check: AutomodChecksEnum
-    days: int
-    points: int
-    duration: int
+    expires: int
 
 
 class ModerationModel(RecordClass):
@@ -84,14 +82,10 @@ class ModerationModel(RecordClass):
     link_whitelist_roles: list[int] | None
     link_list: list[str] | None
     link_is_whitelist: bool
-    mention_active: bool
-    mention_actions: list[AutomodExecutionModel] | None
     caps_active: bool
     caps_actions: list[AutomodExecutionModel] | None
     caps_whitelist_channels: list[int] | None
     caps_whitelist_roles: list[int] | None
-    blacklist_active: bool
-    blacklist_actions: list[AutomodDiscordExecutionModel]
 
 
 class TimerModel(RecordClass):

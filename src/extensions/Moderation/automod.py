@@ -29,14 +29,12 @@ LINK_REGEX = re.compile(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-
 class AutomodActionData(object):
     member: discord.Member
     trigger_content: str
-    trigger_reason: AutomodExecutionReason
+    trigger_reason: str
     trigger_action: AutomodExecutionModel
 
     __slots__ = ("trigger_content", "member", "trigger_reason", "trigger_action")
 
-    def __init__(
-        self, member: discord.Member, content: str, reason: AutomodExecutionReason, action: AutomodExecutionModel
-    ):
+    def __init__(self, member: discord.Member, content: str, reason: str, action: AutomodExecutionModel):
         self.member = member
         self.trigger_action = action
         self.trigger_content = content
@@ -47,10 +45,8 @@ class AutomodActionData(object):
         return f"<{name} member={self.member} trigger_action={self.trigger_action!r} trigger_content={self.trigger_content!r} trigger_reason={self.trigger_reason!r}>"
 
     @classmethod
-    def _from_message(
-        cls, *, message: discord.Message, action_taken: AutomodExecutionModel, reason: AutomodExecutionReason
-    ):
-        return cls(member=message.author, action=action_taken, content=message.content, reason=reason)
+    def _from_message(cls, *, message: discord.Message, action_taken: AutomodExecutionModel, reason: AutomodExecutionReason):
+        return cls(member=message.author, action=action_taken, content=message.content, reason=_(message.guild.preferred_locale, f"automod.reason.{reason}"))
 
     @property
     def guild(self):
@@ -60,7 +56,7 @@ class AutomodActionData(object):
 class Automod(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
-        self.invite_cache: dict[str, discord.Invite] = utils.ExpiringCache(seconds=600)
+        self.invite_cache: dict[str, discord.Invite | None] = utils.ExpiringCache(seconds=600)
         self.punished_members: dict[tuple[int, int], bool] = utils.ExpiringCache(seconds=5)
         self._invite_requests: dict[str, asyncio.Event] = {}
 
@@ -75,23 +71,9 @@ class Automod(commands.Cog):
 
     @commands.Cog.listener()
     async def on_automod_rule_delete(self, rule: discord.AutoModRule) -> None:
-        guild_id = rule.guild.id
+        await self.bot.db.execute("DELETE FROM automod_rules WHERE rule_id = $1", rule.id)
 
-        rules: list = await self.bot.db.fetchval("SELECT blacklist_actions FROM moderation WHERE id = $1", guild_id)
-        if not rules:
-            return
-
-        changed = False
-        for _rule in rules:
-            if _rule["r"] == rule.id:
-                changed = True
-                rules.remove(_rule)
-
-        if changed:
-            await self.bot.db.execute(
-                "UPDATE moderation SET blacklist_actions = $1 WHERE id = $1", rules or None, guild_id
-            )
-            self.bot.cache.remove_cache(guild_id, "mod")
+        self.bot.cache.remove_cache(rule.id, "automod")
 
     @commands.Cog.listener()
     async def on_automod_action(self, execution: discord.AutoModAction):
@@ -100,44 +82,35 @@ class Automod(commands.Cog):
         if execution.action.type != discord.AutoModRuleActionType.block_message:
             return
 
-        cache = await self.bot.cache.get_moderation(guild.id)
-        if cache is None or not cache.active:
+        if (
+            execution.rule_trigger_type != discord.AutoModRuleTriggerType.keyword
+            and execution.rule_trigger_type != discord.AutoModRuleTriggerType.mention_spam
+        ):
             return
 
-        if execution.rule_trigger_type == discord.AutoModRuleTriggerType.keyword:
-            automod_type: AutomodExecutionReason = "blacklist"
-        elif execution.rule_trigger_type == discord.AutoModRuleTriggerType.mention_spam:
-            automod_type: AutomodExecutionReason = "mention"
-        else:
+        cache = await self.bot.cache.get_moderation_rule(execution.rule_id)
+        if cache is None:
             return
 
-        if not getattr(cache, automod_type + "_active"):
+        if not cache.actions:
             return
 
         if not guild.chunked:
-            await guild.chunk(cache=True)
+            await guild.chunk()
 
-        member = guild.get_member(execution.user_id)
+        member = execution.member
         if member is None:
+            _log.warning(f"Member {execution.user_id} not found in guild {guild.id}")
             return
 
-        if any(role in cache.mod_roles + cache.ignored_roles for role in member._roles):
-            return
-
-        automod_actions = getattr(cache, automod_type + "_actions")
-        if not automod_actions:
-            return
-
-        if execution.rule_trigger_type == discord.AutoModRuleTriggerType.keyword:
-            automod_actions = list(filter(lambda a: a.rule_id == execution.rule_id, automod_actions))
-            if not automod_actions:
-                return
-
-        for action in automod_actions:
+        for action in cache.actions:
             if Automod._handle_checks(member, action):
                 await self._execute_discord_automod(
                     data=AutomodActionData(
-                        action=action, member=member, reason=automod_type, content=execution.matched_content
+                        action=action,
+                        member=member,
+                        reason=cache.reason or _(guild.preferred_locale, "automod.reason.discord_rule"),
+                        content=execution.matched_content,
                     )
                 )
                 return
@@ -164,12 +137,11 @@ class Automod(commands.Cog):
                 return
 
             invites: set[str] = set([invite[1] for invite in found_invites])
-
             for invite in invites:
                 try:
                     fetched_invite = await self._fetch_invite(invite)
 
-                    if fetched_invite is not False and (
+                    if fetched_invite and (
                         fetched_invite.guild.id == guild.id or fetched_invite.guild.id in cache.invite_allowed
                     ):
                         continue
@@ -220,8 +192,8 @@ class Automod(commands.Cog):
             await self._handle_action(message, cache.caps_actions, "caps")
             return
 
-    async def _fetch_invite(self, code: str) -> discord.Invite | False:
-        if (invite := self.invite_cache.get(code)) is not None:
+    async def _fetch_invite(self, code: str) -> discord.Invite | None:
+        if (invite := self.invite_cache.get(code, False)) is not False:
             return invite
 
         if (request := self._invite_requests.get(code)) is not None:
@@ -230,10 +202,12 @@ class Automod(commands.Cog):
 
         self._invite_requests[code] = event = asyncio.Event()
 
+        invite = None
         try:
             invite = await self.bot.fetch_invite(code, with_counts=False, with_expiration=False)
+            self.invite_cache[code] = invite
         except discord.NotFound:
-            invite = False
+            self.invite_cache[code] = None
         except discord.HTTPException as exc:
             _log.error("Could not fetch invite", exc)
 
@@ -241,7 +215,6 @@ class Automod(commands.Cog):
             self._invite_requests.pop(code)
             raise exc
 
-        self.invite_cache[code] = invite
         event.set()
         self._invite_requests.pop(code)
 
@@ -253,7 +226,6 @@ class Automod(commands.Cog):
         actions: list[AutomodExecutionModel],
         reason: AutomodExecutionReason,
     ):
-
         for action in actions:
             if Automod._handle_checks(message.author, action):
                 data = AutomodActionData._from_message(message=message, reason=reason, action_taken=action)
@@ -277,13 +249,9 @@ class Automod(commands.Cog):
         elif check == AutomodChecksEnum.no_avatar:
             return member.avatar is None
         elif check == AutomodChecksEnum.join_date:
-            days = action.days
-
-            return (discord.utils.utcnow() - member.joined_at).days <= days
+            return (discord.utils.utcnow() - member.joined_at).days <= action.days
         elif check == AutomodChecksEnum.account_age:
-            days = action.days
-
-            return (discord.utils.utcnow() - member.created_at).days <= days
+            return (discord.utils.utcnow() - member.created_at).days <= action.days
 
     async def _execute_final_action(self, member: discord.Member, action: AutomodExecutionModel):
         guild = member.guild
@@ -328,7 +296,6 @@ class Automod(commands.Cog):
     async def _execute_discord_automod(self, data: AutomodActionData, message: discord.Message = None) -> None:
         guild = data.guild
         member = data.member
-        lc = guild.preferred_locale
         automod_action = data.trigger_action
 
         if message is not None:
@@ -350,11 +317,11 @@ class Automod(commands.Cog):
 
         if automod_action.action == AutomodActionEnum.ban:
             if guild.me.guild_permissions.ban_members:
-                await guild.ban(member, reason=_(lc, f"automod.reason.{data.trigger_reason}"))
+                await guild.ban(member, reason=data.trigger_reason)
                 await _logging.automod_log(self.bot, data)
         elif automod_action.action == AutomodActionEnum.kick:
             if guild.me.guild_permissions.kick_members:
-                await guild.kick(member, reason=_(lc, f"automod.reason.{data.trigger_reason}"))
+                await guild.kick(member, reason=data.trigger_reason)
                 await _logging.automod_log(self.bot, data)
         elif automod_action.action == AutomodActionEnum.delete:
             await _logging.automod_log(self.bot, data)
@@ -366,7 +333,7 @@ class Automod(commands.Cog):
                 if timers is not None:
                     await timers.create_timer(guild.id, member.id, TimerEnum.tempban, banned_until)
                     await _logging.automod_log(self.bot, data)
-                    await guild.ban(member, reason=_(lc, f"automod.reason.{automod_action}"))
+                    await guild.ban(member, reason=data.trigger_reason)
                 else:
                     _log.warning("Timer Plugin is not initialized")
         elif automod_action.action == AutomodActionEnum.tempmute:
@@ -379,7 +346,7 @@ class Automod(commands.Cog):
             await self._handle_points(data)
 
     @staticmethod
-    def _is_affected(message: discord.Message, cache: ModerationModel, reason: AutomodExecutionReason) -> bool:
+    def _is_affected(message: discord.Message, cache: ModerationModel, kind: AutomodExecutionReason) -> bool:
         """This function checks if the automod should be executed on the message.
         It checks for:
          - Automod and check enabled
@@ -394,16 +361,16 @@ class Automod(commands.Cog):
         if not cache.active:
             return False
 
-        if not getattr(cache, f"{reason}_active") or not getattr(cache, f"{reason}_actions"):
+        if not getattr(cache, f"{kind}_active") or not getattr(cache, f"{kind}_actions"):
             return False
 
         if any(role in cache.mod_roles + cache.ignored_roles for role in roles):
             return False
 
-        if channel.id in getattr(cache, f"{reason}_whitelist_channels"):
+        if channel.id in getattr(cache, f"{kind}_whitelist_channels"):
             return False
 
-        if any(role in getattr(cache, f"{reason}_whitelist_roles") for role in roles):
+        if any(role in getattr(cache, f"{kind}_whitelist_roles") for role in roles):
             return False
 
         return True
@@ -413,7 +380,10 @@ class Automod(commands.Cog):
         member = data.member
 
         points = await self.__add_points(
-            data.member, data.trigger_action.points, _(guild.preferred_locale, f"automod.reason.{data.trigger_reason}")
+            member=data.member,
+            points=data.trigger_action.points,
+            reason=data.trigger_reason,
+            expires=data.trigger_action.duration,
         )
 
         if points is None:
@@ -426,17 +396,18 @@ class Automod(commands.Cog):
         if points >= 10:
             cache = await self.bot.cache.get_moderation(guild.id)
             if cache is None:
+                _log.warning(f"Adding points to {member.id}, but no cache for guild {guild.id}")
                 return
 
             await self._handle_final_action(member, cache.automod_actions)
             await self.bot.db.execute(
-                "DELETE FROM automod_users WHERE user_id = $1 AND guild_id = $2", member.id, guild.id
+                "UPDATE automod_users SET expires = now() WHERE user_id = $1 AND guild_id = $2 AND expires > now()", member.id, guild.id
             )
 
     async def add_warn_points(self, member: discord.Member, moderator: discord.Member, add_points: int, reason: str):
         guild = member.guild
 
-        points = await self.__add_points(member, add_points, reason)
+        points = await self.__add_points(member=member, points=add_points, reason=reason)
         if points is None:
             _log.warning(f"{member.id} has no points in {guild.id}...")
             return
@@ -453,20 +424,21 @@ class Automod(commands.Cog):
                 "DELETE FROM automod_users WHERE user_id = $1 AND guild_id = $2", member.id, guild.id
             )
 
-    async def __add_points(self, member: discord.Member, points: int, reason: str) -> int:
+    async def __add_points(self, *, member: discord.Member, points: int, reason: str, expires: int = None) -> int:
         guild = member.guild
+        expires_at = discord.utils.utcnow() + datetime.timedelta(seconds=expires or 1209600)
 
         await self.bot.db.execute(
-            "INSERT INTO automod_users (guild_id, user_id, timestamp, points, reason) VALUES ($1, $2, $3, $4, $5)",
+            "INSERT INTO automod_users (guild_id, user_id, expires, points, reason) VALUES ($1, $2, $3, $4, $5)",
             guild.id,
             member.id,
-            discord.utils.utcnow(),
+            expires_at,
             points,
             reason,
         )
 
-        points = await self.bot.db.fetchval(
-            "SELECT SUM(points) FROM automod_users WHERE user_id = $1 AND guild_id = $2", member.id, guild.id
+        return await self.bot.db.fetchval(
+            "SELECT SUM(points) FROM automod_users WHERE user_id = $1 AND guild_id = $2 AND now() < expires",
+            member.id,
+            guild.id,
         )
-
-        return points

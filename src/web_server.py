@@ -46,6 +46,23 @@ class CacheUpdater(BaseHandler):
         return self.set_status(200)
 
 
+class AutomoderationCacheUpdater(BaseHandler):
+    async def get(self):
+        rule_id = self.get_argument("rule")
+
+        if not rule_id:
+            return self.set_status(400)
+
+        try:
+            rule_id = int(rule_id)
+        except ValueError:
+            return self.set_status(400)
+
+        self.bot.cache.remove_cache(rule_id, "automod")
+
+        return self.set_status(200)
+
+
 class TwitchNotifier(BaseHandler):
     async def get(self):
         user_id = self.get_argument("user_id")
@@ -74,6 +91,7 @@ async def start_webserver(bot: Plyoox):
     web = tornado.web.Application(
         [
             (r"/update/cache", CacheUpdater, {"bot": bot}),
+            (r"/update/cache/automoderation", AutomoderationCacheUpdater, {"bot": bot}),
             (r"/notification/twitch", TwitchNotifier, {"bot": bot}),
         ]
     )

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import discord
 from discord.ext import commands
@@ -21,7 +21,7 @@ class Notification(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    async def _get_stream_embed(data: dict[str, ...], lc: discord.Locale) -> discord.Embed:
+    async def _get_stream_embed(data: dict[str, Any], lc: discord.Locale) -> discord.Embed:
         time = datetime.datetime.strptime(data["started_at"], "%Y-%m-%dT%H:%M:%SZ").replace(
             tzinfo=datetime.timezone.utc
         )

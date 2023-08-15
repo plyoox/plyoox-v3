@@ -68,6 +68,7 @@ class Plyoox(commands.AutoShardedBot):
             tree_cls=extensions.CommandTree,
             chunk_guilds_at_startup=False,
             help_command=None,
+            activity=discord.CustomActivity("plyoox.net"),
         )
 
         self.imager_url = os.getenv("IMAGER_URL")

@@ -153,6 +153,8 @@ class Owner(commands.Cog):
             else:
                 await ctx.send(f"```py\n{value}{ret}\n```")
 
+            await ctx.message.add_reaction("✅")
+
     @commands.command(name="reload-util")
     @commands.is_owner()
     async def reload_utils(self, ctx: commands.Context, path: str):

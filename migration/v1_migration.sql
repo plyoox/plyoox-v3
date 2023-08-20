@@ -3,3 +3,7 @@ ALTER TABLE leveling_users
         UNIQUE (guild_id, user_id);
 
 ALTER TYPE user_permission ADD VALUE 'helper';
+
+alter table public.leveling
+    rename column booster_xp_multiplicator to booster_xp_multiplier;
+

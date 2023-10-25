@@ -98,7 +98,7 @@ level:
     reset_reason: "The level was reset."
   reset_guild_level:
     modal_title: "Reset all levels?"
-    question: "Do you really want to reset the level of all users?"
+    question: "Do you want to reset all levels?"
     placeholder: "Repeat \"Reset all levels\""
     reset_text: "Reset all levels"
     wrong_answer: "The specified text does not match. The levels have not been reset."

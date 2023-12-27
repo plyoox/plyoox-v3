@@ -3,6 +3,7 @@ import os
 
 import discord
 import yaml
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +64,7 @@ def get_command_key(locale: discord.Locale, key: str) -> str | None:
         return language.get(key)
 
 
-def get_key(language: str, key: str, **kwargs: dict[str, ...]) -> str:
+def get_key(language: str, key: str, **kwargs: dict[str, Any]) -> str:
     """Returns the localized message for a key. If the key is not available, a placeholder is returned."""
     lang: dict = _languages.get(language)
     message: str = lang.get(key)

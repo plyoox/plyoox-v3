@@ -4,7 +4,7 @@ from typing import Literal
 import asyncpg
 from lru import LRU
 
-from .models import ModerationRule, WelcomeModel, LevelingModel, LoggingModel, ModerationModel, AutomodExecutionModel
+from .models import LevelRole, ModerationRule, WelcomeModel, LevelingModel, LoggingModel, ModerationModel, AutomodExecutionModel
 
 
 CacheType = Literal["wel", "log", "lvl", "mod", "automod"]
@@ -90,7 +90,7 @@ class CacheManager:
         if guild_cache is not False:
             return guild_cache
 
-        result = await self._pool.fetchrow("SELECT * FROM leveling WHERE id = $1", id)
+        result = await self._pool.fetchrow("SELECT * FROM level_config WHERE id = $1", id)
         if result is None:
             self._leveling[id] = None
             return
@@ -98,12 +98,14 @@ class CacheManager:
         result = dict(result)
         del result["id"]
 
+        roles = [LevelRole(**role) for role in (result["roles"] or [])]
+
         model = LevelingModel(
             active=result["active"],
-            no_xp_channels=result["no_xp_channels"] or [],
-            no_xp_role=result["no_xp_role"],
+            exempt_channels=result["exempt_channels"] or [],
+            exempt_role=result["exempt_role"],
             remove_roles=result["remove_roles"],
-            roles=result["roles"] or [],
+            roles=roles,
             message=result["message"],
             channel=result["channel"],
             booster_xp_multiplier=result["booster_xp_multiplier"],

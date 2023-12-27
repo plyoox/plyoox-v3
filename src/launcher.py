@@ -24,6 +24,7 @@ args = parser.parse_args()
 # Set up logging
 
 logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
 discord.utils.setup_logging(root=True)
 
 logging.getLogger("tornado.access").setLevel(logging.ERROR)
@@ -35,7 +36,9 @@ async def generate_db():
     import lib.database as db
 
     # Create database engine
-    engine = async_sql.create_async_engine(os.getenv("POSTGRES_DSN").replace("postgresql://", "postgresql+asyncpg://"))
+    engine = async_sql.create_async_engine(
+        os.getenv("POSTGRES_DSN").replace("postgresql://", "postgresql+asyncpg://")
+    )
 
     async with engine.begin() as conn:
         logger.debug("Setup database...")
@@ -65,7 +68,9 @@ async def main():
 
     async with bot:
         if sys.platform == "linux":
-            bot.loop.add_signal_handler(signal.SIGTERM, lambda: bot.loop.create_task(bot.close()))
+            bot.loop.add_signal_handler(
+                signal.SIGTERM, lambda: bot.loop.create_task(bot.close())
+            )
         await bot.start(os.getenv("DISCORD_TOKEN"))
 
 

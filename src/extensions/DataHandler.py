@@ -22,7 +22,7 @@ LOGGING_COLORS = {
     logging.DEBUG: discord.Color.dark_gray(),
 }
 
-RESUME_REGEX = re.compile("Shard ID (\d|None) has successfully RESUMED session.+")
+RESUME_REGEX = re.compile(r"Shard ID (\d|None) has successfully RESUMED session.+")
 
 
 class DiscordNotificationLoggingHandler(logging.Handler):

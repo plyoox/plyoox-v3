@@ -9,6 +9,11 @@ if TYPE_CHECKING:
     from lib.enums import AutomodActionEnum, AutomodChecksEnum, TimerEnum
 
 
+class LevelRole(RecordClass):
+    role: int
+    level: int
+
+
 class WelcomeModel(RecordClass):
     active: bool
     join_active: bool
@@ -25,10 +30,10 @@ class LevelingModel(RecordClass):
     active: bool
     message: str | None
     channel: int | None
-    roles: list[list[int]] | None
-    no_xp_role: int | None
+    roles: list[LevelRole]
     remove_roles: bool
-    no_xp_channels: list[int] | None
+    exempt_role: int | None
+    exempt_channels: list[int]
     booster_xp_multiplier: int | None
 
 

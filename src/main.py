@@ -13,6 +13,7 @@ import discord
 from discord import utils
 from discord.ext import commands
 
+import translation
 from cache import CacheManager
 from lib import database, extensions
 
@@ -36,7 +37,7 @@ plugins = [
     "extensions.DataHandler",
     "extensions.Notification",
     "extensions.Migration",
-    "extensions.Statistics",
+    # "extensions.Statistics",
     "extensions.EmbedCreator",
 ]
 
@@ -82,7 +83,7 @@ class Plyoox(commands.AutoShardedBot):
             logger.warning("NOTIFICATOR_URL is not set. Notification extension will not be loaded.")
 
     async def setup_hook(self) -> None:
-        await self.tree.set_translator(extensions.Translator())
+        await self.tree.set_translator(translation.Translator())
 
         for plugin in plugins:
             logger.debug(f"Load plugin '{plugin}'...")

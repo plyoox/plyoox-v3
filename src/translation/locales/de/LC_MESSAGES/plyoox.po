@@ -8,93 +8,97 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-27 13:42+0100\n"
+"POT-Creation-Date: 2023-12-27 14:49+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/extensions/Leveling.py:50
 msgid "Reset server levels"
 msgstr ""
 
-#: src/extensions/Leveling.py:54
+#: src/extensions/Leveling.py:55
 msgid "Are you sure you want to reset all levels?"
 msgstr ""
 
-#: src/extensions/Leveling.py:63
+#: src/extensions/Leveling.py:66
 msgid "Wrong answer provided, aborting."
 msgstr ""
 
-#: src/extensions/Leveling.py:84
+#: src/extensions/Leveling.py:90
 msgid "View rank"
 msgstr ""
 
-#: src/extensions/Leveling.py:92
+#: src/extensions/Leveling.py:98
 msgid "Commands that are needed to interact with the level-system."
 msgstr ""
 
-#: src/extensions/Leveling.py:126
+#: src/extensions/Leveling.py:132
 msgid "This module is currently disabled."
 msgstr "Das Modul ist derzeit deaktiviert."
 
-#: src/extensions/Leveling.py:145 src/extensions/Leveling.py:190
-#: src/extensions/Leveling.py:205
+#: src/extensions/Leveling.py:150 src/extensions/Leveling.py:196
+#: src/extensions/Leveling.py:210
 msgid "The required infrastructure is currently not available."
 msgstr ""
 
-#: src/extensions/Leveling.py:388
+#: src/extensions/Leveling.py:166
+msgid "This user has never written anything or is excluded."
+msgstr ""
+
+#: src/extensions/Leveling.py:392
 msgid "Shows information about the current rank of a member."
 msgstr ""
 
-#: src/extensions/Leveling.py:390
+#: src/extensions/Leveling.py:394
 msgid "The member from whom you want the rank."
 msgstr ""
 
-#: src/extensions/Leveling.py:400
+#: src/extensions/Leveling.py:404
 msgid "Shows the available level roles."
 msgstr ""
 
-#: src/extensions/Leveling.py:412
+#: src/extensions/Leveling.py:422
 msgid "The server has no level roles configured."
 msgstr ""
 
-#: src/extensions/Leveling.py:423
+#: src/extensions/Leveling.py:433
 msgid "Available level roles"
 msgstr ""
 
-#: src/extensions/Leveling.py:430
+#: src/extensions/Leveling.py:440
 msgid "Lists the top 10 users with the highest level on this guild."
 msgstr ""
 
-#: src/extensions/Leveling.py:478
+#: src/extensions/Leveling.py:487
 msgid "There is no user tracked by the level system."
 msgstr ""
 
-#: src/extensions/Leveling.py:485
+#: src/extensions/Leveling.py:494
 msgid "Top 10 users with the highest level"
 msgstr ""
 
-#: src/extensions/Leveling.py:500
+#: src/extensions/Leveling.py:509
 msgid "Resets the level of a member. This action cannot be undone."
 msgstr ""
 
-#: src/extensions/Leveling.py:502
+#: src/extensions/Leveling.py:511
 msgid "The member from whom you want to reset rank."
 msgstr ""
 
-#: src/extensions/Leveling.py:528
+#: src/extensions/Leveling.py:537
 msgid "The level progress of this user was reset."
 msgstr ""
 
-#: src/extensions/Leveling.py:533
+#: src/extensions/Leveling.py:542
 msgid "The levels of this user were successfully reset."
 msgstr ""
 
-#: src/extensions/Leveling.py:540
+#: src/extensions/Leveling.py:549
 msgid ""
 "Resets the levels of all members in the guild. This action cannot be undone."
 msgstr ""

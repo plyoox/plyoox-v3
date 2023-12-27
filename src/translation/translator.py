@@ -10,14 +10,17 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from lib.errors import TranslationError
+
 if TYPE_CHECKING:
     from main import Plyoox
 
 
 _LOCALES_PATH = Path(str(importlib.resources.files(__package__).joinpath("locales")))
+
 DOMAIN = "plyoox"
 
-log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__)
 
 
 def locale_to_gnu(locale: discord.Locale) -> str:
@@ -36,12 +39,28 @@ def yield_mo_paths() -> Iterator[Path]:
         yield from lc_messages.glob("*.mo")
 
 
+class EmptyTranslations(gettext.NullTranslations):
+    """Returns an empty message to indicate no translation is available."""
+
+    def gettext(self, message: str) -> None:
+        return None
+
+    def ngettext(self, msgid1: str, msgid2: str, n: int) -> None:
+        return None
+
+    def pgettext(self, context: str, message: str) -> None:
+        return None
+
+    def npgettext(self, context: str, msgid1: str, msgid2: str, n: int) -> None:
+        return None
+
+
 class GettextTranslator(app_commands.Translator):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
         if not any(yield_mo_paths()):
-            log.warning("No compiled localizations detected")
+            _log.warning("No compiled localizations detected")
 
     def translate(
         self,
@@ -55,8 +74,11 @@ class GettextTranslator(app_commands.Translator):
                 localedir=str(_LOCALES_PATH),
                 languages=(locale_to_gnu(locale), "en_US"),
             )
-        except OSError:
-            return
+        except OSError as e:
+            _log.error(f"Failed to load locale {locale}", e)
+            raise TranslationError(f"Failed to load locale {locale}") from e
+
+        t.add_fallback(EmptyTranslations())
 
         plural: str | None = string.extras.get("plural")
         if plural is not None:
@@ -64,6 +86,9 @@ class GettextTranslator(app_commands.Translator):
             translated = t.ngettext(string.message, plural, context.data)
         else:
             translated = t.gettext(string.message)
+
+        if context.location is app_commands.TranslationContextLocation.other and isinstance(context.data, dict):
+            translated = translated.format(**context.data)
 
         return translated or f"~~{str(string)}~~"
 

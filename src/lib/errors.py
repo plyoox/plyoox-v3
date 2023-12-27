@@ -19,3 +19,7 @@ class ConversionError(app_commands.AppCommandError):
         interaction: discord.Interaction
 
     pass
+
+
+class TranslationError(app_commands.AppCommandError):
+    pass

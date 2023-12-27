@@ -5,20 +5,20 @@ from typing import Optional, Union
 
 import discord
 from discord import utils, app_commands
+from discord.app_commands import locale_str as _
 
 from lib import colors, helper, extensions
-from translation import _
 
 
 class UserGroup(app_commands.Group):
     def __init__(self):
         super().__init__(
             name="user-info",
-            description="Provides information about a guild member or user.",
+            description=_("Provides information about a guild member or user."),
             guild_only=True,
         )
 
-    joined_group = app_commands.Group(name="joined", description="Provides join information about a member.")
+    joined_group = app_commands.Group(name="joined", description=_("Provides join information about a member."))
 
     @staticmethod
     def sort(list_user: discord.Member):
@@ -28,21 +28,21 @@ class UserGroup(app_commands.Group):
     @staticmethod
     async def _send_joined_response(interaction: discord.Interaction, member: discord.Member, position: int) -> None:
         """Shortcut to send the response for the joined command."""
-        locale = interaction.locale
-
-        embed = extensions.Embed(title=_(locale, "user_info.joined.title"))
+        embed = extensions.Embed(title=interaction.translate(_("Join information")))
         embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
-        embed.add_field(name=_(locale, "user_info.joined.position"), value=f"> {position}")
+        embed.add_field(name=interaction.translate(_("Position")), value=f"> {position}")
         embed.add_field(
-            name=_(locale, "user_info.joined.days_since"),
+            name=interaction.translate(_("Daus since joined")),
             value=f"> {(datetime.datetime.now(tz=datetime.timezone.utc) - member.joined_at).days}",
         )
-        embed.add_field(name=_(locale, "joined_at"), value=helper.embed_timestamp_format(member.joined_at))
+        embed.add_field(
+            name=interaction.translate(_("Joined at")), value=helper.embed_timestamp_format(member.joined_at)
+        )
 
         if interaction.extras.get("deferred"):
             await interaction.followup.send(embed=embed)
         else:
-            await interaction.response.send_message(embed=embed)
+            await interaction.response.send(embed=embed)
 
     @staticmethod
     async def _send_about_response(
@@ -52,22 +52,22 @@ class UserGroup(app_commands.Group):
         public_flags = helper.get_badges(member.public_flags)
 
         embed = extensions.Embed(
-            title=_(lc, "user_info.about.user_information"),
+            title=interaction.translate(_("User information")),
             color=member.accent_color or colors.DISCORD_DEFAULT,
         )  # accent color is not provided in the default member object
 
         embed.set_author(name=str(member), icon_url=member.display_avatar.url)
         embed.set_thumbnail(url=member.display_avatar.url)
         embed.add_field(
-            name=_(lc, "user_info.about.account"),
-            value=f"> __{_(lc, 'id')}:__ {member.id}\n"
-            f"> __{_(lc, 'created_at')}:__ {utils.format_dt(member.created_at)}\n"
-            f"> __{_(lc, 'user_info.about.bot')}:__ {_(lc, member.bot)}",
+            name=interaction.translate(_("Account")),
+            value=f"> __{interaction.translate(_('Id'))}:__ {member.id}\n"
+            f"> __{interaction.translate(_('Created at'))}:__ {utils.format_dt(member.created_at)}\n"
+            f"> __{interaction.translate(_("Bot"))}:__ {interaction.translate(_('Yes') if member.bot else _('No'))}",
         )
 
         embed.add_field(
-            name=f"{_(lc, 'user_info.about.public_badges')} ({len(public_flags)})",
-            value=f"> {''.join(public_flags)}" if len(public_flags) else _(lc, "user_info.about.no_flags"),
+            name=f"{interaction.translate(_('Public Badges'))} ({len(public_flags)})",
+            value=f"> {''.join(public_flags)}" if len(public_flags) else interaction.translate(_("No public badges")),
         )
 
         if isinstance(member, discord.Member):
@@ -75,38 +75,38 @@ class UserGroup(app_commands.Group):
 
             embed.insert_field_at(
                 0,
-                name=_(lc, "user"),
-                value=f"> __{_(lc, 'nick')}:__ {member.nick or _(lc, 'user_info.about.no_nick')}\n"
+                name=interaction.translate(_("User information")),
+                value=f"> __{interaction.translate(_('Nick'))}:__ {member.nick or interaction.translate(_("No nick"))}\n"
                 f"> __{_(lc, 'user_info.about.server_avatar')}:__ {_(lc, bool(member.guild_avatar))}",
             )
             embed.insert_field_at(
                 1,
-                name=_(lc, "guild"),
-                value=f"> __{_(lc, 'joined_at')}:__ {utils.format_dt(member.joined_at)}\n"
+                name=interaction.translate(_("Guild")),
+                value=f"> __{interaction.translate(_("Joined at"))}:__ {utils.format_dt(member.joined_at)}\n"
                 + (
-                    f"> __{_(lc, 'user_info.about.member_verification')}:__ {_(lc, not member.pending)}\n"
+                    f"> __{interaction.translate(_("Completed verification"))}:__ {interaction.translate(_("Yes") if member.pending else _("No"))}\n"
                     if "MEMBER_VERIFICATION_GATE_ENABLED" in member.guild.features
                     else ""
                 )
-                + f"> __{_(lc, 'user_info.about.premium_subscriber')}:__ "
-                f"{utils.format_dt(member.premium_since) if member.premium_since else _(lc, False)}",
+                + f"> __{interaction.translate(_("Boosts guild"))}:__ "
+                f"{utils.format_dt(member.premium_since) if member.premium_since else interaction.translate(_("No"))}",
             )
 
             formatted_roles = helper.format_roles(roles)
             embed.insert_field_at(
                 3,
-                name=f"{_(lc, 'roles')} ({len(roles) - 1})",
-                value=f"> {formatted_roles}" if formatted_roles else _(lc, "no_roles"),
+                name=f"{interaction.translate(_("Roles"))} ({len(roles) - 1})",
+                value=f"> {formatted_roles}" if formatted_roles else interaction.translate(_("No roles")),
             )
 
-        await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
+        await interaction.response.send_translated(embeds=[embed], ephemeral=ephemeral)
 
-    @joined_group.command(name="position", description="Shows the user on a join position")
-    @app_commands.describe(position="Join position on the guild")
+    @joined_group.command(name="position", description=_("Shows the user on a join position"))
+    @app_commands.describe(position=_("Join position on the guild"))
     async def joined_position(self, interaction: discord.Interaction, position: app_commands.Range[int, 1]):
         """Provides join information based on the join position."""
         if interaction.guild.member_count is not None and position > interaction.guild.member_count:
-            await interaction.response.send_message(_(interaction.locale, "user_info.joined.number_to_high"))
+            await interaction.response.send_translated(_("No member found at this position."))
             return
 
         if not interaction.guild.chunked:
@@ -120,12 +120,12 @@ class UserGroup(app_commands.Group):
         try:
             member = members[position - 1]
         except KeyError:
-            return helper.interaction_send(interaction, "user_info.joined.postion_no_member")
+            return await interaction.response.send_translated(_("No member found at this position."))
 
         await self._send_joined_response(interaction, member, position)
 
-    @joined_group.command(name="member", description="Shows join information about a specific member.")
-    @app_commands.describe(member="The member you want the join position from.")
+    @joined_group.command(name="member", description=_("Shows join information about a specific member."))
+    @app_commands.describe(member=_("The member you want the join position from."))
     async def joined_member(self, interaction: discord.Interaction, member: Optional[discord.Member]):
         """Provides join information based on the member. If no member is provided, the user that executed
         the command will be used.
@@ -143,16 +143,16 @@ class UserGroup(app_commands.Group):
 
         await self._send_joined_response(interaction, current_member, position)
 
-    @app_commands.command(name="about", description="Shows information's about a Discord member.")
-    @app_commands.describe(member="The member you want the information about.")
+    @app_commands.command(name="about", description=_("Shows information's about a Discord member."))
+    @app_commands.describe(member=_("The member you want the information about."))
     async def about(self, interaction: discord.Interaction, member: Optional[Union[discord.Member, discord.User]]):
         """Shows basic information about a user. If no member is provided, the user
         that executed the command will be used.
         """
         await self._send_about_response(interaction, member=member or interaction.user)
 
-    @app_commands.command(name="avatar", description="Shows the avatar of a user.")
-    @app_commands.describe(member="The member you want the avatar from.")
+    @app_commands.command(name="avatar", description=_("Shows the avatar of a user."))
+    @app_commands.describe(member=_("The member you want the avatar from."))
     async def avatar(self, interaction: discord.Interaction, member: Optional[discord.Member]):
         """Shows the avatar of a member. If no member is provided, the user
         that executed the command will be used.

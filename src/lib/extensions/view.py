@@ -1,8 +1,8 @@
 import discord
 from discord import ui
+from discord.app_commands import locale_str as _
 
 from lib import emojis
-from translation import _
 
 
 class PrivateView(ui.View):

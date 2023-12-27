@@ -5,19 +5,18 @@ import re
 from typing import TYPE_CHECKING, Optional, Union
 
 import discord
-from discord import app_commands
+from discord import app_commands, utils
 from discord.ext import commands
+from discord.app_commands import locale_str as _
 
 from lib import parsers, extensions
 from lib.enums import TimerEnum
-from translation import _
 from . import _views as views, _logging_helper, clear_group, automod
 
 if TYPE_CHECKING:
     from main import Plyoox
 
 
-_T = app_commands.locale_str
 DISCORD_INVITE_SINGLE = re.compile(
     r"^(https?://)?discord(?:(app)?\.com/invite?|\.gg)/([a-zA-Z0-9-]{2,32})$", re.IGNORECASE
 )
@@ -35,7 +34,7 @@ class Moderation(commands.Cog):
         self.bot = bot
 
         self.ctx_menu = app_commands.ContextMenu(
-            name=_T("Invite info", key="view-invite-info"),
+            name=_("Invite info"),
             callback=self.invite_info_context_menu,
         )
 
@@ -44,7 +43,7 @@ class Moderation(commands.Cog):
     clear_group = clear_group.ClearGroup()
     warn_group = app_commands.Group(
         name="warn",
-        description="Commands to manage warnings on a user.",
+        description=_("Commands to manage warnings on a user."),
         guild_only=True,
         default_permissions=discord.Permissions(manage_messages=True),
     )
@@ -52,14 +51,14 @@ class Moderation(commands.Cog):
     @staticmethod
     async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
         if interaction.user.top_role <= target.top_role:
-            await interaction.response.send_message(
-                _(interaction.locale, "moderation.hierarchy_not_permitted"), ephemeral=True
+            await interaction.response.send_translated(
+                _("The user must be below you in the hierarchy."), ephemeral=True
             )
             return False
 
         if target.top_role >= interaction.guild.me.top_role:
             await interaction.response.send_message(
-                _(interaction.locale, "moderation.bot_cannot_punish"), ephemeral=True
+                _(interaction.locale, "The user must be below the bot in the hierarchy."), ephemeral=True
             )
             return False
 
@@ -104,10 +103,10 @@ class Moderation(commands.Cog):
             f"> __{_(lc, 'moderation.invite_info.member_count')}:__ {invite.approximate_member_count}",
         )
 
-        await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
+        await interaction.response.send_translated(embeds=[embed], ephemeral=ephemeral)
 
-    @app_commands.command(name="ban", description="Bans an user from the guild.")
-    @app_commands.describe(member="The member that should be banned.", reason="Why the member should be banned.")
+    @app_commands.command(name="ban", description=_("Bans an user from the guild."))
+    @app_commands.describe(member=_("The member that should be banned."), reason=_("Why the member should be banned."))
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
@@ -128,13 +127,13 @@ class Moderation(commands.Cog):
 
         await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, kind="ban")
         await guild.ban(member, reason=reason, delete_message_days=1)
-        await interaction.followup.send(_(lc, "moderation.ban.successfully_banned"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been permanently banned")), ephemeral=True)
 
-    @app_commands.command(name="tempban", description="Bans an user from the guild for a specific time.")
+    @app_commands.command(name="tempban", description=_("Bans an user from the guild for a specific time."))
     @app_commands.describe(
-        member=_T("The member that should be banned.", key="ban.member"),
-        reason=_T("Why the member should be banned.", key="ban.reason"),
-        duration="How long the member should be banned.",
+        member=_("The member that should be banned."),
+        reason=_("Why the member should be banned."),
+        duration=_("How long the member should be banned."),
     )
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
@@ -146,16 +145,15 @@ class Moderation(commands.Cog):
         duration: str,
         reason: Optional[app_commands.Range[str, None, 512]],
     ):
-        lc = interaction.locale
         guild = interaction.guild
 
         banned_until = parsers.parse_datetime_from_string(duration)
         if banned_until is None:
-            await interaction.response.send_message(_(lc, "moderation.invalid_duration"), ephemeral=True)
+            await interaction.response.send_translated(_("The provided duration is invalid."), ephemeral=True)
             return
 
         if (banned_until - discord.utils.utcnow()).total_seconds() > 31_536_000:
-            await interaction.response.send_message(_(lc, "moderation.tempban.too_long"), ephemeral=True)
+            await interaction.response.send_translated(_("The provided duration is too long."), ephemeral=True)
             return
 
         if not await Moderation._can_execute_on(interaction, member):
@@ -169,10 +167,10 @@ class Moderation(commands.Cog):
         await self.bot.timer.create_timer(member.id, guild.id, type=TimerEnum.tempban, expires=banned_until)
         await guild.ban(member, reason=reason, delete_message_days=1)
 
-        await interaction.followup.send(_(lc, "moderation.tempban.successfully_banned"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been banned until {timestamp}.")).format(timestamp=utils.time), ephemeral=True)
 
-    @app_commands.command(name="kick", description="Kicks an user from the guild.")
-    @app_commands.describe(member="The member that should be kicked.", reason="Why the member should be kicked.")
+    @app_commands.command(name="kick", description=_("Kicks an user from the guild."))
+    @app_commands.describe(member=_("The member that should be kicked."), reason=_("Why the member should be kicked."))
     @app_commands.checks.bot_has_permissions(kick_members=True)
     @app_commands.default_permissions(kick_members=True)
     @app_commands.guild_only
@@ -192,13 +190,13 @@ class Moderation(commands.Cog):
         await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, kind="kick")
         await guild.kick(member, reason=reason)
 
-        await interaction.followup.send(_(lc, "moderation.kick.successfully_kicked"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been kicked.")), ephemeral=True)
 
-    @app_commands.command(name="tempmute", description="Mutes an user for a specific time.")
+    @app_commands.command(name="tempmute", description=_("Mutes an user for a specific time."))
     @app_commands.describe(
-        member="The member that should be muted.",
-        reason="Why the member should be muted.",
-        duration="How long the member should be muted (max 28 days).",
+        member=_("The member that should be muted."),
+        reason=_("Why the member should be muted."),
+        duration=_("How long the member should be muted (max 28 days)."),
     )
     @app_commands.checks.bot_has_permissions(moderate_members=True)
     @app_commands.default_permissions(mute_members=True)
@@ -214,11 +212,11 @@ class Moderation(commands.Cog):
 
         banned_until = parsers.parse_datetime_from_string(duration)
         if banned_until is None:
-            await interaction.response.send_message(_(lc, "moderation.invalid_duration"), ephemeral=True)
+            await interaction.response.send_translated(_(lc, "The provided duration is invalid."), ephemeral=True)
             return
 
         if (banned_until - discord.utils.utcnow()).total_seconds() > 86400 * 28:
-            await interaction.response.send_message(_(lc, "moderation.tempmute.too_long"), ephemeral=True)
+            await interaction.response.send_translated(_("The provided duration is too long."), ephemeral=True)
             return
 
         if not await Moderation._can_execute_on(interaction, member):
@@ -230,10 +228,10 @@ class Moderation(commands.Cog):
             interaction, target=member, until=banned_until, reason=reason, kind="tempmute"
         )
 
-        await interaction.followup.send(_(lc, "moderation.tempmute.successfully_muted"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been temporary muted")), ephemeral=True)
 
-    @app_commands.command(name="unban", description="Unbans an user from the guild.")
-    @app_commands.describe(user="The member that should be unbanned.", reason="Why the member has been unbanned.")
+    @app_commands.command(name="unban", description=_("Unbans an user from the guild."))
+    @app_commands.describe(user=_("The user that should be unbanned."), reason=_("Why the member has been unbanned."))
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
@@ -246,7 +244,7 @@ class Moderation(commands.Cog):
         try:
             await guild.unban(user, reason=reason)
         except discord.NotFound:
-            await interaction.response.send_message(_(lc, "moderation.unban.not_banned"), ephemeral=True)
+            await interaction.response.send_translated(_("The user is not banned on this server."), ephemeral=True)
             return
 
         await interaction.response.defer(ephemeral=True)
@@ -256,13 +254,10 @@ class Moderation(commands.Cog):
             "DELETE FROM timers WHERE target_id = $1 AND guild_id = $2 AND type = 'tempban'", user.id, guild.id
         )
 
-        await interaction.followup.send(_(lc, "moderation.unban.successfully_unbanned"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been unbanned.")), ephemeral=True)
 
-    @app_commands.command(name="softban", description="Kicks an user from the guild and deletes their messages.")
-    @app_commands.describe(
-        member=_T("The member that should be kicked.", key="kick.member"),
-        reason=_T("Why the member should be kicked.", key="kick.reason"),
-    )
+    @app_commands.command(name="softban", description=_("Kicks an user from the guild and deletes their messages."))
+    @app_commands.describe(member=_("The member that should be kicked."), reason=_("Why the member should be kicked."))
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
@@ -284,10 +279,10 @@ class Moderation(commands.Cog):
         await guild.ban(member, reason=reason, delete_message_days=1)
         await guild.unban(member, reason=reason)
 
-        await interaction.followup.send(_(lc, "moderation.softban.successfully_kicked"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been kicked.")), ephemeral=True)
 
-    @app_commands.command(name="slowmode", description="Sets the slowmode of the current channel.")
-    @app_commands.describe(duration="How long the slowmode should be (max 6hrs).")
+    @app_commands.command(name="slowmode", description=_("Sets the slowmode of the current channel."))
+    @app_commands.describe(duration=_("How long the slowmode should be (max 6hrs)."))
     @app_commands.checks.cooldown(2, 10, key=lambda i: i.channel_id)
     @app_commands.checks.bot_has_permissions(manage_channels=True)
     @app_commands.default_permissions(manage_messages=True)
@@ -297,13 +292,15 @@ class Moderation(commands.Cog):
 
         if duration is None:
             await interaction.channel.edit(slowmode_delay=0)
-            await interaction.response.send_message(_(lc, "moderation.slowmode.disabled"), ephemeral=True)
+            await interaction.response.send_translated(_("The slowmode has been disabled."), ephemeral=True)
         else:
             await interaction.channel.edit(slowmode_delay=duration)
-            await interaction.response.send_message(_(lc, "moderation.slowmode.enabled"), ephemeral=True)
+            await interaction.response.send_message(_(lc, "The slowmode has been enabled."), ephemeral=True)
 
-    @app_commands.command(name="unmute", description="Unmutes an user.")
-    @app_commands.describe(member="The member that should be unmuted.", reason="Why the member should be unmuted.")
+    @app_commands.command(name="unmute", description=_("Unmutes an user."))
+    @app_commands.describe(
+        member=_("The member that should be unmuted."), reason=_("Why the member should be unmuted.")
+    )
     @app_commands.checks.bot_has_permissions(mute_members=True)
     @app_commands.default_permissions(mute_members=True)
     @app_commands.guild_only
@@ -320,10 +317,10 @@ class Moderation(commands.Cog):
 
         await interaction.response.defer(ephemeral=True)
 
-        await member.timeout(None, reason=_(lc, "moderation.unmute.reason"))
+        await member.timeout(None, reason=reason)
         await _logging_helper.log_simple_punish_command(interaction, target=member, kind="unmute", reason=reason)
 
-        await interaction.followup.send(_(lc, "moderation.unmute.successfully_unmuted"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been unmuted.")), ephemeral=True)
 
     @app_commands.command(name="invite-info", description="Shows information about a invite.")
     @app_commands.describe(invite="The invite you want to get information about.")

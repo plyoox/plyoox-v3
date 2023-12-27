@@ -2,9 +2,10 @@ import logging
 
 import discord
 from discord import app_commands
+from discord.app_commands import locale_str as _
 
 from lib import errors
-from translation import _
+from translation.translator import translate
 
 _log = logging.getLogger(__name__)
 
@@ -20,9 +21,7 @@ class CommandTree(app_commands.CommandTree):
             await interaction.response.send_message(error, ephemeral=True)
         elif isinstance(error, app_commands.BotMissingPermissions):
             await interaction.response.send_message(
-                _(
-                    interaction.locale,
-                    "errors.bot_missing_permissions",
+                translate(_("Bot is missing permissions: {missing_permission}"), self.bot, interaction.locale).format(
                     permissions=", ".join(error.missing_permissions),
                 ),
                 ephemeral=True,
@@ -33,7 +32,11 @@ class CommandTree(app_commands.CommandTree):
             pass
         elif isinstance(error, app_commands.CommandOnCooldown):
             await interaction.response.send_message(
-                _(interaction.locale, "errors.command_on_cooldown", retry_after=round(error.retry_after)),
+                translate(
+                    _("Command is on cooldown, retry after {retry_after} seconds"), self.bot, interaction.locale
+                ).format(
+                    retry_after=round(error.retry_after),
+                ),
                 ephemeral=True,
             )
         else:
@@ -41,7 +44,7 @@ class CommandTree(app_commands.CommandTree):
                 namespace = [interaction.command.name]
                 command = interaction.command
 
-                for _i in range(2):
+                for _ in range(2):
                     if getattr(command, "parent", None):
                         namespace.append(command.parent.name)
                         command = command.parent

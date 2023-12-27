@@ -6,7 +6,7 @@ from recordclass import RecordClass
 
 if TYPE_CHECKING:
     from datetime import datetime
-    from lib.enums import AutomodActionEnum, AutomodChecksEnum, TimerEnum
+    from lib.enums import AutoModerationPunishmentKind, AutoModerationCheckKind, TimerEnum
 
 
 class LevelRole(RecordClass):
@@ -15,7 +15,6 @@ class LevelRole(RecordClass):
 
 
 class WelcomeModel(RecordClass):
-    active: bool
     join_active: bool
     join_channel: int | None
     join_roles: list[int] | None
@@ -27,7 +26,6 @@ class WelcomeModel(RecordClass):
 
 
 class LevelingModel(RecordClass):
-    active: bool
     message: str | None
     channel: int | None
     roles: list[LevelRole]
@@ -37,34 +35,45 @@ class LevelingModel(RecordClass):
     booster_xp_multiplier: int | None
 
 
+class MaybeWebhook(RecordClass):
+    webhook_id: int
+    token: str | None
+    channel_id: int | None
+    guild_id: int
+
+
+class LoggingSettings(RecordClass):
+    channel: MaybeWebhook | None
+    kind: str
+    exempt_channels: list[int] | None
+    exempt_roles: list[int] | None
+
+
 class LoggingModel(RecordClass):
-    active: bool
-    webhook_id: int | None
-    webhook_channel: int | None
-    webhook_token: str | None
-    member_join: bool
-    member_leave: bool
-    member_ban: bool
-    member_unban: bool
-    member_rename: bool
-    member_role_change: bool
-    message_edit: bool
-    message_delete: bool
+    settings: dict[str, LoggingSettings]
 
 
 class ModerationRule(RecordClass):
     guild_id: int
     reason: str
-    actions: list[AutomodExecutionModel]
+    actions: list[AutoModerationAction]
 
 
-class AutomodExecutionModel(RecordClass):
-    action: AutomodActionEnum
-    check: AutomodChecksEnum
-    days: int
-    points: int
-    duration: int
-    expires: int
+class AutoModerationCheck(RecordClass):
+    check: AutoModerationCheckKind
+    time: int | None
+
+
+class AutomoderationPunishment(RecordClass):
+    action: AutoModerationPunishmentKind
+    duration: int | None
+    points: int | None
+    expires_in: int | None
+
+
+class AutoModerationAction(RecordClass):
+    punishment: AutomoderationPunishment
+    check: AutoModerationCheck | None
 
 
 class ModerationModel(RecordClass):
@@ -74,23 +83,23 @@ class ModerationModel(RecordClass):
     log_id: int | None
     log_channel: int | None
     log_token: str | None
-    automod_actions: list[AutomodExecutionModel] | None
+    point_actions: list[AutoModerationAction] | None
     notify_user: bool
     invite_active: bool
-    invite_actions: list[AutomodExecutionModel] | None
-    invite_whitelist_channels: list[int] | None
-    invite_whitelist_roles: list[int] | None
+    invite_actions: list[AutoModerationAction] | None
+    invite_exempt_channels: list[int] | None
+    invite_exempt_roles: list[int] | None
     invite_allowed: list[str] | None
     link_active: bool
-    link_actions: list[AutomodExecutionModel] | None
-    link_whitelist_channels: list[int] | None
-    link_whitelist_roles: list[int] | None
-    link_list: list[str] | None
+    link_actions: list[AutoModerationAction] | None
+    link_exempt_channels: list[int] | None
+    link_exempt_roles: list[int] | None
+    link_allow_list: list[str] | None
     link_is_whitelist: bool
     caps_active: bool
-    caps_actions: list[AutomodExecutionModel] | None
-    caps_whitelist_channels: list[int] | None
-    caps_whitelist_roles: list[int] | None
+    caps_actions: list[AutoModerationAction] | None
+    caps_exempt_channels: list[int] | None
+    caps_exempt_roles: list[int] | None
 
 
 class TimerModel(RecordClass):

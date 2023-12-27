@@ -9,10 +9,11 @@ import asyncpg
 import discord
 from discord import utils
 from discord.ext import commands
+from discord.app_commands import locale_str as _
 
 from cache.models import TimerModel
 from lib.enums import TimerEnum
-from translation import _
+from translation import translate
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -103,7 +104,8 @@ class Timer(commands.Cog):
 
         try:
             await guild.unban(
-                discord.Object(id=timer.target_id), reason=_(guild.preferred_locale, "moderation.tempban_expired")
+                discord.Object(id=timer.target_id),
+                reason=translate(_("Temporary ban expired"), self.bot, guild.preferred_locale),
             )
         except discord.NotFound:
             pass

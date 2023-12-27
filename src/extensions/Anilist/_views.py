@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING
 import aiohttp
 import discord
 from discord import ui
+from discord.app_commands import locale_str as _
 
 from lib import emojis, types, extensions
-from translation import _
 from . import _helper
 
 if TYPE_CHECKING:
@@ -20,9 +20,11 @@ _log = logging.getLogger(__name__)
 
 
 class SiteBackButton(ui.Button):
-    def __init__(self, view: AnilistSearchView, locale: discord.Locale, disabled: bool = False):
+    def __init__(self, view: AnilistSearchView, disabled: bool = False):
+        translate = view._last_interaction.translate
+
         super().__init__(
-            label=_(locale, "previous_site"),
+            label=translate(_("Previous page")),
             style=discord.ButtonStyle.green,
             emoji=emojis.chevron_left,
             disabled=disabled,
@@ -36,9 +38,14 @@ class SiteBackButton(ui.Button):
 
 
 class SiteNextButton(ui.Button):
-    def __init__(self, view: AnilistSearchView, locale: discord.Locale, disabled: bool = False):
+    def __init__(self, view: AnilistSearchView, disabled: bool = False):
+        translate = view._last_interaction.translate
+
         super().__init__(
-            label=_(locale, "next_site"), style=discord.ButtonStyle.green, emoji=emojis.chevron_right, disabled=disabled
+            label=translate(_("Next page")),
+            style=discord.ButtonStyle.green,
+            emoji=emojis.chevron_right,
+            disabled=disabled,
         )
 
         self.search_view = view
@@ -67,9 +74,11 @@ class AnilistSearchView(extensions.PrivateView):
 
 
 class BackButton(ui.Button):
-    def __init__(self, view: AnilistInfoView, *, locale: discord.Locale):
+    def __init__(self, view: AnilistInfoView):
+        translate = view._last_interaction.translate
+
         super().__init__(
-            label=_(locale, "back"),
+            label=translate(_("Back")),
             style=discord.ButtonStyle.gray,
             emoji=emojis.chevron_left,
         )
@@ -94,15 +103,14 @@ class BackButtonView(extensions.PrivateView):
 
 class ViewScoreButton(ui.Button):
     def __init__(self, view: AnilistInfoView, *, locale: discord.Locale):
-        super().__init__(
-            style=discord.ButtonStyle.gray, label=_(locale, "anilist.view.score_button"), emoji=emojis.chart_bar
-        )
+        translate = view._last_interaction.translate
+
+        super().__init__(style=discord.ButtonStyle.gray, label=translate(_("Show rating")), emoji=emojis.chart_bar)
 
         self.anilist_view = view
 
     async def callback(self, interaction: discord.Interaction) -> None:
         bot: Plyoox = interaction.client  # type: ignore
-        lc = interaction.locale
 
         await interaction.response.defer()
 
@@ -115,7 +123,8 @@ class ViewScoreButton(ui.Button):
                     _log.warning(f"Received status code {res.status} and data `{text}` while fetching anilist rating.")
 
                     await interaction.followup.send(
-                        _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
+                        interaction.translate(_("The required infrastructure is currently not available.")),
+                        ephemeral=True,
                     )
                     return
 
@@ -124,12 +133,17 @@ class ViewScoreButton(ui.Button):
         except aiohttp.ClientConnectionError as err:
             _log.error("Could not fetch anilist score", err)
 
-            await interaction.followup.send(_(interaction.locale, "level.infrastructure_offline"), ephemeral=True)
+            await interaction.followup.send(
+                interaction.translate(_("The required infrastructure is currently not available.")),
+                ephemeral=True,
+            )
             return
 
         embed = extensions.Embed(
-            title=_(lc, "anilist.view.score_title", title=self.anilist_view.data["title"]["romaji"]),
-            description=f"{_(lc, 'anilist.score')}: {self.anilist_view.data['averageScore']}/100",
+            title=interaction.translate(_("Rating Statistics for {title}")).format(
+                title=self.anilist_view.data["title"]["romaji"]
+            ),
+            description=interaction.translate(_("Rating")),
         )
         embed.set_image(url="attachment://anilist_score.png")
 
@@ -141,9 +155,10 @@ class ViewScoreButton(ui.Button):
 class ViewTrailerButton(ui.Button):
     def __init__(self, view: AnilistInfoView, locale: discord.Locale):
         data = view.data
+        translate = view._last_interaction.translate
 
         super().__init__(
-            emoji=emojis.link, url=f"https://youtu.be/{data['trailer']['id']}", label=_(locale, "anilist.info.trailer")
+            emoji=emojis.link, url=f"https://youtu.be/{data['trailer']['id']}", label=translate(_("View trailer"))
         )
 
 

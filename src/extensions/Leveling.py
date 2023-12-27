@@ -51,9 +51,7 @@ class ResetGuildModal(ui.Modal):
 
         self.bot: Plyoox = interaction.client  # type: ignore
         self.question = ui.TextInput(
-            label=interaction.translate(
-                _("Are you sure you want to reset all levels?")
-            ),
+            label=interaction.translate(_("Are you sure you want to reset all levels?")),
             placeholder=f"{interaction.translate(_('Repeat:'))} {RESET_LEVEL_CONFIRMATION_TEXT}",
             required=True,
         )
@@ -62,19 +60,13 @@ class ResetGuildModal(ui.Modal):
     async def on_submit(self, interaction: discord.Interaction) -> None:
         lc = interaction.locale
         if self.question.value.lower() != RESET_LEVEL_CONFIRMATION_TEXT.lower():
-            await interaction.response.send_translated(
-                _("Wrong answer provided, aborting."), ephemeral=True
-            )
+            await interaction.response.send_translated(_("Wrong answer provided, aborting."), ephemeral=True)
             return
 
         await interaction.response.defer(ephemeral=True)
-        await self.bot.db.execute(
-            "DELETE FROM level_user WHERE guild_id = $1", interaction.guild_id
-        )
+        await self.bot.db.execute("DELETE FROM level_user WHERE guild_id = $1", interaction.guild_id)
         await interaction.followup.send(
-            interaction.translate(
-                _(lc, "The level of all guild members has been successfully reset.")
-            ),
+            interaction.translate(_(lc, "The level of all guild members has been successfully reset.")),
             ephemeral=True,
         )
 
@@ -82,9 +74,7 @@ class ResetGuildModal(ui.Modal):
 class Leveling(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
-        self._cooldown_by_user = commands.CooldownMapping.from_cooldown(
-            1, 60, commands.BucketType.member
-        )
+        self._cooldown_by_user = commands.CooldownMapping.from_cooldown(1, 60, commands.BucketType.member)
 
         self.ctx_menu = app_commands.ContextMenu(
             name=_("View rank"),
@@ -118,19 +108,15 @@ class Leveling(commands.Cog):
 
     async def _update_member_data(self, id: int, xp: int) -> None:
         """Adds a specific amount of xp to the user in the database."""
-        await self.bot.db.execute(
-            "UPDATE level_user SET xp = xp + $1 WHERE id = $2", xp, id
-        )
+        await self.bot.db.execute("UPDATE level_user SET xp = xp + $1 WHERE id = $2", xp, id)
 
     async def cog_unload(self) -> None:
         self.bot.tree.remove_command(self.ctx_menu.name, type=self.ctx_menu.type)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         cache = await self.bot.cache.get_leveling(interaction.guild_id)
-        if cache is None or not cache.active:
-            await interaction.response.send_translated(
-                _("This module is currently disabled."), ephemeral=True
-            )
+        if not cache:
+            await interaction.response.send_translated(_("This module is currently disabled."), ephemeral=True)
 
             return False
 
@@ -183,14 +169,10 @@ class Leveling(commands.Cog):
         }
 
         try:
-            async with bot.session.get(
-                f"{self.bot.imager_url}/api/level-card", params=params
-            ) as res:
+            async with bot.session.get(f"{self.bot.imager_url}/api/level-card", params=params) as res:
                 if res.status != 200:
                     text = await res.text()
-                    _log.warning(
-                        f"Received status code {res.status} and data `{text}` while fetching level card."
-                    )
+                    _log.warning(f"Received status code {res.status} and data `{text}` while fetching level card.")
 
                     await interaction.response.send_translated(
                         _("The required infrastructure is currently not available."),
@@ -219,7 +201,7 @@ class Leveling(commands.Cog):
             return
 
         cache = await self.bot.cache.get_leveling(guild.id)
-        if cache is None or not cache.active or not cache.roles:
+        if not cache or not cache.roles:
             return
 
         user_data = await self._fetch_member_data(member)
@@ -260,7 +242,7 @@ class Leveling(commands.Cog):
         cache = await self.bot.cache.get_leveling(guild.id)
 
         # leveling is deactivated on this guild
-        if cache is None or not cache.active:
+        if not cache:
             return
 
         # ignore no xp channels
@@ -271,9 +253,7 @@ class Leveling(commands.Cog):
         if cache.exempt_role in member._roles:
             return
 
-        message_xp = random.randint(
-            15, 25
-        )  # generate a random amount of xp between 15 and 25
+        message_xp = random.randint(15, 25)  # generate a random amount of xp between 15 and 25
         member_data = await self._fetch_member_data(member)
 
         if member.premium_since is not None and cache.booster_xp_multiplier is not None:
@@ -286,12 +266,8 @@ class Leveling(commands.Cog):
 
         await self._update_member_data(member_data["id"], message_xp)
 
-        before_level = get_level_from_xp(member_data["xp"])[
-            0
-        ]  # level with the current xp
-        after_level = get_level_from_xp(member_data["xp"] + message_xp)[
-            0
-        ]  # level with the added xp
+        before_level = get_level_from_xp(member_data["xp"])[0]  # level with the current xp
+        after_level = get_level_from_xp(member_data["xp"] + message_xp)[0]  # level with the added xp
         highest_add_role = None
 
         if before_level != after_level:
@@ -303,9 +279,7 @@ class Leveling(commands.Cog):
 
                     if cache.remove_roles and highest_add_role:
                         try:
-                            await member.add_roles(
-                                highest_add_role, reason="Add new level role"
-                            )
+                            await member.add_roles(highest_add_role, reason="Add new level role")
 
                             remove_roles = []
 
@@ -319,9 +293,7 @@ class Leveling(commands.Cog):
                                 if new_role is not None:
                                     remove_roles.append(new_role)
 
-                            await member.remove_roles(
-                                *remove_roles, reason="Remove old level roles"
-                            )
+                            await member.remove_roles(*remove_roles, reason="Remove old level roles")
                         except discord.Forbidden:
                             pass
                     else:
@@ -340,26 +312,18 @@ class Leveling(commands.Cog):
                                 add_lvl_roles.append(new_role)
 
                         try:
-                            await member.add_roles(
-                                *add_lvl_roles, reason="Add new level roles"
-                            )
+                            await member.add_roles(*add_lvl_roles, reason="Add new level roles")
                         except discord.Forbidden:
                             pass
 
             if cache.message:
                 # format the messages with the variables
-                f_level = formatting.LevelFormatObject(
-                    level=after_level, role=highest_add_role
-                )
-                level_message = formatting.format_leveling_message(
-                    cache.message, member=member, level=f_level
-                )
+                f_level = formatting.LevelFormatObject(level=after_level, role=highest_add_role)
+                level_message = formatting.format_leveling_message(cache.message, member=member, level=f_level)
 
                 if not level_message:  # can be none when {level.role} is used and no role was given to the user
                     if level_message is not None:  # currently only for debugging
-                        _log.warning(
-                            f'Message is empty after formatting: "{cache.message}" -> "{level_message}"'
-                        )
+                        _log.warning(f'Message is empty after formatting: "{cache.message}" -> "{level_message}"')
 
                     return
 
@@ -381,9 +345,7 @@ class Leveling(commands.Cog):
         if before.pending and not after.pending:
             await self._add_level_roles(after)
 
-    async def rank_context_menu(
-        self, interaction: discord.Interaction, member: discord.Member
-    ):
+    async def rank_context_menu(self, interaction: discord.Interaction, member: discord.Member):
         """Shows the current ranking information about a member. This can is context menu command."""
         await self._view_rank(interaction, member=member, ephemeral=True)
 
@@ -392,35 +354,24 @@ class Leveling(commands.Cog):
         description=_("Shows information about the current rank of a member."),
     )
     @app_commands.describe(member=_("The member from whom you want the rank."))
-    async def rank(
-        self, interaction: discord.Interaction, member: Optional[discord.Member]
-    ):
+    async def rank(self, interaction: discord.Interaction, member: Optional[discord.Member]):
         """Shows the current ranking information about a member. If no member is provided, the user that executed
         the command will be used.
         """
         await self._view_rank(interaction, member=member or interaction.user)
 
-    @level_group.command(
-        name="show-roles", description=_("Shows the available level roles.")
-    )
+    @level_group.command(name="show-roles", description=_("Shows the available level roles."))
     async def show_roles(self, interaction: discord.Interaction):
         """Shows the roles that are gain able through the level system"""
         guild = interaction.guild
         bot: Plyoox = interaction.client  # type: ignore
 
-        raw_roles = (
-            await bot.db.fetchval(
-                "SELECT roles FROM level_config WHERE id = $1", guild.id
-            )
-            or []
-        )
+        raw_roles = await bot.db.fetchval("SELECT roles FROM level_config WHERE id = $1", guild.id) or []
 
         level_roles = [[role["role"], role["level"]] for role in raw_roles]
 
         if len(level_roles) == 0:
-            await interaction.response.send_translated(
-                _("The server has no level roles configured."), ephemeral=True
-            )
+            await interaction.response.send_translated(_("The server has no level roles configured."), ephemeral=True)
             return
 
         roles: list[str] = []
@@ -433,7 +384,7 @@ class Leveling(commands.Cog):
         embed = extensions.Embed(title=_("Available level roles"))
         embed.description = "\n".join(roles)
 
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_translated(embed=embed)
 
     @level_group.command(
         name="top",
@@ -483,9 +434,7 @@ class Leveling(commands.Cog):
 
         if len(top_users) == 0:
             await interaction.followup.send(
-                interaction.translate(
-                    _("There is no user tracked by the level system.")
-                ),
+                interaction.translate(_("There is no user tracked by the level system.")),
                 ephemeral=True,
             )
             return
@@ -511,9 +460,7 @@ class Leveling(commands.Cog):
     @app_commands.describe(member=_("The member from whom you want to reset rank."))
     @app_commands.default_permissions(administrator=True)
     @app_commands.guild_only
-    async def reset_level(
-        self, interaction: discord.Interaction, member: discord.Member
-    ):
+    async def reset_level(self, interaction: discord.Interaction, member: discord.Member):
         guild = interaction.guild
 
         await self.bot.db.execute(
@@ -524,30 +471,23 @@ class Leveling(commands.Cog):
 
         if guild.me.guild_permissions.manage_roles:
             leveling_cache = await self.bot.cache.get_leveling(guild.id)
-            if leveling_cache is not None:
-                if leveling_cache.roles:
-                    roles_to_remove = []
-                    for [role_id, __] in leveling_cache.roles:
-                        if role_id in member._roles:
-                            roles_to_remove.append(discord.Object(id=role_id))
+            if leveling_cache and leveling_cache.roles:
+                roles_to_remove = []
+                for [role_id, __] in leveling_cache.roles:
+                    if role_id in member._roles:
+                        roles_to_remove.append(discord.Object(id=role_id))
 
-                    await member.remove_roles(
-                        *roles_to_remove,
-                        reason=interaction.translate(
-                            _("The level progress of this user was reset.")
-                        ),
-                    )
+                await member.remove_roles(
+                    *roles_to_remove,
+                    reason=interaction.translate(_("The level progress of this user was reset.")),
+                )
 
-        embed = extensions.Embed(
-            description=_("The levels of this user were successfully reset.")
-        )
+        embed = extensions.Embed(description=_("The levels of this user were successfully reset."))
         await interaction.response.send_translated(embeds=[embed], ephemeral=True)
 
     @app_commands.command(
         name="reset-guild-levels",
-        description=_(
-            "Resets the levels of all members in the guild. This action cannot be undone."
-        ),
+        description=_("Resets the levels of all members in the guild. This action cannot be undone."),
     )
     @app_commands.default_permissions(administrator=True)
     @app_commands.guild_only

@@ -36,9 +36,8 @@ plugins = [
     "extensions.Anilist",
     "extensions.DataHandler",
     "extensions.Notification",
-    "extensions.Migration",
     # "extensions.Statistics",
-    "extensions.EmbedCreator",
+    # "extensions.EmbedCreator",
 ]
 
 

@@ -5,7 +5,7 @@ class PlyooxModuleEnum(enum.Enum):
     Leveling = 1
 
 
-class AutomodActionEnum(str, enum.Enum):
+class AutoModerationPunishmentKind(enum.StrEnum):
     delete = "delete"
     kick = "kick"
     ban = "ban"
@@ -14,25 +14,30 @@ class AutomodActionEnum(str, enum.Enum):
     points = "points"
 
 
-class AutomodFinalActionEnum(str, enum.Enum):
+class AutomodFinalActionEnum(enum.StrEnum):
     kick = "kick"
     ban = "ban"
     tempban = "tempban"
     tempmute = "tempmute"
 
 
-class AutomodChecksEnum(str, enum.Enum):
+class AutoModerationCheckKind(enum.StrEnum):
     no_role = "no_role"
     no_avatar = "no_avatar"
     account_age = "account_age"
     join_date = "join_date"
 
 
-class TimerEnum(str, enum.Enum):
+class TimerEnum(enum.StrEnum):
     tempban = "tempban"
 
 
-class HelperPermissionEnum(str, enum.Enum):
-    none = "none"
-    view = "view"
-    full = "full"
+class LoggingKind(enum.StrEnum):
+    member_ban = "member_ban"
+    member_rename = "member_rename"
+    member_join = "member_join"
+    message_edit = "message_edit"
+    message_delete = "message_delete"
+    member_unban = "member_unban"
+    member_role_update = "member_role_update"
+    member_leave = "member_leave"

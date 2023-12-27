@@ -4,11 +4,10 @@ from discord.ext import commands
 
 from lib import extensions
 from main import Plyoox
-from translation import _
 from . import guild_group, user_group
 
 
-_T = app_commands.locale_str
+_ = app_commands.locale_str
 
 
 class Infos(commands.Cog):
@@ -16,7 +15,7 @@ class Infos(commands.Cog):
         self.bot = bot
 
         self.ctx_menu = app_commands.ContextMenu(
-            name=_T("View user info", key="view-user-info"),
+            name=_("View user info."),
             callback=self.about_context_menu,
         )
 
@@ -25,19 +24,19 @@ class Infos(commands.Cog):
     guild_commands = guild_group.GuildGroup()
     user_commands = user_group.UserGroup()
 
-    @app_commands.command(name="bot", description="Shows information about the bot")
+    @app_commands.command(name="bot", description=_("Shows information about the bot."))
     async def bot(self, interaction: discord.Interaction):
         """Shows basic information about the bot."""
-        lc = interaction.locale
+        translate = interaction.translate
 
-        embed = extensions.Embed(title=_(lc, "infos.bot.title"))
-        embed.add_field(name=_(lc, "infos.bot.coder"), value=f"> JohannesIBK#9220")
-        embed.add_field(name=_(lc, "infos.bot.additional_coders"), value=f"> X Gamer Guide#1866")
-        embed.add_field(name=_(lc, "infos.bot.guild_count"), value=f"> {len(self.bot.guilds)}")
-        embed.add_field(name=_(lc, "infos.bot.uptime"), value=f"> {utils.format_dt(self.bot.start_time, 'R')}")
+        embed = extensions.Embed(title=translate(_("Bot information")))
+        embed.add_field(name=translate(_("Developer")), value="> JohannesIBK#9220")
+        embed.add_field(name=translate(_("Contributers")), value="> X Gamer Guide#1866")
+        embed.add_field(name=translate(_("Guild count")), value=f"> {len(self.bot.guilds)}")
+        embed.add_field(name=translate(_("Uptime")), value=f"> {utils.format_dt(self.bot.start_time, 'R')}")
         embed.add_field(
-            name=_(lc, "infos.bot.privacy_policy"),
-            value=f"> [plyoox.net](https://plyoox.net/privacy-discord)",
+            name=translate(_("Privacy Policy")),
+            value="> [plyoox.net](https://plyoox.net/privacy-discord)",
         )
 
         view = ui.View()
@@ -46,7 +45,7 @@ class Infos(commands.Cog):
         view.add_item(ui.Button(label="Support", url="https://discord.gg/5qPPvQe"))
         view.add_item(
             ui.Button(
-                label="Invite",
+                label=translate(_("Invite")),
                 url=utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(275146828846)),
             )
         )

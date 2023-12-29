@@ -1,16 +1,15 @@
 import asyncio
 import re
 import time
-from typing import Optional, Callable, Union
+from typing import Optional, Callable
 
 import discord
 from discord import app_commands
 from discord.ext import commands
+from discord.app_commands import locale_str as _
 
 from lib import extensions
-from translation import _
 
-_T = app_commands.locale_str
 LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
 
 
@@ -48,7 +47,7 @@ class ClearGroup(app_commands.Group):
 
     @staticmethod
     async def _purge_helper(
-        channel: Union[discord.TextChannel],
+        channel: discord.TextChannel,
         *,
         limit: Optional[int] = 100,
         check: Callable[[discord.Message], bool],
@@ -87,32 +86,39 @@ class ClearGroup(app_commands.Group):
         """This function is a helper to clear messages in an interaction channel.
         predicate must be a function (lambda) to specify the messages the bot should remove"""
         channel: discord.TextChannel = interaction.channel  # type: ignore
-        lc = interaction.locale
 
         # delete the messages
         deleted_messages = await self._purge_helper(channel, limit=limit, check=predicate, reason=reason)
         deleted_count = len(deleted_messages)
 
         if deleted_count == 0:
-            await interaction.followup.send(_(lc, "moderation.clear.messages_to_old"))
+            await interaction.followup.send(
+                interaction.translate(_("Cannot purge messages older than 14 days, due to Discord limitations."))
+            )
             return
 
         affected_users = set(m.author.id for m in deleted_messages)  # list of affected users
 
-        embed = extensions.Embed(title=_(lc, "moderation.clear.success_title"))
-        embed.title = _(lc, "moderation.clear.success_title")
+        embed = extensions.Embed(title=interaction.translate(_("Messages deleted")))
 
-        embed.add_field(name=_(lc, "moderation.clear.deleted_messages"), value=f"> {deleted_count}/{limit}")
-        embed.add_field(name=_(lc, "moderation.clear.affected_users"), value=f"> {len(affected_users)}")
-        embed.add_field(name=_(lc, "reason"), value=f"> {reason or _(lc, 'no_reason')}")
+        embed.add_field(name=interaction.translate(_("Messages deleted")), value=f"> {deleted_count}/{limit}")
+        embed.add_field(name=interaction.translate(_("Affected users")), value=f"> {len(affected_users)}")
+        embed.add_field(
+            name=interaction.translate(_("Reason")), value=f"> {reason or f"*{interaction.translate(_('No reason'))}*"}"
+        )
 
-        # send the information to the user. the response has been deferred, so this uses followup
-        await interaction.followup.send(_(lc, "moderation.successful_execution"), embed=embed)
+        # Send the information to the user. The response has been deferred, so this uses followup
+        await interaction.followup.send(
+            interaction.translate(
+                _("{message_count} Messages have been deleted."), data={"message_count": deleted_messages}
+            ),
+            embed=embed,
+        )
 
-    @app_commands.command(name="all", description="Clear all messages in a channel.")
+    @app_commands.command(name="all", description=_("Clear all messages in a channel."))
     @app_commands.describe(
-        amount="The amount of messages you want to purge.",
-        reason=_T("Why the messages should be deleted.", key="clear.reason"),
+        amount=_("The amount of messages you want to purge."),
+        reason=_("Why the messages should be deleted."),
     )
     async def clear_all(
         self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]
@@ -122,13 +128,13 @@ class ClearGroup(app_commands.Group):
         await interaction.response.defer(ephemeral=True)
 
         # do the actual clearing
-        await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: True)
+        await self.do_removal(interaction, amount, reason=reason, predicate=lambda _: True)
 
-    @app_commands.command(name="contains", description="Clears all messages that contain a specific string.")
+    @app_commands.command(name="contains", description=("Clears all messages that contain a specific string."))
     @app_commands.describe(
-        amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
-        string="If this string is contained in a message, the bot will delete it.",
-        reason=_T("Why the messages should be deleted.", key="clear.reason"),
+        amount=_("The number of messages the bot should scan through."),
+        string=_("If this string is contained in a message, the bot will delete it."),
+        reason=_("Why the messages should be deleted."),
     )
     async def clear_contains(
         self,
@@ -142,11 +148,11 @@ class ClearGroup(app_commands.Group):
             interaction, amount, reason=reason, predicate=lambda m: string.lower() in m.content.lower()
         )
 
-    @app_commands.command(name="user", description="Clears all messages from a specific user.")
+    @app_commands.command(name="user", description=_("Clears all messages from a specific user."))
     @app_commands.describe(
-        amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
-        user="The user from whom the messages are to be deleted",
-        reason=_T("Why the messages should be deleted.", key="clear.reason"),
+        amount=_("The number of messages the bot should scan through."),
+        user=_("The user from whom the messages are to be deleted"),
+        reason=_("Why the messages should be deleted."),
     )
     async def clear_user(
         self,
@@ -158,10 +164,10 @@ class ClearGroup(app_commands.Group):
         await interaction.response.defer(ephemeral=True)
         await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: m.author.id == user.id)
 
-    @app_commands.command(name="links", description="Deletes all messages that contain a link.")
+    @app_commands.command(name="links", description=_("Deletes all messages that contain a link."))
     @app_commands.describe(
-        amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
-        reason=_T("Why the messages should be deleted.", key="clear.reason"),
+        amount=_("The number of messages the bot should scan through."),
+        reason=_("Why the messages should be deleted."),
     )
     async def clear_links(
         self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]
@@ -171,10 +177,10 @@ class ClearGroup(app_commands.Group):
             interaction, amount, reason=reason, predicate=lambda m: bool(LINK_REGEX.search(m.content))
         )
 
-    @app_commands.command(name="files", description="Deletes all messages that contains files.")
+    @app_commands.command(name="files", description=_("Deletes all messages that contains files."))
     @app_commands.describe(
-        amount=_T("The number of messages the bot should scan through.", key="clear.amount"),
-        reason=_T("Why the messages should be deleted.", key="clear.reason"),
+        amount=_("The number of messages the bot should scan through."),
+        reason=_("Why the messages should be deleted."),
     )
     async def clear_files(
         self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]

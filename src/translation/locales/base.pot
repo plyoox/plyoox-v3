@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-27 14:49+0100\n"
+"POT-Creation-Date: 2023-12-29 12:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,88 +17,1234 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: src/extensions/Anilist/_helper.py:60
+#, python-brace-format
+msgid "Results for {query}"
+msgstr ""
+
+#: src/extensions/Anilist/_helper.py:81
+#: src/extensions/Anilist/anilist_cog.py:73
+#: src/extensions/Anilist/anilist_cog.py:104
+msgid "No results found."
+msgstr ""
+
+#: src/extensions/Anilist/_helper.py:115
+msgid "Description"
+msgstr ""
+
+#: src/extensions/Anilist/_helper.py:118
+msgid "Genres"
+msgstr ""
+
+#: src/extensions/Anilist/_helper.py:122
+msgid "Related to"
+msgstr ""
+
+#: src/extensions/Anilist/_views.py:27
+msgid "Previous page"
+msgstr ""
+
+#: src/extensions/Anilist/_views.py:45
+msgid "Next page"
+msgstr ""
+
+#: src/extensions/Anilist/_views.py:81 src/extensions/Moderation/_views.py:24
+msgid "Back"
+msgstr ""
+
+#: src/extensions/Anilist/_views.py:108
+msgid "Show rating"
+msgstr ""
+
+#: src/extensions/Anilist/_views.py:126 src/extensions/Anilist/_views.py:137
+#: src/extensions/Leveling.py:136 src/extensions/Leveling.py:178
+#: src/extensions/Leveling.py:192
+msgid "The required infrastructure is currently not available."
+msgstr ""
+
+#: src/extensions/Anilist/_views.py:143
+#, python-brace-format
+msgid "Rating Statistics for {title}"
+msgstr ""
+
+#: src/extensions/Anilist/_views.py:146
+msgid "Rating"
+msgstr ""
+
+#: src/extensions/Anilist/_views.py:161
+msgid "View trailer"
+msgstr ""
+
+#: src/extensions/Anilist/anilist_cog.py:20
+msgid "Commands for querying the Anilist site."
+msgstr ""
+
+#: src/extensions/Anilist/anilist_cog.py:51
+msgid "Search for an anime on Anilist."
+msgstr ""
+
+#: src/extensions/Anilist/anilist_cog.py:53
+#: src/extensions/Anilist/anilist_cog.py:91
+msgid "The query to search for."
+msgstr ""
+
+#: src/extensions/Anilist/anilist_cog.py:54
+msgid "In which language the titles should be displayed (default original)."
+msgstr ""
+
+#: src/extensions/Anilist/anilist_cog.py:64
+#: src/extensions/Anilist/anilist_cog.py:95
+msgid "The limit of the API has been reached. Please try again later."
+msgstr ""
+
+#: src/extensions/Anilist/anilist_cog.py:90
+msgid "Get information about an anime on Anilist."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:19
+msgid "Provides fun commands."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:29
+msgid "Flip a coin."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:33
+msgid "Generates a random color."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:41
+#, python-brace-format
+msgid ""
+"Random color:\n"
+"HEX: `{hex}`\n"
+"RGB: `{rgb}`"
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:48
+msgid "Spin a slot machine."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:63
+msgid "You won! :tada:"
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:65
+msgid "You lost :cry:"
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:69
+msgid "Ship two users."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:71
+msgid "A user to be shipped"
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:71
+msgid "Another optional user that will be shipped with the first one"
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:89
+msgid "Chooses one of the two given choices."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:90
+msgid "The first choice"
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:90
+msgid "The second choice"
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:96
+msgid "Roll a dice."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:102
+msgid "Shows a random cat."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:106
+msgid "Could not get a cat :("
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:112
+msgid "Shows a random dog."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:131
+msgid "Cries."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:134
+#, python-brace-format
+msgid "{user.mention} cries :cry:"
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:140
+msgid "Hugs a user."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:141
+msgid "The user to hug."
+msgstr ""
+
+#: src/extensions/Fun/fun_group.py:150
+#, python-brace-format
+msgid "{user.mention} hugs {target.mention}"
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:14
+msgid "Provides information about a guild or guild specific information."
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:18
+msgid "Displays general information about the current guild."
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:33
+msgid "Guild information"
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:36
+msgid "General information"
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:43
+msgid "Members"
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:47 src/extensions/Infos/user_group.py:99
+#: src/extensions/Logging.py:105 src/extensions/Logging.py:127
+#: src/extensions/Logging.py:160 src/extensions/Logging.py:163
+msgid "No roles"
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:50
+msgid "More information"
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:57
+msgid "Features"
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:60
+msgid "No features"
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:65
+msgid "Shows how many members joined in the last 24 hours."
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:83
+#, python-brace-format
+msgid "In the last 24 hours {member_count} members joined on the guild."
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:87
+msgid "Shows how many members are currently in the guild."
+msgstr ""
+
+#: src/extensions/Infos/guild_group.py:91
+#, python-brace-format
+msgid "This guild has {member_count} member."
+msgstr ""
+
+#: src/extensions/Infos/infos_cog.py:18
+msgid "View user info."
+msgstr ""
+
+#: src/extensions/Infos/infos_cog.py:27
+msgid "Shows information about the bot."
+msgstr ""
+
+#: src/extensions/Infos/infos_cog.py:32
+msgid "Bot information"
+msgstr ""
+
+#: src/extensions/Infos/infos_cog.py:33
+msgid "Developer"
+msgstr ""
+
+#: src/extensions/Infos/infos_cog.py:34
+msgid "Contributers"
+msgstr ""
+
+#: src/extensions/Infos/infos_cog.py:35
+msgid "Guild count"
+msgstr ""
+
+#: src/extensions/Infos/infos_cog.py:36
+msgid "Uptime"
+msgstr ""
+
+#: src/extensions/Infos/infos_cog.py:38
+msgid "Privacy Policy"
+msgstr ""
+
+#: src/extensions/Infos/infos_cog.py:48
+msgid "Invite"
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:17
+msgid "Provides information about a guild member or user."
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:21
+msgid "Provides join information about a member."
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:31
+msgid "Join information"
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:33
+msgid "Position"
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:35
+msgid "Days since joined"
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:39 src/extensions/Logging.py:107
+#: src/extensions/Logging.py:124
+msgid "Joined at"
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:55 src/extensions/Infos/user_group.py:78
+msgid "User information"
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:62
+msgid "Account"
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:70
+msgid "No public badges"
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:84
+#: src/extensions/Moderation/moderation_cog.py:106
+msgid "Guild"
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:104
+msgid "Displays the user at the join position."
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:105
+msgid "Joining position in the server."
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:109
+#: src/extensions/Infos/user_group.py:123
+msgid "No member found at this position."
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:127
+msgid "Shows join information about a specific member."
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:128
+msgid "The member about whom you want the information."
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:146
+msgid "Shows information's about a member."
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:147
+msgid "The member you want the information about."
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:154
+msgid "Shows the avatar of a user."
+msgstr ""
+
+#: src/extensions/Infos/user_group.py:155
+msgid "The member you want the avatar from."
+msgstr ""
+
 #: src/extensions/Leveling.py:50
 msgid "Reset server levels"
 msgstr ""
 
-#: src/extensions/Leveling.py:55
+#: src/extensions/Leveling.py:54
 msgid "Are you sure you want to reset all levels?"
 msgstr ""
 
-#: src/extensions/Leveling.py:66
+#: src/extensions/Leveling.py:63
 msgid "Wrong answer provided, aborting."
 msgstr ""
 
-#: src/extensions/Leveling.py:90
+#: src/extensions/Leveling.py:80
 msgid "View rank"
 msgstr ""
 
-#: src/extensions/Leveling.py:98
+#: src/extensions/Leveling.py:88
 msgid "Commands that are needed to interact with the level-system."
 msgstr ""
 
-#: src/extensions/Leveling.py:132
+#: src/extensions/Leveling.py:119
 msgid "This module is currently disabled."
 msgstr ""
 
-#: src/extensions/Leveling.py:150 src/extensions/Leveling.py:196
-#: src/extensions/Leveling.py:210
-msgid "The required infrastructure is currently not available."
-msgstr ""
-
-#: src/extensions/Leveling.py:166
+#: src/extensions/Leveling.py:152
 msgid "This user has never written anything or is excluded."
 msgstr ""
 
-#: src/extensions/Leveling.py:392
+#: src/extensions/Leveling.py:354
 msgid "Shows information about the current rank of a member."
 msgstr ""
 
-#: src/extensions/Leveling.py:394
+#: src/extensions/Leveling.py:356
 msgid "The member from whom you want the rank."
 msgstr ""
 
-#: src/extensions/Leveling.py:404
+#: src/extensions/Leveling.py:363
 msgid "Shows the available level roles."
 msgstr ""
 
-#: src/extensions/Leveling.py:422
+#: src/extensions/Leveling.py:374
 msgid "The server has no level roles configured."
 msgstr ""
 
-#: src/extensions/Leveling.py:433
+#: src/extensions/Leveling.py:384
 msgid "Available level roles"
 msgstr ""
 
-#: src/extensions/Leveling.py:440
+#: src/extensions/Leveling.py:391
 msgid "Lists the top 10 users with the highest level on this guild."
 msgstr ""
 
-#: src/extensions/Leveling.py:487
+#: src/extensions/Leveling.py:437
 msgid "There is no user tracked by the level system."
 msgstr ""
 
-#: src/extensions/Leveling.py:494
+#: src/extensions/Leveling.py:443
 msgid "Top 10 users with the highest level"
 msgstr ""
 
-#: src/extensions/Leveling.py:509
+#: src/extensions/Leveling.py:458
 msgid "Resets the level of a member. This action cannot be undone."
 msgstr ""
 
-#: src/extensions/Leveling.py:511
+#: src/extensions/Leveling.py:460
 msgid "The member from whom you want to reset rank."
 msgstr ""
 
-#: src/extensions/Leveling.py:537
+#: src/extensions/Leveling.py:483
 msgid "The level progress of this user was reset."
 msgstr ""
 
-#: src/extensions/Leveling.py:542
+#: src/extensions/Leveling.py:486
 msgid "The levels of this user were successfully reset."
 msgstr ""
 
-#: src/extensions/Leveling.py:549
+#: src/extensions/Leveling.py:491
 msgid ""
 "Resets the levels of all members in the guild. This action cannot be undone."
+msgstr ""
+
+#: src/extensions/Logging.py:71
+#, python-brace-format
+msgid "The user {member.name} joined the guild."
+msgstr ""
+
+#: src/extensions/Logging.py:75
+msgid "User joined"
+msgstr ""
+
+#: src/extensions/Logging.py:77 src/extensions/Logging.py:99
+#: src/extensions/Logging.py:119 src/extensions/Logging.py:143
+msgid "Account created at"
+msgstr ""
+
+#: src/extensions/Logging.py:93
+#, python-brace-format
+msgid "The user {member.name} left the guild."
+msgstr ""
+
+#: src/extensions/Logging.py:98
+msgid "Member left"
+msgstr ""
+
+#: src/extensions/Logging.py:103 src/extensions/Logging.py:105
+#: src/extensions/Logging.py:127
+msgid "Roles"
+msgstr ""
+
+#: src/extensions/Logging.py:123 src/extensions/Logging.py:130
+msgid "User banned"
+msgstr ""
+
+#: src/extensions/Logging.py:141
+msgid "Member unbanned"
+msgstr ""
+
+#: src/extensions/Logging.py:156
+msgid "Member roles changed"
+msgstr ""
+
+#: src/extensions/Logging.py:160
+msgid "New roles"
+msgstr ""
+
+#: src/extensions/Logging.py:163
+msgid "Old roles"
+msgstr ""
+
+#: src/extensions/Logging.py:168
+msgid "Member renamed"
+msgstr ""
+
+#: src/extensions/Logging.py:172
+msgid "Previous name"
+msgstr ""
+
+#: src/extensions/Logging.py:177
+msgid "New name"
+msgstr ""
+
+#: src/extensions/Logging.py:212
+msgid "Old message content"
+msgstr ""
+
+#: src/extensions/Logging.py:212 src/extensions/Logging.py:232
+#: src/extensions/Logging.py:281
+msgid "No content"
+msgstr ""
+
+#: src/extensions/Logging.py:227
+#, python-brace-format
+msgid "**{member}** edited a message in {channel}."
+msgstr ""
+
+#: src/extensions/Logging.py:229
+msgid "Message edited"
+msgstr ""
+
+#: src/extensions/Logging.py:236
+msgid "New message content"
+msgstr ""
+
+#: src/extensions/Logging.py:265
+msgid "Message deleted"
+msgstr ""
+
+#: src/extensions/Logging.py:273
+#, python-brace-format
+msgid "A message from **{member}** was deleted from {channel.mention}."
+msgstr ""
+
+#: src/extensions/Logging.py:280
+msgid "Message content"
+msgstr ""
+
+#: src/extensions/Logging.py:289
+msgid "Attachments"
+msgstr ""
+
+#: src/extensions/Logging.py:294
+#, python-brace-format
+msgid "A message from {channel} has been deleted."
+msgstr ""
+
+#: src/extensions/Logging.py:318
+msgid "Bulk message delete"
+msgstr ""
+
+#: src/extensions/Logging.py:320
+#, python-brace-format
+msgid "{count} messages have been deleted from {channel}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:85
+#: src/extensions/Moderation/_logging_helper.py:228
+#: src/extensions/Moderation/clear_group.py:107
+msgid "Reason"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:85
+#: src/extensions/Moderation/clear_group.py:107
+msgid "No reason"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:86
+#: src/extensions/Moderation/_logging_helper.py:189
+#: src/extensions/Moderation/_logging_helper.py:230
+msgid "Executed at"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:90
+#: src/extensions/Moderation/_logging_helper.py:193
+msgid "Punished until"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:184
+#, python-brace-format
+msgid ""
+"The user {target.mention} ({target}) has reached the maximum number of "
+"points."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:187
+msgid "Automod: Maximum points reached"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:188
+msgid "Action"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:200
+msgid "Maximum amount of points reached"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:223
+#, python-brace-format
+msgid "The user {target} ({target.id}) has been warned by {moderator}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:227
+msgid "User has been warned"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:229
+msgid "Moderator"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:232
+msgid "Points added"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:240
+#, python-brace-format
+msgid ""
+"You have been warned in `{guild.name}` for **{reason}** and now have "
+"`{points}` points"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:255
+msgid "User has been temporary banned"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:256
+#, python-brace-format
+msgid ""
+"The user {target.mention} ({target}) has been temporarily banned by "
+"{moderator}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:262
+msgid "User has been banned"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:263
+#, python-brace-format
+msgid "The user {target.mention} ({target}) has been banned by {moderator}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:269
+msgid "User has been temporary muted"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:270
+#, python-brace-format
+msgid ""
+"The user {target.mention} ({target}) has been temporarily muted by "
+"{moderator}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:276
+msgid "User has been kicked"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:277
+#, python-brace-format
+msgid "The user {target.mention} ({target}) has been kicked by {moderator}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:283
+msgid "User has been unbanned"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:284
+#, python-brace-format
+msgid "The user {target.mention} ({target}) has been unbanned by {moderator}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:290
+msgid "User has been softbanned"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:291
+#, python-brace-format
+msgid ""
+"The user {target.mention} ({target}) has been softbanned by {moderator}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:297
+msgid "User has been unmuted"
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:298
+#, python-brace-format
+msgid "The user {target.mention} ({target}) has been unmuted by {moderator}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:311
+#, python-brace-format
+msgid "You have been banned from {guild.name} until {timestamp} for {reason}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:315
+#, python-brace-format
+msgid "You have been banned from {guild.name} for {reason}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:319
+#, python-brace-format
+msgid "You have been muted from {guild.name} until {timestamp} for {reason}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:323
+#: src/extensions/Moderation/_logging_helper.py:327
+#, python-brace-format
+msgid "You have been kicked from {guild.name} for {reason}."
+msgstr ""
+
+#: src/extensions/Moderation/_logging_helper.py:331
+#, python-brace-format
+msgid "You have been unmuted from {guild.name} for {reason}."
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:29
+msgid "List of members"
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:50
+msgid "Confirm the selection of users to be banned."
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:67
+msgid "Ban users"
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:68
+msgid "View users"
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:69
+msgid "Cancel"
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:74
+#, python-brace-format
+msgid "{user_count} users will be banned..."
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:89
+#, python-brace-format
+msgid "Too many errors occurred while banning users. {user_count} users banned"
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:98
+#, python-brace-format
+msgid "Successfully banned {user_count} users."
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:147
+msgid "This user has no warnings."
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:149
+msgid "Infractions"
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:157
+msgid "Never"
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:197
+msgid "Active Infractions"
+msgstr ""
+
+#: src/extensions/Moderation/_views.py:197
+msgid "Expired Infractions"
+msgstr ""
+
+#: src/extensions/Moderation/automod.py:67
+msgid "Discord invite"
+msgstr ""
+
+#: src/extensions/Moderation/automod.py:69
+msgid "External link"
+msgstr ""
+
+#: src/extensions/Moderation/automod.py:71
+msgid "Caps spam"
+msgstr ""
+
+#: src/extensions/Moderation/automod.py:73
+msgid "Maximum points reached"
+msgstr ""
+
+#: src/extensions/Moderation/automod.py:75
+#: src/extensions/Moderation/automod.py:135
+msgid "Violating a Discord moderation rule"
+msgstr ""
+
+#: src/extensions/Moderation/automod.py:293
+#: src/extensions/Moderation/automod.py:297
+#: src/extensions/Moderation/automod.py:311
+msgid "Maximum number of points reached"
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:96
+msgid "Cannot purge messages older than 14 days, due to Discord limitations."
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:102
+#: src/extensions/Moderation/clear_group.py:104
+msgid "Messages deleted"
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:105
+msgid "Affected users"
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:113
+#, python-brace-format
+msgid "{message_count} Messages have been deleted."
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:118
+msgid "Clear all messages in a channel."
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:120
+msgid "The amount of messages you want to purge."
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:121
+#: src/extensions/Moderation/clear_group.py:137
+#: src/extensions/Moderation/clear_group.py:155
+#: src/extensions/Moderation/clear_group.py:170
+#: src/extensions/Moderation/clear_group.py:183
+msgid "Why the messages should be deleted."
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:135
+#: src/extensions/Moderation/clear_group.py:153
+#: src/extensions/Moderation/clear_group.py:169
+#: src/extensions/Moderation/clear_group.py:182
+msgid "The number of messages the bot should scan through."
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:136
+msgid "If this string is contained in a message, the bot will delete it."
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:151
+msgid "Clears all messages from a specific user."
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:154
+msgid "The user from whom the messages are to be deleted"
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:167
+msgid "Deletes all messages that contain a link."
+msgstr ""
+
+#: src/extensions/Moderation/clear_group.py:180
+msgid "Deletes all messages that contains files."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:40
+msgid "Invite info"
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:49
+msgid "Commands to manage warnings on a user."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:58
+msgid "The user must be below you in the hierarchy."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:73
+#, python-brace-format
+msgid "Information about the invite `{invite}`"
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:74
+msgid "Invite information"
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:79
+#: src/extensions/Moderation/moderation_cog.py:82
+msgid "No date"
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:85
+msgid "Information"
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:99
+msgid "No creator"
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:101
+msgid "Creator"
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:115
+msgid "Bans an user from the guild."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:116
+#: src/extensions/Moderation/moderation_cog.py:142
+msgid "The member that should be banned."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:116
+#: src/extensions/Moderation/moderation_cog.py:143
+msgid "Why the member should be banned."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:137
+msgid "The user has been permanently banned"
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:140
+msgid "Bans an user from the guild for a specific time."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:144
+msgid "How long the member should be banned."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:160
+#: src/extensions/Moderation/moderation_cog.py:225
+msgid "The provided duration is invalid."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:164
+#: src/extensions/Moderation/moderation_cog.py:229
+msgid "The provided duration is too long."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:179
+#, python-brace-format
+msgid "The user has been banned until {timestamp}."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:185
+msgid "Kicks an user from the guild."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:186
+#: src/extensions/Moderation/moderation_cog.py:274
+msgid "The member that should be kicked."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:186
+#: src/extensions/Moderation/moderation_cog.py:274
+msgid "Why the member should be kicked."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:205
+#: src/extensions/Moderation/moderation_cog.py:295
+msgid "The user has been kicked."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:207
+msgid "Mutes an user for a specific time."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:209
+msgid "The member that should be muted."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:210
+msgid "Why the member should be muted."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:211
+msgid "How long the member should be muted (max 28 days)."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:242
+#, python-brace-format
+msgid "The user has been muted until {timestamp}."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:248
+msgid "Unbans an user from the guild."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:249
+msgid "The user that should be unbanned."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:249
+msgid "Why the member has been unbanned."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:261
+msgid "The user is not banned on this server."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:271
+msgid "The user has been unbanned."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:273
+msgid "Kicks an user from the guild and deletes their messages."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:297
+msgid "Sets the slowmode of the current channel."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:298
+msgid "How long the slowmode should be (max 6hrs)."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:306
+msgid "The slowmode has been disabled."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:309
+msgid "The slowmode has been enabled."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:311
+msgid "Unmutes an user."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:313
+msgid "The member that should be unmuted."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:313
+msgid "Why the member should be unmuted."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:332
+msgid "The user has been unmuted."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:334
+msgid "Shows information about a invite."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:335
+msgid "The invite you want to get information about."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:341
+msgid "The input is not a valid invite."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:347
+#: src/extensions/Moderation/moderation_cog.py:364
+msgid "The invite does not exist."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:358
+msgid "This message does not contain an invite."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:369
+msgid "Bans users based on a multiple factors."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:371
+msgid ""
+"The channel to search through. If not specified, the current channel is used."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:372
+msgid "The amount of messages to search through (100)."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:373
+msgid "The reason for the massban."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:374
+msgid "Must be contained in a message."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:375
+msgid "Must be at the start of a message."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:376
+msgid "Must be at the end of a message"
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:377
+msgid "If the message contains an embed."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:378
+msgid "If the message contains a attachment."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:379
+msgid "Only users that joined after this."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:380
+msgid "Only users that joined before this."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:381
+msgid "If users have a role or not."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:382
+msgid "If users have an avatar or not."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:383
+msgid "Regex that must be matched in the username."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:384
+msgid "Only messages sent after this (id)."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:385
+msgid "Only messages sent before this (id)."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:386
+msgid "Only users that are younger than this (days)."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:387
+msgid "Only users that joined before this (days)."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:463
+msgid "The provided regex is invalid."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:514
+msgid "There are no users that meets this criteria."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:519
+msgid "Confirm the selection of users scheduled for ban."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:523
+msgid "Lists current warnings for a user."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:524
+msgid "The user to list warnings for."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:527
+#: src/extensions/Moderation/moderation_cog.py:549
+#: src/extensions/Moderation/moderation_cog.py:591
+#: src/extensions/Moderation/moderation_cog.py:614
+msgid "Bots cannot be punished."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:535
+msgid "Adds a warning to a user."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:537
+msgid "The user to add a warning to."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:538
+msgid "The amount of points to add."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:539
+msgid "The reason for the warning."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:555
+msgid "The required module is not loaded."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:564
+msgid "This has not been set up. Please visit https://plyoox.net"
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:570
+msgid ""
+"The moderation module has been disabled. It can be enabled on the [Dashboard]"
+"(https://plyoox.net)."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:576
+msgid "There are no point actions configured."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:582
+#, python-brace-format
+msgid "{user} has been warned."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:585
+msgid "Removes a warning from a user."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:586
+msgid "The user to remove a warning from."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:586
+msgid "The ID of the warning to remove."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:602
+msgid "The warning has been removed."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:605
+#, python-brace-format
+msgid "There is no warning with the id `{id}`"
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:610
+msgid "Removes all warnings from a user."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:611
+msgid "The user to remove all warnings from."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:624
+msgid "All warnings have been removed."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:627
+#, python-brace-format
+msgid "{member} has no warnings"
+msgstr ""
+
+#: src/extensions/Timers.py:108
+msgid "Temporary ban expired"
+msgstr ""
+
+#: src/lib/extensions/command_tree.py:24
+#, python-brace-format
+msgid "Bot is missing permissions: {missing_permission}"
+msgstr ""
+
+#: src/lib/extensions/command_tree.py:36
+#, python-brace-format
+msgid "Command is on cooldown, retry after {retry_after} seconds"
 msgstr ""

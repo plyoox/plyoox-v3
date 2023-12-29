@@ -4,9 +4,9 @@ from typing import TYPE_CHECKING
 
 import discord
 from discord import ui
+from discord.app_commands import locale_str as _
 
 from lib import emojis, extensions
-from translation import _
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -21,13 +21,13 @@ class MemberView(extensions.PaginatedEphemeralView):
         self.members = members
         self.old_view = old_view
 
-        self.stop_button.label = _(interaction.locale, "back")
+        self.stop_button.label = interaction.translate(_("Back"))
 
     def generate_embed(self):
-        lc = self._last_interaction.locale
+        translate = self._last_interaction.translate
 
-        embed = extensions.Embed(title=_(lc, "moderation.massban.view_member_title"))
-        embed.set_footer(text=f"{_(lc, 'page')}: {self.current_page + 1}/{self.last_page + 1}")
+        embed = extensions.Embed(title=translate(_("List of members")))
+        embed.set_footer(text=f"{translate(_("Page"))}: {self.current_page + 1}/{self.last_page + 1}")
 
         members = self.members[
             self.current_page * MemberView.MEMBERS_PER_PAGE : MemberView.MEMBERS_PER_PAGE * (self.current_page + 1)
@@ -47,7 +47,7 @@ class MemberView(extensions.PaginatedEphemeralView):
 
     @ui.button(custom_id="stop", emoji=emojis.chevrons_left, style=discord.ButtonStyle.blurple)
     async def stop_button(self, interaction: discord.Interaction, _b: ui.Button):
-        embed = extensions.Embed(description=_(interaction.locale, "moderation.massban.overview_description"))
+        embed = extensions.Embed(description=interaction.translate(_("Confirm the selection of users to be banned.")))
         await interaction.response.defer()
 
         await interaction.edit_original_response(embed=embed, view=self.old_view)
@@ -64,15 +64,15 @@ class MassbanView(extensions.EphemeralView):
         self.members = members
         self.reason = reason
 
-        self.ban_button.label = _(interaction.locale, "moderation.massban.ban_button_label")
-        self.member_view.label = _(interaction.locale, "moderation.massban.view_member_button_label")
-        self.stop_button.label = _(interaction.locale, "abort")
+        self.ban_button.label = interaction.translate(_("Ban users"))
+        self.member_view.label = interaction.translate(_("View users"))
+        self.stop_button.label = interaction.translate(_("Cancel"))
 
     @ui.button(emoji=emojis.hammer, style=discord.ButtonStyle.green)
     async def ban_button(self, interaction: discord.Interaction, _b: discord.Button):
-        lc = interaction.locale
-
-        await interaction.response.send_message(_(lc, "moderation.massban.ban_users", member_count=len(self.members)))
+        await interaction.response.send_translated(
+            _("{user_count} users will be banned..."), translation_data={"user_count": len(self.members)}
+        )
 
         error_count = 0
         ban_count = 0
@@ -85,14 +85,18 @@ class MassbanView(extensions.EphemeralView):
                 error_count += 1
                 if error_count == 5:
                     await interaction.edit_original_response(
-                        content=_(lc, "moderation.massban.ban_failed", member_count=ban_count)
+                        content=interaction.translate(
+                            _("Too many errors occurred while banning users. {user_count} users banned"),
+                            data={"user_count": ban_count},
+                        )
                     )
                     return
             except discord.HTTPException:
                 pass
 
         await interaction.edit_original_response(
-            content=_(lc, "moderation.massban.ban_success", member_count=ban_count), view=None
+            content=interaction.translate(_("Successfully banned {user_count} users."), data={"user_count": ban_count}),
+            view=None,
         )
 
     @ui.button(emoji=emojis.users)
@@ -131,7 +135,7 @@ class WarnView(extensions.PaginatedEphemeralView):
         return infraction_count // 10
 
     async def generate_embed(self, page: int) -> discord.Embed:
-        lc = self._last_interaction.locale
+        translate = self._last_interaction.translate
 
         if self.view_expired:
             query = "SELECT * from automod_users WHERE user_id = $1 AND guild_id = $2 AND expires < now() OFFSET $3 LIMIT 10"
@@ -140,25 +144,25 @@ class WarnView(extensions.PaginatedEphemeralView):
 
         infractions = await self.bot.db.fetch(query, self.user.id, self._last_interaction.guild_id, page * 10)
         if len(infractions) == 0:
-            return extensions.Embed(description=_(lc, "moderation.warn.no_warnings"))
+            return extensions.Embed(description=translate(_("This user has no warnings.")))
 
-        embed = extensions.Embed(title=_(lc, "moderation.warn.view.title"))
+        embed = extensions.Embed(title=translate(_("Infractions")))
         embed.set_author(name=str(self.user), icon_url=self.user.display_avatar.url)
-        embed.set_footer(text=f'{_(lc, "page")} {self.current_page + 1}/{self.last_page + 1}')
+        embed.set_footer(text=f'{translate(_("Page"))} {self.current_page + 1}/{self.last_page + 1}')
 
         for infraction in infractions:
             infraction = dict(infraction)
 
             expires_at = (
-                discord.utils.format_dt(infraction["expires"]) if infraction["expires"] else _(lc, "no_expiration")
+                discord.utils.format_dt(infraction["expires"]) if infraction["expires"] else translate(_("Never"))
             )
 
             embed.add_field(
-                name=f'{_(lc, "moderation.warn.view.infraction")} #{infraction["id"]}',
+                name=f'{translate(_("Infraction"))} #{infraction["id"]}',
                 value=(
-                    f"**{_(lc, 'moderation.warn.points')}:** {infraction['points']}\n"
-                    f"**{_(lc, 'expires_at')}:** {expires_at}\n"
-                    f"**{_(lc, 'reason')}:** {infraction['reason']}"
+                    f"**{translate(_("Points"))}:** {infraction['points']}\n"
+                    f"**{translate(_("Expires at"))}:** {expires_at}\n"
+                    f"**{translate(_("Reason"))}:** {infraction['reason']}"
                 ),
                 inline=True,
             )
@@ -190,9 +194,7 @@ class WarnView(extensions.PaginatedEphemeralView):
         self.current_page = 0
         self.view_expired = not self.view_expired
 
-        button.label = _(
-            interaction.locale, "moderation.warn.view." + ("view_active" if self.view_expired else "view_expired")
-        )
+        button.label = interaction.translate(_("Active Infractions") if self.view_expired else _("Expired Infractions"))
 
         self.last_page = await self.get_page_count()
         embed = await self.generate_embed(self.current_page)

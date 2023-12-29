@@ -72,7 +72,7 @@ class LoggingEvents(commands.Cog):
             ).format(member=member),
             color=SUCCESS_COLOR,
         )
-        embed.set_author(name=_("Member joined"), icon_url=member.display_avatar)
+        embed.set_author(name=_("User joined"), icon_url=member.display_avatar)
         embed.add_field(
             name=_("Account created at"),
             value=helper.embed_timestamp_format(member.created_at),
@@ -120,7 +120,7 @@ class LoggingEvents(commands.Cog):
         embed.set_footer(text=f"{translate(_('User id'), self.bot, guild.preferred_locale)}: {user.id}")
 
         if isinstance(user, discord.Member):
-            embed.set_author(name=_("Member banned"), icon_url=user.display_avatar)
+            embed.set_author(name=_("User banned"), icon_url=user.display_avatar)
             embed.add_field(name=_("Joined at"), value=helper.embed_timestamp_format(user.joined_at))
 
             roles = helper.format_roles(user.roles)
@@ -224,7 +224,7 @@ class LoggingEvents(commands.Cog):
             edit_channel = f"<#{payload.channel_id}>"
 
         log_embed.description = translate(
-            _("logging.message_edit.description"), self.bot, guild.preferred_locale
+            _("**{member}** edited a message in {channel}."), self.bot, guild.preferred_locale
         ).format(member=edit_member, channel=edit_channel)
         log_embed.set_author(name=_("Message edited"), icon_url=avatar)
         log_embed.set_footer(text=f"{translate(_('User id'), self.bot, guild.preferred_locale)}: {member.id}")
@@ -317,7 +317,7 @@ class LoggingEvents(commands.Cog):
         embed = extensions.Embed(
             title=_("Bulk message delete"),
             color=ERROR_COLOR,
-            description=translate(_("logging.bulk_delete.description")).format(
+            description=translate(_("{count} messages have been deleted from {channel}.")).format(
                 count=len(payload.message_ids),
                 channel=f"<#{payload.channel_id}>",
             ),

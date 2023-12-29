@@ -109,7 +109,7 @@ def plural_locale_str(
 
 def translate(
     message: app_commands.locale_str,
-    obj: Plyoox | discord.Interaction,
+    obj: Plyoox,
     locale: discord.Locale | None = None,
     data: Any = None,
 ) -> str:
@@ -117,23 +117,19 @@ def translate(
 
     Unlike the methods built into discord.py, this will use the original message
     if a translation could not be found.
-
     """
-    if isinstance(obj, commands.Bot):
-        if locale is None:
-            return str(message)
+    if locale is None:
+        return str(message)
 
-        assert obj.tree.translator is not None
-        context = app_commands.TranslationContext(
-            location=app_commands.TranslationContextLocation.other,
-            data=data,
-        )
-        translated = obj.tree.translator.translate(
-            message,
-            locale=locale,
-            context=context,
-        )
-    else:
-        translated = obj.translate(message, data=data)
+    assert obj.tree.translator is not None
+    context = app_commands.TranslationContext(
+        location=app_commands.TranslationContextLocation.other,
+        data=data,
+    )
+    translated = obj.tree.translator.translate(
+        message,
+        locale=locale,
+        context=context,
+    )
 
     return translated or f"~~{str(message)}~~"

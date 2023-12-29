@@ -32,7 +32,7 @@ class UserGroup(app_commands.Group):
         embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
         embed.add_field(name=interaction.translate(_("Position")), value=f"> {position}")
         embed.add_field(
-            name=interaction.translate(_("Daus since joined")),
+            name=interaction.translate(_("Days since joined")),
             value=f"> {(datetime.datetime.now(tz=datetime.timezone.utc) - member.joined_at).days}",
         )
         embed.add_field(
@@ -101,8 +101,8 @@ class UserGroup(app_commands.Group):
 
         await interaction.response.send_translated(embeds=[embed], ephemeral=ephemeral)
 
-    @joined_group.command(name="position", description=_("Shows the user on a join position"))
-    @app_commands.describe(position=_("Join position on the guild"))
+    @joined_group.command(name="position", description=_("Displays the user at the join position."))
+    @app_commands.describe(position=_("Joining position in the server."))
     async def joined_position(self, interaction: discord.Interaction, position: app_commands.Range[int, 1]):
         """Provides join information based on the join position."""
         if interaction.guild.member_count is not None and position > interaction.guild.member_count:
@@ -125,7 +125,7 @@ class UserGroup(app_commands.Group):
         await self._send_joined_response(interaction, member, position)
 
     @joined_group.command(name="member", description=_("Shows join information about a specific member."))
-    @app_commands.describe(member=_("The member you want the join position from."))
+    @app_commands.describe(member=_("The member about whom you want the information."))
     async def joined_member(self, interaction: discord.Interaction, member: Optional[discord.Member]):
         """Provides join information based on the member. If no member is provided, the user that executed
         the command will be used.
@@ -143,7 +143,7 @@ class UserGroup(app_commands.Group):
 
         await self._send_joined_response(interaction, current_member, position)
 
-    @app_commands.command(name="about", description=_("Shows information's about a Discord member."))
+    @app_commands.command(name="about", description=_("Shows information's about a member."))
     @app_commands.describe(member=_("The member you want the information about."))
     async def about(self, interaction: discord.Interaction, member: Optional[Union[discord.Member, discord.User]]):
         """Shows basic information about a user. If no member is provided, the user

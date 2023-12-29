@@ -8,10 +8,11 @@ from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
+from discord.app_commands import locale_str as _
 
 from lib import utils
 from lib.enums import AutomodActionEnum, AutomodChecksEnum, TimerEnum, AutomodFinalActionEnum
-from translation import _
+from translation import translate as global_translate
 from . import _logging_helper as _logging
 
 if TYPE_CHECKING:
@@ -46,18 +47,32 @@ class AutomodActionData(object):
 
     @classmethod
     def _from_message(
-        cls, *, message: discord.Message, action_taken: AutomodExecutionModel, reason: AutomodExecutionReason
+        cls,
+        *,
+        bot: Plyoox,
+        message: discord.Message,
+        action_taken: AutomodExecutionModel,
+        reason: AutomodExecutionReason,
     ):
-        return cls(
-            member=message.author,
-            action=action_taken,
-            content=message.content,
-            reason=_(message.guild.preferred_locale, f"automod.reason.{reason}"),
-        )
+        reason = global_translate("", bot, message.guild.preferred_locale)
+
+        return cls(member=message.author, action=action_taken, content=message.content, reason=reason)
 
     @property
     def guild(self):
         return self.member.guild
+
+    def _translate_reason(bot: Plyoox, reason: AutomodExecutionReason, locale: discord.Locale) -> str:
+        if reason == "invite":
+            return global_translate(_("Discord invite"), bot, locale)
+        elif reason == "link":
+            return global_translate(_("External link"), bot, locale)
+        elif reason == "caps":
+            return global_translate(_("Caps spam"), bot, locale)
+        elif reason == "points":
+            return global_translate(_("Maximum points reached"), bot, locale)
+        elif reason == "discord_rule":
+            return global_translate(_("Violating a Discord moderation rule"), bot, locale)
 
 
 class Automod(commands.Cog):
@@ -116,7 +131,8 @@ class Automod(commands.Cog):
                     data=AutomodActionData(
                         action=action,
                         member=member,
-                        reason=cache.reason or _(guild.preferred_locale, "automod.reason.discord_rule"),
+                        reason=cache.reason
+                        or global_translate(_("Violating a Discord moderation rule"), self.bot, guild.preferred_locale),
                         content=execution.matched_content,
                     )
                 )
@@ -261,8 +277,10 @@ class Automod(commands.Cog):
             return (discord.utils.utcnow() - member.created_at).days <= action.days
 
     async def _execute_final_action(self, member: discord.Member, action: AutomodExecutionModel):
+        def translate(string: _) -> str:
+            return global_translate(string, self.bot, member.guild.preferred_locale)
+
         guild = member.guild
-        lc = guild.preferred_locale
 
         if self.punished_members.get((member.id, member.guild.id)):
             return
@@ -272,11 +290,11 @@ class Automod(commands.Cog):
         if action.action == AutomodFinalActionEnum.kick:
             if guild.me.guild_permissions.kick_members:
                 await _logging.automod_final_log(self.bot, member, action.action)  # type: ignore
-                await guild.kick(member, reason=_(lc, "automod.final.reason"))
+                await guild.kick(member, reason=translate(_("Maximum number of points reached")))
         elif action.action == AutomodFinalActionEnum.ban:
             await _logging.automod_final_log(self.bot, member, action.action)  # type: ignore
             if guild.me.guild_permissions.ban_members:
-                await guild.ban(member, reason=_(lc, "automod.final.reason"))
+                await guild.ban(member, reason=translate(_("Maximum number of points reached")))
         elif action.action == AutomodFinalActionEnum.tempban:
             if guild.me.guild_permissions.ban_members:
                 banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
@@ -290,7 +308,7 @@ class Automod(commands.Cog):
                         TimerEnum.tempban,
                         banned_until,
                     )
-                    await guild.ban(member, reason=_(lc, "automod.final.reason"))
+                    await guild.ban(member, reason=translate(_("Maximum number of points reached")))
                 else:
                     _log.warning("Timer Plugin is not initialized")
         elif action.action == AutomodActionEnum.tempmute:
@@ -374,10 +392,10 @@ class Automod(commands.Cog):
         if any(role in cache.mod_roles + cache.ignored_roles for role in roles):
             return False
 
-        if channel.id in getattr(cache, f"{kind}_whitelist_channels"):
+        if channel.id in getattr(cache, f"{kind}_exempt_channels"):
             return False
 
-        if any(role in getattr(cache, f"{kind}_whitelist_roles") for role in roles):
+        if any(role in getattr(cache, f"{kind}_exempt_roles") for role in roles):
             return False
 
         return True

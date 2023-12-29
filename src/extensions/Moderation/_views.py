@@ -86,7 +86,7 @@ class MassbanView(extensions.EphemeralView):
                 if error_count == 5:
                     await interaction.edit_original_response(
                         content=interaction.translate(
-                            _("Too many errors occurred while banning users. {user_count} users banned"),
+                            _("Too many errors occurred while banning users. {user_count} users have been banned."),
                             data={"user_count": ban_count},
                         )
                     )

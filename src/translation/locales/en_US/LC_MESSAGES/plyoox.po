@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 12:32+0100\n"
+"POT-Creation-Date: 2023-12-29 12:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -746,7 +746,9 @@ msgstr ""
 
 #: src/extensions/Moderation/_views.py:89
 #, python-brace-format
-msgid "Too many errors occurred while banning users. {user_count} users banned"
+msgid ""
+"Too many errors occurred while banning users. {user_count} users have been "
+"banned."
 msgstr ""
 
 #: src/extensions/Moderation/_views.py:98
@@ -787,18 +789,15 @@ msgid "Caps spam"
 msgstr ""
 
 #: src/extensions/Moderation/automod.py:73
-msgid "Maximum points reached"
+#: src/extensions/Moderation/automod.py:293
+#: src/extensions/Moderation/automod.py:297
+#: src/extensions/Moderation/automod.py:311
+msgid "Maximum number of points reached"
 msgstr ""
 
 #: src/extensions/Moderation/automod.py:75
 #: src/extensions/Moderation/automod.py:135
 msgid "Violating a Discord moderation rule"
-msgstr ""
-
-#: src/extensions/Moderation/automod.py:293
-#: src/extensions/Moderation/automod.py:297
-#: src/extensions/Moderation/automod.py:311
-msgid "Maximum number of points reached"
 msgstr ""
 
 #: src/extensions/Moderation/clear_group.py:96

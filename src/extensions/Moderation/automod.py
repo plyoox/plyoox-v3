@@ -70,7 +70,7 @@ class AutomodActionData(object):
         elif reason == "caps":
             return global_translate(_("Caps spam"), bot, locale)
         elif reason == "points":
-            return global_translate(_("Maximum points reached"), bot, locale)
+            return global_translate(_("Maximum number of points reached"), bot, locale)
         elif reason == "discord_rule":
             return global_translate(_("Violating a Discord moderation rule"), bot, locale)
 

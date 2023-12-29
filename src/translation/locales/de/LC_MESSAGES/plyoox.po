@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 12:32+0100\n"
+"POT-Creation-Date: 2023-12-29 12:48+0100\n"
 "PO-Revision-Date: 2023-12-28 22:33+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -655,7 +655,9 @@ msgstr "Der Benutzer wurde temporär gebannt"
 msgid ""
 "The user {target.mention} ({target}) has been temporarily banned by "
 "{moderator}."
-msgstr "Der Benutzer {target.mention} ({target}) wurde von {moderator} temporär gebannt."
+msgstr ""
+"Der Benutzer {target.mention} ({target}) wurde von {moderator} temporär "
+"gebannt."
 
 #: src/extensions/Moderation/_logging_helper.py:262
 #, fuzzy
@@ -665,7 +667,8 @@ msgstr "Ein Benutzer wurde gebannt"
 #: src/extensions/Moderation/_logging_helper.py:263
 #, python-brace-format
 msgid "The user {target.mention} ({target}) has been banned by {moderator}."
-msgstr "Der Benutzer {target.mention} ({target}) wurde von {moderator} gebannt."
+msgstr ""
+"Der Benutzer {target.mention} ({target}) wurde von {moderator} gebannt."
 
 #: src/extensions/Moderation/_logging_helper.py:269
 #, fuzzy
@@ -677,7 +680,9 @@ msgstr "Ein Benutzer wurde temporär gemutet"
 msgid ""
 "The user {target.mention} ({target}) has been temporarily muted by "
 "{moderator}."
-msgstr "Der Benutzer {target.mention} ({target}) wurde von {moderator} temporär gemutet."
+msgstr ""
+"Der Benutzer {target.mention} ({target}) wurde von {moderator} temporär "
+"gemutet."
 
 #: src/extensions/Moderation/_logging_helper.py:276
 #, fuzzy
@@ -687,7 +692,8 @@ msgstr "Ein Benutzer wurde gekickt"
 #: src/extensions/Moderation/_logging_helper.py:277
 #, python-brace-format
 msgid "The user {target.mention} ({target}) has been kicked by {moderator}."
-msgstr "Der Benutzer {target.mention} ({target}) wurde von {moderator} gekickt."
+msgstr ""
+"Der Benutzer {target.mention} ({target}) wurde von {moderator} gekickt."
 
 #: src/extensions/Moderation/_logging_helper.py:283
 #, fuzzy
@@ -697,7 +703,8 @@ msgstr "Ein Benutzer wurde entbannt"
 #: src/extensions/Moderation/_logging_helper.py:284
 #, python-brace-format
 msgid "The user {target.mention} ({target}) has been unbanned by {moderator}."
-msgstr "Der Benutzer {target.mention} ({target}) wurde von {moderator} entbannt."
+msgstr ""
+"Der Benutzer {target.mention} ({target}) wurde von {moderator} entbannt."
 
 #: src/extensions/Moderation/_logging_helper.py:290
 #, fuzzy
@@ -708,7 +715,8 @@ msgstr "Der Benutzer wurde softgebannt"
 #, python-brace-format
 msgid ""
 "The user {target.mention} ({target}) has been softbanned by {moderator}."
-msgstr "Der Benutzer {target.mention} ({target}) wurde von {moderator} softgebannt"
+msgstr ""
+"Der Benutzer {target.mention} ({target}) wurde von {moderator} softgebannt"
 
 #: src/extensions/Moderation/_logging_helper.py:297
 #, fuzzy
@@ -718,7 +726,8 @@ msgstr "Der Benutzer wurde entmutet"
 #: src/extensions/Moderation/_logging_helper.py:298
 #, python-brace-format
 msgid "The user {target.mention} ({target}) has been unmuted by {moderator}."
-msgstr "Der Benutzer {target.mention} ({target}) wurde von {moderator} entmutet."
+msgstr ""
+"Der Benutzer {target.mention} ({target}) wurde von {moderator} entmutet."
 
 #: src/extensions/Moderation/_logging_helper.py:311
 #, python-brace-format
@@ -774,88 +783,89 @@ msgid "{user_count} users will be banned..."
 msgstr "{user_count} Benutzer werden gebannt..."
 
 #: src/extensions/Moderation/_views.py:89
-#, python-brace-format
-msgid "Too many errors occurred while banning users. {user_count} users banned"
-msgstr "Zu viele Fehler beim Bannen von Benutzern aufgetreten. {user_count} Benutzer wurden gebannt"
+#, fuzzy, python-brace-format
+msgid ""
+"Too many errors occurred while banning users. {user_count} users have been "
+"banned."
+msgstr ""
+"Zu viele Fehler beim Bannen von Benutzern aufgetreten. {user_count} Benutzer "
+"wurden gebannt"
 
 #: src/extensions/Moderation/_views.py:98
 #, python-brace-format
 msgid "Successfully banned {user_count} users."
-msgstr ""
+msgstr "{user_count} Benutzer wurden erfolgreich gebannt."
 
 #: src/extensions/Moderation/_views.py:147
 #, fuzzy
 msgid "This user has no warnings."
-msgstr "Die Abfrage zum Suchen."
+msgstr "Der Benutzer hat keine Warnungen."
 
 #: src/extensions/Moderation/_views.py:149
 msgid "Infractions"
-msgstr ""
+msgstr "Warnungen"
 
 #: src/extensions/Moderation/_views.py:157
 msgid "Never"
-msgstr ""
+msgstr "Nie"
 
 #: src/extensions/Moderation/_views.py:197
 msgid "Active Infractions"
-msgstr ""
+msgstr "Aktive Warnungen"
 
 #: src/extensions/Moderation/_views.py:197
 msgid "Expired Infractions"
-msgstr ""
+msgstr "Abgelaufene Warnungen"
 
 #: src/extensions/Moderation/automod.py:67
 msgid "Discord invite"
-msgstr ""
+msgstr "Discord Einladung"
 
 #: src/extensions/Moderation/automod.py:69
 msgid "External link"
-msgstr ""
+msgstr "Externer Link"
 
 #: src/extensions/Moderation/automod.py:71
 msgid "Caps spam"
-msgstr ""
+msgstr "Großbuchstaben Spam"
 
 #: src/extensions/Moderation/automod.py:73
-msgid "Maximum points reached"
-msgstr ""
-
-#: src/extensions/Moderation/automod.py:75
-#: src/extensions/Moderation/automod.py:135
-msgid "Violating a Discord moderation rule"
-msgstr ""
-
 #: src/extensions/Moderation/automod.py:293
 #: src/extensions/Moderation/automod.py:297
 #: src/extensions/Moderation/automod.py:311
 msgid "Maximum number of points reached"
-msgstr ""
+msgstr "Maximale Punktzahl erreicht"
+
+#: src/extensions/Moderation/automod.py:75
+#: src/extensions/Moderation/automod.py:135
+msgid "Violating a Discord moderation rule"
+msgstr "Verstoß gegen eine Discord Moderationsregel"
 
 #: src/extensions/Moderation/clear_group.py:96
 msgid "Cannot purge messages older than 14 days, due to Discord limitations."
-msgstr ""
+msgstr "Es können keine Nachrichten gelöscht werden, die älter als 14 Tage sind."
 
 #: src/extensions/Moderation/clear_group.py:102
 #: src/extensions/Moderation/clear_group.py:104
 msgid "Messages deleted"
-msgstr ""
+msgstr "Nachrichten gelöscht"
 
 #: src/extensions/Moderation/clear_group.py:105
 msgid "Affected users"
-msgstr ""
+msgstr "Betroffene Benutzer"
 
 #: src/extensions/Moderation/clear_group.py:113
 #, python-brace-format
 msgid "{message_count} Messages have been deleted."
-msgstr ""
+msgstr "{message_count} Nachrichten wurden gelöscht."
 
 #: src/extensions/Moderation/clear_group.py:118
 msgid "Clear all messages in a channel."
-msgstr ""
+msgstr "Löscht alle Nachrichten in einem Kanal."
 
 #: src/extensions/Moderation/clear_group.py:120
 msgid "The amount of messages you want to purge."
-msgstr ""
+msgstr "Die Anzahl der Nachrichten, die gelöscht werden sollen."
 
 #: src/extensions/Moderation/clear_group.py:121
 #: src/extensions/Moderation/clear_group.py:137
@@ -863,147 +873,147 @@ msgstr ""
 #: src/extensions/Moderation/clear_group.py:170
 #: src/extensions/Moderation/clear_group.py:183
 msgid "Why the messages should be deleted."
-msgstr ""
+msgstr "Warum die Nachrichten gelöscht werden sollen."
 
 #: src/extensions/Moderation/clear_group.py:135
 #: src/extensions/Moderation/clear_group.py:153
 #: src/extensions/Moderation/clear_group.py:169
 #: src/extensions/Moderation/clear_group.py:182
 msgid "The number of messages the bot should scan through."
-msgstr ""
+msgstr "Die Anzahl der Nachrichten, die der Bot durchsuchen soll."
 
 #: src/extensions/Moderation/clear_group.py:136
 msgid "If this string is contained in a message, the bot will delete it."
-msgstr ""
+msgstr "Löscht alle Nachrichten, die diese Zeichenfolge enthalten."
 
 #: src/extensions/Moderation/clear_group.py:151
 msgid "Clears all messages from a specific user."
-msgstr ""
+msgstr "Löscht alle Nachrichten eines bestimmten Benutzers."
 
 #: src/extensions/Moderation/clear_group.py:154
 msgid "The user from whom the messages are to be deleted"
-msgstr ""
+msgstr "Der Benutzer, von dem die Nachrichten gelöscht werden sollen"
 
 #: src/extensions/Moderation/clear_group.py:167
 msgid "Deletes all messages that contain a link."
-msgstr ""
+msgstr "Löscht alle Nachrichten, die einen Link enthalten."
 
 #: src/extensions/Moderation/clear_group.py:180
 msgid "Deletes all messages that contains files."
-msgstr ""
+msgstr "Löscht alle Nachrichten, die Dateien enthalten."
 
 #: src/extensions/Moderation/moderation_cog.py:40
 msgid "Invite info"
-msgstr ""
+msgstr "Einladungsinfo"
 
 #: src/extensions/Moderation/moderation_cog.py:49
 msgid "Commands to manage warnings on a user."
-msgstr ""
+msgstr "Befehle zum Verwalten von Warnungen eines Benutzers."
 
 #: src/extensions/Moderation/moderation_cog.py:58
 msgid "The user must be below you in the hierarchy."
-msgstr ""
+msgstr "Der Benutzer muss unter dir in der Hierarchie stehen."
 
 #: src/extensions/Moderation/moderation_cog.py:73
 #, fuzzy, python-brace-format
 msgid "Information about the invite `{invite}`"
-msgstr "Informationen über einen Anime auf Anilist abrufen."
+msgstr "Informationen über die Einladung `{invite}`"
 
 #: src/extensions/Moderation/moderation_cog.py:74
 msgid "Invite information"
-msgstr ""
+msgstr "Einladungsinformationen"
 
 #: src/extensions/Moderation/moderation_cog.py:79
 #: src/extensions/Moderation/moderation_cog.py:82
 msgid "No date"
-msgstr ""
+msgstr "Kein Datum"
 
 #: src/extensions/Moderation/moderation_cog.py:85
 msgid "Information"
-msgstr ""
+msgstr "Informationen"
 
 #: src/extensions/Moderation/moderation_cog.py:99
 msgid "No creator"
-msgstr ""
+msgstr "Keinen Ersteller"
 
 #: src/extensions/Moderation/moderation_cog.py:101
 msgid "Creator"
-msgstr ""
+msgstr "Ersteller"
 
 #: src/extensions/Moderation/moderation_cog.py:115
 msgid "Bans an user from the guild."
-msgstr ""
+msgstr "Bannt einen Benutzer vom Server."
 
 #: src/extensions/Moderation/moderation_cog.py:116
 #: src/extensions/Moderation/moderation_cog.py:142
 #, fuzzy
 msgid "The member that should be banned."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr "Der Benutzer, der gebannt werden soll."
 
 #: src/extensions/Moderation/moderation_cog.py:116
 #: src/extensions/Moderation/moderation_cog.py:143
 #, fuzzy
 msgid "Why the member should be banned."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr "Warum der Benutzer gebannt werden soll."
 
 #: src/extensions/Moderation/moderation_cog.py:137
 #, fuzzy
 msgid "The user has been permanently banned"
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr "Der Benutzer wurde permanent gebannt."
 
 #: src/extensions/Moderation/moderation_cog.py:140
 msgid "Bans an user from the guild for a specific time."
-msgstr ""
+msgstr "Bannt einen Benutzer für eine bestimmte Zeit vom Server."
 
 #: src/extensions/Moderation/moderation_cog.py:144
 msgid "How long the member should be banned."
-msgstr ""
+msgstr "Wie lange der Benutzer gebannt werden soll."
 
 #: src/extensions/Moderation/moderation_cog.py:160
 #: src/extensions/Moderation/moderation_cog.py:225
 msgid "The provided duration is invalid."
-msgstr ""
+msgstr "Die angegebene Dauer ist ungültig."
 
 #: src/extensions/Moderation/moderation_cog.py:164
 #: src/extensions/Moderation/moderation_cog.py:229
 msgid "The provided duration is too long."
-msgstr ""
+msgstr "Die angegebene Dauer ist zu lang."
 
 #: src/extensions/Moderation/moderation_cog.py:179
 #, fuzzy, python-brace-format
 msgid "The user has been banned until {timestamp}."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr "Der Benutzer wurde bis {timestamp} gebannt."
 
 #: src/extensions/Moderation/moderation_cog.py:185
 msgid "Kicks an user from the guild."
-msgstr ""
+msgstr "Kickt einen Benutzer vom Server."
 
 #: src/extensions/Moderation/moderation_cog.py:186
 #: src/extensions/Moderation/moderation_cog.py:274
 #, fuzzy
 msgid "The member that should be kicked."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr "Das Mitglied, das gekickt werden soll."
 
 #: src/extensions/Moderation/moderation_cog.py:186
 #: src/extensions/Moderation/moderation_cog.py:274
 #, fuzzy
 msgid "Why the member should be kicked."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr "Warum das Mitglied gekickt werden soll."
 
 #: src/extensions/Moderation/moderation_cog.py:205
 #: src/extensions/Moderation/moderation_cog.py:295
 #, fuzzy
 msgid "The user has been kicked."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr "Der Benutzer wurde gekickt."
 
 #: src/extensions/Moderation/moderation_cog.py:207
 msgid "Mutes an user for a specific time."
-msgstr ""
+msgstr "Mutet einen Benutzer für eine bestimmte Zeit."
 
 #: src/extensions/Moderation/moderation_cog.py:209
 #, fuzzy
 msgid "The member that should be muted."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:210
 msgid "Why the member should be muted."
@@ -1016,7 +1026,7 @@ msgstr ""
 #: src/extensions/Moderation/moderation_cog.py:242
 #, fuzzy, python-brace-format
 msgid "The user has been muted until {timestamp}."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:248
 msgid "Unbans an user from the guild."
@@ -1025,22 +1035,22 @@ msgstr ""
 #: src/extensions/Moderation/moderation_cog.py:249
 #, fuzzy
 msgid "The user that should be unbanned."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:249
 #, fuzzy
 msgid "Why the member has been unbanned."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:261
 #, fuzzy
 msgid "The user is not banned on this server."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:271
 #, fuzzy
 msgid "The user has been unbanned."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:273
 msgid "Kicks an user from the guild and deletes their messages."
@@ -1057,12 +1067,12 @@ msgstr ""
 #: src/extensions/Moderation/moderation_cog.py:306
 #, fuzzy
 msgid "The slowmode has been disabled."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:309
 #, fuzzy
 msgid "The slowmode has been enabled."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:311
 msgid "Unmutes an user."
@@ -1071,17 +1081,17 @@ msgstr ""
 #: src/extensions/Moderation/moderation_cog.py:313
 #, fuzzy
 msgid "The member that should be unmuted."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:313
 #, fuzzy
 msgid "Why the member should be unmuted."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:332
 #, fuzzy
 msgid "The user has been unmuted."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:334
 #, fuzzy
@@ -1227,7 +1237,7 @@ msgstr "Die Abfrage zum Suchen."
 #: src/extensions/Moderation/moderation_cog.py:555
 #, fuzzy
 msgid "The required module is not loaded."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:564
 msgid "This has not been set up. Please visit https://plyoox.net"
@@ -1246,7 +1256,7 @@ msgstr ""
 #: src/extensions/Moderation/moderation_cog.py:582
 #, fuzzy, python-brace-format
 msgid "{user} has been warned."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:585
 #, fuzzy
@@ -1261,12 +1271,12 @@ msgstr "Die Abfrage zum Suchen."
 #: src/extensions/Moderation/moderation_cog.py:586
 #, fuzzy
 msgid "The ID of the warning to remove."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:602
 #, fuzzy
 msgid "The warning has been removed."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:605
 #, python-brace-format
@@ -1286,7 +1296,7 @@ msgstr "Die Abfrage zum Suchen."
 #: src/extensions/Moderation/moderation_cog.py:624
 #, fuzzy
 msgid "All warnings have been removed."
-msgstr "Das Modul ist derzeit deaktiviert."
+msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:627
 #, python-brace-format
@@ -1306,6 +1316,9 @@ msgstr ""
 #, python-brace-format
 msgid "Command is on cooldown, retry after {retry_after} seconds"
 msgstr ""
+
+#~ msgid "Maximum points reached"
+#~ msgstr "Maximale Punktzahl erreicht"
 
 #~ msgid "Member banned"
 #~ msgstr "Mitglied gebannt"

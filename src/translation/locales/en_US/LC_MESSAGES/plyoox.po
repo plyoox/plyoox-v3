@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 12:48+0100\n"
+"POT-Creation-Date: 2023-12-29 14:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -960,7 +960,7 @@ msgid "The user has been kicked."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:207
-msgid "Mutes an user for a specific time."
+msgid "Mutes a member for a specific time."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:209
@@ -977,7 +977,7 @@ msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:242
 #, python-brace-format
-msgid "The user has been muted until {timestamp}."
+msgid "The member has been muted until {timestamp}."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:248
@@ -989,7 +989,7 @@ msgid "The user that should be unbanned."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:249
-msgid "Why the member has been unbanned."
+msgid "Why the user should be unbanned."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:261
@@ -1001,7 +1001,7 @@ msgid "The user has been unbanned."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:273
-msgid "Kicks an user from the guild and deletes their messages."
+msgid "Kicks a member from the guild and deletes their messages."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:297
@@ -1021,7 +1021,7 @@ msgid "The slowmode has been enabled."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:311
-msgid "Unmutes an user."
+msgid "Unmutes a member."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:313
@@ -1033,7 +1033,7 @@ msgid "Why the member should be unmuted."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:332
-msgid "The user has been unmuted."
+msgid "The member has been unmuted."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:334
@@ -1123,11 +1123,11 @@ msgid "Only messages sent before this (id)."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:386
-msgid "Only users that are younger than this (days)."
+msgid "Only users that are younger than this (in days)."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:387
-msgid "Only users that joined before this (days)."
+msgid "Only users that joined before this (in days)."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:463
@@ -1183,8 +1183,8 @@ msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:570
 msgid ""
-"The moderation module has been disabled. It can be enabled on the [Dashboard]"
-"(https://plyoox.net)."
+"The module is currently disabled. Enabled it on the [Dashboard](https://"
+"plyoox.net)."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:576

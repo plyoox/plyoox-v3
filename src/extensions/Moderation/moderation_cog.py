@@ -204,7 +204,7 @@ class Moderation(commands.Cog):
 
         await interaction.followup.send(interaction.translate(_("The user has been kicked.")), ephemeral=True)
 
-    @app_commands.command(name="tempmute", description=_("Mutes an user for a specific time."))
+    @app_commands.command(name="tempmute", description=_("Mutes a member for a specific time."))
     @app_commands.describe(
         member=_("The member that should be muted."),
         reason=_("Why the member should be muted."),
@@ -239,14 +239,14 @@ class Moderation(commands.Cog):
         )
 
         await interaction.followup.send(
-            interaction.translate(_("The user has been muted until {timestamp}.")).format(
+            interaction.translate(_("The member has been muted until {timestamp}.")).format(
                 timestamp=utils.format_dt(muted_until)
             ),
             ephemeral=True,
         )
 
     @app_commands.command(name="unban", description=_("Unbans an user from the guild."))
-    @app_commands.describe(user=_("The user that should be unbanned."), reason=_("Why the member has been unbanned."))
+    @app_commands.describe(user=_("The user that should be unbanned."), reason=_("Why the user should be unbanned."))
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
@@ -270,7 +270,7 @@ class Moderation(commands.Cog):
 
         await interaction.followup.send(interaction.translate(_("The user has been unbanned.")), ephemeral=True)
 
-    @app_commands.command(name="softban", description=_("Kicks an user from the guild and deletes their messages."))
+    @app_commands.command(name="softban", description=_("Kicks a member from the guild and deletes their messages."))
     @app_commands.describe(member=_("The member that should be kicked."), reason=_("Why the member should be kicked."))
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
@@ -308,7 +308,7 @@ class Moderation(commands.Cog):
             await interaction.channel.edit(slowmode_delay=duration)
             await interaction.response.send_translated(_("The slowmode has been enabled."), ephemeral=True)
 
-    @app_commands.command(name="unmute", description=_("Unmutes an user."))
+    @app_commands.command(name="unmute", description=_("Unmutes a member."))
     @app_commands.describe(
         member=_("The member that should be unmuted."), reason=_("Why the member should be unmuted.")
     )
@@ -329,7 +329,7 @@ class Moderation(commands.Cog):
         await member.timeout(None, reason=reason)
         await _logging_helper.log_simple_punish_command(interaction, target=member, kind="unmute", reason=reason)
 
-        await interaction.followup.send(interaction.translate(_("The user has been unmuted.")), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The member has been unmuted.")), ephemeral=True)
 
     @app_commands.command(name="invite-info", description=_("Shows information about a invite."))
     @app_commands.describe(invite=_("The invite you want to get information about."))
@@ -383,8 +383,8 @@ class Moderation(commands.Cog):
         username_regex=_("Regex that must be matched in the username."),
         sent_after=_("Only messages sent after this (id)."),
         sent_before=_("Only messages sent before this (id)."),
-        account_younger_days=_("Only users that are younger than this (days)."),
-        joined_before_days=_("Only users that joined before this (days)."),
+        account_younger_days=_("Only users that are younger than this (in days)."),
+        joined_before_days=_("Only users that joined before this (in days)."),
     )
     @app_commands.guild_only
     @app_commands.checks.bot_has_permissions(read_messages=True)
@@ -567,7 +567,7 @@ class Moderation(commands.Cog):
 
         if not cache.active:
             await interaction.response.send_translated(
-                _("The moderation module has been disabled. It can be enabled on the [Dashboard](https://plyoox.net)."),
+                _("The module is currently disabled. Enabled it on the [Dashboard](https://plyoox.net)."),
                 ephemeral=True,
             )
             return

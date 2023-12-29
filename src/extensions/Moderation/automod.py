@@ -11,7 +11,7 @@ from discord.ext import commands
 from discord.app_commands import locale_str as _
 
 from lib import utils
-from lib.enums import AutomodActionEnum, AutomodChecksEnum, TimerEnum, AutomodFinalActionEnum
+from lib.enums import AutoModerationPunishmentKind, AutoModerationCheckKind, TimerEnum, AutomodFinalActionEnum
 from translation import translate as global_translate
 from . import _logging_helper as _logging
 
@@ -267,13 +267,13 @@ class Automod(commands.Cog):
 
         if check is None:
             return True
-        elif check == AutomodChecksEnum.no_role:
+        elif check == AutoModerationCheckKind.no_role:
             return not member._roles
-        elif check == AutomodChecksEnum.no_avatar:
+        elif check == AutoModerationCheckKind.no_avatar:
             return member.avatar is None
-        elif check == AutomodChecksEnum.join_date:
+        elif check == AutoModerationCheckKind.join_date:
             return (discord.utils.utcnow() - member.joined_at).days <= action.days
-        elif check == AutomodChecksEnum.account_age:
+        elif check == AutoModerationCheckKind.account_age:
             return (discord.utils.utcnow() - member.created_at).days <= action.days
 
     async def _execute_final_action(self, member: discord.Member, action: AutomodExecutionModel):
@@ -311,7 +311,7 @@ class Automod(commands.Cog):
                     await guild.ban(member, reason=translate(_("Maximum number of points reached")))
                 else:
                     _log.warning("Timer Plugin is not initialized")
-        elif action.action == AutomodActionEnum.tempmute:
+        elif action.action == AutoModerationPunishmentKind.tempmute:
             if guild.me.guild_permissions.mute_members:
                 muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
                 await _logging.automod_final_log(self.bot, member, action.action, until=muted_until)  # type: ignore
@@ -325,32 +325,32 @@ class Automod(commands.Cog):
 
         if message is not None:
             if automod_action.action in [
-                AutomodActionEnum.kick,
-                AutomodActionEnum.tempmute,
-                AutomodActionEnum.points,
-                AutomodActionEnum.delete,
+                AutoModerationPunishmentKind.kick,
+                AutoModerationPunishmentKind.tempmute,
+                AutoModerationPunishmentKind.points,
+                AutoModerationPunishmentKind.delete,
             ]:
                 if message.channel.permissions_for(guild.me).manage_messages:
                     await message.delete()
 
-        if automod_action.action != AutomodActionEnum.delete:
+        if automod_action.action != AutoModerationPunishmentKind.delete:
             if self.punished_members.get((member.id, member.guild.id)):
                 return
             else:
-                if automod_action.action != AutomodActionEnum.points:
+                if automod_action.action != AutoModerationPunishmentKind.points:
                     self.punished_members[(member.id, member.guild.id)] = True
 
-        if automod_action.action == AutomodActionEnum.ban:
+        if automod_action.action == AutoModerationPunishmentKind.ban:
             if guild.me.guild_permissions.ban_members:
                 await guild.ban(member, reason=data.trigger_reason)
                 await _logging.automod_log(self.bot, data)
-        elif automod_action.action == AutomodActionEnum.kick:
+        elif automod_action.action == AutoModerationPunishmentKind.kick:
             if guild.me.guild_permissions.kick_members:
                 await guild.kick(member, reason=data.trigger_reason)
                 await _logging.automod_log(self.bot, data)
-        elif automod_action.action == AutomodActionEnum.delete:
+        elif automod_action.action == AutoModerationPunishmentKind.delete:
             await _logging.automod_log(self.bot, data)
-        elif automod_action.action == AutomodActionEnum.tempban:
+        elif automod_action.action == AutoModerationPunishmentKind.tempban:
             if guild.me.guild_permissions.ban_members:
                 banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
 
@@ -361,13 +361,13 @@ class Automod(commands.Cog):
                     await guild.ban(member, reason=data.trigger_reason)
                 else:
                     _log.warning("Timer Plugin is not initialized")
-        elif automod_action.action == AutomodActionEnum.tempmute:
+        elif automod_action.action == AutoModerationPunishmentKind.tempmute:
             if guild.me.guild_permissions.mute_members:
                 muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
 
                 await member.timeout(muted_until)
                 await _logging.automod_log(self.bot, data, until=muted_until)
-        elif automod_action.action == AutomodActionEnum.points:
+        elif automod_action.action == AutoModerationPunishmentKind.points:
             await self._handle_points(data)
 
     @staticmethod

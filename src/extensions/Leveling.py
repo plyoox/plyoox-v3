@@ -115,7 +115,7 @@ class Leveling(commands.Cog):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         cache = await self.bot.cache.get_leveling(interaction.guild_id)
-        if cache is None or not cache.active:
+        if not cache:
             await interaction.response.send_translated(_("This module is currently disabled."), ephemeral=True)
 
             return False
@@ -201,7 +201,7 @@ class Leveling(commands.Cog):
             return
 
         cache = await self.bot.cache.get_leveling(guild.id)
-        if cache is None or not cache.active or not cache.roles:
+        if not cache or not cache.roles:
             return
 
         user_data = await self._fetch_member_data(member)
@@ -242,7 +242,7 @@ class Leveling(commands.Cog):
         cache = await self.bot.cache.get_leveling(guild.id)
 
         # leveling is deactivated on this guild
-        if cache is None or not cache.active:
+        if not cache:
             return
 
         # ignore no xp channels
@@ -471,17 +471,16 @@ class Leveling(commands.Cog):
 
         if guild.me.guild_permissions.manage_roles:
             leveling_cache = await self.bot.cache.get_leveling(guild.id)
-            if leveling_cache is not None:
-                if leveling_cache.roles:
-                    roles_to_remove = []
-                    for [role_id, __] in leveling_cache.roles:
-                        if role_id in member._roles:
-                            roles_to_remove.append(discord.Object(id=role_id))
+            if leveling_cache and leveling_cache.roles:
+                roles_to_remove = []
+                for [role_id, __] in leveling_cache.roles:
+                    if role_id in member._roles:
+                        roles_to_remove.append(discord.Object(id=role_id))
 
-                    await member.remove_roles(
-                        *roles_to_remove,
-                        reason=interaction.translate(_("The level progress of this user was reset.")),
-                    )
+                await member.remove_roles(
+                    *roles_to_remove,
+                    reason=interaction.translate(_("The level progress of this user was reset.")),
+                )
 
         embed = extensions.Embed(description=_("The levels of this user were successfully reset."))
         await interaction.response.send_translated(embeds=[embed], ephemeral=True)

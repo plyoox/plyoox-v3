@@ -1,13 +1,30 @@
 import asyncio
 from typing import Literal
 
+from discord import utils
+
 import asyncpg
 from lru import LRU
 
-from .models import LevelRole, ModerationRule, WelcomeModel, LevelingModel, LoggingModel, ModerationModel, AutomodExecutionModel
+from lib.enums import LoggingKind
+
+from .models import (
+    AutoModerationAction,
+    AutoModerationCheck,
+    AutomoderationPunishment,
+    LevelRole,
+    LoggingSettings,
+    MaybeWebhook,
+    ModerationRule,
+    WelcomeModel,
+    LevelingModel,
+    LoggingModel,
+    ModerationModel,
+)
 
 
-CacheType = Literal["wel", "log", "lvl", "mod", "automod"]
+type CacheType = Literal["wel", "log", "lvl", "mod", "automod"]
+type Falsify = None | False
 
 
 class CacheManager:
@@ -32,62 +49,77 @@ class CacheManager:
         self._automoderation_queue: dict[int, asyncio.Event] = dict()
 
     @staticmethod
-    def __to_moderation_actions(actions: list[dict] | None) -> list[AutomodExecutionModel]:
-        if actions is None:
+    def __to_moderation_actions(actions: list[dict] | None):
+        if not actions:
             return []
 
-        return [
-            AutomodExecutionModel(
-                action=action["a"],
-                check=action.get("c"),
-                points=action.get("p"),
-                days=action.get("d"),
-                duration=action.get("t"),
+        formatted_actions = []
+
+        for action in actions:
+            punishment_key = action["punishment"]
+            points = None
+            expires_in = None
+            duration = None
+
+            if isinstance(punishment_key, dict):
+                punishment_key = tuple(punishment_key.keys())[0]
+                points = action["punishment"][punishment_key].get("points")
+                expires_in = action["punishment"][punishment_key].get("expires_in")
+                duration = action["punishment"][punishment_key].get("duration")
+
+            punishment = AutomoderationPunishment(
+                action=punishment_key, points=points, expires_in=expires_in, duration=duration
             )
-            for action in actions
-        ]
 
-    async def __get_cache(self, cache: LRU, id: int, query: str, model):
-        guild_cache = cache.get(id, False)
-        if guild_cache is not False:
+            check = action.get("check")
+            if check is not None:
+                check_time = None
+
+                if isinstance(check, dict):
+                    check = tuple(check.keys())[0]
+                    check_time = action["check"][check].get("time")
+
+                check = AutoModerationCheck(check=check, time=check_time)
+
+            formatted_actions.append(AutoModerationAction(punishment=punishment, check=check))
+
+        return formatted_actions
+
+    async def get_welcome(self, id: int) -> WelcomeModel | None | False:
+        """
+        Returns the cache for the welcome plugin.
+
+        If the guild has no configuration, it will return `None`,
+        if the configuration is disabled it will return `False`.
+        """
+        guild_cache = self._welcome.get(id, utils.MISSING)
+        if guild_cache is not utils.MISSING:
             return guild_cache
 
-        result = await self._pool.fetchrow(query, id)
+        result = await self._pool.fetchrow("SELECT * FROM welcome_config WHERE id = $1", id)
         if result is None:
-            cache[id] = None
-            return
-
-        result = dict(result)
-        del result["id"]
-
-        model = model(**result)
-        cache[id] = model
-
-        return model
-
-    async def get_welcome(self, id: int) -> WelcomeModel | None:
-        """Returns the cache for the welcome plugin."""
-        guild_cache = self._welcome.get(id, False)
-        if guild_cache is not False:
-            return guild_cache
-
-        result = await self._pool.fetchrow("SELECT * FROM welcome WHERE id = $1", id)
-        if result is None:
-            self._welcome[id] = None
+            self._welcome[id] = False
             return None
 
-        result = dict(result)
-        del result["id"]
+        if not result["active"]:
+            self._welcome[id] = False
+            return False
 
-        model = WelcomeModel(**result)
-        self._welcome[id] = model
+        result = dict(result)
+        del result["id"], result["active"]
+
+        self._welcome[id] = model = WelcomeModel(**result)
 
         return model
 
-    async def get_leveling(self, id: int) -> LevelingModel | None:
-        """Returns the cache for the leveling plugin."""
-        guild_cache = self._leveling.get(id, False)
-        if guild_cache is not False:
+    async def get_leveling(self, id: int) -> LevelingModel | None | False:
+        """Returns the cache for the leveling plugin.
+
+        If the guild has no configuration, it will return `None`,
+        if the configuration is disabled it will return `False`.
+        """
+        guild_cache = self._leveling.get(id, utils.MISSING)
+        if guild_cache is not utils.MISSING:
             return guild_cache
 
         result = await self._pool.fetchrow("SELECT * FROM level_config WHERE id = $1", id)
@@ -95,13 +127,16 @@ class CacheManager:
             self._leveling[id] = None
             return
 
+        if not result["active"]:
+            self._leveling[id] = False
+            return False
+
         result = dict(result)
         del result["id"]
 
         roles = [LevelRole(**role) for role in (result["roles"] or [])]
 
         model = LevelingModel(
-            active=result["active"],
             exempt_channels=result["exempt_channels"] or [],
             exempt_role=result["exempt_role"],
             remove_roles=result["remove_roles"],
@@ -116,7 +151,7 @@ class CacheManager:
 
     async def get_moderation(self, id: int) -> ModerationModel | None:
         """Returns the cache for the moderation plugin."""
-        guild_cache = self._moderation.get(id, False)
+        guild_cache = self._moderation.get(id, utils.MISSING)
         if guild_cache is not False:
             return guild_cache
 
@@ -129,23 +164,22 @@ class CacheManager:
             active=result["active"],
             invite_actions=self.__to_moderation_actions(result["invite_actions"]),
             invite_active=result["invite_active"],
-            invite_whitelist_channels=result["invite_whitelist_channels"] or [],
-            invite_whitelist_roles=result["invite_whitelist_roles"] or [],
+            invite_exempt_channels=result["invite_exempt_channels"] or [],
+            invite_exempt_roles=result["invite_exempt_roles"] or [],
             invite_allowed=result["invite_allowed"] or [],
             caps_actions=self.__to_moderation_actions(result["caps_actions"]),
             caps_active=result["caps_active"],
-            caps_whitelist_roles=result["caps_whitelist_roles"] or [],
-            caps_whitelist_channels=result["caps_whitelist_channels"] or [],
+            caps_exempt_roles=result["caps_exempt_roles"] or [],
+            caps_exempt_channels=result["caps_exempt_channels"] or [],
             log_id=result["log_id"],
             log_channel=result["log_channel"],
             log_token=result["log_token"],
             automod_actions=self.__to_moderation_actions(result["automod_actions"]),
-            link_list=result["link_list"] or [],
+            link_allow_list=result["link_allow_list"] or [],
             link_active=result["link_active"],
-            link_whitelist_channels=result["link_whitelist_channels"] or [],
-            link_whitelist_roles=result["link_whitelist_roles"] or [],
+            link_exempt_channels=result["link_exempt_channels"] or [],
+            link_exempt_roles=result["link_exempt_roles"] or [],
             link_actions=self.__to_moderation_actions(result["link_actions"]),
-            link_is_whitelist=result["link_is_whitelist"],
             mod_roles=result["mod_roles"] or [],
             notify_user=result["notify_user"],
             ignored_roles=result["ignored_roles"] or [],
@@ -155,10 +189,14 @@ class CacheManager:
 
         return model
 
-    async def get_logging(self, id: int) -> LoggingModel | None:
-        """Returns the cache for the logging plugin."""
-        guild_cache = self._logging.get(id, False)
-        if guild_cache is not False:
+    async def get_logging(self, id: int) -> LoggingModel | None | False:
+        """Returns the cache for the logging plugin.
+
+        If the guild has no configuration, it will return `None`,
+        if the configuration is disabled it will return `False`.
+        """
+        guild_cache = self._logging.get(id, utils.MISSING)
+        if guild_cache is not utils.MISSING:
             return guild_cache
 
         result = await self._pool.fetchrow("SELECT * FROM logging WHERE id = $1", id)
@@ -166,10 +204,42 @@ class CacheManager:
             self._logging[id] = None
             return None
 
-        result = dict(result)
-        del result["id"]
+        if not result["active"]:
+            self._logging[id] = False
+            return False
 
-        model = LoggingModel(**result)
+        settings_query = await self._pool.fetch(
+            "SELECT l.*, w.webhook_id, w.token, w.channel_id, w.guild_id FROM logging_settings l "
+            "INNER JOIN maybe_webhook w ON w.webhook_id = l.channel WHERE guild_id = $1 AND active = true",
+            id,
+        )
+        settings: dict[LoggingKind, LoggingSettings] = {}
+
+        for setting in settings_query:
+            # Do not cache disabled settings
+            if not setting["active"]:
+                continue
+
+            channel: MaybeWebhook | None = None
+
+            if setting["webhook_id"]:
+                channel = MaybeWebhook(
+                    webhook_id=setting["webhook_id"],
+                    token=setting["token"],
+                    channel_id=setting["channel_id"],
+                    guild_id=setting["guild_id"],
+                )
+
+            current_setting = LoggingSettings(
+                channel=channel,
+                kind=setting["kind"],
+                exempt_channels=setting["exempt_channels"] or [],
+                exempt_roles=setting["exempt_roles"] or [],
+            )
+
+            settings[setting["kind"]] = current_setting
+
+        model = LoggingModel(active=result["active"], settings=settings)
         self._logging[id] = model
 
         return model

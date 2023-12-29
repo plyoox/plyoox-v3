@@ -32,7 +32,7 @@ class LoggingEvents(commands.Cog):
     async def _get_cache(self, id: int) -> LoggingModel | None:
         cache = await self.bot.cache.get_logging(id)
 
-        if cache and cache.active and cache.webhook_id is not None and cache.webhook_token is not None:
+        if not cache:
             return cache
 
     async def _send_message(

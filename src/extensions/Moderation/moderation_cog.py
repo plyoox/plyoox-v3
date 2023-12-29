@@ -134,7 +134,7 @@ class Moderation(commands.Cog):
         await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, kind="ban")
         await guild.ban(member, reason=reason, delete_message_days=1)
         await interaction.followup.send(
-            interaction.translate(_("The user has been permanently banned")), ephemeral=True
+            interaction.translate(_("The user has been permanently banned.")), ephemeral=True
         )
 
     @app_commands.command(name="tempban", description=_("Bans an user from the guild for a specific time."))
@@ -373,7 +373,7 @@ class Moderation(commands.Cog):
         reason=_("The reason for the massban."),
         message_contains=_("Must be contained in a message."),
         message_starts=_("Must be at the start of a message."),
-        message_ends=_("Must be at the end of a message"),
+        message_ends=_("Must be at the end of a message."),
         has_embed=_("If the message contains an embed."),
         has_attachment=_("If the message contains a attachment."),
         joined_after=_("Only users that joined after this."),

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 14:42+0100\n"
+"POT-Creation-Date: 2023-12-29 15:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -914,7 +914,7 @@ msgid "Why the member should be banned."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:137
-msgid "The user has been permanently banned"
+msgid "The user has been permanently banned."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:140
@@ -1083,7 +1083,7 @@ msgid "Must be at the start of a message."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:376
-msgid "Must be at the end of a message"
+msgid "Must be at the end of a message."
 msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:377

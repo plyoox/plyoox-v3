@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-29 12:28+0100\n"
+"POT-Creation-Date: 2023-12-29 12:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -622,7 +622,7 @@ msgstr ""
 #, python-brace-format
 msgid ""
 "You have been warned in `{guild.name}` for **{reason}** and now have "
-"`{points}` points"
+"`{points}` points."
 msgstr ""
 
 #: src/extensions/Moderation/_logging_helper.py:255

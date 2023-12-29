@@ -237,7 +237,7 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
         try:
             await member.send(
                 translate(
-                    _("You have been warned in `{guild.name}` for **{reason}** and now have `{points}` points")
+                    _("You have been warned in `{guild.name}` for **{reason}** and now have `{points}` points.")
                 ).format(reason=reason, guild=guild, points=points)
             )
         except discord.Forbidden:

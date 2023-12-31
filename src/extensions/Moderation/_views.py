@@ -27,7 +27,7 @@ class MemberView(extensions.PaginatedEphemeralView):
         translate = self._last_interaction.translate
 
         embed = extensions.Embed(title=translate(_("List of members")))
-        embed.set_footer(text=f"{translate(_("Page"))}: {self.current_page + 1}/{self.last_page + 1}")
+        embed.set_footer(text=f"{translate(_('Page'))}: {self.current_page + 1}/{self.last_page + 1}")
 
         members = self.members[
             self.current_page * MemberView.MEMBERS_PER_PAGE : MemberView.MEMBERS_PER_PAGE * (self.current_page + 1)
@@ -122,13 +122,13 @@ class WarnView(extensions.PaginatedEphemeralView):
         self.user = user
         self.view_expired = False
 
-        self.view_expired_button.label = _(original_interaction.locale, "moderation.warn.view.view_expired")
+        self.view_expired_button.label = original_interaction.translate(_("Expired Infractions"))
 
     async def get_page_count(self):
         if self.view_expired:
-            query = "SELECT count(*) FROM automod_users WHERE user_id = $1 AND guild_id = $2 AND expires < now()"
+            query = "SELECT count(*) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND expires_at < now()"
         else:
-            query = "SELECT count(*) FROM automod_users WHERE user_id = $1 AND guild_id = $2 AND expires > now()"
+            query = "SELECT count(*) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND expires_at > now()"
 
         infraction_count = await self.bot.db.fetchval(query, self.user.id, self._last_interaction.guild_id)
 
@@ -138,9 +138,9 @@ class WarnView(extensions.PaginatedEphemeralView):
         translate = self._last_interaction.translate
 
         if self.view_expired:
-            query = "SELECT * from automod_users WHERE user_id = $1 AND guild_id = $2 AND expires < now() OFFSET $3 LIMIT 10"
+            query = "SELECT * from automoderation_user WHERE user_id = $1 AND guild_id = $2 AND expires_at < now() OFFSET $3 LIMIT 10"
         else:
-            query = "SELECT * from automod_users WHERE user_id = $1 AND guild_id = $2 AND expires > now() OFFSET $3 LIMIT 10"
+            query = "SELECT * from automoderation_user WHERE user_id = $1 AND guild_id = $2 AND expires_at > now() OFFSET $3 LIMIT 10"
 
         infractions = await self.bot.db.fetch(query, self.user.id, self._last_interaction.guild_id, page * 10)
         if len(infractions) == 0:
@@ -160,9 +160,9 @@ class WarnView(extensions.PaginatedEphemeralView):
             embed.add_field(
                 name=f'{translate(_("Infraction"))} #{infraction["id"]}',
                 value=(
-                    f"**{translate(_("Points"))}:** {infraction['points']}\n"
-                    f"**{translate(_("Expires at"))}:** {expires_at}\n"
-                    f"**{translate(_("Reason"))}:** {infraction['reason']}"
+                    f"**{translate(_('Points'))}:** {infraction['points']}\n"
+                    f"**{translate(_('Expires at'))}:** {expires_at}\n"
+                    f"**{translate(_('Reason'))}:** {infraction['reason']}"
                 ),
                 inline=True,
             )

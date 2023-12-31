@@ -12,11 +12,14 @@ from discord.ext import commands
 from discord.app_commands import locale_str as _
 
 from cache.models import TimerModel
-from lib.enums import TimerEnum
+
+
 from translation import translate
 
 if TYPE_CHECKING:
     from main import Plyoox
+
+    from lib.enums import TimerEnum
 
 
 _log = logging.getLogger("Timer")

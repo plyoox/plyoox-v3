@@ -1,4 +1,5 @@
-from typing import Literal
+from collections.abc import Callable
 
-AutomodExecutionReason = Literal["link", "invite", "caps", "points", "discord_rule"]
-ModerationExecutedCommand = Literal["tempban", "ban", "tempmute", "kick", "unban", "softban", "unmute"]
+from discord.app_commands import locale_str
+
+type Translate = Callable[[locale_str], str]

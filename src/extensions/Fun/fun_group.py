@@ -90,7 +90,7 @@ class Fun(commands.GroupCog, group_name="fun", group_description=_("Provides fun
     @app_commands.describe(this=_("The first choice"), that=_("The second choice"))
     async def thisorthat(self, interaction: discord.Interaction, this: str, that: str):
         await interaction.response.send_message(
-            f"**{interaction.translate(_("My random answer"))}**\n{random.choice((this, that))}"
+            f"**{interaction.translate(_('My random answer'))}**\n{random.choice((this, that))}"
         )
 
     @app_commands.command(name="dice", description=_("Roll a dice."))

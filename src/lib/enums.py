@@ -41,3 +41,27 @@ class LoggingKind(enum.StrEnum):
     member_unban = "member_unban"
     member_role_update = "member_role_update"
     member_leave = "member_leave"
+
+
+class AutoModerationFinalActionKind(enum.StrEnum):
+    kick = "kick"
+    ban = "ban"
+    tempban = "tempban"
+    tempmute = "tempmute"
+
+
+class ModerationCommandKind(enum.StrEnum):
+    tempban = "tempban"
+    ban = "ban"
+    tempmute = "tempmute"
+    unban = "unban"
+    softban = "softban"
+    unmute = "unmute"
+
+
+class AutoModerationExecutionKind(enum.StrEnum):
+    link = "link"
+    invite = "invite"
+    caps = "caps"
+    points = "points"
+    discord_rule = "discord_rule"

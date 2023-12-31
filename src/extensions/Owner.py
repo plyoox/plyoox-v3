@@ -12,7 +12,6 @@ import discord
 from discord.ext import commands
 
 from lib import extensions
-from translation import languages
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -78,13 +77,6 @@ class Owner(commands.Cog):
         else:
             await ctx.message.add_reaction("✅")
 
-    @commands.command(name="reload-language")
-    @commands.is_owner()
-    async def reload_language(self, ctx: commands.Context):
-        languages._load_languages()
-
-        await ctx.message.add_reaction("✅")
-
     @commands.command(hidden=True)
     @commands.is_owner()
     async def loadfrommee6(self, ctx: commands.Context, guild_id: int):
@@ -103,11 +95,11 @@ class Owner(commands.Cog):
 
         async with self.bot.db.acquire() as con:
             async with con.transaction():
-                await con.execute("DELETE FROM leveling_users WHERE guild_id = $1", guild_id)
+                await con.execute("DELETE FROM level_user WHERE guild_id = $1", guild_id)
 
                 for user in users:
                     await con.execute(
-                        "INSERT INTO leveling_users (guild_id, user_id, xp) VALUES ($1, $2, $3)",
+                        "INSERT INTO level_user (guild_id, user_id, xp) VALUES ($1, $2, $3)",
                         guild_id,
                         user["uid"],
                         user["xp"],

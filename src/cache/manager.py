@@ -11,7 +11,7 @@ from lib.enums import LoggingKind
 from .models import (
     AutoModerationAction,
     AutoModerationCheck,
-    AutomoderationPunishment,
+    AutoModerationPunishment,
     LevelRole,
     LoggingSettings,
     MaybeWebhook,
@@ -24,7 +24,7 @@ from .models import (
 
 
 type CacheType = Literal["wel", "log", "lvl", "mod", "automod"]
-type Falsify = None | False
+type Falsify = None | bool
 
 
 class CacheManager:
@@ -67,7 +67,7 @@ class CacheManager:
                 expires_in = action["punishment"][punishment_key].get("expires_in")
                 duration = action["punishment"][punishment_key].get("duration")
 
-            punishment = AutomoderationPunishment(
+            punishment = AutoModerationPunishment(
                 action=punishment_key, points=points, expires_in=expires_in, duration=duration
             )
 
@@ -85,7 +85,7 @@ class CacheManager:
 
         return formatted_actions
 
-    async def get_welcome(self, id: int) -> WelcomeModel | None | False:
+    async def get_welcome(self, id: int) -> WelcomeModel | Falsify:
         """
         Returns the cache for the welcome plugin.
 
@@ -112,7 +112,7 @@ class CacheManager:
 
         return model
 
-    async def get_leveling(self, id: int) -> LevelingModel | None | False:
+    async def get_leveling(self, id: int) -> LevelingModel | Falsify:
         """Returns the cache for the leveling plugin.
 
         If the guild has no configuration, it will return `None`,
@@ -132,7 +132,7 @@ class CacheManager:
             return False
 
         result = dict(result)
-        del result["id"]
+        del result["id"], result["active"]
 
         roles = [LevelRole(**role) for role in (result["roles"] or [])]
 
@@ -155,7 +155,7 @@ class CacheManager:
         if guild_cache is not False:
             return guild_cache
 
-        result = await self._pool.fetchrow("SELECT * FROM moderation WHERE id = $1", id)
+        result = await self._pool.fetchrow("SELECT * FROM moderation_config WHERE id = $1", id)
         if result is None:
             self._moderation[id] = None
             return None
@@ -189,7 +189,7 @@ class CacheManager:
 
         return model
 
-    async def get_logging(self, id: int) -> LoggingModel | None | False:
+    async def get_logging(self, id: int) -> LoggingModel | Falsify:
         """Returns the cache for the logging plugin.
 
         If the guild has no configuration, it will return `None`,
@@ -199,7 +199,7 @@ class CacheManager:
         if guild_cache is not utils.MISSING:
             return guild_cache
 
-        result = await self._pool.fetchrow("SELECT * FROM logging WHERE id = $1", id)
+        result = await self._pool.fetchrow("SELECT * FROM logging_config WHERE id = $1", id)
         if result is None:
             self._logging[id] = None
             return None
@@ -209,8 +209,9 @@ class CacheManager:
             return False
 
         settings_query = await self._pool.fetch(
-            "SELECT l.*, w.webhook_id, w.token, w.channel_id, w.guild_id FROM logging_settings l "
-            "INNER JOIN maybe_webhook w ON w.webhook_id = l.channel WHERE guild_id = $1 AND active = true",
+            "SELECT l.*, w.id as mwh_id, w.token as mwh_token, w.webhook_channel as mwh_webhook_channel, "
+            " w.guild_id as mwh_guild_id FROM logging_settings l INNER JOIN maybe_webhook w ON w.id = l.channel "
+            "WHERE l.guild_id = $1 AND active = true",
             id,
         )
         settings: dict[LoggingKind, LoggingSettings] = {}
@@ -222,12 +223,12 @@ class CacheManager:
 
             channel: MaybeWebhook | None = None
 
-            if setting["webhook_id"]:
+            if setting["mwh_id"]:
                 channel = MaybeWebhook(
-                    webhook_id=setting["webhook_id"],
-                    token=setting["token"],
-                    channel_id=setting["channel_id"],
-                    guild_id=setting["guild_id"],
+                    id=setting["mwh_id"],
+                    token=setting["mwh_token"],
+                    webhook_channel=setting["mwh_webhook_channel"],
+                    guild_id=setting["mwh_guild_id"],
                 )
 
             current_setting = LoggingSettings(
@@ -239,7 +240,7 @@ class CacheManager:
 
             settings[setting["kind"]] = current_setting
 
-        model = LoggingModel(active=result["active"], settings=settings)
+        model = LoggingModel(settings=settings)
         self._logging[id] = model
 
         return model
@@ -257,7 +258,7 @@ class CacheManager:
         self._automoderation_queue[rule_id] = event = asyncio.Event()
 
         result = await self._pool.fetchrow(
-            "SELECT actions, guild_id, reason FROM automod_rules WHERE rule_id = $1", rule_id
+            "SELECT actions, guild_id, reason FROM automoderation_rule WHERE rule_id = $1", rule_id
         )
         if result is None:
             self._automoderation[rule_id] = None

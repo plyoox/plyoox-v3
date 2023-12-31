@@ -11,7 +11,7 @@ from discord.ext import commands
 from discord.app_commands import locale_str as _
 
 from lib import parsers, extensions
-from lib.enums import TimerEnum
+from lib.enums import TimerEnum, ModerationCommandKind
 from . import _views as views, _logging_helper, clear_group, automod
 
 if TYPE_CHECKING:
@@ -60,8 +60,8 @@ class Moderation(commands.Cog):
             return False
 
         if target.top_role >= interaction.guild.me.top_role:
-            await interaction.response.send_message(
-                _(interaction.locale, "The user must be below the bot in the hierarchy."), ephemeral=True
+            await interaction.response.send_translated(
+                _("The user must be below the bot in the hierarchy."), ephemeral=True
             )
             return False
 
@@ -83,17 +83,17 @@ class Moderation(commands.Cog):
         )
         embed.add_field(
             name=interaction.translate(_("Information")),
-            value=f"> __{interaction.translate(_("Url"))}:__ {invite.url}\n"
-            f"> __{_(interaction.translate(_("Uses")))}:__ {invite.uses or 0}/{invite.max_uses or '∞'}\n"
-            f"> __{_(interaction.translate(_("Created at")))}:__ {created_at}\n"
-            f"> __{_(interaction.translate(_("Expires at")))}:__ {expires_at}",
+            value=f"> __{interaction.translate(_('Url'))}:__ {invite.url}\n"
+            f"> __{interaction.translate(_('Uses'))}:__ {invite.uses or 0}/{invite.max_uses or '∞'}\n"
+            f"> __{interaction.translate(_('Created at'))}:__ {created_at}\n"
+            f"> __{interaction.translate(_('Expires at'))}:__ {expires_at}",
         )
 
         if invite.inviter is not None:
             value = (
-                f"> __{interaction.translate(_("Id"))}:__ {invite.inviter.id}\n"
-                f"> __{interaction.translate(_("Name"))}:__ {invite.inviter}\n"
-                f"> __{interaction.translate(_("Mention"))}:__{invite.inviter.mention}",
+                f"> __{interaction.translate(_('Id'))}:__ {invite.inviter.id}\n"
+                f"> __{interaction.translate(_('Name'))}:__ {invite.inviter}\n"
+                f"> __{interaction.translate(_('Mention'))}:__{invite.inviter.mention}",
             )
         else:
             value = interaction.translate(_("No creator"))
@@ -104,10 +104,10 @@ class Moderation(commands.Cog):
 
         embed.add_field(
             name=_("Guild"),
-            value=f"> __{interaction.translate(_("Name"))}:__ {invite.guild.name}\n"
-            f"> __{interaction.translate(_("Id"))}:__ {invite.guild.id}\n"
-            f"> __{interaction.translate("Vanity Url")}:__ {invite.guild.vanity_url or interaction.translate(_("No vanity url"))}\n"
-            f"> __{interaction.translate("Member count")}:__ {invite.approximate_member_count}",
+            value=f"> __{interaction.translate(_('Name'))}:__ {invite.guild.name}\n"
+            f"> __{interaction.translate(_('Id'))}:__ {invite.guild.id}\n"
+            f"> __{interaction.translate('Vanity Url')}:__ {invite.guild.vanity_url or interaction.translate(_('No vanity url'))}\n"
+            f"> __{interaction.translate('Member count')}:__ {invite.approximate_member_count}",
         )
 
         await interaction.response.send_translated(embeds=[embed], ephemeral=ephemeral)
@@ -131,7 +131,7 @@ class Moderation(commands.Cog):
 
         await interaction.response.defer(ephemeral=True)
 
-        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, kind="ban")
+        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, kind=ModerationCommandKind.ban)
         await guild.ban(member, reason=reason, delete_message_days=1)
         await interaction.followup.send(
             interaction.translate(_("The user has been permanently banned.")), ephemeral=True
@@ -170,14 +170,14 @@ class Moderation(commands.Cog):
         await interaction.response.defer(ephemeral=True)
 
         await _logging_helper.log_simple_punish_command(
-            interaction, target=member, until=banned_until, reason=reason, kind="tempban"
+            interaction, target=member, until=banned_until, reason=reason, kind=ModerationCommandKind.tempban
         )
         await self.bot.timer.create_timer(member.id, guild.id, type=TimerEnum.tempban, expires=banned_until)
         await guild.ban(member, reason=reason, delete_message_days=1)
 
         await interaction.followup.send(
             interaction.translate(_("The user has been banned until {timestamp}.")).format(
-                timestamp=utils.format_dt(datetime)
+                timestamp=utils.format_dt(banned_until)
             ),
             ephemeral=True,
         )
@@ -262,10 +262,10 @@ class Moderation(commands.Cog):
             return
 
         await interaction.response.defer(ephemeral=True)
-        await _logging_helper.log_simple_punish_command(interaction, target=user, reason=reason, kind="unban")
+        await _logging_helper.log_simple_punish_command(interaction, target=user, reason=reason, kind=ModerationCommandKind.unban)
 
         await self.bot.db.execute(
-            "DELETE FROM timers WHERE target_id = $1 AND guild_id = $2 AND type = 'tempban'", user.id, guild.id
+            "DELETE FROM timer WHERE target_id = $1 AND guild_id = $2 AND kind = 'tempban'", user.id, guild.id
         )
 
         await interaction.followup.send(interaction.translate(_("The user has been unbanned.")), ephemeral=True)
@@ -327,7 +327,7 @@ class Moderation(commands.Cog):
         await interaction.response.defer(ephemeral=True)
 
         await member.timeout(None, reason=reason)
-        await _logging_helper.log_simple_punish_command(interaction, target=member, kind="unmute", reason=reason)
+        await _logging_helper.log_simple_punish_command(interaction, target=member, kind=ModerationCommandKind.unmute, reason=reason)
 
         await interaction.followup.send(interaction.translate(_("The member has been unmuted.")), ephemeral=True)
 
@@ -361,7 +361,7 @@ class Moderation(commands.Cog):
         try:
             invite = await self.bot.fetch_invite(invites[0][-1], with_expiration=True, with_counts=True)
         except discord.NotFound:
-            await interaction.response.send_message(_("The invite does not exist."), ephemeral=True)
+            await interaction.response.send_translated(_("The invite does not exist."), ephemeral=True)
             return
 
         await self._view_invite_info(interaction, invite=invite, ephemeral=True)
@@ -551,7 +551,7 @@ class Moderation(commands.Cog):
 
         automod_cog: automod.Automod | None = self.bot.get_cog("Automod")
         if automod_cog is None:
-            _log.warn("Automod cog is not loaded.")
+            _log.warning("Automod cog is not loaded.")
             await interaction.response.send_translated(_("The required module is not loaded."), ephemeral=True)
             return
 
@@ -592,7 +592,7 @@ class Moderation(commands.Cog):
             return
 
         query_response = await self.bot.db.execute(
-            "DELETE FROM automod_users WHERE id = $1 and guild_id = $2 AND user_id = $3",
+            "DELETE FROM automoderation_user WHERE id = $1 and guild_id = $2 AND user_id = $3",
             id,
             interaction.guild_id,
             member.id,
@@ -615,7 +615,7 @@ class Moderation(commands.Cog):
             return
 
         query_response = await self.bot.db.execute(
-            "DELETE FROM automod_users WHERE guild_id = $1 AND user_id = $2",
+            "DELETE FROM automoderation_user WHERE guild_id = $1 AND user_id = $2",
             interaction.guild_id,
             member.id,
         )
@@ -631,16 +631,16 @@ class Moderation(commands.Cog):
     @tempban.autocomplete("duration")
     async def autocomplete_duration(self, interaction: discord.Interaction, current: str):
         times = [
-            {"label": f"30 {interaction.locale(_("minutes"))}", "value": "30min"},
-            {"label": f"1 {_(interaction.locale(_("hours")))}", "value": "1h"},
-            {"label": f"3 {_(interaction.locale(_("hours")))}", "value": "3h"},
-            {"label": f"6 {_(interaction.locale(_("hours")))}", "value": "6h"},
-            {"label": f"12 {_(interaction.locale(_("hours")))}", "value": "12h"},
-            {"label": f"1 {_(interaction.locale(_("day")))}", "value": "1d"},
-            {"label": f"3 {_(interaction.locale(_("days")))}", "value": "3d"},
-            {"label": f"7 {_(interaction.locale(_("days")))}", "value": "7d"},
-            {"label": f"14 {_(interaction.locale(_("days")))}", "value": "14d"},
-            {"label": f"1 {_(interaction.locale(_("month")))} (28 {_(interaction.locale(_("days")))})", "value": "28d"},
+            {"label": f"30 {interaction.translate(_('minutes'))}", "value": "30min"},
+            {"label": f"1 {interaction.translate(_('hours'))}", "value": "1h"},
+            {"label": f"3 {interaction.translate(_('hours'))}", "value": "3h"},
+            {"label": f"6 {interaction.translate(_('hours'))}", "value": "6h"},
+            {"label": f"12 {interaction.translate(_('hours'))}", "value": "12h"},
+            {"label": f"1 {interaction.translate(_('day'))}", "value": "1d"},
+            {"label": f"3 {interaction.translate(_('days'))}", "value": "3d"},
+            {"label": f"7 {interaction.translate(_('days'))}", "value": "7d"},
+            {"label": f"14 {interaction.translate(_('days'))}", "value": "14d"},
+            {"label": f"1 {interaction.translate(_('month'))} (28 {interaction.translate(_('days'))})", "value": "28d"},
         ]
 
         if not current:

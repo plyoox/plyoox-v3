@@ -36,9 +36,9 @@ class LevelingModel(RecordClass):
 
 
 class MaybeWebhook(RecordClass):
-    webhook_id: int
+    id: int
     token: str | None
-    channel_id: int | None
+    webhook_channel: int | None
     guild_id: int
 
 
@@ -64,7 +64,7 @@ class AutoModerationCheck(RecordClass):
     time: int | None
 
 
-class AutomoderationPunishment(RecordClass):
+class AutoModerationPunishment(RecordClass):
     action: AutoModerationPunishmentKind
     duration: int | None
     points: int | None
@@ -72,7 +72,7 @@ class AutomoderationPunishment(RecordClass):
 
 
 class AutoModerationAction(RecordClass):
-    punishment: AutomoderationPunishment
+    punishment: AutoModerationPunishment
     check: AutoModerationCheck | None
 
 
@@ -80,9 +80,7 @@ class ModerationModel(RecordClass):
     active: bool
     mod_roles: list[int] | None
     ignored_roles: list[int] | None
-    log_id: int | None
-    log_channel: int | None
-    log_token: str | None
+    logging_channel: MaybeWebhook | None
     point_actions: list[AutoModerationAction] | None
     notify_user: bool
     invite_active: bool

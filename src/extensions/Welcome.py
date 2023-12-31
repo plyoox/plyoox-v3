@@ -1,13 +1,16 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands
 
-from cache import WelcomeModel
 from lib import formatting
 
 if TYPE_CHECKING:
     from main import Plyoox
+
+    from cache import WelcomeModel
 
 
 class Welcome(commands.Cog):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-31 22:24+0100\n"
+"POT-Creation-Date: 2023-12-31 22:47+0100\n"
 "PO-Revision-Date: 2023-12-29 15:15+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -618,10 +618,9 @@ msgstr "Account erstellt am"
 #: src/extensions/Logging.py:116 src/extensions/Logging.py:145
 #: src/extensions/Logging.py:160 src/extensions/Logging.py:182
 #: src/extensions/Logging.py:201 src/extensions/Logging.py:220
-#: src/extensions/Logging.py:287 src/extensions/Logging.py:333
-#, fuzzy
+#: src/extensions/Logging.py:291 src/extensions/Logging.py:345
 msgid "User id"
-msgstr "Benutzer beigetreten"
+msgstr "User ID"
 
 #: src/extensions/Logging.py:135
 msgid "The user {member.name} left the guild."
@@ -667,48 +666,48 @@ msgstr "Neuer Name"
 msgid "Old message content"
 msgstr "Alter Nachrichteninhalt"
 
-#: src/extensions/Logging.py:269 src/extensions/Logging.py:289
-#: src/extensions/Logging.py:340
+#: src/extensions/Logging.py:269 src/extensions/Logging.py:293
+#: src/extensions/Logging.py:352
 msgid "No content"
 msgstr "Kein Inhalt"
 
-#: src/extensions/Logging.py:284
+#: src/extensions/Logging.py:288
 msgid "**{member}** edited a message in {channel}."
 msgstr "**{member}** hat eine Nachricht in {channel} bearbeitet."
 
-#: src/extensions/Logging.py:286
+#: src/extensions/Logging.py:290
 msgid "Message edited"
 msgstr "Nachricht bearbeitet"
 
-#: src/extensions/Logging.py:293
+#: src/extensions/Logging.py:297
 msgid "New message content"
 msgstr "Neuer Nachrichteninhalt"
 
-#: src/extensions/Logging.py:322
+#: src/extensions/Logging.py:334
 msgid "Message deleted"
 msgstr "Nachricht gelöscht"
 
-#: src/extensions/Logging.py:330
+#: src/extensions/Logging.py:342
 msgid "A message from **{member}** was deleted from {channel.mention}."
 msgstr "Eine Nachricht von **{member}** wurde aus {channel.mention} gelöscht."
 
-#: src/extensions/Logging.py:339
+#: src/extensions/Logging.py:351
 msgid "Message content"
 msgstr "Nachrichteninhalt"
 
-#: src/extensions/Logging.py:348
+#: src/extensions/Logging.py:360
 msgid "Attachments"
 msgstr "Anhänge"
 
-#: src/extensions/Logging.py:353
+#: src/extensions/Logging.py:365
 msgid "A message from {channel} has been deleted."
 msgstr "Eine Nachricht aus {channel} wurde gelöscht."
 
-#: src/extensions/Logging.py:377
+#: src/extensions/Logging.py:389
 msgid "Bulk message delete"
 msgstr "Massenlöschung von Nachrichten"
 
-#: src/extensions/Logging.py:379
+#: src/extensions/Logging.py:391
 msgid "{count} messages have been deleted from {channel}."
 msgstr "Es wurden {count} Nachrichten aus {channel} gelöscht."
 

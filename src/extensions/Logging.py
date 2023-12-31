@@ -275,6 +275,7 @@ class LoggingEvents(commands.Cog):
             user_name = payload.data["author"]["username"]
             user_discriminator = payload.data["author"]["discriminator"]
             user_avatar = payload.data["author"].get("avatar", int(user_discriminator) % len(discord.DefaultAvatar))
+            edit_channel = f"<#{payload.channel_id}>"
 
             avatar = f"{discord.Asset.BASE}/avatars/{edit_member_id}/{user_avatar}.webp?size=1024"
 
@@ -285,7 +286,7 @@ class LoggingEvents(commands.Cog):
 
         log_embed.description = global_translate(
             _("**{member}** edited a message in {channel}."), self.bot, guild.preferred_locale
-        ).format(member=edit_member, channel=f"<#{payload.channel_id}>")
+        ).format(member=edit_member, channel=edit_channel)
         log_embed.set_author(name=_("Message edited"), icon_url=avatar)
         log_embed.set_footer(text=f"{global_translate(_('User id'), self.bot, guild.preferred_locale)}: {edit_member_id}")
 
@@ -308,13 +309,21 @@ class LoggingEvents(commands.Cog):
             return
 
         cache = await self._get_setting(guild.id, LoggingKind.message_delete)
-        if cache is None or not cache.message_delete:
+        if cache is None:
             return
 
         # do not log messages deleted from the logging channel
         # this prevents a logging loop
-        if cache.webhook_channel == payload.channel_id:
+        webhook_channel = cache.channel
+        if webhook_channel is None:
             return
+
+        if webhook_channel.token is None:
+            if webhook_channel.id == payload.channel_id:
+                return
+        else:
+            if webhook_channel.webhook_channel == payload.channel_id:
+                return
 
         message = payload.cached_message
         member = message.author if message else None

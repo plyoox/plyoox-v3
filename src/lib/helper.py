@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import discord
-from discord.app_commands import locale_str as _
 
 from lib import emojis
 
@@ -62,14 +61,6 @@ def get_badges(flags: discord.PublicUserFlags) -> list[str]:
         flag_list.append(emojis.active_developer)
 
     return flag_list
-
-
-async def interaction_send(interaction: discord.Interaction, key: str, /, ephemeral=True, **kwargs) -> None:
-    """Responds to an interaction with a locale string as ephemeral. This is mostly used to respond to errors."""
-    if interaction.extras.get("deferred"):
-        await interaction.followup.send(_(interaction.locale, key, **kwargs), ephemeral=ephemeral)
-    else:
-        await interaction.response.send_message(_(interaction.locale, key, **kwargs), ephemeral=ephemeral)
 
 
 async def permission_check(

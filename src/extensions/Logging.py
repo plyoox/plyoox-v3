@@ -10,11 +10,12 @@ from discord.ext import commands
 from discord.app_commands import locale_str as _
 
 from lib import helper, extensions
-from translation.translator import translate
+from lib.enums import LoggingKind
+from translation.translator import translate as global_translate
 
 if TYPE_CHECKING:
     from main import Plyoox
-    from cache import LoggingModel
+    from cache.models import LoggingSettings
 
 _log = logging.getLogger(__name__)
 
@@ -29,45 +30,80 @@ class LoggingEvents(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
 
-    async def _get_cache(self, id: int) -> LoggingModel | None:
+    async def _get_setting(self, id: int, kind: LoggingKind) -> LoggingSettings | None:
+        """Returns the logging settings for the given guild id and kind.
+        Only returns the settings if the logging is active and a channel is set.
+        """
+
         cache = await self.bot.cache.get_logging(id)
 
         if not cache:
-            return cache
+            return
+
+        settings = cache.settings.get(kind)
+        if settings and settings.channel:
+            return settings
 
     async def _send_message(
         self,
         guild: discord.Guild,
-        cache: LoggingModel,
+        cache: LoggingSettings,
         *,
         file: discord.File = utils.MISSING,
         embeds: list[discord.Embed] = utils.MISSING,
     ):
-        webhook = discord.Webhook.partial(cache.webhook_id, cache.webhook_token, session=self.bot.session)
-
         if embeds is not utils.MISSING:
             for embed in embeds:
                 embed._update_locale(guild.preferred_locale, self.bot.tree.translator)
 
-        try:
-            await webhook.send(embeds=embeds, file=file)
-        except discord.NotFound:
-            await self.bot.db.execute(
-                "UPDATE logging SET webhook_id = NULL, webhook_token = NULL WHERE id = $1", guild.id
-            )
+        # Normally all logging channels should be webhook channels,
+        # but just in case (e.g. manual insertion)
+        if cache.channel.token is None:
+            channel = guild.get_channel(cache.channel.id)  # channel is a text channel
+            if channel is None or not channel.permissions_for(guild.me).send_messages:
+                _log.info(f"Deleted logging channel {cache.channel} due to missing permissions")
 
-            self.bot.cache.edit_cache(guild.id, "log", webhook_token=None, webhook_id=None)
+                await self.bot.db.execute(
+                    "DELETE FROM maybe_webhook WHERE id = $1 AND guild_id = $2",
+                    cache.channel.id,
+                    guild.id,
+                )
+
+                self.bot.cache.remove_cache(guild.id, "log")
+            else:
+                try:
+                    await channel.send(file=file, embeds=embeds)
+                except Exception as e:
+                    _log.error(f"Could not logging message to channel {channel}", exc_info=e)
+        else:
+            webhook = discord.Webhook.partial(cache.channel.id, cache.channel.token, session=self.bot.session)
+
+            try:
+                await webhook.send(embeds=embeds, file=file)
+            except discord.NotFound:
+                _log.info(f"Deleted logging webhook {repr(cache.channel)} due to missing webhook")
+
+                await self.bot.db.execute(
+                    "DELETE FROM maybe_webhook WHERE id = $1", cache.channel.id
+                )
+
+                self.bot.cache.edit_cache(guild.id, "log", webhook_token=None, webhook_id=None)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         guild = member.guild
 
-        cache = await self._get_cache(guild.id)
-        if cache is None or not cache.member_join:
+        cache = await self._get_setting(guild.id, LoggingKind.member_join)
+        if cache is None:
+            return
+
+        # Members that join *can* have a role, for example the twitch integration role
+        # is added before the member joins the guild.
+        if any(role in cache.exempt_roles for role in member.roles):
             return
 
         embed = extensions.Embed(
-            description=translate(
+            description=global_translate(
                 _("The user {member.name} joined the guild."), self.bot, guild.preferred_locale
             ).format(member=member),
             color=SUCCESS_COLOR,
@@ -77,47 +113,51 @@ class LoggingEvents(commands.Cog):
             name=_("Account created at"),
             value=helper.embed_timestamp_format(member.created_at),
         )
-        embed.set_footer(text=f"{translate(_('User id'), self.bot, guild.preferred_locale)}: {member.id}")
+        embed.set_footer(text=f"{_('User id')}: {member.id}")
 
-        await self._send_message(guild, cache, embed=[embed])
+        await self._send_message(guild, cache, embeds=[embed])
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
+        def translate(string: _):
+            return global_translate(string, self.bot, member.guild.preferred_locale)
+
         guild = member.guild
 
-        cache = await self._get_cache(guild.id)
-        if cache is None or not cache.member_join:
+        cache = await self._get_setting(guild.id, LoggingKind.member_leave)
+        if cache is None:
+            return
+
+        if any(role in cache.exempt_roles for role in member.roles):
             return
 
         embed = extensions.Embed(
-            description=translate(_("The user {member.name} left the guild."), self.bot, guild.preferred_locale).format(
-                member=member
-            ),
+            description=translate(_("The user {member.name} left the guild.")).format(member=member),
             color=ERROR_COLOR,
         )
         embed.set_author(name=_("Member left"), icon_url=member.display_avatar)
         embed.add_field(name=_("Account created at"), value=helper.embed_timestamp_format(member.created_at))
 
         roles = helper.format_roles(member.roles)
-        if roles:
-            embed.add_field(name=_("Roles"), value=f"> {roles}")
-        else:
-            embed.add_field(name=_("Roles"), value=_("No roles"))
+        embed.add_field(name=_("Roles"), value=f"> {roles}" if roles else _("No roles"))
 
         embed.add_field(name=_("Joined at"), value=helper.embed_timestamp_format(member.joined_at))
-        embed.set_footer(text=f"{translate(_('User id'), self.bot, guild.preferred_locale)}: {member.id}")
+        embed.set_footer(text=f"{translate(_('User id'))}: {member.id}")
 
-        await self._send_message(member.guild, cache, embed=[embed])
+        await self._send_message(member.guild, cache, embeds=[embed])
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild: discord.Guild, user: discord.User | discord.Member):
-        cache = await self._get_cache(guild.id)
-        if cache is None or not cache.member_ban:
+        cache = await self._get_setting(guild.id, LoggingKind.member_ban)
+        if cache is None:
+            return
+
+        if any(role in cache.exempt_roles for role in user.roles):
             return
 
         embed = extensions.Embed(color=ERROR_COLOR)
         embed.add_field(name=_("Account created at"), value=helper.embed_timestamp_format(user.created_at))
-        embed.set_footer(text=f"{translate(_('User id'), self.bot, guild.preferred_locale)}: {user.id}")
+        embed.set_footer(text=f"{global_translate(_('User id'), self.bot, guild.preferred_locale)}: {user.id}")
 
         if isinstance(user, discord.Member):
             embed.set_author(name=_("User banned"), icon_url=user.display_avatar)
@@ -129,32 +169,36 @@ class LoggingEvents(commands.Cog):
         else:
             embed.set_author(name=_("User banned"), icon_url=user.display_avatar)
 
-        await self._send_message(guild, cache, embed={embed})
+        await self._send_message(guild, cache, embeds=[embed])
 
     @commands.Cog.listener()
     async def on_member_unban(self, guild: discord.Guild, user: discord.User):
-        cache = await self._get_cache(guild.id)
-        if cache is None or not cache.member_unban:
+        cache = await self._get_setting(guild.id, LoggingKind.member_unban)
+        if cache is None:
             return
 
         embed = extensions.Embed(color=WARN_COLOR)
         embed.set_author(name=_("Member unbanned"), icon_url=user.display_avatar)
-        embed.set_footer(text=f"{translate(_('User id'), self.bot, guild.preferred_locale)}: {user.id}")
+        embed.set_footer(text=f"{global_translate(_('User id'), self.bot, guild.preferred_locale)}: {user.id}")
         embed.add_field(name=_("Account created at"), value=helper.embed_timestamp_format(user.created_at))
 
-        await self._send_message(guild, cache, embed=embed)
+        await self._send_message(guild, cache, embeds=[embed])
 
     @commands.Cog.listener()
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         guild = after.guild
-        cache = await self._get_cache(before.guild.id)
-        if cache is None:
-            return
 
-        if cache.member_role_change and before.roles != after.roles:
+        if before.roles != after.roles:
+            cache = await self._get_setting(guild.id, LoggingKind.member_role_update)
+            if cache is None:
+                return
+
+            if any(role in cache.exempt_roles for role in after.roles):
+                return
+
             embed = extensions.Embed(color=INFO_COLOR)
             embed.set_author(name=_("Member roles changed"), icon_url=before.display_avatar)
-            embed.set_footer(text=f"{translate(_('User id'), self.bot, guild.preferred_locale)}: {before.id}")
+            embed.set_footer(text=f"{global_translate(_('User id'), self.bot, guild.preferred_locale)}: {before.id}")
 
             new_roles = helper.format_roles(after.roles)
             embed.add_field(name=_("New roles"), value=f"> {new_roles}" if new_roles else _("No roles"))
@@ -162,11 +206,18 @@ class LoggingEvents(commands.Cog):
             old_roles = helper.format_roles(before.roles)
             embed.add_field(name=_("Old roles"), value=f"> {old_roles}" if old_roles else _("No roles"))
 
-            await self._send_message(guild, cache, embed=[embed])
-        elif cache.member_rename and before.display_name != after.display_name:
+            await self._send_message(guild, cache, embeds=[embed])
+        elif before.display_name != after.display_name:
+            cache = await self._get_setting(guild.id, LoggingKind.member_rename)
+            if cache is None:
+                return
+
+            if any(role in cache.exempt_roles for role in after.roles):
+                return
+
             embed = extensions.Embed(color=INFO_COLOR)
             embed.set_author(name=_("Member renamed"), icon_url=after.display_avatar)
-            embed.set_footer(text=f"{translate(_('User id'), self.bot, guild.preferred_locale)}: {before.id}")
+            embed.set_footer(text=f"{global_translate(_('User id'), self.bot, guild.preferred_locale)}: {before.id}")
 
             embed.add_field(
                 name=_("Previous name"),
@@ -190,16 +241,22 @@ class LoggingEvents(commands.Cog):
             _log.warning(f"Could not find guild {payload.guild_id}")
             return
 
-        cache = await self._get_cache(guild.id)
-        if cache is None or not cache.message_edit:
+        cache = await self._get_setting(guild.id, LoggingKind.message_edit)
+        if cache is None:
             return
 
-        message = payload.cached_message
+        # Ignore exempt channels
+        if payload.channel_id in cache.exempt_channels:
+            return
+
+        # Ignore exempt roles
+        if any(role in cache.exempt_roles for role in payload.data["member"].get("roles", [])):
+            return
 
         log_embed = extensions.Embed(color=WARN_COLOR)
         embeds = [log_embed]
 
-        if message is not None:
+        if message := payload.cached_message:
             member = message.author
 
             avatar = member.display_avatar
@@ -223,11 +280,11 @@ class LoggingEvents(commands.Cog):
             edit_member = f"{user_name}#{user_discriminator}"
             edit_channel = f"<#{payload.channel_id}>"
 
-        log_embed.description = translate(
+        log_embed.description = global_translate(
             _("**{member}** edited a message in {channel}."), self.bot, guild.preferred_locale
         ).format(member=edit_member, channel=edit_channel)
         log_embed.set_author(name=_("Message edited"), icon_url=avatar)
-        log_embed.set_footer(text=f"{translate(_('User id'), self.bot, guild.preferred_locale)}: {member.id}")
+        log_embed.set_footer(text=f"{global_translate(_('User id'), self.bot, guild.preferred_locale)}: {edit_member_id}")
 
         content = payload.data.get("content") or _("No content")
 
@@ -247,7 +304,7 @@ class LoggingEvents(commands.Cog):
             _log.warning(f"Could not find guild with id {payload.guild_id}")
             return
 
-        cache = await self._get_cache(guild.id)
+        cache = await self._get_setting(guild.id, LoggingKind.message_delete)
         if cache is None or not cache.message_delete:
             return
 
@@ -269,10 +326,12 @@ class LoggingEvents(commands.Cog):
             if not message.content and not message.attachments:
                 return
 
-            log_embed.description = translate(
-                _("A message from **{member}** was deleted from {channel.mention}.")
+            log_embed.description = global_translate(
+                _("A message from **{member}** was deleted from {channel.mention}."), self.bot, guild.preferred_locale
             ).format(member=member, channel=message.channel)
-            log_embed.set_footer(text=f"{translate(_('User id'), self.bot, guild.preferred_locale)}: {member.id}")
+            log_embed.set_footer(
+                text=f"{global_translate(_('User id'), self.bot, guild.preferred_locale)}: {member.id}"
+            )
 
             # messages longer than 1024 characters receive their own embed
             if len(message.content) <= 1024:
@@ -290,8 +349,8 @@ class LoggingEvents(commands.Cog):
                     value=", ".join([f"`{attachment.filename}`" for attachment in message.attachments]),
                 )
         else:
-            log_embed.description = translate(
-                _("A message from {channel} has been deleted.", self.bot, guild.preferred_locale)
+            log_embed.description = global_translate(
+                _("A message from {channel} has been deleted."), self.bot, guild.preferred_locale
             ).format(
                 channel=f"<#{payload.channel_id}>",
             )
@@ -305,7 +364,7 @@ class LoggingEvents(commands.Cog):
             _log.warning(f"Could not find guild with id {payload.guild_id}")
             return
 
-        cache = await self._get_cache(guild.id)
+        cache = await self._get_setting(guild.id, LoggingKind.message_delete)
         if cache is None or not cache.message_delete:
             return
 
@@ -317,7 +376,7 @@ class LoggingEvents(commands.Cog):
         embed = extensions.Embed(
             title=_("Bulk message delete"),
             color=ERROR_COLOR,
-            description=translate(_("{count} messages have been deleted from {channel}.")).format(
+            description=global_translate(_("{count} messages have been deleted from {channel}."), self.bot, guild.preferred_locale).format(
                 count=len(payload.message_ids),
                 channel=f"<#{payload.channel_id}>",
             ),
@@ -337,7 +396,7 @@ class LoggingEvents(commands.Cog):
 
                 file = discord.File(_file, filename="deleted_messages.txt")
 
-        await self._send_message(guild, cache, embed=[embed], file=file)
+        await self._send_message(guild, cache, embeds=[embed], file=file)
 
 
 async def setup(bot: Plyoox):

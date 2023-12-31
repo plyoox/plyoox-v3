@@ -11,14 +11,16 @@ from discord.ext import commands
 from discord.app_commands import locale_str as _
 
 from lib import utils
-from lib.enums import AutoModerationPunishmentKind, AutoModerationCheckKind, TimerEnum, AutomodFinalActionEnum
+from lib.enums import (
+    AutoModerationPunishmentKind, AutoModerationCheckKind, TimerEnum, AutomodFinalActionEnum,
+    AutoModerationExecutionKind,
+)
 from translation import translate as global_translate
 from . import _logging_helper as _logging
 
 if TYPE_CHECKING:
     from main import Plyoox
-    from cache.models import AutomodExecutionModel, ModerationModel
-    from lib.types import AutomodExecutionReason
+    from cache.models import ModerationModel, AutoModerationAction
 
 _log = logging.getLogger(__name__)
 
@@ -27,15 +29,15 @@ EVERYONE_MENTION = re.compile("@(here|everyone)")
 LINK_REGEX = re.compile(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]", re.IGNORECASE)
 
 
-class AutomodActionData(object):
+class AutoModerationActionData(object):
     member: discord.Member
     trigger_content: str
     trigger_reason: str
-    trigger_action: AutomodExecutionModel
+    trigger_action: AutoModerationAction
 
     __slots__ = ("trigger_content", "member", "trigger_reason", "trigger_action")
 
-    def __init__(self, member: discord.Member, content: str, reason: str, action: AutomodExecutionModel):
+    def __init__(self, member: discord.Member, content: str, reason: str, action: AutoModerationAction):
         self.member = member
         self.trigger_action = action
         self.trigger_content = content
@@ -51,18 +53,19 @@ class AutomodActionData(object):
         *,
         bot: Plyoox,
         message: discord.Message,
-        action_taken: AutomodExecutionModel,
-        reason: AutomodExecutionReason,
+        action_taken: AutoModerationAction,
+        reason: AutoModerationExecutionKind,
     ):
-        reason = global_translate("", bot, message.guild.preferred_locale)
+        translated_reason = cls._translate_reason(bot, reason, message.guild.preferred_locale)
 
-        return cls(member=message.author, action=action_taken, content=message.content, reason=reason)
+        return cls(member=message.author, action=action_taken, content=message.content, reason=translated_reason)
 
     @property
     def guild(self):
         return self.member.guild
 
-    def _translate_reason(bot: Plyoox, reason: AutomodExecutionReason, locale: discord.Locale) -> str:
+    @staticmethod
+    def _translate_reason(bot: Plyoox, reason: AutoModerationExecutionKind, locale: discord.Locale) -> str:
         if reason == "invite":
             return global_translate(_("Discord invite"), bot, locale)
         elif reason == "link":
@@ -93,7 +96,7 @@ class Automod(commands.Cog):
 
     @commands.Cog.listener()
     async def on_automod_rule_delete(self, rule: discord.AutoModRule) -> None:
-        await self.bot.db.execute("DELETE FROM automod_rules WHERE rule_id = $1", rule.id)
+        await self.bot.db.execute("DELETE FROM automoderation_rule WHERE rule_id = $1", rule.id)
 
         self.bot.cache.remove_cache(rule.id, "automod")
 
@@ -127,12 +130,15 @@ class Automod(commands.Cog):
 
         for action in cache.actions:
             if Automod._handle_checks(member, action):
+                reason = cache.reason or global_translate(
+                    _("Violating a Discord moderation rule"), self.bot, guild.preferred_locale
+                )
+
                 await self._execute_discord_automod(
-                    data=AutomodActionData(
+                    data=AutoModerationActionData(
                         action=action,
                         member=member,
-                        reason=cache.reason
-                        or global_translate(_("Violating a Discord moderation rule"), self.bot, guild.preferred_locale),
+                        reason=reason,
                         content=execution.matched_content,
                     )
                 )
@@ -156,7 +162,7 @@ class Automod(commands.Cog):
             if cache is None:
                 return
 
-            if not self._is_affected(message, cache, "invite"):
+            if not self._is_affected(message, cache, AutoModerationExecutionKind.invite):
                 return
 
             invites: set[str] = set([invite[1] for invite in found_invites])
@@ -169,7 +175,7 @@ class Automod(commands.Cog):
                     ):
                         continue
 
-                    await self._handle_action(message, cache.invite_actions, "invite")
+                    await self._handle_action(message, cache.invite_actions, AutoModerationExecutionKind.invite)
                     return
                 except discord.HTTPException:
                     break
@@ -179,7 +185,7 @@ class Automod(commands.Cog):
             if cache is None:
                 return
 
-            if not self._is_affected(message, cache, "link"):
+            if not self._is_affected(message, cache, AutoModerationExecutionKind.link):
                 return
 
             links = set([link for link in found_links])
@@ -194,7 +200,7 @@ class Automod(commands.Cog):
                     if link not in cache.link_list:
                         continue
 
-                await self._handle_action(message, cache.link_actions, "link")
+                await self._handle_action(message, cache.link_actions, AutoModerationExecutionKind.link)
                 return
 
         if len(message.content) > 15 and not message.content.islower():
@@ -209,10 +215,10 @@ class Automod(commands.Cog):
             if cache is None:
                 return
 
-            if not self._is_affected(message, cache, "caps"):
+            if not self._is_affected(message, cache, AutoModerationExecutionKind.caps):
                 return
 
-            await self._handle_action(message, cache.caps_actions, "caps")
+            await self._handle_action(message, cache.caps_actions, AutoModerationExecutionKind.caps)
             return
 
     async def _fetch_invite(self, code: str) -> discord.Invite | None:
@@ -246,23 +252,25 @@ class Automod(commands.Cog):
     async def _handle_action(
         self,
         message: discord.Message,
-        actions: list[AutomodExecutionModel],
-        reason: AutomodExecutionReason,
+        actions: list[AutoModerationAction],
+        reason: AutoModerationExecutionKind,
     ):
         for action in actions:
             if Automod._handle_checks(message.author, action):
-                data = AutomodActionData._from_message(message=message, reason=reason, action_taken=action)
+                data = AutoModerationActionData._from_message(message=message, reason=reason, action_taken=action,
+                                                              bot=self.bot)
+
                 await self._execute_discord_automod(data, message=message)
                 break
 
-    async def _handle_final_action(self, member: discord.Member, actions: list[AutomodExecutionModel]):
+    async def _handle_final_action(self, member: discord.Member, actions: list[AutoModerationAction]):
         for action in actions:
             if Automod._handle_checks(member, action):
                 await self._execute_final_action(member, action)
                 break
 
     @staticmethod
-    def _handle_checks(member: discord.Member, action: AutomodExecutionModel) -> bool:
+    def _handle_checks(member: discord.Member, action: AutoModerationAction) -> bool:
         check = action.check
 
         if check is None:
@@ -276,7 +284,7 @@ class Automod(commands.Cog):
         elif check == AutoModerationCheckKind.account_age:
             return (discord.utils.utcnow() - member.created_at).days <= action.days
 
-    async def _execute_final_action(self, member: discord.Member, action: AutomodExecutionModel):
+    async def _execute_final_action(self, member: discord.Member, action: AutoModerationAction):
         def translate(string: _) -> str:
             return global_translate(string, self.bot, member.guild.preferred_locale)
 
@@ -318,7 +326,7 @@ class Automod(commands.Cog):
 
                 await member.timeout(muted_until)
 
-    async def _execute_discord_automod(self, data: AutomodActionData, message: discord.Message = None) -> None:
+    async def _execute_discord_automod(self, data: AutoModerationActionData, message: discord.Message = None) -> None:
         guild = data.guild
         member = data.member
         automod_action = data.trigger_action
@@ -371,7 +379,7 @@ class Automod(commands.Cog):
             await self._handle_points(data)
 
     @staticmethod
-    def _is_affected(message: discord.Message, cache: ModerationModel, kind: AutomodExecutionReason) -> bool:
+    def _is_affected(message: discord.Message, cache: ModerationModel, kind: AutoModerationExecutionKind) -> bool:
         """This function checks if the automod should be executed on the message.
         It checks for:
          - Automod and check enabled
@@ -400,7 +408,7 @@ class Automod(commands.Cog):
 
         return True
 
-    async def _handle_points(self, data: AutomodActionData) -> None:
+    async def _handle_points(self, data: AutoModerationActionData) -> None:
         guild = data.guild
         member = data.member
 
@@ -408,7 +416,7 @@ class Automod(commands.Cog):
             member=data.member,
             points=data.trigger_action.points,
             reason=data.trigger_reason,
-            expires=data.trigger_action.duration,
+            expires_after=data.trigger_action.duration,
         )
 
         if points is None:
@@ -426,7 +434,7 @@ class Automod(commands.Cog):
 
             await self._handle_final_action(member, cache.automod_actions)
             await self.bot.db.execute(
-                "UPDATE automod_users SET expires = now() WHERE user_id = $1 AND guild_id = $2 AND expires > now()",
+                "UPDATE automoderation_user SET expires_at = now() WHERE user_id = $1 AND guild_id = $2 AND expires_at > now()",
                 member.id,
                 guild.id,
             )
@@ -447,16 +455,16 @@ class Automod(commands.Cog):
                 return
 
             await self._handle_final_action(member, cache.automod_actions)
-            await self.bot.db.execute(
-                "DELETE FROM automod_users WHERE user_id = $1 AND guild_id = $2", member.id, guild.id
-            )
 
-    async def __add_points(self, *, member: discord.Member, points: int, reason: str, expires: int = None) -> int:
+    async def __add_points(self, *, member: discord.Member, points: int, reason: str,
+                           expires_after: int = 1209600) -> int:
+        """ Add points to a member and returns the currently active points."""
+
         guild = member.guild
-        expires_at = discord.utils.utcnow() + datetime.timedelta(seconds=expires or 1209600)
+        expires_at = discord.utils.utcnow() + datetime.timedelta(seconds=expires_after)  # default is 2 weeks
 
         await self.bot.db.execute(
-            "INSERT INTO automod_users (guild_id, user_id, expires, points, reason) VALUES ($1, $2, $3, $4, $5)",
+            "INSERT INTO automoderation_user (guild_id, user_id, expires_at, points, reason) VALUES ($1, $2, $3, $4, $5)",
             guild.id,
             member.id,
             expires_at,
@@ -465,7 +473,7 @@ class Automod(commands.Cog):
         )
 
         return await self.bot.db.fetchval(
-            "SELECT SUM(points) FROM automod_users WHERE user_id = $1 AND guild_id = $2 AND now() < expires",
+            "SELECT SUM(points) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND now() < expires_at",
             member.id,
             guild.id,
         )

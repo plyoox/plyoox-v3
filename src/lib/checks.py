@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import discord
+from discord.app_commands import locale_str as _
 
 from lib.enums import PlyooxModuleEnum
 from lib.errors import ModuleDisabled
-from translation import _
 
 if TYPE_CHECKING:
     from cache import CacheManager
@@ -16,14 +16,15 @@ async def module_enabled_check(interaction: discord.Interaction, module: PlyooxM
     """Raise an error if the module is not enabled."""
     manager: CacheManager = interaction.client.cache  # type: ignore
     guild = interaction.guild
-    lc = interaction.locale
     cache = None
 
     if module == PlyooxModuleEnum.Leveling:
         cache = await manager.get_leveling(guild.id)
 
-    if not cache or not cache.active:
-        raise ModuleDisabled(_(lc, "errors.module_disabled", module=str(module.name)))
+    if not cache:
+        raise ModuleDisabled(interaction.translate(
+            _("The module {module} is deactivated on this guild."), data={"module": str(module.name)})
+        )
 
     return True
 

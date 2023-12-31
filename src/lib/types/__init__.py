@@ -1,3 +1,3 @@
 from .database import LevelUserData
-from .types import AutomodExecutionReason, ModerationExecutedCommand
+from .types import Translate
 from .anilist import AnilistScore, AnilistDetailedResponse

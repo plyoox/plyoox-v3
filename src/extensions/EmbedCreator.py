@@ -531,7 +531,7 @@ class EmbedView(ui.View):
                 return discord.utils.utcnow()
 
             try:
-                return datetime.datetime.utcfromtimestamp(int(x))
+                return datetime.datetime.fromtimestamp(int(x), datetime.UTC)
             except ValueError:
                 raise errors.ConversionError("embed-creator.timestamp_conversion_error")
 

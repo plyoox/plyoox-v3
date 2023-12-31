@@ -31,7 +31,7 @@ class Infos(commands.Cog):
 
         embed = extensions.Embed(title=translate(_("Bot information")))
         embed.add_field(name=translate(_("Developer")), value="> JohannesIBK#9220")
-        embed.add_field(name=translate(_("Contributers")), value="> X Gamer Guide#1866")
+        embed.add_field(name=translate(_("Contributors")), value="> X Gamer Guide#1866")
         embed.add_field(name=translate(_("Guild count")), value=f"> {len(self.bot.guilds)}")
         embed.add_field(name=translate(_("Uptime")), value=f"> {utils.format_dt(self.bot.start_time, 'R')}")
         embed.add_field(

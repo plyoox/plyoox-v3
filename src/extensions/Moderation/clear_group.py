@@ -98,13 +98,14 @@ class ClearGroup(app_commands.Group):
             return
 
         affected_users = set(m.author.id for m in deleted_messages)  # list of affected users
+        reason = reason or f"*{interaction.translate(_('No reason'))}*"
 
         embed = extensions.Embed(title=interaction.translate(_("Messages deleted")))
 
         embed.add_field(name=interaction.translate(_("Messages deleted")), value=f"> {deleted_count}/{limit}")
         embed.add_field(name=interaction.translate(_("Affected users")), value=f"> {len(affected_users)}")
         embed.add_field(
-            name=interaction.translate(_("Reason")), value=f"> {reason or f"*{interaction.translate(_('No reason'))}*"}"
+            name=interaction.translate(_("Reason")), value=f"> {reason}"
         )
 
         # Send the information to the user. The response has been deferred, so this uses followup

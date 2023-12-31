@@ -4,6 +4,7 @@ import discord
 from discord import app_commands
 from discord.app_commands import locale_str as _
 
+import translation
 from lib import helper, extensions
 
 
@@ -49,7 +50,7 @@ class GuildGroup(app_commands.Group):
         embed.add_field(
             name=_("More information"),
             value=f"> __{interaction.translate(_('Boost level'))}:__ {guild.premium_tier} ({guild.premium_subscription_count})\n"
-            f"> __{interaction.translate(_('Vanity url'))}:__ {guild.vanity_url or _('guild_info.about.no_vanity_url')}\n"
+            f"> __{interaction.translate(_('Vanity url'))}:__ {guild.vanity_url or interaction.translate(_('No vanity url'))}\n"
             f"> __{interaction.translate(_('Emojis'))}:__ {len(guild.emojis)}/{guild.emoji_limit * 2}\n"  # normal + animated
             f"> __{interaction.translate(_('Stickers'))}:__ {len(guild.stickers)}/{guild.sticker_limit}",
         )

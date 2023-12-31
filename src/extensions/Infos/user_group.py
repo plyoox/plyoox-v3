@@ -28,27 +28,28 @@ class UserGroup(app_commands.Group):
     @staticmethod
     async def _send_joined_response(interaction: discord.Interaction, member: discord.Member, position: int) -> None:
         """Shortcut to send the response for the joined command."""
-        embed = extensions.Embed(title=interaction.translate(_("Join information")))
+        embed = extensions.Embed(title=_("Join information"))
         embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
-        embed.add_field(name=interaction.translate(_("Position")), value=f"> {position}")
+        embed.add_field(name=_("Position"), value=f"> {position}")
         embed.add_field(
-            name=interaction.translate(_("Days since joined")),
+            name=_("Days since joined"),
             value=f"> {(datetime.datetime.now(tz=datetime.timezone.utc) - member.joined_at).days}",
         )
         embed.add_field(
-            name=interaction.translate(_("Joined at")), value=helper.embed_timestamp_format(member.joined_at)
+            name=_("Joined at"), value=helper.embed_timestamp_format(member.joined_at)
         )
+
+        embed._update_locale(interaction.locale, interaction._state._translator)
 
         if interaction.extras.get("deferred"):
             await interaction.followup.send(embed=embed)
         else:
-            await interaction.response.send(embed=embed)
+            await interaction.response.send_message(embed=embed)
 
     @staticmethod
     async def _send_about_response(
         interaction: discord.Interaction, *, member: Union[discord.Member, discord.User], ephemeral: bool = False
     ):
-        lc = interaction.locale
         public_flags = helper.get_badges(member.public_flags)
 
         embed = extensions.Embed(
@@ -62,12 +63,12 @@ class UserGroup(app_commands.Group):
             name=interaction.translate(_("Account")),
             value=f"> __{interaction.translate(_('Id'))}:__ {member.id}\n"
             f"> __{interaction.translate(_('Created at'))}:__ {utils.format_dt(member.created_at)}\n"
-            f"> __{interaction.translate(_("Bot"))}:__ {interaction.translate(_('Yes') if member.bot else _('No'))}",
+            f"> __{interaction.translate(_('Bot'))}:__ {interaction.translate(_('Yes') if member.bot else _('No'))}",
         )
 
         embed.add_field(
             name=f"{interaction.translate(_('Public Badges'))} ({len(public_flags)})",
-            value=f"> {''.join(public_flags)}" if len(public_flags) else interaction.translate(_("No public badges")),
+            value=f"> {''.join(public_flags)}" if len(public_flags) else interaction.translate(_('No public badges')),
         )
 
         if isinstance(member, discord.Member):
@@ -76,27 +77,27 @@ class UserGroup(app_commands.Group):
             embed.insert_field_at(
                 0,
                 name=interaction.translate(_("User information")),
-                value=f"> __{interaction.translate(_('Nick'))}:__ {member.nick or interaction.translate(_("No nick"))}\n"
-                f"> __{_(lc, 'user_info.about.server_avatar')}:__ {_(lc, bool(member.guild_avatar))}",
+                value=f"> __{interaction.translate(_('Nick'))}:__ {member.nick or interaction.translate(_('No nick'))}\n"
+                f"> __{interaction.translate(_('Server avatar'))}:__ {interaction.translate(_('Yes') if member.guild_avatar else _('No'))}\n"
             )
             embed.insert_field_at(
                 1,
                 name=interaction.translate(_("Guild")),
-                value=f"> __{interaction.translate(_("Joined at"))}:__ {utils.format_dt(member.joined_at)}\n"
+                value=f"> __{interaction.translate(_('Joined at'))}:__ {utils.format_dt(member.joined_at)}\n"
                 + (
-                    f"> __{interaction.translate(_("Completed verification"))}:__ {interaction.translate(_("Yes") if member.pending else _("No"))}\n"
+                    f"> __{interaction.translate(_('Completed verification'))}:__ {interaction.translate(_('Yes') if member.pending else _('No'))}\n"
                     if "MEMBER_VERIFICATION_GATE_ENABLED" in member.guild.features
                     else ""
                 )
-                + f"> __{interaction.translate(_("Boosts guild"))}:__ "
-                f"{utils.format_dt(member.premium_since) if member.premium_since else interaction.translate(_("No"))}",
+                + f"> __{interaction.translate(_('Boosts guild'))}:__ "
+                f"{utils.format_dt(member.premium_since) if member.premium_since else interaction.translate(_('No'))}",
             )
 
             formatted_roles = helper.format_roles(roles)
             embed.insert_field_at(
                 3,
-                name=f"{interaction.translate(_("Roles"))} ({len(roles) - 1})",
-                value=f"> {formatted_roles}" if formatted_roles else interaction.translate(_("No roles")),
+                name=f"{interaction.translate(_('Roles'))} ({len(roles) - 1})",
+                value=f"> {formatted_roles}" if formatted_roles else interaction.translate(_('No roles')),
             )
 
         await interaction.response.send_translated(embeds=[embed], ephemeral=ephemeral)

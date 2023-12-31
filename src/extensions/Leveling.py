@@ -58,7 +58,6 @@ class ResetGuildModal(ui.Modal):
         self.add_item(self.question)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        lc = interaction.locale
         if self.question.value.lower() != RESET_LEVEL_CONFIRMATION_TEXT.lower():
             await interaction.response.send_translated(_("Wrong answer provided, aborting."), ephemeral=True)
             return
@@ -66,7 +65,7 @@ class ResetGuildModal(ui.Modal):
         await interaction.response.defer(ephemeral=True)
         await self.bot.db.execute("DELETE FROM level_user WHERE guild_id = $1", interaction.guild_id)
         await interaction.followup.send(
-            interaction.translate(_(lc, "The level of all guild members has been successfully reset.")),
+            interaction.translate(_("The level of all guild members has been successfully reset.")),
             ephemeral=True,
         )
 
@@ -446,8 +445,8 @@ class Leveling(commands.Cog):
         for index, top_user in enumerate(top_users, start=1):
             embed.add_field(
                 name=f"{index}. {top_user['member'].display_name}",
-                value=f"> {interaction.translate(_("Level"))} {top_user['level']}\n"
-                f"> {top_user['xp_progress']} {interaction.translate(_("XP"))}",
+                value=f"> {interaction.translate(_('Level'))} {top_user['level']}\n"
+                f"> {top_user['xp_progress']} {interaction.translate(_('XP'))}",
                 inline=True,
             )
 

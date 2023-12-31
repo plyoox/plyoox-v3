@@ -13,7 +13,7 @@ class PrivateView(ui.View):
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         if interaction.user.id != self._last_interaction.user.id:
-            await interaction.response.send_message(_(interaction.locale, "views.creator_only"), ephemeral=True)
+            await interaction.response.send_translated(_("Only the creator can use this action."), ephemeral=True)
             return False
 
         self._last_interaction = interaction
@@ -68,7 +68,7 @@ class PaginatedEphemeralView(EphemeralView):
         self.last_page = last_page
         self.update_button_state()
 
-        self.stop_button.label = _(original_interaction.locale, "abort")
+        self.stop_button.label = original_interaction.translate(_("Cancel"))
 
     def update_button_state(self):
         self.back_button.disabled = self.current_page == 0

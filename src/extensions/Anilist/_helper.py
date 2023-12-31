@@ -57,7 +57,7 @@ def generate_search_embed(
     title: Literal["romaji", "english", "native"],
 ) -> discord.Embed:
     """Generates an embed from Anilist data"""
-    embed = extensions.Embed(title=translate(_("Results for {query}").format(query=query)))
+    embed = extensions.Embed(title=translate(_("Results for {query}")).format(query=query))
 
     for item in data:
         embed.add_field(name=get_title(item["title"], title), value=to_description(item["description"]))
@@ -102,15 +102,15 @@ def generate_info_embed(data: AnilistDetailedResponse, translate) -> discord.Emb
     embed.set_thumbnail(url=data["coverImage"]["large"])
     embed.set_image(url=data["bannerImage"])
 
-    embed.description = f"__**{translate(_("Information"))}**__\n"
-    embed.description += f"**{translate(_("Status"))}:** {data['status']}\n"
+    embed.description = f"__**{translate(_('Information'))}**__\n"
+    embed.description += f"**{translate(_('Status'))}:** {data['status']}\n"
     embed.description += (
-        f"**{translate(_("Episodes"))}:** {data['episodes']} ({data['duration']} {translate(_("minutes"))})\n"
+        f"**{translate(_('Episodes'))}:** {data['episodes']} ({data['duration']} {translate(_('minutes'))})\n"
     )
-    embed.description += f"**{translate(_("Season"))}:** {data['season']}\n"
-    embed.description += f"**{translate(_("Year"))}:** {data['seasonYear']}\n"
-    embed.description += f"**{translate(_("Country"))}:** {data['countryOfOrigin']}\n"
-    embed.description += f"**{translate(_("Score"))}:** {data['averageScore']}/100\n"
+    embed.description += f"**{translate(_('Season'))}:** {data['season']}\n"
+    embed.description += f"**{translate(_('Year'))}:** {data['seasonYear']}\n"
+    embed.description += f"**{translate(_('Country'))}:** {data['countryOfOrigin']}\n"
+    embed.description += f"**{translate(_('Score'))}:** {data['averageScore']}/100\n"
 
     embed.add_field(name=translate(_("Description")), value=to_description(data["description"]))
 

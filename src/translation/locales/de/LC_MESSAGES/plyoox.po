@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-31 22:47+0100\n"
-"PO-Revision-Date: 2023-12-29 15:15+0100\n"
+"POT-Creation-Date: 2024-01-01 12:42+0100\n"
+"PO-Revision-Date: 2024-01-01 20:29+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de\n"
@@ -18,60 +18,59 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: src/extensions/Anilist/_helper.py:60
+#: src/extensions/Anilist/_helper.py:61
 msgid "Results for {query}"
 msgstr "Ergebnisse für {query}"
 
-#: src/extensions/Anilist/_helper.py:81
+#: src/extensions/Anilist/_helper.py:82
 #: src/extensions/Anilist/anilist_cog.py:73
-#: src/extensions/Anilist/anilist_cog.py:104
+#: src/extensions/Anilist/anilist_cog.py:103
 msgid "No results found."
 msgstr "Keine Ergebnisse gefunden."
 
-#: src/extensions/Anilist/_helper.py:105
+#: src/extensions/Anilist/_helper.py:106
 #: src/extensions/Moderation/moderation_cog.py:85
 msgid "Information"
 msgstr "Informationen"
 
-#: src/extensions/Anilist/_helper.py:106
+#: src/extensions/Anilist/_helper.py:107
 msgid "Status"
 msgstr "Status"
 
-#: src/extensions/Anilist/_helper.py:108
+#: src/extensions/Anilist/_helper.py:109
 msgid "Episodes"
 msgstr "Episoden"
 
-#: src/extensions/Anilist/_helper.py:108
+#: src/extensions/Anilist/_helper.py:109
 #: src/extensions/Moderation/moderation_cog.py:634
 msgid "minutes"
 msgstr "Minuten"
 
-#: src/extensions/Anilist/_helper.py:110
-#, fuzzy
-msgid "Season"
-msgstr "Season"
-
 #: src/extensions/Anilist/_helper.py:111
+msgid "Season"
+msgstr "Saison"
+
+#: src/extensions/Anilist/_helper.py:112
 msgid "Year"
 msgstr "Jahr"
 
-#: src/extensions/Anilist/_helper.py:112
+#: src/extensions/Anilist/_helper.py:113
 msgid "Country"
 msgstr "Land"
 
-#: src/extensions/Anilist/_helper.py:113
+#: src/extensions/Anilist/_helper.py:114
 msgid "Score"
 msgstr "Bewertung"
 
-#: src/extensions/Anilist/_helper.py:115
+#: src/extensions/Anilist/_helper.py:116
 msgid "Description"
 msgstr "Beschreibung"
 
-#: src/extensions/Anilist/_helper.py:118
+#: src/extensions/Anilist/_helper.py:119
 msgid "Genres"
 msgstr "Genre"
 
-#: src/extensions/Anilist/_helper.py:122
+#: src/extensions/Anilist/_helper.py:123
 msgid "Related to"
 msgstr "Verwandt mit"
 
@@ -118,7 +117,7 @@ msgid "Search for an anime on Anilist."
 msgstr "Suche nach einem Anime auf Anilist."
 
 #: src/extensions/Anilist/anilist_cog.py:53
-#: src/extensions/Anilist/anilist_cog.py:91
+#: src/extensions/Anilist/anilist_cog.py:90
 msgid "The query to search for."
 msgstr "Die Abfrage zum Suchen."
 
@@ -128,12 +127,12 @@ msgstr ""
 "In welcher Sprache die Titel angezeigt werden sollen (Standard: Original)."
 
 #: src/extensions/Anilist/anilist_cog.py:64
-#: src/extensions/Anilist/anilist_cog.py:95
+#: src/extensions/Anilist/anilist_cog.py:94
 msgid "The limit of the API has been reached. Please try again later."
 msgstr ""
 "Das Limit der API wurde erreicht. Bitte versuchen Sie es später erneut."
 
-#: src/extensions/Anilist/anilist_cog.py:90
+#: src/extensions/Anilist/anilist_cog.py:89
 msgid "Get information about an anime on Anilist."
 msgstr "Informationen über einen Anime auf Anilist abrufen."
 
@@ -274,9 +273,8 @@ msgstr "Besitzer"
 
 #: src/extensions/Infos/guild_group.py:41 src/extensions/Infos/user_group.py:65
 #: src/extensions/Moderation/moderation_cog.py:88
-#, fuzzy
 msgid "Created at"
-msgstr "Verwandt mit"
+msgstr "Erstellt am"
 
 #: src/extensions/Infos/guild_group.py:44
 msgid "Members"
@@ -360,7 +358,6 @@ msgid "Developer"
 msgstr "Entwickler"
 
 #: src/extensions/Infos/infos_cog.py:34
-#, fuzzy
 msgid "Contributors"
 msgstr "Beitragende"
 
@@ -428,9 +425,8 @@ msgid "No"
 msgstr "Nein"
 
 #: src/extensions/Infos/user_group.py:70
-#, fuzzy
 msgid "Public Badges"
-msgstr "Keine öffentlichen Abzeichen"
+msgstr "Öffentlichen Abzeichen"
 
 #: src/extensions/Infos/user_group.py:71
 msgid "No public badges"
@@ -516,9 +512,8 @@ msgid "Wrong answer provided, aborting."
 msgstr "Falsche Antwort angegeben, Abbruch."
 
 #: src/extensions/Leveling.py:68
-#, fuzzy
 msgid "The level of all guild members has been successfully reset."
-msgstr "Das Level des Users wurde zurückgesetzt."
+msgstr "Das Level aller Mitglieder wurde zurückgesetzt."
 
 #: src/extensions/Leveling.py:79
 msgid "View rank"
@@ -745,9 +740,8 @@ msgstr "Punkte hinzugefügt"
 
 #: src/extensions/Moderation/_logging_helper.py:155
 #: src/extensions/Moderation/_logging_helper.py:157
-#, fuzzy
 msgid "Message"
-msgstr "Nachricht bearbeitet"
+msgstr "Nachricht"
 
 #: src/extensions/Moderation/_logging_helper.py:195
 msgid ""
@@ -938,20 +932,17 @@ msgid "Never"
 msgstr "Nie"
 
 #: src/extensions/Moderation/_views.py:161
-#, fuzzy
 msgid "Infraction"
-msgstr "Warnungen"
+msgstr "Warnung"
 
 #: src/extensions/Moderation/_views.py:163
-#, fuzzy
 msgid "Points"
-msgstr "Punkte hinzugefügt"
+msgstr "Punkte"
 
 #: src/extensions/Moderation/_views.py:164
 #: src/extensions/Moderation/moderation_cog.py:89
-#, fuzzy
 msgid "Expires at"
-msgstr "Abgelaufene Warnungen"
+msgstr "Läuft ab am"
 
 #: src/extensions/Moderation/_views.py:197
 msgid "Active Infractions"
@@ -1055,9 +1046,8 @@ msgid "The user must be below you in the hierarchy."
 msgstr "Der Benutzer muss unter dir in der Hierarchie stehen."
 
 #: src/extensions/Moderation/moderation_cog.py:64
-#, fuzzy
 msgid "The user must be below the bot in the hierarchy."
-msgstr "Der Benutzer muss unter dir in der Hierarchie stehen."
+msgstr "Der Benutzer muss unter dem Bot in der Hierarchie stehen."
 
 #: src/extensions/Moderation/moderation_cog.py:73
 msgid "Information about the invite `{invite}`"
@@ -1081,9 +1071,8 @@ msgid "Uses"
 msgstr "Benutzungen"
 
 #: src/extensions/Moderation/moderation_cog.py:96
-#, fuzzy
 msgid "Mention"
-msgstr "Aktion"
+msgstr "Erwähnung"
 
 #: src/extensions/Moderation/moderation_cog.py:99
 msgid "No creator"

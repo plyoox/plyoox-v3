@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2023-12-31 22:47+0100\n"
+"POT-Creation-Date: 2024-01-01 12:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,59 +15,59 @@ msgstr ""
 "Generated-By: pygettext.py 1.5\n"
 
 
-#: src/extensions/Anilist/_helper.py:60
+#: src/extensions/Anilist/_helper.py:61
 msgid "Results for {query}"
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:81
+#: src/extensions/Anilist/_helper.py:82
 #: src/extensions/Anilist/anilist_cog.py:73
-#: src/extensions/Anilist/anilist_cog.py:104
+#: src/extensions/Anilist/anilist_cog.py:103
 msgid "No results found."
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:105
+#: src/extensions/Anilist/_helper.py:106
 #: src/extensions/Moderation/moderation_cog.py:85
 msgid "Information"
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:106
+#: src/extensions/Anilist/_helper.py:107
 msgid "Status"
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:108
+#: src/extensions/Anilist/_helper.py:109
 msgid "Episodes"
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:108
+#: src/extensions/Anilist/_helper.py:109
 #: src/extensions/Moderation/moderation_cog.py:634
 msgid "minutes"
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:110
+#: src/extensions/Anilist/_helper.py:111
 msgid "Season"
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:111
+#: src/extensions/Anilist/_helper.py:112
 msgid "Year"
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:112
+#: src/extensions/Anilist/_helper.py:113
 msgid "Country"
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:113
+#: src/extensions/Anilist/_helper.py:114
 msgid "Score"
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:115
+#: src/extensions/Anilist/_helper.py:116
 msgid "Description"
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:118
+#: src/extensions/Anilist/_helper.py:119
 msgid "Genres"
 msgstr ""
 
-#: src/extensions/Anilist/_helper.py:122
+#: src/extensions/Anilist/_helper.py:123
 msgid "Related to"
 msgstr ""
 
@@ -114,7 +114,7 @@ msgid "Search for an anime on Anilist."
 msgstr ""
 
 #: src/extensions/Anilist/anilist_cog.py:53
-#: src/extensions/Anilist/anilist_cog.py:91
+#: src/extensions/Anilist/anilist_cog.py:90
 msgid "The query to search for."
 msgstr ""
 
@@ -123,11 +123,11 @@ msgid "In which language the titles should be displayed (default original)."
 msgstr ""
 
 #: src/extensions/Anilist/anilist_cog.py:64
-#: src/extensions/Anilist/anilist_cog.py:95
+#: src/extensions/Anilist/anilist_cog.py:94
 msgid "The limit of the API has been reached. Please try again later."
 msgstr ""
 
-#: src/extensions/Anilist/anilist_cog.py:90
+#: src/extensions/Anilist/anilist_cog.py:89
 msgid "Get information about an anime on Anilist."
 msgstr ""
 

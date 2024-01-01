@@ -38,7 +38,7 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description=_("Comm
             async with self.bot.session.post(self.url, json=data) as resp:
                 if retry_after := resp.headers.get("Retry-After"):
                     self.limit_lock = True
-                    self.bot.loop.create_task(self.__reset_limit(int(retry_after)))
+                    await self.bot.loop.create_task(self.__reset_limit(int(retry_after)))
                     raise errors.AnilistQueryError("Rate limit exceeded")
 
                 if resp.status != 200:
@@ -82,7 +82,6 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description=_("Comm
                 interaction.translate,
                 query=query,
                 data=data,
-                locale=interaction.locale,
                 title=title.lower(),  # type: ignore
             ),
         )

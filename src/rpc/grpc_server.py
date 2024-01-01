@@ -43,11 +43,12 @@ class UpdateCacheServicer(UpdateCacheServicer):
         return Empty()
 
 
-async def start_server(bot: Plyoox, url: str):
+async def start_server(bot: Plyoox, url: str) -> grpc.aio.Server:
     server = grpc.aio.server()
     cache_pb2_grpc.add_UpdateCacheServicer_to_server(UpdateCacheServicer(bot), server)
 
     server.add_insecure_port(url)
 
     await server.start()
-    await server.wait_for_termination()
+
+    return server

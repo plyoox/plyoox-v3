@@ -30,10 +30,6 @@ discord.utils.setup_logging(root=True, level=logging.INFO)
 logging.getLogger("tornado.access").setLevel(logging.ERROR)
 
 
-async def start_grpc_server(bot):
-    await start_server(bot, "[::]:50051")
-
-
 async def main():
     import signal
     import yarl
@@ -51,12 +47,17 @@ async def main():
     await bot._create_db_pool()
     await bot._create_http_client()
 
-    asyncio.ensure_future(start_grpc_server(bot))
-
     async with bot:
         if sys.platform == "linux":
             bot.loop.add_signal_handler(signal.SIGTERM, lambda: bot.loop.create_task(bot.close()))
-        await bot.start(os.getenv("DISCORD_TOKEN"))
+
+        server = await start_server(bot, "[::]:50051")
+
+        try:
+            await asyncio.gather(server.wait_for_termination(), bot.start(os.getenv("DISCORD_TOKEN")))
+        finally:
+            await server.stop(grace=1)
+            await bot.close()
 
 
 asyncio.run(main())

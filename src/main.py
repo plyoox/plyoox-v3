@@ -108,6 +108,9 @@ class Plyoox(commands.AutoShardedBot):
 
     async def close(self):
         logger.info("Stopping bot...")
+        await self.session.close()
+        await self.db.close()
+
         await super().close()
         logger.info("Plyoox has been successfully stopped.")
 

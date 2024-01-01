@@ -7,6 +7,8 @@ import sys
 import discord
 from dotenv import load_dotenv
 
+from rpc.grpc_server import start_server
+
 if sys.platform == "linux":
     import uvloop
 
@@ -23,16 +25,19 @@ args = parser.parse_args()
 # Set up logging
 
 logger = logging.getLogger()
-discord.utils.setup_logging(root=True, level=logging.DEBUG)
+discord.utils.setup_logging(root=True, level=logging.INFO)
 
 logging.getLogger("tornado.access").setLevel(logging.ERROR)
+
+
+async def start_grpc_server(bot):
+    await start_server(bot, "[::]:50051")
 
 
 async def main():
     import signal
     import yarl
 
-    import web_server
     from main import Plyoox
 
     if gateway_url := os.getenv("GATEWAY_URL"):
@@ -45,7 +50,8 @@ async def main():
 
     await bot._create_db_pool()
     await bot._create_http_client()
-    await web_server.start_webserver(bot)
+
+    asyncio.ensure_future(start_grpc_server(bot))
 
     async with bot:
         if sys.platform == "linux":

@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from main import Plyoox
     from . import _views
     from lib.types.anilist import _AnilistTitle, AnilistSearchResponse, AnilistDetailedResponse
+    from lib.types import Translate
 
 
 SCORE_COLORS = {
@@ -92,7 +93,7 @@ async def paginate_search(interaction: discord.Interaction, view: _views.Anilist
     await interaction.edit_original_response(embed=embed, view=view)
 
 
-def generate_info_embed(data: AnilistDetailedResponse, translate) -> discord.Embed:
+def generate_info_embed(data: AnilistDetailedResponse, translate: Translate) -> discord.Embed:
     title = data["title"]["romaji"]
     if data["title"]["english"]:
         title += f" ({data['title']['english']})"

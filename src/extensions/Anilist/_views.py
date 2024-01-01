@@ -59,8 +59,8 @@ class AnilistSearchView(extensions.PrivateView):
     def __init__(self, interaction: discord.Interaction, query: str, title: str):
         super().__init__(interaction)
 
-        self._back_button = SiteBackButton(self, interaction.locale, disabled=True)
-        self._next_button = SiteNextButton(self, interaction.locale)
+        self._back_button = SiteBackButton(self, disabled=True)
+        self._next_button = SiteNextButton(self)
 
         self.current_page = 1
         self.add_item(self._back_button)
@@ -88,7 +88,7 @@ class BackButton(ui.Button):
     async def callback(self, interaction: discord.Interaction) -> None:
         await interaction.response.defer()
         await interaction.edit_original_response(
-            embed=_helper.generate_info_embed(self.anilist_view.data, interaction.locale),
+            embed=_helper.generate_info_embed(self.anilist_view.data, interaction.translate),
             view=self.anilist_view,
             attachments=[],
         )
@@ -98,11 +98,11 @@ class BackButtonView(extensions.PrivateView):
     def __init__(self, view: AnilistInfoView, *, interaction: discord.Interaction):
         super().__init__(original_interaction=interaction)
 
-        self.add_item(BackButton(view, locale=interaction.locale))
+        self.add_item(BackButton(view))
 
 
 class ViewScoreButton(ui.Button):
-    def __init__(self, view: AnilistInfoView, *, locale: discord.Locale):
+    def __init__(self, view: AnilistInfoView):
         translate = view._last_interaction.translate
 
         super().__init__(style=discord.ButtonStyle.gray, label=translate(_("Show rating")), emoji=emojis.chart_bar)
@@ -153,7 +153,7 @@ class ViewScoreButton(ui.Button):
 
 
 class ViewTrailerButton(ui.Button):
-    def __init__(self, view: AnilistInfoView, locale: discord.Locale):
+    def __init__(self, view: AnilistInfoView):
         data = view.data
         translate = view._last_interaction.translate
 
@@ -168,6 +168,6 @@ class AnilistInfoView(extensions.PrivateView):
 
         self.data = data
 
-        self.add_item(ViewScoreButton(self, locale=interaction.locale))
+        self.add_item(ViewScoreButton(self))
         if data["trailer"]["site"] == "youtube":
-            self.add_item(ViewTrailerButton(self, interaction.locale))
+            self.add_item(ViewTrailerButton(self))

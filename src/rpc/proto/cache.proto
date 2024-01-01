@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package UpdateCache;
+
+service UpdateCache {
+  rpc DeleteModerationCache(Id) returns (Empty) {}
+  rpc DeleteAutoModerationCache(Id) returns (Empty) {}
+  rpc DeleteWelcomeCache(Id) returns (Empty) {}
+  rpc DeleteLoggingCache(Id) returns (Empty) {}
+  rpc DeleteLevelCache(Id) returns (Empty) {}
+}
+
+message Id {
+  int64 id = 1;
+}
+
+message Empty {}

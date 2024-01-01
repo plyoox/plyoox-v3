@@ -194,6 +194,18 @@ class Owner(commands.Cog):
 
         await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
+    @commands.command(name="list-emojis")
+    @commands.guild_only()
+    @commands.is_owner()
+    async def list_emojis(self, ctx: commands.Context):
+        emojis = await ctx.guild.fetch_emojis()
+
+        if not emojis:
+            await ctx.send("This guild has no emojis.")
+            return
+
+        await ctx.send("\n".join([f"{emoji} - `{emoji}`" for emoji in emojis]))
+
 
 async def setup(bot: Plyoox):
     await bot.add_cog(Owner(bot))

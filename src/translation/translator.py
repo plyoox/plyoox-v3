@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Iterator
 
 import discord
 from discord import app_commands
+from discord.app_commands import TranslationContextLocation
 
 from lib.errors import TranslationError
 
@@ -21,8 +22,15 @@ DOMAIN = "plyoox"
 
 _log = logging.getLogger(__name__)
 
+AVAILABLE_LOCALES = [
+    discord.Locale.german,
+]
 
-def locale_to_gnu(locale: discord.Locale) -> str:
+
+def get_locale(locale: discord.Locale) -> str:
+    if locale not in AVAILABLE_LOCALES:
+        return "en_US"
+
     return str(locale).replace("-", "_")
 
 
@@ -67,11 +75,15 @@ class GettextTranslator(app_commands.Translator):
         locale: discord.Locale,
         context: app_commands.TranslationContextTypes,
     ) -> str | None:
+        if context.location != app_commands.TranslationContextLocation.other:
+            if locale not in AVAILABLE_LOCALES:
+                return None
+
         try:
             t = gettext.translation(
                 domain=DOMAIN,
                 localedir=str(_LOCALES_PATH),
-                languages=(locale_to_gnu(locale), "en_US"),
+                languages=(get_locale(locale), "en_US"),
             )
         except OSError as e:
             _log.error(f"Failed to load locale {locale}", e)
@@ -89,7 +101,10 @@ class GettextTranslator(app_commands.Translator):
         if context.location is app_commands.TranslationContextLocation.other and isinstance(context.data, dict):
             translated = translated.format(**context.data)
 
-        return translated or f"~~{str(string)}~~"
+        if translated is None and context.location is TranslationContextLocation.other:
+            return f"failed-{str(string)}"
+
+        return translated
 
 
 def plural_locale_str(

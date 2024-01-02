@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-02 21:24+0100\n"
+"POT-Creation-Date: 2024-01-02 22:46+0100\n"
 "PO-Revision-Date: 2024-01-02 21:25+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -82,7 +82,7 @@ msgstr "Vorherige Seite"
 msgid "Next page"
 msgstr "Nächste Seite"
 
-#: src/extensions/Anilist/_views.py:81 src/extensions/Moderation/_views.py:24
+#: src/extensions/Anilist/_views.py:81 src/extensions/Moderation/_views.py:25
 msgid "Back"
 msgstr "Zurück"
 
@@ -268,6 +268,7 @@ msgid "Owner"
 msgstr "Besitzer"
 
 #: src/extensions/Infos/guild_group.py:41 src/extensions/Infos/user_group.py:65
+#: src/extensions/Moderation/_views.py:170
 #: src/extensions/Moderation/moderation_cog.py:88
 msgid "Created at"
 msgstr "Erstellt am"
@@ -711,7 +712,7 @@ msgstr "Kein Grund angegeben"
 #: src/extensions/Moderation/_logging_helper.py:97
 #: src/extensions/Moderation/_logging_helper.py:149
 #: src/extensions/Moderation/_logging_helper.py:248
-#: src/extensions/Moderation/_views.py:165
+#: src/extensions/Moderation/_views.py:171
 #: src/extensions/Moderation/clear_group.py:108
 msgid "Reason"
 msgstr "Grund"
@@ -966,36 +967,36 @@ msgstr "Deine Nachricht in **{guild.name}** wurde für `{reason}` gelöscht."
 msgid "You have received points in **{guild.name}** for `{reason}`."
 msgstr "Du hast Punkte in **{guild.name}** für `{reason}` erhalten."
 
-#: src/extensions/Moderation/_views.py:29
+#: src/extensions/Moderation/_views.py:30
 msgid "List of members"
 msgstr "Liste der Mitglieder"
 
-#: src/extensions/Moderation/_views.py:30
-#: src/extensions/Moderation/_views.py:151
+#: src/extensions/Moderation/_views.py:31
+#: src/extensions/Moderation/_views.py:155
 msgid "Page"
 msgstr "Seite"
 
-#: src/extensions/Moderation/_views.py:50
+#: src/extensions/Moderation/_views.py:51
 msgid "Confirm the selection of users to be banned."
 msgstr "Bestätigen Sie die Auswahl der zu bannenden Benutzer."
 
-#: src/extensions/Moderation/_views.py:67
+#: src/extensions/Moderation/_views.py:68
 msgid "Ban users"
 msgstr "Benutzer bannen"
 
-#: src/extensions/Moderation/_views.py:68
+#: src/extensions/Moderation/_views.py:69
 msgid "View users"
 msgstr "Benutzer anzeigen"
 
-#: src/extensions/Moderation/_views.py:69 src/lib/extensions/view.py:71
+#: src/extensions/Moderation/_views.py:70 src/lib/extensions/view.py:71
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: src/extensions/Moderation/_views.py:74
+#: src/extensions/Moderation/_views.py:75
 msgid "{user_count} users will be banned..."
 msgstr "{user_count} Benutzer werden gebannt..."
 
-#: src/extensions/Moderation/_views.py:89
+#: src/extensions/Moderation/_views.py:90
 msgid ""
 "Too many errors occurred while banning users. {user_count} users have been "
 "banned."
@@ -1003,41 +1004,41 @@ msgstr ""
 "Zu viele Fehler beim Bannen von Benutzern aufgetreten. {user_count} Benutzer "
 "wurden gebannt."
 
-#: src/extensions/Moderation/_views.py:98
+#: src/extensions/Moderation/_views.py:99
 msgid "Successfully banned {user_count} users."
 msgstr "{user_count} Benutzer wurden erfolgreich gebannt."
 
-#: src/extensions/Moderation/_views.py:125
-#: src/extensions/Moderation/_views.py:197
+#: src/extensions/Moderation/_views.py:126
+#: src/extensions/Moderation/_views.py:203
 msgid "Expired Infractions"
 msgstr "Abgelaufene Warnungen"
 
-#: src/extensions/Moderation/_views.py:147
+#: src/extensions/Moderation/_views.py:151
 msgid "This user has no warnings."
 msgstr "Der Benutzer hat keine Warnungen."
 
-#: src/extensions/Moderation/_views.py:149
+#: src/extensions/Moderation/_views.py:153
 msgid "Infractions"
 msgstr "Warnungen"
 
-#: src/extensions/Moderation/_views.py:157
+#: src/extensions/Moderation/_views.py:162
 msgid "Never"
 msgstr "Nie"
 
-#: src/extensions/Moderation/_views.py:161
+#: src/extensions/Moderation/_views.py:166
 msgid "Infraction"
 msgstr "Warnung"
 
-#: src/extensions/Moderation/_views.py:163
+#: src/extensions/Moderation/_views.py:168
 msgid "Points"
 msgstr "Punkte"
 
-#: src/extensions/Moderation/_views.py:164
+#: src/extensions/Moderation/_views.py:169
 #: src/extensions/Moderation/moderation_cog.py:89
 msgid "Expires at"
 msgstr "Läuft ab am"
 
-#: src/extensions/Moderation/_views.py:197
+#: src/extensions/Moderation/_views.py:203
 msgid "Active Infractions"
 msgstr "Aktive Warnungen"
 
@@ -1338,9 +1339,7 @@ msgstr "Bannt Benutzer basierend auf mehreren Faktoren."
 #: src/extensions/Moderation/moderation_cog.py:371
 msgid ""
 "The channel to search through. If not specified, the current channel is used."
-msgstr ""
-"Der Kanal, der durchsucht werden soll. Wenn kein Kanal angegeben ist, wird "
-"der aktuelle Kanal verwendet."
+msgstr "Kanal, der durchsucht werden soll (Standard: aktueller Kanal)."
 
 #: src/extensions/Moderation/moderation_cog.py:372
 msgid "The amount of messages to search through (100)."

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-01-02 21:24+0100\n"
+"POT-Creation-Date: 2024-01-02 22:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,7 +79,7 @@ msgstr ""
 msgid "Next page"
 msgstr ""
 
-#: src/extensions/Anilist/_views.py:81 src/extensions/Moderation/_views.py:24
+#: src/extensions/Anilist/_views.py:81 src/extensions/Moderation/_views.py:25
 msgid "Back"
 msgstr ""
 
@@ -261,6 +261,7 @@ msgstr ""
 
 #: src/extensions/Infos/guild_group.py:41
 #: src/extensions/Infos/user_group.py:65
+#: src/extensions/Moderation/_views.py:170
 #: src/extensions/Moderation/moderation_cog.py:88
 msgid "Created at"
 msgstr ""
@@ -698,7 +699,7 @@ msgstr ""
 #: src/extensions/Moderation/_logging_helper.py:97
 #: src/extensions/Moderation/_logging_helper.py:149
 #: src/extensions/Moderation/_logging_helper.py:248
-#: src/extensions/Moderation/_views.py:165
+#: src/extensions/Moderation/_views.py:171
 #: src/extensions/Moderation/clear_group.py:108
 msgid "Reason"
 msgstr ""
@@ -890,74 +891,74 @@ msgstr ""
 msgid "You have received points in **{guild.name}** for `{reason}`."
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:29
+#: src/extensions/Moderation/_views.py:30
 msgid "List of members"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:30
-#: src/extensions/Moderation/_views.py:151
+#: src/extensions/Moderation/_views.py:31
+#: src/extensions/Moderation/_views.py:155
 msgid "Page"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:50
+#: src/extensions/Moderation/_views.py:51
 msgid "Confirm the selection of users to be banned."
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:67
+#: src/extensions/Moderation/_views.py:68
 msgid "Ban users"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:68
+#: src/extensions/Moderation/_views.py:69
 msgid "View users"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:69 src/lib/extensions/view.py:71
+#: src/extensions/Moderation/_views.py:70 src/lib/extensions/view.py:71
 msgid "Cancel"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:74
+#: src/extensions/Moderation/_views.py:75
 msgid "{user_count} users will be banned..."
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:89
+#: src/extensions/Moderation/_views.py:90
 msgid "Too many errors occurred while banning users. {user_count} users have been banned."
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:98
+#: src/extensions/Moderation/_views.py:99
 msgid "Successfully banned {user_count} users."
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:125
-#: src/extensions/Moderation/_views.py:197
+#: src/extensions/Moderation/_views.py:126
+#: src/extensions/Moderation/_views.py:203
 msgid "Expired Infractions"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:147
+#: src/extensions/Moderation/_views.py:151
 msgid "This user has no warnings."
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:149
+#: src/extensions/Moderation/_views.py:153
 msgid "Infractions"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:157
+#: src/extensions/Moderation/_views.py:162
 msgid "Never"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:161
+#: src/extensions/Moderation/_views.py:166
 msgid "Infraction"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:163
+#: src/extensions/Moderation/_views.py:168
 msgid "Points"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:164
+#: src/extensions/Moderation/_views.py:169
 #: src/extensions/Moderation/moderation_cog.py:89
 msgid "Expires at"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:197
+#: src/extensions/Moderation/_views.py:203
 msgid "Active Infractions"
 msgstr ""
 

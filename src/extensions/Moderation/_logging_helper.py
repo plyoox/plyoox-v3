@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from main import Plyoox
     from cache.models import ModerationModel
     from .automod import AutoModerationActionData
-    from lib.enums import ModerationCommandKind, AutoModerationFinalActionKind
+    from lib.enums import ModerationCommandKind, AutoModerationFinalPunishmentKind, AutoModerationPunishmentKind
 
 _log = logging.getLogger(__name__)
 
@@ -87,25 +87,29 @@ async def log_simple_punish_command(
 
     webhook = await _get_log_channel(interaction.client, cache, interaction.guild)
     if webhook is not None:
-        title, description = _get_dynamic_log_description(interaction.translate, moderator=interaction.user,
-                                                          target=target, kind=kind)
+        title, description = _get_dynamic_log_description(
+            interaction.translate, moderator=interaction.user,
+            target=target, kind=kind
+        )
 
         embed = extensions.Embed(description=description)
         embed.set_author(name=title, icon_url=target.display_avatar)
         embed.add_field(name=translate(_("Reason")), value="> " + (reason or translate(_("No reason"))))
         embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
-        embed.set_footer(text=f"{translate(_('Id'))}: {target.id}")
+        embed.set_footer(text=f"{translate(_('User Id'))}: {target.id}")
 
         if until is not None:
             embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
 
-        await _send_webhook(interaction.client, interaction.guild.id, webhook, embed=embed)  # type: ignore
+        await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed])
 
     if cache.notify_user and isinstance(target, discord.Member):
         reason = reason or f"*{translate(_('No reason'))}*"
         until = discord.utils.format_dt(until) if until else None
-        message = _get_dynamic_log_user_message(interaction.translate, kind=kind, reason=reason, timestamp=until,
-                                                guild=interaction.guild)
+        message = _get_dynamic_log_user_message(
+            interaction.translate, kind=kind, reason=reason, timestamp=until,
+            guild=interaction.guild
+        )
 
         try:
             await target.send(message)
@@ -125,23 +129,26 @@ async def automod_log(
 
     guild = data.guild
     member = data.member
-    lc = guild.preferred_locale
 
     cache = await bot.cache.get_moderation(guild.id)
-    if cache is None:
+    if not cache:
         return
 
     webhook = await _get_log_channel(bot, cache, guild)
     if webhook is not None:
-        (title, description) = _get_dynamic_log_description(translate, moderator=None, kind=data.trigger_action.action, target=member)
+        (title, description) = _get_dynamic_auto_moderation_description(
+            translate,
+            kind=data.trigger_action.punishment.kind,
+            target=member
+        )
 
         embeds = []
 
-        embed = extensions.Embed(description=description, target=member)
+        embed = extensions.Embed(description=description)
         embed.set_author(name=title, icon_url=member.display_avatar)
         embed.add_field(name=translate(_("Reason")), value=f"> {data.trigger_reason}")
         embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
-        embed.set_footer(text=f"{translate(_('Id'))}: {member.id}")
+        embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
         if until is not None:
             embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
@@ -160,8 +167,9 @@ async def automod_log(
         await _send_webhook(bot, guild.id, webhook, embeds=embeds)
 
     if cache.notify_user:
+        timestamp = utils.format_dt(until) if until is not None else None
         user_message = _get_dynamic_log_user_message(
-            translate, guild=guild, reason=data.trigger_reason, timestamp=until, kind=data.trigger_action.action
+            translate, guild=guild, reason=data.trigger_reason, timestamp=timestamp, kind=data.trigger_action.punishment.kind
         )
 
         try:
@@ -173,7 +181,7 @@ async def automod_log(
 async def automod_final_log(
     bot: Plyoox,
     member: discord.Member,
-    action: AutoModerationFinalActionKind,
+    action: AutoModerationFinalPunishmentKind,
     *,
     until: datetime.datetime | None = None,
 ) -> None:
@@ -188,7 +196,7 @@ async def automod_final_log(
 
     webhook = await _get_log_channel(bot, cache, guild)
     if webhook is not None:
-        (title,) = _get_dynamic_log_description(translate, moderator=None, kind=action, target=member)
+        title, = _get_dynamic_auto_moderation_description(translate, kind=action, target=member)
 
         embed = extensions.Embed(
             description=translate(
@@ -198,7 +206,7 @@ async def automod_final_log(
         embed.set_author(name=translate(_("Automod: Maximum points reached")), icon_url=member.display_avatar)
         embed.add_field(name=translate(_("Action")), value=f"> {title}")
         embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
-        embed.set_footer(text=f"{translate(_('Id'))}: {member.id}")
+        embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
         if until is not None:
             embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
@@ -240,7 +248,7 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
         embed.add_field(name=translate(_("Reason")), value=f"> {reason}")
         embed.add_field(name=translate(_("Moderator")), value=f"> {moderator} ({moderator.id})")
         embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
-        embed.set_footer(text=f"{translate(_('Id'))}: {member.id}")
+        embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
         embed.add_field(name=translate(_("Points added")), value=f"> {points}")
 
         await _send_webhook(bot, guild.id, webhook, embeds=[embed])
@@ -261,56 +269,153 @@ def _get_dynamic_log_description(
     *,
     moderator: discord.Member | None,
     target: discord.User | discord.Member,
-    kind: ModerationCommandKind | AutoModerationFinalActionKind
+    kind: ModerationCommandKind
 ) -> (str, str):
     match kind:
+        case "points":
+            return (
+                translate(_("User has reached the maximum number of points")),
+                translate(_("The user {target.mention} ({target}) has reached the maximum number of points.")).format(
+                    target=target
+                ),
+            )
+        case "delete":
+            return (
+                translate(_("Message has been deleted")),
+                translate(
+                    _(
+                        "The message from {target.mention} ({target}) has been deleted by {moderator.mention} ({moderator})."
+                    )
+                ).format(
+                    target=target, moderator=moderator
+                ),
+            )
         case "tempban":
             return (
                 translate(_("User has been temporary banned")),
-                translate(_("The user {target.mention} ({target}) has been temporarily banned by {moderator}.")).format(
+                translate(
+                    _(
+                        "The user {target.mention} ({target}) has been temporarily banned by {moderator.mention} ({moderator})."
+                    )
+                ).format(
                     target=target, moderator=moderator
                 ),
             )
         case "ban":
             return (
                 translate(_("User has been banned")),
-                translate(_("The user {target.mention} ({target}) has been banned by {moderator}.")).format(
+                translate(
+                    _("The user {target.mention} ({target}) has been banned by {moderator.mention} ({moderator}).")
+                ).format(
                     target=target, moderator=moderator
                 ),
             )
         case "tempmute":
             return (
                 translate(_("User has been temporary muted")),
-                translate(_("The user {target.mention} ({target}) has been temporarily muted by {moderator}.")).format(
+                translate(
+                    _(
+                        "The user {target.mention} ({target}) has been temporarily muted by {moderator.mention} ({moderator})."
+                    )
+                ).format(
                     target=target, moderator=moderator
                 ),
             )
         case "kick":
             return (
                 translate(_("User has been kicked")),
-                translate(_("The user {target.mention} ({target}) has been kicked by {moderator}.")).format(
+                translate(
+                    _("The user {target.mention} ({target}) has been kicked by {moderator.mention} ({moderator}).")
+                ).format(
                     target=target, moderator=moderator
                 ),
             )
         case "unban":
             return (
                 translate(_("User has been unbanned")),
-                translate(_("The user {target.mention} ({target}) has been unbanned by {moderator}.")).format(
+                translate(
+                    _("The user {target.mention} ({target}) has been unbanned by {moderator.mention} ({moderator}).")
+                ).format(
                     target=target, moderator=moderator
                 ),
             )
         case "softban":
             return (
                 translate(_("User has been softbanned")),
-                translate(_("The user {target.mention} ({target}) has been softbanned by {moderator}.")).format(
+                translate(
+                    _("The user {target.mention} ({target}) has been softbanned by {moderator.mention} ({moderator}).")
+                ).format(
                     target=target, moderator=moderator
                 ),
             )
         case "unmute":
             return (
                 translate(_("User has been unmuted")),
-                translate(_("The user {target.mention} ({target}) has been unmuted by {moderator}.")).format(
+                translate(
+                    _("The user {target.mention} ({target}) has been unmuted by {moderator.mention} ({moderator}).")
+                ).format(
                     target=target, moderator=moderator
+                ),
+            )
+
+
+def _get_dynamic_auto_moderation_description(
+    translate: types.Translate,
+    *,
+    target: discord.User | discord.Member,
+    kind: AutoModerationFinalPunishmentKind | AutoModerationPunishmentKind
+) -> (str, str):
+    match kind:
+        case "points":
+            return (
+                translate(_("User has reached the maximum number of points")),
+                translate(_("The user {target.mention} ({target}) has reached the maximum number of points.")).format(
+                    target=target
+                ),
+            )
+        case "delete":
+            return (
+                translate(_("Message has been deleted")),
+                translate(
+                    _("The message from {target.mention} ({target}) has been deleted by the automoderation system.")
+                ).format(
+                    target=target
+                ),
+            )
+        case "tempban":
+            return (
+                translate(_("User has been temporary banned")),
+                translate(
+                    _("The user {target.mention} ({target}) has been temporarily banned by the automoderation system.")
+                ).format(
+                    target=target
+                ),
+            )
+        case "ban":
+            return (
+                translate(_("User has been banned")),
+                translate(
+                    _("The user {target.mention} ({target}) has been banned by the automoderation system.")
+                ).format(
+                    target=target
+                ),
+            )
+        case "tempmute":
+            return (
+                translate(_("User has been temporary muted")),
+                translate(
+                    _("The user {target.mention} ({target}) has been temporarily muted the automoderation system.")
+                ).format(
+                    target=target
+                ),
+            )
+        case "kick":
+            return (
+                translate(_("User has been kicked")),
+                translate(
+                    _("The user {target.mention} ({target}) has been kicked by the automoderation system.")
+                ).format(
+                    target=target
                 ),
             )
 
@@ -319,32 +424,40 @@ def _get_dynamic_log_user_message(
     translate: types.Translate,
     *,
     guild: discord.Guild,
-    kind: ModerationCommandKind | AutoModerationFinalActionKind,
+    kind: ModerationCommandKind | AutoModerationFinalPunishmentKind | AutoModerationPunishmentKind,
     reason: str,
     timestamp: str | None
 ) -> str:
     match kind:
         case "tempban":
-            return translate(_("You have been banned from {guild.name} until {timestamp} for {reason}.")).format(
+            return translate(_("You have been banned from **{guild.name}** until {timestamp} for `{reason}`.")).format(
                 guild=guild, reason=reason, timestamp=timestamp
             )
         case "ban":
-            return translate(_("You have been banned from {guild.name} for {reason}.")).format(
+            return translate(_("You have been banned from **{guild.name}** for `{reason}`.")).format(
                 guild=guild, reason=reason
             )
         case "tempmute":
-            return translate(_("You have been muted from {guild.name} until {timestamp} for {reason}.")).format(
+            return translate(_("You have been muted from **{guild.name}** until {timestamp} for `{reason}`.")).format(
                 guild=guild, reason=reason, timestamp=timestamp
             )
         case "kick":
-            return translate(_("You have been kicked from {guild.name} for {reason}.")).format(
+            return translate(_("You have been kicked from **{guild.name}** for `{reason}`.")).format(
                 guild=guild, reason=reason
             )
         case "softban":
-            return translate(_("You have been kicked from {guild.name} for {reason}.")).format(
+            return translate(_("You have been kicked from **{guild.name}** for `{reason}`.")).format(
                 guild=guild, reason=reason
             )
         case "unmute":
-            return translate(_("You have been unmuted from {guild.name} for {reason}.")).format(
+            return translate(_("You have been unmuted from **{guild.name}** for `{reason}`.")).format(
+                guild=guild, reason=reason
+            )
+        case "delete":
+            return translate(_("Your message in **{guild.name}** has been deleted for `{reason}`.")).format(
+                guild=guild, reason=reason
+            )
+        case "points":
+            return translate(_("You have received points in **{guild.name}** for `{reason}`.")).format(
                 guild=guild, reason=reason
             )

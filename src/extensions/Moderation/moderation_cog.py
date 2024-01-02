@@ -53,7 +53,7 @@ class Moderation(commands.Cog):
 
     @staticmethod
     async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
-        if interaction.user.top_role <= target.top_role:
+        if interaction.user.top_role <= target.top_role and interaction.user.id != interaction.guild.owner_id:
             await interaction.response.send_translated(
                 _("The user must be below you in the hierarchy."), ephemeral=True
             )
@@ -572,14 +572,14 @@ class Moderation(commands.Cog):
             )
             return
 
-        if not cache.automod_actions:
+        if not cache.point_actions:
             await interaction.response.send_translated(_("There are no point actions configured."), ephemeral=True)
             return
 
         await automod_cog.add_warn_points(member, interaction.user, points, reason)
 
         await interaction.response.send_translated(
-            _("{user} has been warned."), ephemeral=True, translation_data={"user": str(member)}
+            _("{user.mention} has been warned."), ephemeral=True, translation_data={"user": member}
         )
 
     @warn_group.command(name="remove", description=_("Removes a warning from a user."))

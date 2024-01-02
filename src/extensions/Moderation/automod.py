@@ -104,9 +104,11 @@ class Automod(commands.Cog):
     async def on_automod_action(self, execution: discord.AutoModAction):
         guild = execution.guild
 
+        # Only accept block message actions
         if execution.action.type != discord.AutoModRuleActionType.block_message:
             return
 
+        # Currently only support keyword rules and the mention spam rule
         if (
             execution.rule_trigger_type != discord.AutoModRuleTriggerType.keyword
             and execution.rule_trigger_type != discord.AutoModRuleTriggerType.mention_spam
@@ -114,10 +116,7 @@ class Automod(commands.Cog):
             return
 
         cache = await self.bot.cache.get_moderation_rule(execution.rule_id)
-        if cache is None:
-            return
-
-        if not cache.actions:
+        if not cache:  # Not configured or no actions
             return
 
         if not guild.chunked:
@@ -171,7 +170,7 @@ class Automod(commands.Cog):
                     fetched_invite = await self._fetch_invite(invite)
 
                     if fetched_invite and (
-                        fetched_invite.guild.id == guild.id or fetched_invite.guild.id in cache.invite_allowed
+                        fetched_invite.guild.id == guild.id or fetched_invite.guild.id in cache.invite_exempt_guilds
                     ):
                         continue
 
@@ -331,8 +330,10 @@ class Automod(commands.Cog):
         member = data.member
         automod_action = data.trigger_action
 
+        punishment_kind = automod_action.punishment.kind
+
         if message is not None:
-            if automod_action.action in [
+            if punishment_kind in [
                 AutoModerationPunishmentKind.kick,
                 AutoModerationPunishmentKind.tempmute,
                 AutoModerationPunishmentKind.points,
@@ -341,26 +342,27 @@ class Automod(commands.Cog):
                 if message.channel.permissions_for(guild.me).manage_messages:
                     await message.delete()
 
-        if automod_action.action != AutoModerationPunishmentKind.delete:
+        if punishment_kind != AutoModerationPunishmentKind.delete:
+            # Check if the member is already punished
             if self.punished_members.get((member.id, member.guild.id)):
                 return
             else:
-                if automod_action.action != AutoModerationPunishmentKind.points:
+                if punishment_kind != AutoModerationPunishmentKind.points:
                     self.punished_members[(member.id, member.guild.id)] = True
 
-        if automod_action.action == AutoModerationPunishmentKind.ban:
+        if punishment_kind == AutoModerationPunishmentKind.ban:
             if guild.me.guild_permissions.ban_members:
                 await guild.ban(member, reason=data.trigger_reason)
                 await _logging.automod_log(self.bot, data)
-        elif automod_action.action == AutoModerationPunishmentKind.kick:
+        elif punishment_kind == AutoModerationPunishmentKind.kick:
             if guild.me.guild_permissions.kick_members:
                 await guild.kick(member, reason=data.trigger_reason)
                 await _logging.automod_log(self.bot, data)
-        elif automod_action.action == AutoModerationPunishmentKind.delete:
+        elif punishment_kind == AutoModerationPunishmentKind.delete:
             await _logging.automod_log(self.bot, data)
-        elif automod_action.action == AutoModerationPunishmentKind.tempban:
+        elif punishment_kind == AutoModerationPunishmentKind.tempban:
             if guild.me.guild_permissions.ban_members:
-                banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
+                banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.punishment.duration)
 
                 timers = self.bot.timer
                 if timers is not None:
@@ -369,13 +371,13 @@ class Automod(commands.Cog):
                     await guild.ban(member, reason=data.trigger_reason)
                 else:
                     _log.warning("Timer Plugin is not initialized")
-        elif automod_action.action == AutoModerationPunishmentKind.tempmute:
+        elif punishment_kind == AutoModerationPunishmentKind.tempmute:
             if guild.me.guild_permissions.mute_members:
-                muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
+                muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.punishment.duration)
 
                 await member.timeout(muted_until)
                 await _logging.automod_log(self.bot, data, until=muted_until)
-        elif automod_action.action == AutoModerationPunishmentKind.points:
+        elif punishment_kind == AutoModerationPunishmentKind.points:
             await self._handle_points(data)
 
     @staticmethod
@@ -397,7 +399,7 @@ class Automod(commands.Cog):
         if not getattr(cache, f"{kind}_active") or not getattr(cache, f"{kind}_actions"):
             return False
 
-        if any(role in cache.mod_roles + cache.ignored_roles for role in roles):
+        if any(role in cache.moderation_roles + cache.ignored_roles for role in roles):
             return False
 
         if channel.id in getattr(cache, f"{kind}_exempt_channels"):
@@ -432,7 +434,7 @@ class Automod(commands.Cog):
                 _log.warning(f"Adding points to {member.id}, but no cache for guild {guild.id}")
                 return
 
-            await self._handle_final_action(member, cache.automod_actions)
+            await self._handle_final_action(member, cache.point_actions)
             await self.bot.db.execute(
                 "UPDATE automoderation_user SET expires_at = now() WHERE user_id = $1 AND guild_id = $2 AND expires_at > now()",
                 member.id,
@@ -454,7 +456,7 @@ class Automod(commands.Cog):
             if cache is None:
                 return
 
-            await self._handle_final_action(member, cache.automod_actions)
+            await self._handle_final_action(member, cache.point_actions)
 
     async def __add_points(self, *, member: discord.Member, points: int, reason: str,
                            expires_after: int = 1209600) -> int:

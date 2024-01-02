@@ -2,7 +2,7 @@ asyncpg~=0.29.0
 python-dotenv~=1.0
 aiohttp~=3.8
 lru-dict~=1.0
-discord.py[speed] @ git+https://github.com/JohannesIBK/discord.py@bc862e7da4b78b2eb7e082d125b3809688e19453
+discord.py[speed] @ git+https://github.com/JohannesIBK/discord.py@be9f1cda18e12b1a79928aed36ba80eeb23353c4
 recordclass~=0.0
 python-dateutil~=2.8.2
 aiolimiter~=1.1.0

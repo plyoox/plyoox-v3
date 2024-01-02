@@ -10,6 +10,7 @@ from lib import emojis, extensions
 
 if TYPE_CHECKING:
     from main import Plyoox
+    from lib.types import Infractions
 
 
 class MemberView(extensions.PaginatedEphemeralView):
@@ -30,7 +31,7 @@ class MemberView(extensions.PaginatedEphemeralView):
         embed.set_footer(text=f"{translate(_('Page'))}: {self.current_page + 1}/{self.last_page + 1}")
 
         members = self.members[
-            self.current_page * MemberView.MEMBERS_PER_PAGE : MemberView.MEMBERS_PER_PAGE * (self.current_page + 1)
+          self.current_page * MemberView.MEMBERS_PER_PAGE: MemberView.MEMBERS_PER_PAGE * (self.current_page + 1)
         ]
 
         embed.description = "\n".join(f"{m} ({m.id})" for m in members)
@@ -124,7 +125,7 @@ class WarnView(extensions.PaginatedEphemeralView):
 
         self.view_expired_button.label = original_interaction.translate(_("Expired Infractions"))
 
-    async def get_page_count(self):
+    async def get_page_count(self) -> int:
         if self.view_expired:
             query = "SELECT count(*) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND expires_at < now()"
         else:
@@ -142,7 +143,10 @@ class WarnView(extensions.PaginatedEphemeralView):
         else:
             query = "SELECT * from automoderation_user WHERE user_id = $1 AND guild_id = $2 AND expires_at > now() OFFSET $3 LIMIT 10"
 
-        infractions = await self.bot.db.fetch(query, self.user.id, self._last_interaction.guild_id, page * 10)
+        infractions: Infractions = await self.bot.db.fetch(
+            query, self.user.id, self._last_interaction.guild_id, page * 10
+        )
+
         if len(infractions) == 0:
             return extensions.Embed(description=translate(_("This user has no warnings.")))
 
@@ -153,8 +157,9 @@ class WarnView(extensions.PaginatedEphemeralView):
         for infraction in infractions:
             infraction = dict(infraction)
 
+            created_at = discord.utils.format_dt(infraction["created_at"])
             expires_at = (
-                discord.utils.format_dt(infraction["expires"]) if infraction["expires"] else translate(_("Never"))
+                discord.utils.format_dt(infraction["expires_at"]) if infraction["expires_at"] else translate(_("Never"))
             )
 
             embed.add_field(
@@ -162,6 +167,7 @@ class WarnView(extensions.PaginatedEphemeralView):
                 value=(
                     f"**{translate(_('Points'))}:** {infraction['points']}\n"
                     f"**{translate(_('Expires at'))}:** {expires_at}\n"
+                    f"**{translate(_('Created at'))}:** {created_at}\n"
                     f"**{translate(_('Reason'))}:** {infraction['reason']}"
                 ),
                 inline=True,

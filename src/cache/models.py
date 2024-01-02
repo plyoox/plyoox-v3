@@ -65,7 +65,7 @@ class AutoModerationCheck(RecordClass):
 
 
 class AutoModerationPunishment(RecordClass):
-    action: AutoModerationPunishmentKind
+    kind: AutoModerationPunishmentKind
     duration: int | None
     points: int | None
     expires_in: int | None
@@ -78,16 +78,16 @@ class AutoModerationAction(RecordClass):
 
 class ModerationModel(RecordClass):
     active: bool
-    mod_roles: list[int] | None
+    moderation_roles: list[int]
     ignored_roles: list[int] | None
     logging_channel: MaybeWebhook | None
     point_actions: list[AutoModerationAction] | None
     notify_user: bool
     invite_active: bool
     invite_actions: list[AutoModerationAction] | None
-    invite_exempt_channels: list[int] | None
-    invite_exempt_roles: list[int] | None
-    invite_allowed: list[str] | None
+    invite_exempt_channels: list[int]
+    invite_exempt_roles: list[int]
+    invite_exempt_guilds: list[str]
     link_active: bool
     link_actions: list[AutoModerationAction] | None
     link_exempt_channels: list[int] | None

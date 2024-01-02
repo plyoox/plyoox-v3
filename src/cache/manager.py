@@ -68,7 +68,7 @@ class CacheManager:
                 duration = action["punishment"][punishment_key].get("duration")
 
             punishment = AutoModerationPunishment(
-                action=punishment_key, points=points, expires_in=expires_in, duration=duration
+                kind=punishment_key, points=points, expires_in=expires_in, duration=duration
             )
 
             check = action.get("check")
@@ -152,13 +152,26 @@ class CacheManager:
     async def get_moderation(self, id: int) -> ModerationModel | None:
         """Returns the cache for the moderation plugin."""
         guild_cache = self._moderation.get(id, utils.MISSING)
-        if guild_cache is not False:
+        if guild_cache:
             return guild_cache
 
-        result = await self._pool.fetchrow("SELECT * FROM moderation_config WHERE id = $1", id)
+        result = await self._pool.fetchrow(
+            "SELECT m.*, w.id as mwh_id, w.token as mwh_token, w.webhook_channel as mwh_webhook_channel, "
+            "w.guild_id as mwh_guild_id FROM moderation_config m INNER JOIN public.maybe_webhook w "
+            "ON w.id = m.logging_channel WHERE m.id = $1", id)
         if result is None:
             self._moderation[id] = None
             return None
+
+        if result["logging_channel"]:
+            logging_channel = MaybeWebhook(
+                id=result["mwh_id"],
+                token=result["mwh_token"],
+                webhook_channel=result["mwh_webhook_channel"],
+                guild_id=result["mwh_guild_id"],
+            )
+        else:
+            logging_channel = None
 
         model = ModerationModel(
             active=result["active"],
@@ -166,21 +179,19 @@ class CacheManager:
             invite_active=result["invite_active"],
             invite_exempt_channels=result["invite_exempt_channels"] or [],
             invite_exempt_roles=result["invite_exempt_roles"] or [],
-            invite_allowed=result["invite_allowed"] or [],
+            invite_exempt_guilds=result["invite_exempt_guilds"] or [],
             caps_actions=self.__to_moderation_actions(result["caps_actions"]),
             caps_active=result["caps_active"],
             caps_exempt_roles=result["caps_exempt_roles"] or [],
             caps_exempt_channels=result["caps_exempt_channels"] or [],
-            log_id=result["log_id"],
-            log_channel=result["log_channel"],
-            log_token=result["log_token"],
-            automod_actions=self.__to_moderation_actions(result["automod_actions"]),
+            logging_channel=logging_channel,
+            point_actions=self.__to_moderation_actions(result["point_actions"]),
             link_allow_list=result["link_allow_list"] or [],
             link_active=result["link_active"],
             link_exempt_channels=result["link_exempt_channels"] or [],
             link_exempt_roles=result["link_exempt_roles"] or [],
             link_actions=self.__to_moderation_actions(result["link_actions"]),
-            mod_roles=result["mod_roles"] or [],
+            moderation_roles=result["moderation_roles"] or [],
             notify_user=result["notify_user"],
             ignored_roles=result["ignored_roles"] or [],
         )
@@ -245,10 +256,10 @@ class CacheManager:
 
         return model
 
-    async def get_moderation_rule(self, rule_id: int) -> ModerationRule | None:
+    async def get_moderation_rule(self, rule_id: int) -> ModerationRule | None | bool:
         """Returns the cache for the moderation rule."""
-        rule_cache = self._automoderation.get(rule_id, False)
-        if rule_cache is not False:
+        rule_cache = self._automoderation.get(rule_id, utils.MISSING)
+        if rule_cache:
             return rule_cache
 
         if event := self._automoderation_queue.get(rule_id):
@@ -260,12 +271,21 @@ class CacheManager:
         result = await self._pool.fetchrow(
             "SELECT actions, guild_id, reason FROM automoderation_rule WHERE rule_id = $1", rule_id
         )
+        # Rule does not exist
         if result is None:
             self._automoderation[rule_id] = None
             del self._automoderation_queue[rule_id]
             event.set()
 
             return None
+
+        # If the rule has no actions, there is no need to store it
+        if not result["actions"]:
+            self._automoderation[rule_id] = False
+            del self._automoderation_queue[rule_id]
+            event.set()
+
+            return False
 
         rule_actions = self.__to_moderation_actions(result["actions"])
 

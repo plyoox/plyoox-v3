@@ -43,7 +43,7 @@ class LoggingKind(enum.StrEnum):
     member_leave = "member_leave"
 
 
-class AutoModerationFinalActionKind(enum.StrEnum):
+class AutoModerationFinalPunishmentKind(enum.StrEnum):
     kick = "kick"
     ban = "ban"
     tempban = "tempban"

@@ -28,18 +28,14 @@ class UserGroup(app_commands.Group):
     @staticmethod
     async def _send_joined_response(interaction: discord.Interaction, member: discord.Member, position: int) -> None:
         """Shortcut to send the response for the joined command."""
-        embed = extensions.Embed(title=_("Join information"))
+        embed = extensions.Embed(title=interaction.translate(_("Join information")))
         embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
-        embed.add_field(name=_("Position"), value=f"> {position}")
+        embed.add_field(name=interaction.translate(_("Position")), value=f"> {position}")
         embed.add_field(
-            name=_("Days since joined"),
+            name=interaction.translate(_("Days since joined")),
             value=f"> {(datetime.datetime.now(tz=datetime.timezone.utc) - member.joined_at).days}",
         )
-        embed.add_field(
-            name=_("Joined at"), value=helper.embed_timestamp_format(member.joined_at)
-        )
-
-        embed._update_locale(interaction.locale, interaction._state._translator)
+        embed.add_field(name=interaction.translate(_("Joined at")), value=helper.embed_timestamp_format(member.joined_at))
 
         if interaction.extras.get("deferred"):
             await interaction.followup.send(embed=embed)
@@ -78,7 +74,7 @@ class UserGroup(app_commands.Group):
                 0,
                 name=interaction.translate(_("User information")),
                 value=f"> __{interaction.translate(_('Nick'))}:__ {member.nick or interaction.translate(_('No nick'))}\n"
-                f"> __{interaction.translate(_('Server avatar'))}:__ {interaction.translate(_('Yes') if member.guild_avatar else _('No'))}\n"
+                f"> __{interaction.translate(_('Server avatar'))}:__ {interaction.translate(_('Yes') if member.guild_avatar else _('No'))}\n",
             )
             embed.insert_field_at(
                 1,
@@ -100,7 +96,7 @@ class UserGroup(app_commands.Group):
                 value=f"> {formatted_roles}" if formatted_roles else interaction.translate(_('No roles')),
             )
 
-        await interaction.response.send_translated(embeds=[embed], ephemeral=ephemeral)
+        await interaction.response.send_message(embeds=[embed], ephemeral=ephemeral)
 
     @joined_group.command(name="position", description=_("Displays the user at the join position."))
     @app_commands.describe(position=_("Joining position in the server."))
@@ -121,7 +117,8 @@ class UserGroup(app_commands.Group):
         try:
             member = members[position - 1]
         except KeyError:
-            return await interaction.response.send_translated(_("No member found at this position."))
+            await interaction.response.send_translated(_("No member found at this position."))
+            return
 
         await self._send_joined_response(interaction, member, position)
 

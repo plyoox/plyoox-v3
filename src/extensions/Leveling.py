@@ -119,7 +119,7 @@ class Leveling(commands.Cog):
             if interaction.user.guild_permissions.administrator:
                 await interaction.response.send_translated(
                     _("The level system has not been enabled. Go to the [Dashboard](https://plyoox.net) to enabled it."),
-                    ephemeral=True
+                    ephemeral=True,
                 )
                 return False
 
@@ -390,11 +390,13 @@ class Leveling(commands.Cog):
 
         remove_roles_str = interaction.translate(_("Yes") if pg_result["remove_roles"] else _("No"))
 
-        embed = extensions.Embed(title=_("Available level roles"))
-        embed.description = interaction.translate(_("Remove previous roles: {remove_roles}")).format(remove_roles=remove_roles_str) + "\n"
+        embed = extensions.Embed(title=interaction.translate(_("Available level roles")))
+        embed.description = (
+            interaction.translate(_("Remove previous roles: {remove_roles}")).format(remove_roles=remove_roles_str) + "\n"
+        )
         embed.description += "\n".join(roles)
 
-        await interaction.response.send_translated(embeds=[embed])
+        await interaction.response.send_message(embeds=[embed])
 
     @level_group.command(
         name="top",
@@ -492,8 +494,8 @@ class Leveling(commands.Cog):
                     reason=interaction.translate(_("The level progress of this user was reset.")),
                 )
 
-        embed = extensions.Embed(description=_("The levels of this user were successfully reset."))
-        await interaction.response.send_translated(embeds=[embed], ephemeral=True)
+        embed = extensions.Embed(description=interaction.translate(_("The levels of this user were successfully reset.")))
+        await interaction.response.send_message(embeds=[embed], ephemeral=True)
 
     @app_commands.command(
         name="reset-guild-levels",

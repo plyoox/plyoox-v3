@@ -31,37 +31,35 @@ class GuildGroup(app_commands.Group):
         else:
             owner = guild.owner
 
-        embed = extensions.Embed(title=_("Guild information"))
+        embed = extensions.Embed(title=interaction.translate(_("Guild information")))
         embed.set_thumbnail(url=guild.icon)
         embed.add_field(
-            name=_("General information"),
+            name=interaction.translate(_("General information")),
             value=f"> __{interaction.translate(_('Name'))}:__ {guild.name}\n"
             f"> __{interaction.translate(_('Id'))}:__ {guild.id}\n"
             f"> __{interaction.translate(_('Owner'))}:__ {owner}\n"
             f"> __{interaction.translate(_('Created at'))}:__ {discord.utils.format_dt(guild.created_at)}",
         )
 
-        embed.add_field(name=_("Members"), value=f"> {str(guild.member_count)}")
+        embed.add_field(name=interaction.translate(_("Members")), value=f"> {str(guild.member_count)}")
 
         embed.add_field(
             name=f"{interaction.translate(_('Roles'))} ({len(roles) - 1})",
             value=f"> {helper.format_roles(list(roles))}" if guild._roles else _("No roles"),
         )
         embed.add_field(
-            name=_("More information"),
+            name=interaction.translate(_("More information")),
             value=f"> __{interaction.translate(_('Boost level'))}:__ {guild.premium_tier} ({guild.premium_subscription_count})\n"
             f"> __{interaction.translate(_('Vanity url'))}:__ {guild.vanity_url or interaction.translate(_('No vanity url'))}\n"
             f"> __{interaction.translate(_('Emojis'))}:__ {len(guild.emojis)}/{guild.emoji_limit * 2}\n"  # normal + animated
             f"> __{interaction.translate(_('Stickers'))}:__ {len(guild.stickers)}/{guild.sticker_limit}",
         )
         embed.add_field(
-            name=_("Features"),
-            value=f"> {', '.join(f'`{feature}`' for feature in guild.features)}"
-            if guild.features
-            else _("No features"),
+            name=interaction.translate(_("Features")),
+            value=f"> {', '.join(f'`{feature}`' for feature in guild.features)}" if guild.features else _("No features"),
         )
 
-        await interaction.response.send_translated(embeds=[embed])
+        await interaction.response.send_message(embeds=[embed])
 
     @app_commands.command(name="today-joined", description=_("Shows how many members joined in the last 24 hours."))
     async def today_joined(self, interaction: discord.Interaction):

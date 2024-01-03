@@ -56,3 +56,7 @@ skip-magic-trailing-comma = false
 
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
+
+[tool.black]
+line-length = 125
+skip-string-normalization = true

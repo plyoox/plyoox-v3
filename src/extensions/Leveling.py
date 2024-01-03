@@ -49,7 +49,7 @@ class ResetGuildModal(ui.Modal):
     def __init__(self, interaction: discord.Interaction):
         super().__init__(title=interaction.translate(_("Reset server levels")))
 
-        self.bot: Plyoox = interaction.client  # type: ignore
+        self.bot: Plyoox = interaction.client
         self.question = ui.TextInput(
             label=interaction.translate(_("Are you sure you want to reset all levels?")),
             placeholder=f"{interaction.translate(_('Repeat:'))} {RESET_LEVEL_CONFIRMATION_TEXT}",
@@ -64,6 +64,7 @@ class ResetGuildModal(ui.Modal):
 
         await interaction.response.defer(ephemeral=True)
         await self.bot.db.execute("DELETE FROM level_user WHERE guild_id = $1", interaction.guild_id)
+
         await interaction.followup.send(
             interaction.translate(_("The level of all guild members has been successfully reset.")),
             ephemeral=True,
@@ -115,6 +116,13 @@ class Leveling(commands.Cog):
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         cache = await self.bot.cache.get_leveling(interaction.guild_id)
         if not cache:
+            if interaction.user.guild_permissions.administrator:
+                await interaction.response.send_translated(
+                    _("The level system has not been enabled. Go to the [Dashboard](https://plyoox.net) to enabled it."),
+                    ephemeral=True
+                )
+                return
+
             await interaction.response.send_translated(_("This module is currently disabled."), ephemeral=True)
 
             return False
@@ -363,12 +371,12 @@ class Leveling(commands.Cog):
     async def show_roles(self, interaction: discord.Interaction):
         """Shows the roles that are gain able through the level system"""
         guild = interaction.guild
-        bot: Plyoox = interaction.client  # type: ignore
+        bot: Plyoox = interaction.client
 
-        raw_roles = await bot.db.fetchval("SELECT roles FROM level_config WHERE id = $1", guild.id) or []
+        # Result must be defined, because the command can only be invoked if the level system is enabled.
+        pg_result = await bot.db.fetchrow("SELECT roles, remove_roles FROM level_config WHERE id = $1", guild.id)
 
-        level_roles = [[role["role"], role["level"]] for role in raw_roles]
-
+        level_roles = [[role["role"], role["level"]] for role in (pg_result["roles"] or [])]
         if len(level_roles) == 0:
             await interaction.response.send_translated(_("The server has no level roles configured."), ephemeral=True)
             return
@@ -380,10 +388,13 @@ class Leveling(commands.Cog):
             if role is not None:
                 roles.append(f"{level} - {role.mention}")
 
-        embed = extensions.Embed(title=_("Available level roles"))
-        embed.description = "\n".join(roles)
+        remove_roles_str = interaction.translate(_("Yes") if pg_result["remove_roles"] else _("No"))
 
-        await interaction.response.send_translated(embed=embed)
+        embed = extensions.Embed(title=_("Available level roles"))
+        embed.description = interaction.translate(_("Remove previous roles: {remove_roles}")).format(remove_roles=remove_roles_str) + "\n"
+        embed.description += "\n".join(roles)
+
+        await interaction.response.send_translated(embeds=[embed])
 
     @level_group.command(
         name="top",
@@ -391,7 +402,7 @@ class Leveling(commands.Cog):
     )
     async def top(self, interaction: discord.Interaction):
         guild = interaction.guild
-        bot: Plyoox = interaction.client  # type: ignore
+        bot: Plyoox = interaction.client
 
         await interaction.response.defer(ephemeral=True)
 

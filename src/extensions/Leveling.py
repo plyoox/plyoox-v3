@@ -121,7 +121,7 @@ class Leveling(commands.Cog):
                     _("The level system has not been enabled. Go to the [Dashboard](https://plyoox.net) to enabled it."),
                     ephemeral=True
                 )
-                return
+                return False
 
             await interaction.response.send_translated(_("This module is currently disabled."), ephemeral=True)
 

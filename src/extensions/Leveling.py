@@ -392,7 +392,8 @@ class Leveling(commands.Cog):
 
         embed = extensions.Embed(title=interaction.translate(_("Available level roles")))
         embed.description = (
-            interaction.translate(_("Remove previous roles: {remove_roles}")).format(remove_roles=remove_roles_str) + "\n"
+            interaction.translate(_("**Remove previous roles:** {remove_roles}")).format(remove_roles=remove_roles_str)
+            + "\n"
         )
         embed.description += "\n".join(roles)
 

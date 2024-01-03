@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-01-02 22:46+0100\n"
+"POT-Creation-Date: 2024-01-03 12:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,8 +88,8 @@ msgid "Show rating"
 msgstr ""
 
 #: src/extensions/Anilist/_views.py:126 src/extensions/Anilist/_views.py:137
-#: src/extensions/Leveling.py:135 src/extensions/Leveling.py:177
-#: src/extensions/Leveling.py:191
+#: src/extensions/Leveling.py:141 src/extensions/Leveling.py:183
+#: src/extensions/Leveling.py:197
 msgid "The required infrastructure is currently not available."
 msgstr ""
 
@@ -406,13 +406,14 @@ msgid "Bot"
 msgstr ""
 
 #: src/extensions/Infos/user_group.py:66 src/extensions/Infos/user_group.py:81
-#: src/extensions/Infos/user_group.py:88
-msgid "Yes"
+#: src/extensions/Infos/user_group.py:88 src/extensions/Infos/user_group.py:93
+#: src/extensions/Leveling.py:389
+msgid "No"
 msgstr ""
 
 #: src/extensions/Infos/user_group.py:66 src/extensions/Infos/user_group.py:81
-#: src/extensions/Infos/user_group.py:88 src/extensions/Infos/user_group.py:93
-msgid "No"
+#: src/extensions/Infos/user_group.py:88 src/extensions/Leveling.py:389
+msgid "Yes"
 msgstr ""
 
 #: src/extensions/Infos/user_group.py:70
@@ -501,83 +502,91 @@ msgstr ""
 msgid "Wrong answer provided, aborting."
 msgstr ""
 
-#: src/extensions/Leveling.py:68
+#: src/extensions/Leveling.py:69
 msgid "The level of all guild members has been successfully reset."
 msgstr ""
 
-#: src/extensions/Leveling.py:79
+#: src/extensions/Leveling.py:80
 msgid "View rank"
 msgstr ""
 
-#: src/extensions/Leveling.py:87
+#: src/extensions/Leveling.py:88
 msgid "Commands that are needed to interact with the level-system."
 msgstr ""
 
-#: src/extensions/Leveling.py:118
+#: src/extensions/Leveling.py:121
+msgid "The level system has not been enabled. Go to the [Dashboard](https://plyoox.net) to enabled it."
+msgstr ""
+
+#: src/extensions/Leveling.py:124
 msgid "This module is currently disabled."
 msgstr ""
 
-#: src/extensions/Leveling.py:151
+#: src/extensions/Leveling.py:157
 msgid "This user has never written anything or is excluded."
 msgstr ""
 
-#: src/extensions/Leveling.py:353
+#: src/extensions/Leveling.py:359
 msgid "Shows information about the current rank of a member."
 msgstr ""
 
-#: src/extensions/Leveling.py:355
+#: src/extensions/Leveling.py:361
 msgid "The member from whom you want the rank."
 msgstr ""
 
-#: src/extensions/Leveling.py:362
+#: src/extensions/Leveling.py:368
 msgid "Shows the available level roles."
 msgstr ""
 
-#: src/extensions/Leveling.py:373
+#: src/extensions/Leveling.py:379
 msgid "The server has no level roles configured."
 msgstr ""
 
-#: src/extensions/Leveling.py:383
+#: src/extensions/Leveling.py:391
 msgid "Available level roles"
 msgstr ""
 
-#: src/extensions/Leveling.py:390
+#: src/extensions/Leveling.py:392
+msgid "Remove previous roles: {remove_roles}"
+msgstr ""
+
+#: src/extensions/Leveling.py:399
 msgid "Lists the top 10 users with the highest level on this guild."
 msgstr ""
 
-#: src/extensions/Leveling.py:436
+#: src/extensions/Leveling.py:445
 msgid "There is no user tracked by the level system."
 msgstr ""
 
-#: src/extensions/Leveling.py:442
+#: src/extensions/Leveling.py:451
 msgid "Top 10 users with the highest level"
 msgstr ""
 
-#: src/extensions/Leveling.py:448
+#: src/extensions/Leveling.py:457
 msgid "Level"
 msgstr ""
 
-#: src/extensions/Leveling.py:449
+#: src/extensions/Leveling.py:458
 msgid "XP"
 msgstr ""
 
-#: src/extensions/Leveling.py:457
+#: src/extensions/Leveling.py:466
 msgid "Resets the level of a member. This action cannot be undone."
 msgstr ""
 
-#: src/extensions/Leveling.py:459
+#: src/extensions/Leveling.py:468
 msgid "The member from whom you want to reset rank."
 msgstr ""
 
-#: src/extensions/Leveling.py:481
+#: src/extensions/Leveling.py:490
 msgid "The level progress of this user was reset."
 msgstr ""
 
-#: src/extensions/Leveling.py:484
+#: src/extensions/Leveling.py:493
 msgid "The levels of this user were successfully reset."
 msgstr ""
 
-#: src/extensions/Leveling.py:489
+#: src/extensions/Leveling.py:498
 msgid "Resets the levels of all members in the guild. This action cannot be undone."
 msgstr ""
 

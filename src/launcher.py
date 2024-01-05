@@ -25,7 +25,7 @@ args = parser.parse_args()
 # Set up logging
 
 logger = logging.getLogger()
-discord.utils.setup_logging(root=True, level=logging.INFO)
+discord.utils.setup_logging(root=True, level=logging.DEBUG)
 
 logging.getLogger("tornado.access").setLevel(logging.ERROR)
 

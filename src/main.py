@@ -49,7 +49,7 @@ class Plyoox(commands.AutoShardedBot):
     imager_url: str
     notificator_url: str
 
-    def __init__(self):
+    def __init__(self, compress: bool = True):
         intents = discord.Intents(
             bans=True,
             message_content=True,
@@ -68,6 +68,7 @@ class Plyoox(commands.AutoShardedBot):
             tree_cls=extensions.CommandTree,
             chunk_guilds_at_startup=False,
             help_command=None,
+            compress=compress,
         )
 
         self.imager_url = os.getenv("IMAGER_URL")

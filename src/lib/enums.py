@@ -57,6 +57,7 @@ class ModerationCommandKind(enum.StrEnum):
     unban = "unban"
     softban = "softban"
     unmute = "unmute"
+    kick = "kick"
 
 
 class AutoModerationExecutionKind(enum.StrEnum):

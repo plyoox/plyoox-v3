@@ -187,7 +187,9 @@ class Moderation(commands.Cog):
             return
 
         await interaction.response.defer(ephemeral=True)
-        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, kind="kick")
+        await _logging_helper.log_simple_punish_command(
+            interaction, target=member, reason=reason, kind=ModerationCommandKind.kick
+        )
         await guild.kick(member, reason=reason)
 
         await interaction.followup.send(interaction.translate(_("The user has been kicked.")), ephemeral=True)
@@ -223,7 +225,7 @@ class Moderation(commands.Cog):
         await interaction.response.defer(ephemeral=True)
         await member.timeout(muted_until, reason=reason)
         await _logging_helper.log_simple_punish_command(
-            interaction, target=member, until=muted_until, reason=reason, kind="tempmute"
+            interaction, target=member, until=muted_until, reason=reason, kind=ModerationCommandKind.tempmute
         )
 
         await interaction.followup.send(
@@ -278,7 +280,9 @@ class Moderation(commands.Cog):
 
         await interaction.response.defer(ephemeral=True)
 
-        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, kind="softban")
+        await _logging_helper.log_simple_punish_command(
+            interaction, target=member, reason=reason, kind=ModerationCommandKind.softban
+        )
         await guild.ban(member, reason=reason, delete_message_days=1)
         await guild.unban(member, reason=reason)
 

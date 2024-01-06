@@ -12,7 +12,10 @@ from discord.app_commands import locale_str as _
 
 from lib import utils
 from lib.enums import (
-    AutoModerationPunishmentKind, AutoModerationCheckKind, TimerEnum, AutomodFinalActionEnum,
+    AutoModerationPunishmentKind,
+    AutoModerationCheckKind,
+    TimerEnum,
+    AutomodFinalActionEnum,
     AutoModerationExecutionKind,
 )
 from translation import translate as global_translate
@@ -256,8 +259,9 @@ class Automod(commands.Cog):
     ):
         for action in actions:
             if Automod._handle_checks(message.author, action):
-                data = AutoModerationActionData._from_message(message=message, reason=reason, action_taken=action,
-                                                              bot=self.bot)
+                data = AutoModerationActionData._from_message(
+                    message=message, reason=reason, action_taken=action, bot=self.bot
+                )
 
                 await self._execute_discord_automod(data, message=message)
                 break
@@ -296,16 +300,16 @@ class Automod(commands.Cog):
 
         if action.action == AutomodFinalActionEnum.kick:
             if guild.me.guild_permissions.kick_members:
-                await _logging.automod_final_log(self.bot, member, action.action)  # type: ignore
+                await _logging.automod_final_log(self.bot, member, action.action)
                 await guild.kick(member, reason=translate(_("Maximum number of points reached")))
         elif action.action == AutomodFinalActionEnum.ban:
-            await _logging.automod_final_log(self.bot, member, action.action)  # type: ignore
+            await _logging.automod_final_log(self.bot, member, action.action)
             if guild.me.guild_permissions.ban_members:
                 await guild.ban(member, reason=translate(_("Maximum number of points reached")))
         elif action.action == AutomodFinalActionEnum.tempban:
             if guild.me.guild_permissions.ban_members:
                 banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
-                await _logging.automod_final_log(self.bot, member, action.action, until=banned_until)  # type: ignore
+                await _logging.automod_final_log(self.bot, member, action.action, until=banned_until)
 
                 timers = self.bot.timer
                 if timers is not None:
@@ -321,7 +325,7 @@ class Automod(commands.Cog):
         elif action.action == AutoModerationPunishmentKind.tempmute:
             if guild.me.guild_permissions.mute_members:
                 muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
-                await _logging.automod_final_log(self.bot, member, action.action, until=muted_until)  # type: ignore
+                await _logging.automod_final_log(self.bot, member, action.action, until=muted_until)
 
                 await member.timeout(muted_until)
 
@@ -458,9 +462,8 @@ class Automod(commands.Cog):
 
             await self._handle_final_action(member, cache.point_actions)
 
-    async def __add_points(self, *, member: discord.Member, points: int, reason: str,
-                           expires_after: int = 1209600) -> int:
-        """ Add points to a member and returns the currently active points."""
+    async def __add_points(self, *, member: discord.Member, points: int, reason: str, expires_after: int = 1209600) -> int:
+        """Add points to a member and returns the currently active points."""
 
         guild = member.guild
         expires_at = discord.utils.utcnow() + datetime.timedelta(seconds=expires_after)  # default is 2 weeks

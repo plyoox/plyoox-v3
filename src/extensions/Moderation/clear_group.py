@@ -104,9 +104,7 @@ class ClearGroup(app_commands.Group):
 
         embed.add_field(name=interaction.translate(_("Messages deleted")), value=f"> {deleted_count}/{limit}")
         embed.add_field(name=interaction.translate(_("Affected users")), value=f"> {len(affected_users)}")
-        embed.add_field(
-            name=interaction.translate(_("Reason")), value=f"> {reason}"
-        )
+        embed.add_field(name=interaction.translate(_("Reason")), value=f"> {reason}")
 
         # Send the information to the user. The response has been deferred, so this uses followup
         await interaction.followup.send(
@@ -145,9 +143,7 @@ class ClearGroup(app_commands.Group):
         reason: Optional[str],
     ):
         await interaction.response.defer(ephemeral=True)
-        await self.do_removal(
-            interaction, amount, reason=reason, predicate=lambda m: string.lower() in m.content.lower()
-        )
+        await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: string.lower() in m.content.lower())
 
     @app_commands.command(name="user", description=_("Clears all messages from a specific user."))
     @app_commands.describe(
@@ -174,9 +170,7 @@ class ClearGroup(app_commands.Group):
         self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]
     ):
         await interaction.response.defer(ephemeral=True)
-        await self.do_removal(
-            interaction, amount, reason=reason, predicate=lambda m: bool(LINK_REGEX.search(m.content))
-        )
+        await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: bool(LINK_REGEX.search(m.content)))
 
     @app_commands.command(name="files", description=_("Deletes all messages that contains files."))
     @app_commands.describe(

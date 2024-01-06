@@ -88,8 +88,7 @@ async def log_simple_punish_command(
     webhook = await _get_log_channel(interaction.client, cache, interaction.guild)
     if webhook is not None:
         title, description = _get_dynamic_log_description(
-            interaction.translate, moderator=interaction.user,
-            target=target, kind=kind
+            interaction.translate, moderator=interaction.user, target=target, kind=kind
         )
 
         embed = extensions.Embed(description=description)
@@ -107,8 +106,7 @@ async def log_simple_punish_command(
         reason = reason or f"*{translate(_('No reason'))}*"
         until = discord.utils.format_dt(until) if until else None
         message = _get_dynamic_log_user_message(
-            interaction.translate, kind=kind, reason=reason, timestamp=until,
-            guild=interaction.guild
+            interaction.translate, kind=kind, reason=reason, timestamp=until, guild=interaction.guild
         )
 
         try:
@@ -137,9 +135,7 @@ async def automod_log(
     webhook = await _get_log_channel(bot, cache, guild)
     if webhook is not None:
         (title, description) = _get_dynamic_auto_moderation_description(
-            translate,
-            kind=data.trigger_action.punishment.kind,
-            target=member
+            translate, kind=data.trigger_action.punishment.kind, target=member
         )
 
         embeds = []
@@ -196,7 +192,7 @@ async def automod_final_log(
 
     webhook = await _get_log_channel(bot, cache, guild)
     if webhook is not None:
-        title, = _get_dynamic_auto_moderation_description(translate, kind=action, target=member)
+        (title,) = _get_dynamic_auto_moderation_description(translate, kind=action, target=member)
 
         embed = extensions.Embed(
             description=translate(
@@ -216,7 +212,10 @@ async def automod_final_log(
     if cache.notify_user:
         until = discord.utils.format_dt(until) if until is not None else None
         message = _get_dynamic_log_user_message(
-            translate, guild=guild, reason=translate(_("Maximum amount of points reached")), timestamp=until,
+            translate,
+            guild=guild,
+            reason=translate(_("Maximum amount of points reached")),
+            timestamp=until,
             kind=action,
         )
 
@@ -269,7 +268,7 @@ def _get_dynamic_log_description(
     *,
     moderator: discord.Member | None,
     target: discord.User | discord.Member,
-    kind: ModerationCommandKind
+    kind: ModerationCommandKind,
 ) -> (str, str):
     match kind:
         case "points":
@@ -283,12 +282,8 @@ def _get_dynamic_log_description(
             return (
                 translate(_("Message has been deleted")),
                 translate(
-                    _(
-                        "The message from {target.mention} ({target}) has been deleted by {moderator.mention} ({moderator})."
-                    )
-                ).format(
-                    target=target, moderator=moderator
-                ),
+                    _("The message from {target.mention} ({target}) has been deleted by {moderator.mention} ({moderator}).")
+                ).format(target=target, moderator=moderator),
             )
         case "tempban":
             return (
@@ -297,18 +292,14 @@ def _get_dynamic_log_description(
                     _(
                         "The user {target.mention} ({target}) has been temporarily banned by {moderator.mention} ({moderator})."
                     )
-                ).format(
-                    target=target, moderator=moderator
-                ),
+                ).format(target=target, moderator=moderator),
             )
         case "ban":
             return (
                 translate(_("User has been banned")),
                 translate(
                     _("The user {target.mention} ({target}) has been banned by {moderator.mention} ({moderator}).")
-                ).format(
-                    target=target, moderator=moderator
-                ),
+                ).format(target=target, moderator=moderator),
             )
         case "tempmute":
             return (
@@ -317,45 +308,35 @@ def _get_dynamic_log_description(
                     _(
                         "The user {target.mention} ({target}) has been temporarily muted by {moderator.mention} ({moderator})."
                     )
-                ).format(
-                    target=target, moderator=moderator
-                ),
+                ).format(target=target, moderator=moderator),
             )
         case "kick":
             return (
                 translate(_("User has been kicked")),
                 translate(
                     _("The user {target.mention} ({target}) has been kicked by {moderator.mention} ({moderator}).")
-                ).format(
-                    target=target, moderator=moderator
-                ),
+                ).format(target=target, moderator=moderator),
             )
         case "unban":
             return (
                 translate(_("User has been unbanned")),
                 translate(
                     _("The user {target.mention} ({target}) has been unbanned by {moderator.mention} ({moderator}).")
-                ).format(
-                    target=target, moderator=moderator
-                ),
+                ).format(target=target, moderator=moderator),
             )
         case "softban":
             return (
                 translate(_("User has been softbanned")),
                 translate(
                     _("The user {target.mention} ({target}) has been softbanned by {moderator.mention} ({moderator}).")
-                ).format(
-                    target=target, moderator=moderator
-                ),
+                ).format(target=target, moderator=moderator),
             )
         case "unmute":
             return (
                 translate(_("User has been unmuted")),
                 translate(
                     _("The user {target.mention} ({target}) has been unmuted by {moderator.mention} ({moderator}).")
-                ).format(
-                    target=target, moderator=moderator
-                ),
+                ).format(target=target, moderator=moderator),
             )
 
 
@@ -363,7 +344,7 @@ def _get_dynamic_auto_moderation_description(
     translate: types.Translate,
     *,
     target: discord.User | discord.Member,
-    kind: AutoModerationFinalPunishmentKind | AutoModerationPunishmentKind
+    kind: AutoModerationFinalPunishmentKind | AutoModerationPunishmentKind,
 ) -> (str, str):
     match kind:
         case "points":
@@ -378,25 +359,19 @@ def _get_dynamic_auto_moderation_description(
                 translate(_("Message has been deleted")),
                 translate(
                     _("The message from {target.mention} ({target}) has been deleted by the automoderation system.")
-                ).format(
-                    target=target
-                ),
+                ).format(target=target),
             )
         case "tempban":
             return (
                 translate(_("User has been temporary banned")),
                 translate(
                     _("The user {target.mention} ({target}) has been temporarily banned by the automoderation system.")
-                ).format(
-                    target=target
-                ),
+                ).format(target=target),
             )
         case "ban":
             return (
                 translate(_("User has been banned")),
-                translate(
-                    _("The user {target.mention} ({target}) has been banned by the automoderation system.")
-                ).format(
+                translate(_("The user {target.mention} ({target}) has been banned by the automoderation system.")).format(
                     target=target
                 ),
             )
@@ -405,16 +380,12 @@ def _get_dynamic_auto_moderation_description(
                 translate(_("User has been temporary muted")),
                 translate(
                     _("The user {target.mention} ({target}) has been temporarily muted the automoderation system.")
-                ).format(
-                    target=target
-                ),
+                ).format(target=target),
             )
         case "kick":
             return (
                 translate(_("User has been kicked")),
-                translate(
-                    _("The user {target.mention} ({target}) has been kicked by the automoderation system.")
-                ).format(
+                translate(_("The user {target.mention} ({target}) has been kicked by the automoderation system.")).format(
                     target=target
                 ),
             )
@@ -426,7 +397,7 @@ def _get_dynamic_log_user_message(
     guild: discord.Guild,
     kind: ModerationCommandKind | AutoModerationFinalPunishmentKind | AutoModerationPunishmentKind,
     reason: str,
-    timestamp: str | None
+    timestamp: str | None,
 ) -> str:
     match kind:
         case "tempban":

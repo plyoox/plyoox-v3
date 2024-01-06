@@ -261,7 +261,7 @@ class CacheManager:
 
         return model
 
-    async def get_punishments(self, id: int) -> dict[int, AutoModerationPunishment] | Falsify:
+    async def get_punishments(self, id: int) -> dict[int, Punishment] | Falsify:
         punishment_cache = self._punishment_cache.get(id, utils.MISSING)
         if punishment_cache is not utils.MISSING:
             return punishment_cache

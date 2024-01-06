@@ -8,7 +8,7 @@ import discord
 from discord import utils
 from discord.app_commands import locale_str as _
 
-from lib import helper, extensions, types
+from lib import helper, extensions, types, colors
 from translation.translator import translate as global_translate
 
 if TYPE_CHECKING:
@@ -87,11 +87,9 @@ async def log_simple_punish_command(
 
     webhook = await _get_log_channel(interaction.client, cache, interaction.guild)
     if webhook is not None:
-        title, description = _get_dynamic_log_description(
-            interaction.translate, moderator=interaction.user, target=target, kind=kind
-        )
+        title, description = _get_dynamic_log_description(translate, moderator=interaction.user, target=target, kind=kind)
 
-        embed = extensions.Embed(description=description)
+        embed = extensions.Embed(description=description, color=colors.COMMAND_LOG_COLOR)
         embed.set_author(name=title, icon_url=target.display_avatar)
         embed.add_field(name=translate(_("Reason")), value="> " + (reason or translate(_("No reason"))))
         embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
@@ -134,9 +132,14 @@ async def automod_log(
 
     webhook = await _get_log_channel(bot, cache, guild)
     if webhook is not None:
-        (title, description) = _get_dynamic_auto_moderation_description(
-            translate, kind=data.trigger_action.punishment.kind, target=member
-        )
+        if data.moderator:
+            title, description = _get_dynamic_log_description(
+                translate, moderator=data.moderator, target=member, kind=data.trigger_action.punishment.kind
+            )
+        else:
+            (title, description) = _get_dynamic_auto_moderation_description(
+                translate, kind=data.trigger_action.punishment.kind, target=member
+            )
 
         embeds = []
 
@@ -145,6 +148,13 @@ async def automod_log(
         embed.add_field(name=translate(_("Reason")), value=f"> {data.trigger_reason}")
         embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
         embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
+
+        # data.moderator is only set when executed by the punishment command
+        if data.moderator:
+            embed.title = translate(_("Punishment executed"))
+            embed.color = colors.PUNISHMENT_COLOR
+        else:
+            embed.color = colors.AUTOMOD_COLOR
 
         if until is not None:
             embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
@@ -157,7 +167,11 @@ async def automod_log(
             if len(data.trigger_content) <= 1024:
                 embed.add_field(name=translate(_("Message")), value=data.trigger_content)
             else:
-                message_embed = extensions.Embed(title=translate(_("Message")), description=data.trigger_content)
+                message_embed = extensions.Embed(
+                    title=translate(_("Message")),
+                    description=data.trigger_content,
+                    color=colors.AUTOMOD_COLOR,  # punishment never has any content attached
+                )
                 embeds.append(message_embed)
 
         await _send_webhook(bot, guild.id, webhook, embeds=embeds)
@@ -268,7 +282,7 @@ def _get_dynamic_log_description(
     *,
     moderator: discord.Member | None,
     target: discord.User | discord.Member,
-    kind: ModerationCommandKind,
+    kind: ModerationCommandKind | AutoModerationPunishmentKind,
 ) -> (str, str):
     match kind:
         case "points":

@@ -10,9 +10,11 @@ from discord import app_commands, utils
 from discord.ext import commands
 from discord.app_commands import locale_str as _
 
+from cache import Punishment
 from lib import parsers, extensions
 from lib.enums import TimerEnum, ModerationCommandKind
 from . import _views as views, _logging_helper, clear_group, automod
+from .automod import Automod, AutoModerationActionData
 
 if TYPE_CHECKING:
     from main import Plyoox
@@ -615,6 +617,39 @@ class Moderation(commands.Cog):
                 _("{member} has no warnings"), ephemeral=True, translation_data={"member": str(member)}
             )
 
+    @app_commands.command(name="punish", description=_("Punish a user with predefined templates."))
+    @app_commands.describe(member=_("The user to punish."))
+    @app_commands.default_permissions(ban_members=True)
+    async def punish(self, interaction: discord.Interaction, member: discord.Member, template: int):
+        automod: Automod = self.bot.get_cog("Automod")  # type: ignore
+        if automod is None:
+            _log.warning("Automod cog is not loaded.")
+            await interaction.response.send_translated(_("The required module is not loaded."), ephemeral=True)
+            return
+
+        cache = await self.bot.cache.get_punishments(interaction.guild_id)
+        if cache is None:
+            await interaction.response.send_translated(_("There are no punishments configured."), ephemeral=True)
+            return
+
+        punishment = cache.get(template)
+        if punishment is None:
+            await interaction.response.send_translated(_("The provided template does not exist."), ephemeral=True)
+            return
+
+        if not await self._can_execute_on(interaction, member):
+            return
+
+        for action in punishment.actions:
+            if automod._handle_checks(member, action):
+                data = AutoModerationActionData(
+                    action=action, member=member, reason=punishment.reason, moderator=interaction.user
+                )
+
+                await automod._execute_action(data)
+
+        await interaction.response.send_translated(_("The user has been punished."), ephemeral=True)
+
     @tempmute.autocomplete("duration")
     @tempban.autocomplete("duration")
     async def autocomplete_duration(self, interaction: discord.Interaction, current: str):
@@ -639,3 +674,20 @@ class Moderation(commands.Cog):
             for time in times
             if current.lower() in time["label"].lower()
         ]
+
+    @punish.autocomplete("template")
+    async def autocomplete_template(self, interaction: discord.Interaction, search: str):
+        def sort(value: Punishment):
+            return search in value.name.lower()
+
+        cache = await self.bot.cache.get_punishments(interaction.guild_id)
+        if cache is None:
+            return []
+
+        punishment_list = list(cache.values())
+
+        if len(punishment_list) <= 25:
+            return [app_commands.Choice(name=value.name, value=value.id) for value in punishment_list]
+
+        punishment_list.sort(key=sort)
+        return [app_commands.Choice(name=value.name, value=value.id) for value in punishment_list[:25]]

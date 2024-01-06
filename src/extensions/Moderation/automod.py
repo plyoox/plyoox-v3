@@ -34,21 +34,30 @@ LINK_REGEX = re.compile(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-
 
 class AutoModerationActionData(object):
     member: discord.Member
-    trigger_content: str
+    trigger_content: str | None
     trigger_reason: str
     trigger_action: AutoModerationAction
+    moderator: discord.Member | None
 
-    __slots__ = ("trigger_content", "member", "trigger_reason", "trigger_action")
+    __slots__ = ("trigger_content", "member", "trigger_reason", "trigger_action", "moderator")
 
-    def __init__(self, member: discord.Member, content: str, reason: str, action: AutoModerationAction):
+    def __init__(
+        self,
+        member: discord.Member,
+        reason: str,
+        action: AutoModerationAction,
+        content: str | None = None,
+        moderator: discord.Member | None = None,
+    ):
         self.member = member
         self.trigger_action = action
         self.trigger_content = content
         self.trigger_reason = reason
+        self.moderator = moderator
 
     def __repr__(self) -> str:
         name = self.__class__.__name__
-        return f"<{name} member={self.member} trigger_action={self.trigger_action!r} trigger_content={self.trigger_content!r} trigger_reason={self.trigger_reason!r}>"
+        return f"<{name} member={self.member} trigger_action={self.trigger_action!r} trigger_content={self.trigger_content!r} trigger_reason={self.trigger_reason!r} moderator={self.moderator!r}>"
 
     @classmethod
     def _from_message(
@@ -136,7 +145,7 @@ class Automod(commands.Cog):
                     _("Violating a Discord moderation rule"), self.bot, guild.preferred_locale
                 )
 
-                await self._execute_discord_automod(
+                await self._execute_action(
                     data=AutoModerationActionData(
                         action=action,
                         member=member,
@@ -263,7 +272,7 @@ class Automod(commands.Cog):
                     message=message, reason=reason, action_taken=action, bot=self.bot
                 )
 
-                await self._execute_discord_automod(data, message=message)
+                await self._execute_action(data, message=message)
                 break
 
     async def _handle_final_action(self, member: discord.Member, actions: list[AutoModerationAction]):
@@ -329,7 +338,7 @@ class Automod(commands.Cog):
 
                 await member.timeout(muted_until)
 
-    async def _execute_discord_automod(self, data: AutoModerationActionData, message: discord.Message = None) -> None:
+    async def _execute_action(self, data: AutoModerationActionData, message: discord.Message = None) -> None:
         guild = data.guild
         member = data.member
         automod_action = data.trigger_action

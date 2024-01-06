@@ -129,7 +129,7 @@ class ClearGroup(app_commands.Group):
         # do the actual clearing
         await self.do_removal(interaction, amount, reason=reason, predicate=lambda _: True)
 
-    @app_commands.command(name="contains", description=("Clears all messages that contain a specific string."))
+    @app_commands.command(name="contains", description=_("Clears all messages that contain a specific string."))
     @app_commands.describe(
         amount=_("The number of messages the bot should scan through."),
         string=_("If this string is contained in a message, the bot will delete it."),

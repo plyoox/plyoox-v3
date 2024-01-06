@@ -110,7 +110,7 @@ class ViewScoreButton(ui.Button):
         self.anilist_view = view
 
     async def callback(self, interaction: discord.Interaction) -> None:
-        bot: Plyoox = interaction.client  # type: ignore
+        bot: Plyoox = interaction.client
 
         await interaction.response.defer()
 

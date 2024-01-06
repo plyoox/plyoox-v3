@@ -79,11 +79,11 @@ async def log_simple_punish_command(
     kind: ModerationCommandKind,
     until: datetime.datetime | None = None,
 ) -> None:
-    cache: ModerationModel = await interaction.client.cache.get_moderation(interaction.guild.id)  # type: ignore
+    cache: ModerationModel = await interaction.client.cache.get_moderation(interaction.guild.id)
     if cache is None or not cache.active:
         return
 
-    translate = interaction.translate  # type: ignore
+    translate = interaction.translate
 
     webhook = await _get_log_channel(interaction.client, cache, interaction.guild)
     if webhook is not None:

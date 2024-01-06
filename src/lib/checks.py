@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 async def module_enabled_check(interaction: discord.Interaction, module: PlyooxModuleEnum) -> bool:
     """Raise an error if the module is not enabled."""
-    manager: CacheManager = interaction.client.cache  # type: ignore
+    manager: CacheManager = interaction.client.cache
     guild = interaction.guild
     cache = None
 

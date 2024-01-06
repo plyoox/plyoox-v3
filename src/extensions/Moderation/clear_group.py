@@ -85,7 +85,7 @@ class ClearGroup(app_commands.Group):
     ):
         """This function is a helper to clear messages in an interaction channel.
         predicate must be a function (lambda) to specify the messages the bot should remove"""
-        channel: discord.TextChannel = interaction.channel  # type: ignore
+        channel: discord.TextChannel = interaction.channel
 
         # delete the messages
         deleted_messages = await self._purge_helper(channel, limit=limit, check=predicate, reason=reason)

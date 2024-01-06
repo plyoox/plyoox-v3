@@ -146,7 +146,7 @@ class Leveling(commands.Cog):
             return
 
         guild = interaction.guild
-        bot: Plyoox = interaction.client  # type: ignore
+        bot: Plyoox = interaction.client
 
         user_data: LevelUserData = await self.bot.db.fetchrow(
             "WITH users AS (SELECT xp, user_id, row_number() OVER (ORDER BY xp DESC) AS rank FROM level_user WHERE guild_id = $1) SELECT xp, rank FROM users WHERE user_id = $2",

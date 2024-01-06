@@ -20,10 +20,11 @@ from .models import (
     LevelingModel,
     LoggingModel,
     ModerationModel,
+    Punishment,
 )
 
 
-type CacheType = Literal["wel", "log", "lvl", "mod", "automod"]
+type CacheType = Literal["wel", "log", "lvl", "mod", "automod", "punishment"]
 type Falsify = None | bool
 
 
@@ -36,6 +37,7 @@ class CacheManager:
         "_logging",
         "_automoderation",
         "_automoderation_queue",
+        "_punishment_cache",
     )
 
     def __init__(self, pool: asyncpg.Pool, cache_size: int = 128):
@@ -46,6 +48,7 @@ class CacheManager:
         self._moderation = LRU(cache_size)
         self._logging = LRU(cache_size)
         self._automoderation = LRU(cache_size * 10)
+        self._punishment_cache = LRU(cache_size)
         self._automoderation_queue: dict[int, asyncio.Event] = dict()
 
     @staticmethod
@@ -158,7 +161,9 @@ class CacheManager:
         result = await self._pool.fetchrow(
             "SELECT m.*, w.id as mwh_id, w.token as mwh_token, w.webhook_channel as mwh_webhook_channel, "
             "w.guild_id as mwh_guild_id FROM moderation_config m INNER JOIN public.maybe_webhook w "
-            "ON w.id = m.logging_channel WHERE m.id = $1", id)
+            "ON w.id = m.logging_channel WHERE m.id = $1",
+            id,
+        )
         if result is None:
             self._moderation[id] = None
             return None
@@ -256,6 +261,31 @@ class CacheManager:
 
         return model
 
+    async def get_punishments(self, id: int) -> dict[int, AutoModerationPunishment] | Falsify:
+        punishment_cache = self._punishment_cache.get(id, utils.MISSING)
+        if punishment_cache is not utils.MISSING:
+            return punishment_cache
+
+        rows = await self._pool.fetch(
+            "SELECT id, actions, enabled, name, reason FROM moderation_punishment WHERE guild_id = $1", id
+        )
+
+        punishments = dict()
+
+        for row in rows:
+            if not row["enabled"]:
+                continue
+
+            punishment = Punishment(
+                id=row["id"], actions=self.__to_moderation_actions(row["actions"]), name=row["name"], reason=row["reason"]
+            )
+
+            punishments[row["id"]] = punishment
+
+        self._punishment_cache[id] = punishments
+
+        return punishments
+
     async def get_moderation_rule(self, rule_id: int) -> ModerationRule | None | bool:
         """Returns the cache for the moderation rule."""
         rule_cache = self._automoderation.get(rule_id, utils.MISSING)
@@ -309,6 +339,8 @@ class CacheManager:
             return self._moderation
         elif cache == "automod":
             return self._automoderation
+        elif cache == "punishment":
+            return self._punishment_cache
 
     def remove_cache(self, id: int, store: CacheType) -> None:
         store = self._get_store(store)

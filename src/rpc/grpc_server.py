@@ -42,6 +42,11 @@ class UpdateCacheServicer(UpdateCacheServicer):
 
         return Empty()
 
+    def DeleteModerationPunishmentCache(self, request, context):
+        self.bot.cache.remove_cache(request.id, "punishment")
+
+        return Empty()
+
 
 async def start_server(bot: Plyoox, url: str) -> grpc.aio.Server:
     server = grpc.aio.server()

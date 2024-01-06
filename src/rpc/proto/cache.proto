@@ -8,6 +8,7 @@ service UpdateCache {
   rpc DeleteWelcomeCache(Id) returns (Empty) {}
   rpc DeleteLoggingCache(Id) returns (Empty) {}
   rpc DeleteLevelCache(Id) returns (Empty) {}
+  rpc DeleteModerationPunishmentCache(Id) returns (Empty) {}
 }
 
 message Id {

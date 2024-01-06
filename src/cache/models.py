@@ -107,3 +107,10 @@ class TimerModel(RecordClass):
     type: TimerEnum
     expires: datetime
     data: dict[str, Any] | None
+
+
+class Punishment(RecordClass):
+    id: int
+    name: str
+    reason: str | None
+    actions: list[AutoModerationAction]

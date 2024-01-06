@@ -15,30 +15,35 @@ class UpdateCacheStub(object):
             channel: A grpc.Channel.
         """
         self.DeleteModerationCache = channel.unary_unary(
-                '/UpdateCache.UpdateCache/DeleteModerationCache',
-                request_serializer=cache__pb2.Id.SerializeToString,
-                response_deserializer=cache__pb2.Empty.FromString,
-                )
+            '/UpdateCache.UpdateCache/DeleteModerationCache',
+            request_serializer=cache__pb2.Id.SerializeToString,
+            response_deserializer=cache__pb2.Empty.FromString,
+        )
         self.DeleteAutoModerationCache = channel.unary_unary(
-                '/UpdateCache.UpdateCache/DeleteAutoModerationCache',
-                request_serializer=cache__pb2.Id.SerializeToString,
-                response_deserializer=cache__pb2.Empty.FromString,
-                )
+            '/UpdateCache.UpdateCache/DeleteAutoModerationCache',
+            request_serializer=cache__pb2.Id.SerializeToString,
+            response_deserializer=cache__pb2.Empty.FromString,
+        )
         self.DeleteWelcomeCache = channel.unary_unary(
-                '/UpdateCache.UpdateCache/DeleteWelcomeCache',
-                request_serializer=cache__pb2.Id.SerializeToString,
-                response_deserializer=cache__pb2.Empty.FromString,
-                )
+            '/UpdateCache.UpdateCache/DeleteWelcomeCache',
+            request_serializer=cache__pb2.Id.SerializeToString,
+            response_deserializer=cache__pb2.Empty.FromString,
+        )
         self.DeleteLoggingCache = channel.unary_unary(
-                '/UpdateCache.UpdateCache/DeleteLoggingCache',
-                request_serializer=cache__pb2.Id.SerializeToString,
-                response_deserializer=cache__pb2.Empty.FromString,
-                )
+            '/UpdateCache.UpdateCache/DeleteLoggingCache',
+            request_serializer=cache__pb2.Id.SerializeToString,
+            response_deserializer=cache__pb2.Empty.FromString,
+        )
         self.DeleteLevelCache = channel.unary_unary(
-                '/UpdateCache.UpdateCache/DeleteLevelCache',
-                request_serializer=cache__pb2.Id.SerializeToString,
-                response_deserializer=cache__pb2.Empty.FromString,
-                )
+            '/UpdateCache.UpdateCache/DeleteLevelCache',
+            request_serializer=cache__pb2.Id.SerializeToString,
+            response_deserializer=cache__pb2.Empty.FromString,
+        )
+        self.DeleteModerationPunishmentCache = channel.unary_unary(
+            '/UpdateCache.UpdateCache/DeleteModerationPunishmentCache',
+            request_serializer=cache__pb2.Id.SerializeToString,
+            response_deserializer=cache__pb2.Empty.FromString,
+        )
 
 
 class UpdateCacheServicer(object):
@@ -74,125 +79,224 @@ class UpdateCacheServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DeleteModerationPunishmentCache(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_UpdateCacheServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'DeleteModerationCache': grpc.unary_unary_rpc_method_handler(
-                    servicer.DeleteModerationCache,
-                    request_deserializer=cache__pb2.Id.FromString,
-                    response_serializer=cache__pb2.Empty.SerializeToString,
-            ),
-            'DeleteAutoModerationCache': grpc.unary_unary_rpc_method_handler(
-                    servicer.DeleteAutoModerationCache,
-                    request_deserializer=cache__pb2.Id.FromString,
-                    response_serializer=cache__pb2.Empty.SerializeToString,
-            ),
-            'DeleteWelcomeCache': grpc.unary_unary_rpc_method_handler(
-                    servicer.DeleteWelcomeCache,
-                    request_deserializer=cache__pb2.Id.FromString,
-                    response_serializer=cache__pb2.Empty.SerializeToString,
-            ),
-            'DeleteLoggingCache': grpc.unary_unary_rpc_method_handler(
-                    servicer.DeleteLoggingCache,
-                    request_deserializer=cache__pb2.Id.FromString,
-                    response_serializer=cache__pb2.Empty.SerializeToString,
-            ),
-            'DeleteLevelCache': grpc.unary_unary_rpc_method_handler(
-                    servicer.DeleteLevelCache,
-                    request_deserializer=cache__pb2.Id.FromString,
-                    response_serializer=cache__pb2.Empty.SerializeToString,
-            ),
+        'DeleteModerationCache': grpc.unary_unary_rpc_method_handler(
+            servicer.DeleteModerationCache,
+            request_deserializer=cache__pb2.Id.FromString,
+            response_serializer=cache__pb2.Empty.SerializeToString,
+        ),
+        'DeleteAutoModerationCache': grpc.unary_unary_rpc_method_handler(
+            servicer.DeleteAutoModerationCache,
+            request_deserializer=cache__pb2.Id.FromString,
+            response_serializer=cache__pb2.Empty.SerializeToString,
+        ),
+        'DeleteWelcomeCache': grpc.unary_unary_rpc_method_handler(
+            servicer.DeleteWelcomeCache,
+            request_deserializer=cache__pb2.Id.FromString,
+            response_serializer=cache__pb2.Empty.SerializeToString,
+        ),
+        'DeleteLoggingCache': grpc.unary_unary_rpc_method_handler(
+            servicer.DeleteLoggingCache,
+            request_deserializer=cache__pb2.Id.FromString,
+            response_serializer=cache__pb2.Empty.SerializeToString,
+        ),
+        'DeleteLevelCache': grpc.unary_unary_rpc_method_handler(
+            servicer.DeleteLevelCache,
+            request_deserializer=cache__pb2.Id.FromString,
+            response_serializer=cache__pb2.Empty.SerializeToString,
+        ),
+        'DeleteModerationPunishmentCache': grpc.unary_unary_rpc_method_handler(
+            servicer.DeleteModerationPunishmentCache,
+            request_deserializer=cache__pb2.Id.FromString,
+            response_serializer=cache__pb2.Empty.SerializeToString,
+        ),
     }
-    generic_handler = grpc.method_handlers_generic_handler(
-            'UpdateCache.UpdateCache', rpc_method_handlers)
+    generic_handler = grpc.method_handlers_generic_handler('UpdateCache.UpdateCache', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
- # This class is part of an EXPERIMENTAL API.
+# This class is part of an EXPERIMENTAL API.
 class UpdateCache(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def DeleteModerationCache(request,
+    def DeleteModerationCache(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/UpdateCache.UpdateCache/DeleteModerationCache',
+            '/UpdateCache.UpdateCache/DeleteModerationCache',
             cache__pb2.Id.SerializeToString,
             cache__pb2.Empty.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def DeleteAutoModerationCache(request,
+    def DeleteAutoModerationCache(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/UpdateCache.UpdateCache/DeleteAutoModerationCache',
+            '/UpdateCache.UpdateCache/DeleteAutoModerationCache',
             cache__pb2.Id.SerializeToString,
             cache__pb2.Empty.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def DeleteWelcomeCache(request,
+    def DeleteWelcomeCache(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/UpdateCache.UpdateCache/DeleteWelcomeCache',
+            '/UpdateCache.UpdateCache/DeleteWelcomeCache',
             cache__pb2.Id.SerializeToString,
             cache__pb2.Empty.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def DeleteLoggingCache(request,
+    def DeleteLoggingCache(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/UpdateCache.UpdateCache/DeleteLoggingCache',
+            '/UpdateCache.UpdateCache/DeleteLoggingCache',
             cache__pb2.Id.SerializeToString,
             cache__pb2.Empty.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
 
     @staticmethod
-    def DeleteLevelCache(request,
+    def DeleteLevelCache(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
             target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/UpdateCache.UpdateCache/DeleteLevelCache',
+            '/UpdateCache.UpdateCache/DeleteLevelCache',
             cache__pb2.Id.SerializeToString,
             cache__pb2.Empty.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
+
+    @staticmethod
+    def DeleteModerationPunishmentCache(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/UpdateCache.UpdateCache/DeleteModerationPunishmentCache',
+            cache__pb2.Id.SerializeToString,
+            cache__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )

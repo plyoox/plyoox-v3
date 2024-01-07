@@ -180,3 +180,39 @@ class ClearGroup(app_commands.Group):
     ):
         await interaction.response.defer(ephemeral=True)
         await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: bool(len(m.attachments)))
+
+    @app_commands.command(name="bots", description=_("Deletes all messages that are sent by bots."))
+    @app_commands.describe(
+        amount=_("The number of messages the bot should scan through."),
+        reason=_("Why the messages should be deleted."),
+    )
+    async def clear_bots(
+        self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]
+    ):
+        await interaction.response.defer(ephemeral=True)
+        await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: m.author.bot)
+
+    @app_commands.command(name="until", description=_("Deletes all messages until a specific message."))
+    @app_commands.describe(
+        amount=_("The number of messages the bot should scan through."),
+        message=_("The message until which the bot should delete."),
+        reason=_("Why the messages should be deleted."),
+    )
+    async def clear_until(
+        self,
+        interaction: discord.Interaction,
+        amount: app_commands.Range[int, 1, 500],
+        message: str,
+        reason: Optional[str],
+    ):
+        try:
+            message_id = int(message)
+            if not discord.Object(id=message_id).created_at:
+                raise ValueError
+        except ValueError:
+            await interaction.response.send_translated(_("The provided message id is invalid."), ephemeral=True)
+            return
+
+        await interaction.response.defer(ephemeral=True)
+
+        await self.do_removal(interaction, amount, reason=reason, predicate=lambda m: m.id > message_id)

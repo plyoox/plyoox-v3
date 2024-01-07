@@ -395,13 +395,19 @@ class LoggingEvents(commands.Cog):
             return
 
         cache = await self._get_setting(guild.id, LoggingKind.message_delete)
-        if cache is None or not cache.message_delete:
+        if cache is None:
             return
 
         # do not log messages deleted from the logging channel
         # this prevents a logging loop
-        if cache.webhook_channel == payload.channel_id:
-            return
+        webhook_channel = cache.channel
+
+        if webhook_channel.token is None:
+            if webhook_channel.id == payload.channel_id:
+                return
+        else:
+            if webhook_channel.webhook_channel == payload.channel_id:
+                return
 
         embed = extensions.Embed(
             title=translate(_("Bulk message delete")),

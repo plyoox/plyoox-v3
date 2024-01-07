@@ -108,9 +108,7 @@ class ClearGroup(app_commands.Group):
 
         # Send the information to the user. The response has been deferred, so this uses followup
         await interaction.followup.send(
-            interaction.translate(
-                _("{message_count} Messages have been deleted."), data={"message_count": deleted_messages}
-            ),
+            interaction.translate(_("{message_count} Messages have been deleted."), data={"message_count": deleted_count}),
             embed=embed,
         )
 

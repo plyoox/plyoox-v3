@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-06 23:15+0100\n"
+"POT-Creation-Date: 2024-01-07 21:33+0100\n"
 "PO-Revision-Date: 2024-01-03 12:36+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -278,13 +278,13 @@ msgid "Members"
 msgstr "Mitglieder"
 
 #: src/extensions/Infos/guild_group.py:46 src/extensions/Infos/user_group.py:95
-#: src/extensions/Logging.py:138 src/extensions/Logging.py:166
+#: src/extensions/Logging.py:136 src/extensions/Logging.py:164
 msgid "Roles"
 msgstr "Rollen"
 
 #: src/extensions/Infos/guild_group.py:47 src/extensions/Infos/user_group.py:96
-#: src/extensions/Logging.py:138 src/extensions/Logging.py:166
-#: src/extensions/Logging.py:210 src/extensions/Logging.py:215
+#: src/extensions/Logging.py:136 src/extensions/Logging.py:164
+#: src/extensions/Logging.py:208 src/extensions/Logging.py:213
 msgid "No roles"
 msgstr "Keine Rollen"
 
@@ -394,7 +394,7 @@ msgid "Days since joined"
 msgstr "Tage seit dem Beitritt"
 
 #: src/extensions/Infos/user_group.py:38 src/extensions/Infos/user_group.py:82
-#: src/extensions/Logging.py:140 src/extensions/Logging.py:163
+#: src/extensions/Logging.py:138 src/extensions/Logging.py:161
 msgid "Joined at"
 msgstr "Beigetreten am"
 
@@ -606,104 +606,104 @@ msgstr ""
 "Setzt das Level aller User zurück. Diese Aktion kann nicht rückgängig "
 "gemacht werden."
 
-#: src/extensions/Logging.py:104
+#: src/extensions/Logging.py:102
 msgid "The user {member.name} joined the guild."
 msgstr "Der Benutzer {member.name} ist dem Server beigetreten."
 
-#: src/extensions/Logging.py:107
+#: src/extensions/Logging.py:105
 msgid "User joined"
 msgstr "Benutzer beigetreten"
 
-#: src/extensions/Logging.py:109 src/extensions/Logging.py:135
-#: src/extensions/Logging.py:158 src/extensions/Logging.py:185
+#: src/extensions/Logging.py:107 src/extensions/Logging.py:133
+#: src/extensions/Logging.py:156 src/extensions/Logging.py:183
 msgid "Account created at"
 msgstr "Account erstellt am"
 
-#: src/extensions/Logging.py:112 src/extensions/Logging.py:141
-#: src/extensions/Logging.py:159 src/extensions/Logging.py:184
-#: src/extensions/Logging.py:206 src/extensions/Logging.py:229
-#: src/extensions/Logging.py:306 src/extensions/Logging.py:363
+#: src/extensions/Logging.py:110 src/extensions/Logging.py:139
+#: src/extensions/Logging.py:157 src/extensions/Logging.py:182
+#: src/extensions/Logging.py:204 src/extensions/Logging.py:227
+#: src/extensions/Logging.py:303 src/extensions/Logging.py:357
 msgid "User id"
 msgstr "User ID"
 
-#: src/extensions/Logging.py:131
+#: src/extensions/Logging.py:129
 msgid "The user {member.name} left the guild."
 msgstr "Der Benutzer {member.name} hat den Server verlassen."
 
-#: src/extensions/Logging.py:134
+#: src/extensions/Logging.py:132
 msgid "Member left"
 msgstr "Mitglied verlassen"
 
-#: src/extensions/Logging.py:162 src/extensions/Logging.py:169
+#: src/extensions/Logging.py:160 src/extensions/Logging.py:167
 msgid "User banned"
 msgstr "Benutzer gebannt"
 
-#: src/extensions/Logging.py:183
+#: src/extensions/Logging.py:181
 msgid "Member unbanned"
 msgstr "Mitglied entbannt"
 
-#: src/extensions/Logging.py:205
+#: src/extensions/Logging.py:203
 msgid "Member roles changed"
 msgstr "Mitgliedsrollen geändert"
 
-#: src/extensions/Logging.py:210
+#: src/extensions/Logging.py:208
 msgid "New roles"
 msgstr "Neue Rollen"
 
-#: src/extensions/Logging.py:215
+#: src/extensions/Logging.py:213
 msgid "Old roles"
 msgstr "Alte Rollen"
 
-#: src/extensions/Logging.py:228
+#: src/extensions/Logging.py:226
 msgid "Member renamed"
 msgstr "Mitglied umbenannt"
 
-#: src/extensions/Logging.py:232
+#: src/extensions/Logging.py:230
 msgid "Previous name"
 msgstr "Alter Name"
 
-#: src/extensions/Logging.py:237
+#: src/extensions/Logging.py:235
 msgid "New name"
 msgstr "Neuer Name"
 
-#: src/extensions/Logging.py:282
+#: src/extensions/Logging.py:280
 msgid "Old message content"
 msgstr "Alter Nachrichteninhalt"
 
-#: src/extensions/Logging.py:282 src/extensions/Logging.py:309
-#: src/extensions/Logging.py:369
+#: src/extensions/Logging.py:280 src/extensions/Logging.py:305
+#: src/extensions/Logging.py:363
 msgid "No content"
 msgstr "Kein Inhalt"
 
-#: src/extensions/Logging.py:302
+#: src/extensions/Logging.py:299
 msgid "**{member}** edited a message in {channel}."
 msgstr "**{member}** hat eine Nachricht in {channel} bearbeitet."
 
-#: src/extensions/Logging.py:304
+#: src/extensions/Logging.py:302
 msgid "Message edited"
 msgstr "Nachricht bearbeitet"
 
-#: src/extensions/Logging.py:313
+#: src/extensions/Logging.py:309
 msgid "New message content"
 msgstr "Neuer Nachrichteninhalt"
 
-#: src/extensions/Logging.py:353
+#: src/extensions/Logging.py:347
 msgid "Message deleted"
 msgstr "Nachricht gelöscht"
 
-#: src/extensions/Logging.py:360
+#: src/extensions/Logging.py:354
 msgid "A message from **{member}** was deleted from {channel.mention}."
 msgstr "Eine Nachricht von **{member}** wurde aus {channel.mention} gelöscht."
 
-#: src/extensions/Logging.py:368
+#: src/extensions/Logging.py:362
 msgid "Message content"
 msgstr "Nachrichteninhalt"
 
-#: src/extensions/Logging.py:377
+#: src/extensions/Logging.py:371
 msgid "Attachments"
 msgstr "Anhänge"
 
-#: src/extensions/Logging.py:381
+#: src/extensions/Logging.py:375
 msgid "A message from {channel} has been deleted."
 msgstr "Eine Nachricht aus {channel} wurde gelöscht."
 
@@ -711,7 +711,7 @@ msgstr "Eine Nachricht aus {channel} wurde gelöscht."
 msgid "Bulk message delete"
 msgstr "Massenlöschung von Nachrichten"
 
-#: src/extensions/Logging.py:410
+#: src/extensions/Logging.py:409
 msgid "{count} messages have been deleted from {channel}."
 msgstr "Es wurden {count} Nachrichten aus {channel} gelöscht."
 
@@ -1096,56 +1096,76 @@ msgstr "Nachrichten gelöscht"
 msgid "Affected users"
 msgstr "Betroffene Benutzer"
 
-#: src/extensions/Moderation/clear_group.py:112
+#: src/extensions/Moderation/clear_group.py:111
 msgid "{message_count} Messages have been deleted."
 msgstr "{message_count} Nachrichten wurden gelöscht."
 
-#: src/extensions/Moderation/clear_group.py:117
+#: src/extensions/Moderation/clear_group.py:115
 msgid "Clear all messages in a channel."
 msgstr "Löscht alle Nachrichten in einem Kanal."
 
-#: src/extensions/Moderation/clear_group.py:119
+#: src/extensions/Moderation/clear_group.py:117
 msgid "The amount of messages you want to purge."
 msgstr "Die Anzahl der Nachrichten, die gelöscht werden sollen."
 
-#: src/extensions/Moderation/clear_group.py:120
-#: src/extensions/Moderation/clear_group.py:136
-#: src/extensions/Moderation/clear_group.py:152
-#: src/extensions/Moderation/clear_group.py:167
-#: src/extensions/Moderation/clear_group.py:178
+#: src/extensions/Moderation/clear_group.py:118
+#: src/extensions/Moderation/clear_group.py:134
+#: src/extensions/Moderation/clear_group.py:150
+#: src/extensions/Moderation/clear_group.py:165
+#: src/extensions/Moderation/clear_group.py:176
+#: src/extensions/Moderation/clear_group.py:187
+#: src/extensions/Moderation/clear_group.py:199
 msgid "Why the messages should be deleted."
 msgstr "Warum die Nachrichten gelöscht werden sollen."
 
-#: src/extensions/Moderation/clear_group.py:132
+#: src/extensions/Moderation/clear_group.py:130
 msgid "Clears all messages that contain a specific string."
 msgstr "Löscht alle Nachrichten die eine bestimmte Zeichenkette enthalten."
 
-#: src/extensions/Moderation/clear_group.py:134
-#: src/extensions/Moderation/clear_group.py:150
-#: src/extensions/Moderation/clear_group.py:166
-#: src/extensions/Moderation/clear_group.py:177
+#: src/extensions/Moderation/clear_group.py:132
+#: src/extensions/Moderation/clear_group.py:148
+#: src/extensions/Moderation/clear_group.py:164
+#: src/extensions/Moderation/clear_group.py:175
+#: src/extensions/Moderation/clear_group.py:186
+#: src/extensions/Moderation/clear_group.py:197
 msgid "The number of messages the bot should scan through."
 msgstr "Die Anzahl der Nachrichten, die der Bot durchsuchen soll."
 
-#: src/extensions/Moderation/clear_group.py:135
+#: src/extensions/Moderation/clear_group.py:133
 msgid "If this string is contained in a message, the bot will delete it."
 msgstr "Löscht alle Nachrichten, die diese Zeichenfolge enthalten."
 
-#: src/extensions/Moderation/clear_group.py:148
+#: src/extensions/Moderation/clear_group.py:146
 msgid "Clears all messages from a specific user."
 msgstr "Löscht alle Nachrichten eines bestimmten Benutzers."
 
-#: src/extensions/Moderation/clear_group.py:151
+#: src/extensions/Moderation/clear_group.py:149
 msgid "The user from whom the messages are to be deleted"
 msgstr "Der Benutzer, von dem die Nachrichten gelöscht werden sollen"
 
-#: src/extensions/Moderation/clear_group.py:164
+#: src/extensions/Moderation/clear_group.py:162
 msgid "Deletes all messages that contain a link."
 msgstr "Löscht alle Nachrichten, die einen Link enthalten."
 
-#: src/extensions/Moderation/clear_group.py:175
+#: src/extensions/Moderation/clear_group.py:173
 msgid "Deletes all messages that contains files."
 msgstr "Löscht alle Nachrichten, die Dateien enthalten."
+
+#: src/extensions/Moderation/clear_group.py:184
+msgid "Deletes all messages that are sent by bots."
+msgstr "Löscht alle Nachrichten, die von einem Bot gesendet wurden."
+
+#: src/extensions/Moderation/clear_group.py:195
+msgid "Deletes all messages until a specific message."
+msgstr "Löscht alle Nachrichten bis zu einer bestimmten Nachricht."
+
+#: src/extensions/Moderation/clear_group.py:198
+msgid "The message until which the bot should delete."
+msgstr "Die Nachricht, bis zu der gelöscht werden soll."
+
+#: src/extensions/Moderation/clear_group.py:213
+msgid "The provided message id is invalid."
+msgstr "Die angegebene Nachrichten-ID ist ungültig."
 
 #: src/extensions/Moderation/moderation_cog.py:38
 msgid "Invite info"

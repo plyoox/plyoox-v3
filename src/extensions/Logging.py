@@ -78,9 +78,7 @@ class LoggingEvents(commands.Cog):
             except discord.NotFound:
                 _log.info(f"Deleted logging webhook {repr(cache.channel)} due to missing webhook")
 
-                await self.bot.db.execute(
-                    "DELETE FROM maybe_webhook WHERE id = $1", cache.channel.id
-                )
+                await self.bot.db.execute("DELETE FROM maybe_webhook WHERE id = $1", cache.channel.id)
 
                 self.bot.cache.edit_cache(guild.id, "log", webhook_token=None, webhook_id=None)
 
@@ -298,13 +296,11 @@ class LoggingEvents(commands.Cog):
             else:
                 edit_member = f"{user_name}#{user_discriminator}"
 
-        log_embed.description = translate(
-            _("**{member}** edited a message in {channel}.")
-        ).format(member=edit_member, channel=edit_channel)
-        log_embed.set_author(name=translate(_("Message edited")), icon_url=avatar)
-        log_embed.set_footer(
-            text=f"{translate(_('User id'))}: {edit_member_id}"
+        log_embed.description = translate(_("**{member}** edited a message in {channel}.")).format(
+            member=edit_member, channel=edit_channel
         )
+        log_embed.set_author(name=translate(_("Message edited")), icon_url=avatar)
+        log_embed.set_footer(text=f"{translate(_('User id'))}: {edit_member_id}")
 
         content = payload.data.get("content") or translate(_("No content"))
 
@@ -334,8 +330,6 @@ class LoggingEvents(commands.Cog):
         # do not log messages deleted from the logging channel
         # this prevents a logging loop
         webhook_channel = cache.channel
-        if webhook_channel is None:
-            return
 
         if webhook_channel.token is None:
             if webhook_channel.id == payload.channel_id:
@@ -412,9 +406,7 @@ class LoggingEvents(commands.Cog):
         embed = extensions.Embed(
             title=translate(_("Bulk message delete")),
             color=ERROR_COLOR,
-            description=translate(
-                _("{count} messages have been deleted from {channel}.")
-            ).format(
+            description=translate(_("{count} messages have been deleted from {channel}.")).format(
                 count=len(payload.message_ids),
                 channel=f"<#{payload.channel_id}>",
             ),

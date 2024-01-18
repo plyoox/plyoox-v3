@@ -36,8 +36,6 @@ plugins = [
     "extensions.Anilist",
     "extensions.DataHandler",
     "extensions.Notification",
-    # "extensions.Statistics",
-    # "extensions.EmbedCreator",
 ]
 
 
@@ -76,11 +74,6 @@ class Plyoox(commands.AutoShardedBot):
             plugins.remove("extensions.Leveling")
             plugins.remove("extensions.Anilist")
             logger.warning("IMAGER_URL is not set. Level and Anilist extension will not be loaded.")
-
-        self.notificator_url = os.getenv("NOTIFICATOR_URL")
-        if self.notificator_url is None:
-            plugins.remove("extensions.Notification")
-            logger.warning("NOTIFICATOR_URL is not set. Notification extension will not be loaded.")
 
     async def setup_hook(self) -> None:
         await self.tree.set_translator(translation.Translator())

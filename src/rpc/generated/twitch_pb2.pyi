@@ -1,3 +1,4 @@
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Optional as _Optional
@@ -5,20 +6,26 @@ from typing import ClassVar as _ClassVar, Optional as _Optional
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class TwitchLiveNotification(_message.Message):
-    __slots__ = ("guild_id", "stream_id", "name", "title", "thumbnail_url", "game")
+    __slots__ = ("guild_id", "stream_id", "user_id", "viewer_count", "name", "title", "thumbnail_url", "game", "started_at")
     GUILD_ID_FIELD_NUMBER: _ClassVar[int]
     STREAM_ID_FIELD_NUMBER: _ClassVar[int]
+    USER_ID_FIELD_NUMBER: _ClassVar[int]
+    VIEWER_COUNT_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     TITLE_FIELD_NUMBER: _ClassVar[int]
     THUMBNAIL_URL_FIELD_NUMBER: _ClassVar[int]
     GAME_FIELD_NUMBER: _ClassVar[int]
+    STARTED_AT_FIELD_NUMBER: _ClassVar[int]
     guild_id: int
     stream_id: int
+    user_id: int
+    viewer_count: int
     name: str
     title: str
     thumbnail_url: str
     game: str
-    def __init__(self, guild_id: _Optional[int] = ..., stream_id: _Optional[int] = ..., name: _Optional[str] = ..., title: _Optional[str] = ..., thumbnail_url: _Optional[str] = ..., game: _Optional[str] = ...) -> None: ...
+    started_at: int
+    def __init__(self, guild_id: _Optional[int] = ..., stream_id: _Optional[int] = ..., user_id: _Optional[int] = ..., viewer_count: _Optional[int] = ..., name: _Optional[str] = ..., title: _Optional[str] = ..., thumbnail_url: _Optional[str] = ..., game: _Optional[str] = ..., started_at: _Optional[int] = ...) -> None: ...
 
 class TwitchOfflineNotification(_message.Message):
     __slots__ = ("stream_id",)

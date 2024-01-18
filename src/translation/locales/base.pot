@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-01-07 21:33+0100\n"
+"POT-Creation-Date: 2024-01-18 11:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1500,6 +1500,22 @@ msgstr ""
 
 #: src/extensions/Moderation/moderation_cog.py:666
 msgid "month"
+msgstr ""
+
+#: src/extensions/Notification.py:36
+msgid "Game"
+msgstr ""
+
+#: src/extensions/Notification.py:38
+msgid "Viewer count"
+msgstr ""
+
+#: src/extensions/Notification.py:39
+msgid "Started at"
+msgstr ""
+
+#: src/extensions/Notification.py:80
+msgid "Go to Twitch"
 msgstr ""
 
 #: src/extensions/Timers.py:111

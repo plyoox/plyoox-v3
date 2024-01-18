@@ -15,10 +15,13 @@ service TwitchNotification {
 message TwitchLiveNotification {
     int64 guild_id = 1;
     int64 stream_id = 2;
-    string name = 3;
-    string title = 4;
-    string thumbnail_url = 5;
-    string game = 6;
+    int32 user_id = 3;
+    int32 viewer_count = 4;
+    string name = 5;
+    string title = 6;
+    string thumbnail_url = 7;
+    string game = 8;
+    uint64 started_at = 9;
 }
 
 message TwitchOfflineNotification {

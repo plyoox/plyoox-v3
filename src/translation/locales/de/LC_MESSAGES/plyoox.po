@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-07 21:33+0100\n"
+"POT-Creation-Date: 2024-01-18 11:14+0100\n"
 "PO-Revision-Date: 2024-01-03 12:36+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1590,6 +1590,22 @@ msgstr "Tage"
 #: src/extensions/Moderation/moderation_cog.py:666
 msgid "month"
 msgstr "Monat"
+
+#: src/extensions/Notification.py:36
+msgid "Game"
+msgstr "Spiel"
+
+#: src/extensions/Notification.py:38
+msgid "Viewer count"
+msgstr "Zuschaueranzahl"
+
+#: src/extensions/Notification.py:39
+msgid "Started at"
+msgstr "Gestartet am"
+
+#: src/extensions/Notification.py:80
+msgid "Go to Twitch"
+msgstr "Zu Twitch"
 
 #: src/extensions/Timers.py:111
 msgid "Temporary ban expired"

@@ -74,13 +74,13 @@ class Timer(commands.Cog):
             self._task = self.bot.loop.create_task(self.dispatch_timers())
 
     async def create_timer(
-        self, target_id: int, guild_id: int, type: TimerEnum, expires: datetime.datetime, data: dict[str, Any] = None
+        self, target_id: int, guild_id: int, kind: TimerEnum, expires: datetime.datetime, data: dict[str, Any] = None
     ) -> None:
         timer_id = await self.bot.db.fetchval(
             "INSERT INTO timers (target_id, guild_id, type, expires, data) VALUES ($1, $2, $3, $4, $5) RETURNING id",
             target_id,
             guild_id,
-            type,
+            kind,
             expires,
             data,
         )
@@ -90,7 +90,7 @@ class Timer(commands.Cog):
             expires=expires,
             guild_id=guild_id,
             target_id=target_id,
-            type=type,
+            type=kind,
             data=data,
         )
 

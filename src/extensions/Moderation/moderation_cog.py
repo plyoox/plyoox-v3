@@ -162,7 +162,7 @@ class Moderation(commands.Cog):
         await _logging_helper.log_simple_punish_command(
             interaction, target=member, until=banned_until, reason=reason, kind=ModerationCommandKind.tempban
         )
-        await self.bot.timer.create_timer(member.id, guild.id, type=TimerEnum.tempban, expires=banned_until)
+        await self.bot.timer.create_timer(member.id, guild.id, kind=TimerEnum.tempban, expires=banned_until)
         await guild.ban(member, reason=reason, delete_message_days=1)
 
         await interaction.followup.send(

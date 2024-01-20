@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+import datetime
 
 import discord
 
@@ -78,3 +79,20 @@ async def permission_check(
 
 def embed_timestamp_format(timestamp: datetime) -> str:
     return f"> {discord.utils.format_dt(timestamp)}\n> {discord.utils.format_dt(timestamp, 'R')}"
+
+
+def format_timedelta(delta: datetime.timedelta) -> str:
+    parts = []
+    if delta.days > 0:
+        parts.append("{}d".format(delta.days))
+
+    hours, remainder = divmod(delta.seconds, 3600)
+    if hours > 0:
+        parts.append("{}h".format(hours))
+
+    minutes, seconds = divmod(remainder, 60)
+    if minutes > 0:
+        parts.append("{}m".format(minutes))
+    if seconds > 0:
+        parts.append("{}s".format(seconds))
+    return " ".join(parts)

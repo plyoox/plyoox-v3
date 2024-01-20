@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0ctwitch.proto\x12\x06Twitch\"\xba\x01\n\x16TwitchLiveNotification\x12\x10\n\x08guild_id\x18\x01 \x01(\x03\x12\x11\n\tstream_id\x18\x02 \x01(\x03\x12\x0f\n\x07user_id\x18\x03 \x01(\x05\x12\x14\n\x0cviewer_count\x18\x04 \x01(\x05\x12\x0c\n\x04name\x18\x05 \x01(\t\x12\r\n\x05title\x18\x06 \x01(\t\x12\x15\n\rthumbnail_url\x18\x07 \x01(\t\x12\x0c\n\x04game\x18\x08 \x01(\t\x12\x12\n\nstarted_at\x18\t \x01(\x04\".\n\x19TwitchOfflineNotification\x12\x11\n\tstream_id\x18\x01 \x01(\x03\"7\n\x15\x41\x64\x64TwitchNotification\x12\x10\n\x08guild_id\x18\x01 \x01(\x03\x12\x0c\n\x04name\x18\x02 \x01(\t\"=\n\x18RemoveTwitchNotification\x12\x0f\n\x07user_id\x18\x01 \x01(\x05\x12\x10\n\x08guild_id\x18\x02 \x01(\x03\"/\n\tOAuthCode\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x14\n\x0credirect_uri\x18\x04 \x01(\t\"X\n\nTwitchUser\x12\n\n\x02id\x18\x01 \x01(\x05\x12\r\n\x05login\x18\x02 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x03 \x01(\t\x12\x19\n\x11profile_image_url\x18\x04 \x01(\t\"\x1f\n\x10OAuthUrlResponse\x12\x0b\n\x03url\x18\x01 \x01(\t\"5\n\x0e\x43reateOAuthUrl\x12\r\n\x05state\x18\x01 \x01(\t\x12\x14\n\x0credirect_uri\x18\x02 \x01(\t\"\x07\n\x05\x45mpty2\xb8\x03\n\x12TwitchNotification\x12\x43\n\x10LiveNotification\x12\x1e.Twitch.TwitchLiveNotification\x1a\r.Twitch.Empty\"\x00\x12I\n\x13OfflineNotification\x12!.Twitch.TwitchOfflineNotification\x1a\r.Twitch.Empty\"\x00\x12=\n\x12OAuthAuthorization\x12\x11.Twitch.OAuthCode\x1a\x12.Twitch.TwitchUser\"\x00\x12\x42\n\x0cOAuthBaseUrl\x12\x16.Twitch.CreateOAuthUrl\x1a\x18.Twitch.OAuthUrlResponse\"\x00\x12\x46\n\x0f\x41\x64\x64Notification\x12\x1d.Twitch.AddTwitchNotification\x1a\x12.Twitch.TwitchUser\"\x00\x12G\n\x12RemoveNotification\x12 .Twitch.RemoveTwitchNotification\x1a\r.Twitch.Empty\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0ctwitch.proto\x12\x06Twitch\"\xba\x01\n\x16TwitchLiveNotification\x12\x10\n\x08guild_id\x18\x01 \x01(\x03\x12\x11\n\tstream_id\x18\x02 \x01(\x03\x12\x0f\n\x07user_id\x18\x03 \x01(\x05\x12\x14\n\x0cviewer_count\x18\x04 \x01(\x05\x12\x0c\n\x04name\x18\x05 \x01(\t\x12\r\n\x05title\x18\x06 \x01(\t\x12\x15\n\rthumbnail_url\x18\x07 \x01(\t\x12\x0c\n\x04game\x18\x08 \x01(\t\x12\x12\n\nstarted_at\x18\t \x01(\x04\"Q\n\x19TwitchOfflineNotification\x12\x11\n\tstream_id\x18\x01 \x01(\x03\x12\x10\n\x08guild_id\x18\x02 \x01(\x03\x12\x0f\n\x07user_id\x18\x03 \x01(\x05\"7\n\x15\x41\x64\x64TwitchNotification\x12\x10\n\x08guild_id\x18\x01 \x01(\x03\x12\x0c\n\x04name\x18\x02 \x01(\t\"=\n\x18RemoveTwitchNotification\x12\x0f\n\x07user_id\x18\x01 \x01(\x05\x12\x10\n\x08guild_id\x18\x02 \x01(\x03\"c\n\x16\x45\x64itTwitchNotification\x12\x0f\n\x07user_id\x18\x01 \x01(\x05\x12\x10\n\x08guild_id\x18\x02 \x01(\x03\x12\x17\n\nchannel_id\x18\x03 \x01(\x03H\x00\x88\x01\x01\x42\r\n\x0b_channel_id\"/\n\tOAuthCode\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x14\n\x0credirect_uri\x18\x04 \x01(\t\"X\n\nTwitchUser\x12\n\n\x02id\x18\x01 \x01(\x05\x12\r\n\x05login\x18\x02 \x01(\t\x12\x14\n\x0c\x64isplay_name\x18\x03 \x01(\t\x12\x19\n\x11profile_image_url\x18\x04 \x01(\t\"\x1f\n\x10OAuthUrlResponse\x12\x0b\n\x03url\x18\x01 \x01(\t\"5\n\x0e\x43reateOAuthUrl\x12\r\n\x05state\x18\x01 \x01(\t\x12\x14\n\x0credirect_uri\x18\x02 \x01(\t\"2\n\rRemoveAccount\x12\x10\n\x08guild_id\x18\x01 \x01(\x03\x12\x0f\n\x07user_id\x18\x02 \x01(\x05\"\x07\n\x05\x45mpty2\xbb\x04\n\x12TwitchNotification\x12\x43\n\x10LiveNotification\x12\x1e.Twitch.TwitchLiveNotification\x1a\r.Twitch.Empty\"\x00\x12I\n\x13OfflineNotification\x12!.Twitch.TwitchOfflineNotification\x1a\r.Twitch.Empty\"\x00\x12=\n\x12OAuthAuthorization\x12\x11.Twitch.OAuthCode\x1a\x12.Twitch.TwitchUser\"\x00\x12\x42\n\x0cOAuthBaseUrl\x12\x16.Twitch.CreateOAuthUrl\x1a\x18.Twitch.OAuthUrlResponse\"\x00\x12<\n\x12RemoveGuildAccount\x12\x15.Twitch.RemoveAccount\x1a\r.Twitch.Empty\"\x00\x12\x43\n\x10\x45\x64itNotification\x12\x1e.Twitch.EditTwitchNotification\x1a\r.Twitch.Empty\"\x00\x12\x46\n\x0f\x41\x64\x64Notification\x12\x1d.Twitch.AddTwitchNotification\x1a\x12.Twitch.TwitchUser\"\x00\x12G\n\x12RemoveNotification\x12 .Twitch.RemoveTwitchNotification\x1a\r.Twitch.Empty\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -24,21 +24,25 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_TWITCHLIVENOTIFICATION']._serialized_start=25
   _globals['_TWITCHLIVENOTIFICATION']._serialized_end=211
   _globals['_TWITCHOFFLINENOTIFICATION']._serialized_start=213
-  _globals['_TWITCHOFFLINENOTIFICATION']._serialized_end=259
-  _globals['_ADDTWITCHNOTIFICATION']._serialized_start=261
-  _globals['_ADDTWITCHNOTIFICATION']._serialized_end=316
-  _globals['_REMOVETWITCHNOTIFICATION']._serialized_start=318
-  _globals['_REMOVETWITCHNOTIFICATION']._serialized_end=379
-  _globals['_OAUTHCODE']._serialized_start=381
-  _globals['_OAUTHCODE']._serialized_end=428
-  _globals['_TWITCHUSER']._serialized_start=430
-  _globals['_TWITCHUSER']._serialized_end=518
-  _globals['_OAUTHURLRESPONSE']._serialized_start=520
-  _globals['_OAUTHURLRESPONSE']._serialized_end=551
-  _globals['_CREATEOAUTHURL']._serialized_start=553
-  _globals['_CREATEOAUTHURL']._serialized_end=606
-  _globals['_EMPTY']._serialized_start=608
-  _globals['_EMPTY']._serialized_end=615
-  _globals['_TWITCHNOTIFICATION']._serialized_start=618
-  _globals['_TWITCHNOTIFICATION']._serialized_end=1058
+  _globals['_TWITCHOFFLINENOTIFICATION']._serialized_end=294
+  _globals['_ADDTWITCHNOTIFICATION']._serialized_start=296
+  _globals['_ADDTWITCHNOTIFICATION']._serialized_end=351
+  _globals['_REMOVETWITCHNOTIFICATION']._serialized_start=353
+  _globals['_REMOVETWITCHNOTIFICATION']._serialized_end=414
+  _globals['_EDITTWITCHNOTIFICATION']._serialized_start=416
+  _globals['_EDITTWITCHNOTIFICATION']._serialized_end=515
+  _globals['_OAUTHCODE']._serialized_start=517
+  _globals['_OAUTHCODE']._serialized_end=564
+  _globals['_TWITCHUSER']._serialized_start=566
+  _globals['_TWITCHUSER']._serialized_end=654
+  _globals['_OAUTHURLRESPONSE']._serialized_start=656
+  _globals['_OAUTHURLRESPONSE']._serialized_end=687
+  _globals['_CREATEOAUTHURL']._serialized_start=689
+  _globals['_CREATEOAUTHURL']._serialized_end=742
+  _globals['_REMOVEACCOUNT']._serialized_start=744
+  _globals['_REMOVEACCOUNT']._serialized_end=794
+  _globals['_EMPTY']._serialized_start=796
+  _globals['_EMPTY']._serialized_end=803
+  _globals['_TWITCHNOTIFICATION']._serialized_start=806
+  _globals['_TWITCHNOTIFICATION']._serialized_end=1377
 # @@protoc_insertion_point(module_scope)

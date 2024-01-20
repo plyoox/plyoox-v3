@@ -7,7 +7,9 @@ service TwitchNotification {
     rpc OfflineNotification (TwitchOfflineNotification) returns (Empty) {}
     rpc OAuthAuthorization (OAuthCode) returns (TwitchUser) {}
     rpc OAuthBaseUrl (CreateOAuthUrl) returns (OAuthUrlResponse) {}
+    rpc RemoveGuildAccount (RemoveAccount) returns (Empty) {}
 
+    rpc EditNotification (EditTwitchNotification) returns (Empty) {};
     rpc AddNotification (AddTwitchNotification) returns (TwitchUser) {}
     rpc RemoveNotification (RemoveTwitchNotification) returns (Empty) {}
 }
@@ -26,6 +28,8 @@ message TwitchLiveNotification {
 
 message TwitchOfflineNotification {
     int64 stream_id = 1;
+    int64 guild_id = 2;
+    int32 user_id = 3;
 }
 
 message AddTwitchNotification {
@@ -36,6 +40,12 @@ message AddTwitchNotification {
 message RemoveTwitchNotification {
     int32 user_id = 1;
     int64 guild_id = 2;
+}
+
+message EditTwitchNotification {
+    int32 user_id = 1;
+    int64 guild_id = 2;
+    optional int64 channel_id = 3;
 }
 
 message OAuthCode {
@@ -57,6 +67,11 @@ message OAuthUrlResponse {
 message CreateOAuthUrl {
     string state = 1;
     string redirect_uri = 2;
+}
+
+message RemoveAccount {
+    int64 guild_id = 1;
+    int32 user_id = 2;
 }
 
 message Empty {}

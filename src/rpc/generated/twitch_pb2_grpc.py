@@ -34,6 +34,16 @@ class TwitchNotificationStub(object):
             request_serializer=twitch__pb2.CreateOAuthUrl.SerializeToString,
             response_deserializer=twitch__pb2.OAuthUrlResponse.FromString,
         )
+        self.RemoveGuildAccount = channel.unary_unary(
+            '/Twitch.TwitchNotification/RemoveGuildAccount',
+            request_serializer=twitch__pb2.RemoveAccount.SerializeToString,
+            response_deserializer=twitch__pb2.Empty.FromString,
+        )
+        self.EditNotification = channel.unary_unary(
+            '/Twitch.TwitchNotification/EditNotification',
+            request_serializer=twitch__pb2.EditTwitchNotification.SerializeToString,
+            response_deserializer=twitch__pb2.Empty.FromString,
+        )
         self.AddNotification = channel.unary_unary(
             '/Twitch.TwitchNotification/AddNotification',
             request_serializer=twitch__pb2.AddTwitchNotification.SerializeToString,
@@ -73,6 +83,18 @@ class TwitchNotificationServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def RemoveGuildAccount(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def EditNotification(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def AddNotification(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -107,6 +129,16 @@ def add_TwitchNotificationServicer_to_server(servicer, server):
             servicer.OAuthBaseUrl,
             request_deserializer=twitch__pb2.CreateOAuthUrl.FromString,
             response_serializer=twitch__pb2.OAuthUrlResponse.SerializeToString,
+        ),
+        'RemoveGuildAccount': grpc.unary_unary_rpc_method_handler(
+            servicer.RemoveGuildAccount,
+            request_deserializer=twitch__pb2.RemoveAccount.FromString,
+            response_serializer=twitch__pb2.Empty.SerializeToString,
+        ),
+        'EditNotification': grpc.unary_unary_rpc_method_handler(
+            servicer.EditNotification,
+            request_deserializer=twitch__pb2.EditTwitchNotification.FromString,
+            response_serializer=twitch__pb2.Empty.SerializeToString,
         ),
         'AddNotification': grpc.unary_unary_rpc_method_handler(
             servicer.AddNotification,
@@ -233,6 +265,64 @@ class TwitchNotification(object):
             '/Twitch.TwitchNotification/OAuthBaseUrl',
             twitch__pb2.CreateOAuthUrl.SerializeToString,
             twitch__pb2.OAuthUrlResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
+
+    @staticmethod
+    def RemoveGuildAccount(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Twitch.TwitchNotification/RemoveGuildAccount',
+            twitch__pb2.RemoveAccount.SerializeToString,
+            twitch__pb2.Empty.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+        )
+
+    @staticmethod
+    def EditNotification(
+        request,
+        target,
+        options=(),
+        channel_credentials=None,
+        call_credentials=None,
+        insecure=False,
+        compression=None,
+        wait_for_ready=None,
+        timeout=None,
+        metadata=None,
+    ):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/Twitch.TwitchNotification/EditNotification',
+            twitch__pb2.EditTwitchNotification.SerializeToString,
+            twitch__pb2.Empty.FromString,
             options,
             channel_credentials,
             insecure,

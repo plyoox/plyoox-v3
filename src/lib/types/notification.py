@@ -12,3 +12,9 @@ class TwitchLiveNotification(TypedDict):
     thumbnail_url: str
     game: str
     started_at: datetime
+
+
+class TwitchOfflineNotification(TypedDict):
+    guild_id: int
+    stream_id: int
+    user_id: int

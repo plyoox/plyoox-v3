@@ -10,7 +10,10 @@ from rpc.generated.twitch_pb2_grpc import TwitchNotificationServicer
 if TYPE_CHECKING:
     from main import Plyoox
 
-    from lib.types import TwitchLiveNotification as TwitchLiveNotificationType
+    from lib.types import (
+        TwitchLiveNotification as TwitchLiveNotificationType,
+        TwitchOfflineNotification as TwitchOfflineNotificationType,
+    )
 
 
 class TwitchService(TwitchNotificationServicer):
@@ -37,6 +40,14 @@ class TwitchService(TwitchNotificationServicer):
         return Empty()
 
     async def OfflineNotification(self, request: TwitchOfflineNotification, context):
-        print("offline", request.stream_id)
+        notification = self.bot.notification
+
+        data: TwitchOfflineNotificationType = {
+            "guild_id": request.guild_id,
+            "stream_id": request.stream_id,
+            "user_id": request.user_id,
+        }
+
+        await notification.twitch_offline_edit(data)
 
         return Empty()

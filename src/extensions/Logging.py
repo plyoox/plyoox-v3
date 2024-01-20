@@ -259,6 +259,11 @@ class LoggingEvents(commands.Cog):
         if payload.channel_id in cache.exempt_channels:
             return
 
+        # Also check if parent is exempt
+        if channel := guild.get_channel(payload.channel_id):
+            if channel.category_id in cache.exempt_channels:
+                return
+
         # Ignore exempt roles
         if any(role in cache.exempt_roles for role in payload.data["member"].get("roles", [])):
             return
@@ -327,10 +332,17 @@ class LoggingEvents(commands.Cog):
         if cache is None:
             return
 
+        if payload.channel_id in cache.exempt_channels:
+            return
+
+        # Also check if parent is exempt
+        if channel := guild.get_channel(payload.channel_id):
+            if channel.category_id in cache.exempt_channels:
+                return
+
         # do not log messages deleted from the logging channel
         # this prevents a logging loop
         webhook_channel = cache.channel
-
         if webhook_channel.token is None:
             if webhook_channel.id == payload.channel_id:
                 return
@@ -391,6 +403,15 @@ class LoggingEvents(commands.Cog):
         cache = await self._get_setting(guild.id, LoggingKind.message_delete)
         if cache is None:
             return
+
+        # Check for exempt channels
+        if payload.channel_id in cache.exempt_channels:
+            return
+
+        # Also check if parent is exempt
+        if channel := guild.get_channel(payload.channel_id):
+            if channel.category_id in cache.exempt_channels:
+                return
 
         # do not log messages deleted from the logging channel
         # this prevents a logging loop

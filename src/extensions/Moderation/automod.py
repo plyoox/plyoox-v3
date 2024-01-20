@@ -415,10 +415,11 @@ class Automod(commands.Cog):
         if any(role in cache.moderation_roles + cache.ignored_roles for role in roles):
             return False
 
-        if channel.id in getattr(cache, f"{kind}_exempt_channels"):
+        if any(role in getattr(cache, f"{kind}_exempt_roles") for role in roles):
             return False
 
-        if any(role in getattr(cache, f"{kind}_exempt_roles") for role in roles):
+        exempt_channels = getattr(cache, f"{kind}_exempt_channels")
+        if channel.id in exempt_channels or channel.category_id in exempt_channels:
             return False
 
         return True

@@ -342,8 +342,8 @@ class CacheManager:
         elif cache == "punishment":
             return self._punishment_cache
 
-    def remove_cache(self, id: int, store: CacheType) -> None:
-        store = self._get_store(store)
+    def remove_cache(self, id: int, store_key: CacheType) -> None:
+        store = self._get_store(store_key)
         if store.get(id, None):
             del store[id]
 

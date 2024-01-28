@@ -253,7 +253,7 @@ class Leveling(commands.Cog):
             return
 
         # ignore no xp channels
-        if channel.id in cache.exempt_channels or channel.category_id in cache.exempt_categories:
+        if channel.id in cache.exempt_channels or channel.category_id in cache.exempt_channels:
             return
 
         # ignore members with the no xp role

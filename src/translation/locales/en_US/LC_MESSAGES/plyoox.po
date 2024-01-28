@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-18 11:14+0100\n"
+"POT-Creation-Date: 2024-01-28 12:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -607,7 +607,7 @@ msgstr ""
 #: src/extensions/Logging.py:110 src/extensions/Logging.py:139
 #: src/extensions/Logging.py:157 src/extensions/Logging.py:182
 #: src/extensions/Logging.py:204 src/extensions/Logging.py:227
-#: src/extensions/Logging.py:303 src/extensions/Logging.py:357
+#: src/extensions/Logging.py:310 src/extensions/Logging.py:371
 msgid "User id"
 msgstr ""
 
@@ -651,52 +651,52 @@ msgstr ""
 msgid "New name"
 msgstr ""
 
-#: src/extensions/Logging.py:280
+#: src/extensions/Logging.py:285
 msgid "Old message content"
 msgstr ""
 
-#: src/extensions/Logging.py:280 src/extensions/Logging.py:305
-#: src/extensions/Logging.py:363
+#: src/extensions/Logging.py:285 src/extensions/Logging.py:312
+#: src/extensions/Logging.py:377
 msgid "No content"
 msgstr ""
 
-#: src/extensions/Logging.py:299
-msgid "**{member}** edited a message in {channel}."
-msgstr ""
-
-#: src/extensions/Logging.py:302
-msgid "Message edited"
+#: src/extensions/Logging.py:306
+msgid "**{member}** edited a [message]({message}) in {channel}."
 msgstr ""
 
 #: src/extensions/Logging.py:309
+msgid "Message edited"
+msgstr ""
+
+#: src/extensions/Logging.py:316
 msgid "New message content"
 msgstr ""
 
-#: src/extensions/Logging.py:347
+#: src/extensions/Logging.py:361
 msgid "Message deleted"
 msgstr ""
 
-#: src/extensions/Logging.py:354
+#: src/extensions/Logging.py:368
 msgid "A message from **{member}** was deleted from {channel.mention}."
 msgstr ""
 
-#: src/extensions/Logging.py:362
+#: src/extensions/Logging.py:376
 msgid "Message content"
 msgstr ""
 
-#: src/extensions/Logging.py:371
+#: src/extensions/Logging.py:385
 msgid "Attachments"
 msgstr ""
 
-#: src/extensions/Logging.py:375
+#: src/extensions/Logging.py:389
 msgid "A message from {channel} has been deleted."
 msgstr ""
 
-#: src/extensions/Logging.py:407
+#: src/extensions/Logging.py:430
 msgid "Bulk message delete"
 msgstr ""
 
-#: src/extensions/Logging.py:409
+#: src/extensions/Logging.py:432
 msgid "{count} messages have been deleted from {channel}."
 msgstr ""
 
@@ -1540,19 +1540,31 @@ msgstr ""
 msgid "month"
 msgstr ""
 
-#: src/extensions/Notification.py:36
+#: src/extensions/Notification.py:40
 msgid "Game"
 msgstr ""
 
-#: src/extensions/Notification.py:38
+#: src/extensions/Notification.py:42
 msgid "Viewer count"
 msgstr ""
 
-#: src/extensions/Notification.py:39
+#: src/extensions/Notification.py:43 src/extensions/Notification.py:65
 msgid "Started at"
 msgstr ""
 
-#: src/extensions/Notification.py:80
+#: src/extensions/Notification.py:60
+msgid "Stream went offline"
+msgstr ""
+
+#: src/extensions/Notification.py:66
+msgid "Ended at"
+msgstr ""
+
+#: src/extensions/Notification.py:67
+msgid "Duration"
+msgstr ""
+
+#: src/extensions/Notification.py:114
 msgid "Go to Twitch"
 msgstr ""
 

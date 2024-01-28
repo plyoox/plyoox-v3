@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-18 11:14+0100\n"
+"POT-Creation-Date: 2024-01-28 12:03+0100\n"
 "PO-Revision-Date: 2024-01-03 12:36+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -622,7 +622,7 @@ msgstr "Account erstellt am"
 #: src/extensions/Logging.py:110 src/extensions/Logging.py:139
 #: src/extensions/Logging.py:157 src/extensions/Logging.py:182
 #: src/extensions/Logging.py:204 src/extensions/Logging.py:227
-#: src/extensions/Logging.py:303 src/extensions/Logging.py:357
+#: src/extensions/Logging.py:310 src/extensions/Logging.py:371
 msgid "User id"
 msgstr "User ID"
 
@@ -666,52 +666,52 @@ msgstr "Alter Name"
 msgid "New name"
 msgstr "Neuer Name"
 
-#: src/extensions/Logging.py:280
+#: src/extensions/Logging.py:285
 msgid "Old message content"
 msgstr "Alter Nachrichteninhalt"
 
-#: src/extensions/Logging.py:280 src/extensions/Logging.py:305
-#: src/extensions/Logging.py:363
+#: src/extensions/Logging.py:285 src/extensions/Logging.py:312
+#: src/extensions/Logging.py:377
 msgid "No content"
 msgstr "Kein Inhalt"
 
-#: src/extensions/Logging.py:299
-msgid "**{member}** edited a message in {channel}."
-msgstr "**{member}** hat eine Nachricht in {channel} bearbeitet."
+#: src/extensions/Logging.py:306
+msgid "**{member}** edited a [message]({message}) in {channel}."
+msgstr "**{member}** hat eine [Nachricht]({message}) in {channel} bearbeitet."
 
-#: src/extensions/Logging.py:302
+#: src/extensions/Logging.py:309
 msgid "Message edited"
 msgstr "Nachricht bearbeitet"
 
-#: src/extensions/Logging.py:309
+#: src/extensions/Logging.py:316
 msgid "New message content"
 msgstr "Neuer Nachrichteninhalt"
 
-#: src/extensions/Logging.py:347
+#: src/extensions/Logging.py:361
 msgid "Message deleted"
 msgstr "Nachricht gelöscht"
 
-#: src/extensions/Logging.py:354
+#: src/extensions/Logging.py:368
 msgid "A message from **{member}** was deleted from {channel.mention}."
 msgstr "Eine Nachricht von **{member}** wurde aus {channel.mention} gelöscht."
 
-#: src/extensions/Logging.py:362
+#: src/extensions/Logging.py:376
 msgid "Message content"
 msgstr "Nachrichteninhalt"
 
-#: src/extensions/Logging.py:371
+#: src/extensions/Logging.py:385
 msgid "Attachments"
 msgstr "Anhänge"
 
-#: src/extensions/Logging.py:375
+#: src/extensions/Logging.py:389
 msgid "A message from {channel} has been deleted."
 msgstr "Eine Nachricht aus {channel} wurde gelöscht."
 
-#: src/extensions/Logging.py:407
+#: src/extensions/Logging.py:430
 msgid "Bulk message delete"
 msgstr "Massenlöschung von Nachrichten"
 
-#: src/extensions/Logging.py:409
+#: src/extensions/Logging.py:432
 msgid "{count} messages have been deleted from {channel}."
 msgstr "Es wurden {count} Nachrichten aus {channel} gelöscht."
 
@@ -1591,19 +1591,31 @@ msgstr "Tage"
 msgid "month"
 msgstr "Monat"
 
-#: src/extensions/Notification.py:36
+#: src/extensions/Notification.py:40
 msgid "Game"
 msgstr "Spiel"
 
-#: src/extensions/Notification.py:38
+#: src/extensions/Notification.py:42
 msgid "Viewer count"
 msgstr "Zuschaueranzahl"
 
-#: src/extensions/Notification.py:39
+#: src/extensions/Notification.py:43 src/extensions/Notification.py:65
 msgid "Started at"
 msgstr "Gestartet am"
 
-#: src/extensions/Notification.py:80
+#: src/extensions/Notification.py:60
+msgid "Stream went offline"
+msgstr ""
+
+#: src/extensions/Notification.py:66
+msgid "Ended at"
+msgstr "Geendet am"
+
+#: src/extensions/Notification.py:67
+msgid "Duration"
+msgstr "Dauer"
+
+#: src/extensions/Notification.py:114
 msgid "Go to Twitch"
 msgstr "Zu Twitch"
 

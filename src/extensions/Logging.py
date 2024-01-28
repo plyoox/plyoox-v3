@@ -301,8 +301,10 @@ class LoggingEvents(commands.Cog):
             else:
                 edit_member = f"{user_name}#{user_discriminator}"
 
-        log_embed.description = translate(_("**{member}** edited a message in {channel}.")).format(
-            member=edit_member, channel=edit_channel
+        jump_to_url = f"https://canary.discord.com/channels/{guild.id}/{payload.channel_id}/{payload.message_id}"
+
+        log_embed.description = translate(_("**{member}** edited a [message]({message}) in {channel}.")).format(
+            member=edit_member, channel=edit_channel, message=jump_to_url
         )
         log_embed.set_author(name=translate(_("Message edited")), icon_url=avatar)
         log_embed.set_footer(text=f"{translate(_('User id'))}: {edit_member_id}")

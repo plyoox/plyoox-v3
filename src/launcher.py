@@ -1,11 +1,9 @@
-import argparse
 import asyncio
 import logging
 import os
 import sys
 
 import discord
-from dotenv import load_dotenv
 
 from rpc.grpc_server import start_server
 
@@ -14,16 +12,8 @@ if sys.platform == "linux":
 
     asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-load_dotenv()
-
-# Parse command line arguments
-parser = argparse.ArgumentParser()
-group = parser.add_mutually_exclusive_group()
-group.add_argument("--prod", action="store_true", help="Sync commands with discord")
-args = parser.parse_args()
 
 # Set up logging
-
 logger = logging.getLogger()
 discord.utils.setup_logging(root=True, level=logging.INFO)
 

@@ -85,21 +85,7 @@ async def log_simple_punish_command(
 
     translate = interaction.translate
 
-    webhook = await _get_log_channel(interaction.client, cache, interaction.guild)
-    if webhook is not None:
-        title, description = _get_dynamic_log_description(translate, moderator=interaction.user, target=target, kind=kind)
-
-        embed = extensions.Embed(description=description, color=colors.COMMAND_LOG_COLOR)
-        embed.set_author(name=title, icon_url=target.display_avatar)
-        embed.add_field(name=translate(_("Reason")), value="> " + (reason or translate(_("No reason"))))
-        embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
-        embed.set_footer(text=f"{translate(_('User Id'))}: {target.id}")
-
-        if until is not None:
-            embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
-
-        await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed])
-
+    notified_user = None
     if cache.notify_user and isinstance(target, discord.Member):
         reason = reason or f"*{translate(_('No reason'))}*"
         until = discord.utils.format_dt(until) if until else None
@@ -109,8 +95,26 @@ async def log_simple_punish_command(
 
         try:
             await target.send(message)
+            notified_user = True
         except discord.Forbidden:
-            pass
+            notified_user = False
+
+    webhook = await _get_log_channel(interaction.client, cache, interaction.guild)
+    if webhook is not None:
+        title, description = _get_dynamic_log_description(translate, moderator=interaction.user, target=target, kind=kind)
+
+        embed = extensions.Embed(description=description, color=colors.COMMAND_LOG_COLOR)
+        embed.set_author(name=title, icon_url=target.display_avatar)
+        embed.add_field(name=translate(_("Reason")), value="> " + (reason or translate(_("No reason"))))
+        embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
+        embed.set_footer(text=f"{translate(_('User Id'))}: {target.id}")
+        if until is not None:
+            embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
+
+        if notified_user is not None:
+            embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+
+        await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed])
 
 
 async def automod_log(
@@ -129,6 +133,19 @@ async def automod_log(
     cache = await bot.cache.get_moderation(guild.id)
     if not cache:
         return
+
+    notified_user = None
+    if cache.notify_user:
+        timestamp = utils.format_dt(until) if until is not None else None
+        user_message = _get_dynamic_log_user_message(
+            translate, guild=guild, reason=data.trigger_reason, timestamp=timestamp, kind=data.trigger_action.punishment.kind
+        )
+
+        try:
+            await member.send(user_message)
+            notified_user = True
+        except discord.Forbidden:
+            notified_user = False
 
     webhook = await _get_log_channel(bot, cache, guild)
     if webhook is not None:
@@ -161,6 +178,9 @@ async def automod_log(
         elif points is not None:
             embed.add_field(name=translate(_("Points added")), value="> " + points)
 
+        if notified_user is not None:
+            embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+
         embeds.append(embed)
 
         if data.trigger_content:
@@ -175,17 +195,6 @@ async def automod_log(
                 embeds.append(message_embed)
 
         await _send_webhook(bot, guild.id, webhook, embeds=embeds)
-
-    if cache.notify_user:
-        timestamp = utils.format_dt(until) if until is not None else None
-        user_message = _get_dynamic_log_user_message(
-            translate, guild=guild, reason=data.trigger_reason, timestamp=timestamp, kind=data.trigger_action.punishment.kind
-        )
-
-        try:
-            await member.send(user_message)
-        except discord.Forbidden:
-            pass
 
 
 async def automod_final_log(
@@ -204,6 +213,23 @@ async def automod_final_log(
     if cache is None or not cache.active:
         return
 
+    notified_user = None
+    if cache.notify_user:
+        until = discord.utils.format_dt(until) if until is not None else None
+        message = _get_dynamic_log_user_message(
+            translate,
+            guild=guild,
+            reason=translate(_("Maximum amount of points reached")),
+            timestamp=until,
+            kind=action,
+        )
+
+        try:
+            await member.send(message)
+            notified_user = True
+        except discord.Forbidden:
+            notified_user = False
+
     webhook = await _get_log_channel(bot, cache, guild)
     if webhook is not None:
         (title,) = _get_dynamic_auto_moderation_description(translate, kind=action, target=member)
@@ -221,22 +247,10 @@ async def automod_final_log(
         if until is not None:
             embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
 
+        if notified_user is not None:
+            embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+
         await _send_webhook(bot, guild.id, webhook, embeds=[embed])
-
-    if cache.notify_user:
-        until = discord.utils.format_dt(until) if until is not None else None
-        message = _get_dynamic_log_user_message(
-            translate,
-            guild=guild,
-            reason=translate(_("Maximum amount of points reached")),
-            timestamp=until,
-            kind=action,
-        )
-
-        try:
-            await member.send(message)
-        except discord.Forbidden:
-            pass
 
 
 async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Member, reason: str, points: str) -> None:
@@ -249,8 +263,19 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
     if cache is None or not cache.active:
         return
 
-    webhook = await _get_log_channel(bot, cache, guild)
+    notified_user = None
+    if cache.notify_user:
+        try:
+            await member.send(
+                translate(
+                    _("You have been warned in `{guild.name}` for **{reason}** and now have `{points}` points.")
+                ).format(reason=reason, guild=guild, points=points)
+            )
+            notified_user = True
+        except discord.Forbidden:
+            notified_user = False
 
+    webhook = await _get_log_channel(bot, cache, guild)
     if webhook is not None:
         embed = extensions.Embed(
             description=translate(_("The user {target} ({target.id}) has been warned by {moderator}.")).format(
@@ -261,20 +286,13 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
         embed.add_field(name=translate(_("Reason")), value=f"> {reason}")
         embed.add_field(name=translate(_("Moderator")), value=f"> {moderator} ({moderator.id})")
         embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
-        embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
         embed.add_field(name=translate(_("Points added")), value=f"> {points}")
+        embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
+
+        if notified_user is not None:
+            embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
 
         await _send_webhook(bot, guild.id, webhook, embeds=[embed])
-
-    if cache.notify_user:
-        try:
-            await member.send(
-                translate(
-                    _("You have been warned in `{guild.name}` for **{reason}** and now have `{points}` points.")
-                ).format(reason=reason, guild=guild, points=points)
-            )
-        except discord.Forbidden:
-            pass
 
 
 def _get_dynamic_log_description(

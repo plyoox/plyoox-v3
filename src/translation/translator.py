@@ -102,7 +102,7 @@ class GettextTranslator(app_commands.Translator):
             translated = translated.format(**context.data)
 
         if translated is None and context.location is TranslationContextLocation.other:
-            return f"failed-{str(string)}"
+            return str(string)
 
         return translated
 

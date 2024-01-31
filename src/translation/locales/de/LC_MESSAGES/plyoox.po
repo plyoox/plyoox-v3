@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-31 19:53+0100\n"
+"POT-Creation-Date: 2024-01-31 20:09+0100\n"
 "PO-Revision-Date: 2024-01-03 12:36+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1650,12 +1650,16 @@ msgstr ""
 "Der Befehl konnte nicht gefunden werden. Wenn dieser Fehler häufiger "
 "auftritt, wenden Sie sich an den Support."
 
-#: src/lib/extensions/command_tree.py:30
+#: src/lib/extensions/command_tree.py:31
 msgid "Bot is missing permissions: {missing_permission}"
 msgstr ""
 "Der Bot hat nicht die erforderlichen Berechtigungen: {missing_permission}"
 
-#: src/lib/extensions/command_tree.py:40
+#: src/lib/extensions/command_tree.py:38
+msgid "The given user does not seem to be a guild member."
+msgstr "Der angegebene Benutzer scheint kein Mitglied des Servers zu sein."
+
+#: src/lib/extensions/command_tree.py:46
 msgid "Command is on cooldown, retry after {retry_after} seconds"
 msgstr ""
 "Der Command ist noch im Cooldown, versuche es in {retry_after} Sekunden "
@@ -1664,6 +1668,3 @@ msgstr ""
 #: src/lib/extensions/view.py:16
 msgid "Only the creator can use this action."
 msgstr "Nur der Ersteller kann diese Aktion nutzen."
-
-#~ msgid "The level settings have not been configured."
-#~ msgstr "Das Levelsystem wurde noch nicht konfiguriert."

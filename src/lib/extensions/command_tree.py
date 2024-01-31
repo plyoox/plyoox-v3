@@ -4,7 +4,7 @@ import logging
 from typing import TYPE_CHECKING
 
 import discord
-from discord import app_commands
+from discord import app_commands, AppCommandOptionType
 from discord.app_commands import locale_str as _
 
 from lib import errors
@@ -22,7 +22,8 @@ class CommandTree(app_commands.CommandTree):
     async def on_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError) -> None:
         if isinstance(error, app_commands.CommandNotFound):
             await interaction.response.send_translated(
-                _("The command could not be found. If this error occurs more often, contact support."), ephemeral=True)
+                _("The command could not be found. If this error occurs more often, contact support."), ephemeral=True
+            )
         elif isinstance(error, errors.ModuleDisabled):
             await interaction.response.send_message(error, ephemeral=True)
         elif isinstance(error, app_commands.BotMissingPermissions):
@@ -32,7 +33,12 @@ class CommandTree(app_commands.CommandTree):
                 ephemeral=True,
             )
         elif isinstance(error, app_commands.TransformerError):
-            await interaction.response.send_message(error, ephemeral=True)
+            if error.type == AppCommandOptionType.user:
+                await interaction.response.send_translated(
+                    _("The given user does not seem to be a guild member."), ephemeral=True
+                )
+            else:
+                await interaction.response.send_message(error, ephemeral=True)
         elif isinstance(error, app_commands.CheckFailure):
             pass
         elif isinstance(error, app_commands.CommandOnCooldown):

@@ -49,17 +49,17 @@ def yield_mo_paths() -> Iterator[Path]:
 class EmptyTranslations(gettext.NullTranslations):
     """Returns an empty message to indicate no translation is available."""
 
-    def gettext(self, message: str) -> None:
-        return None
+    def gettext(self, message: str) -> str:
+        return message
 
-    def ngettext(self, msgid1: str, msgid2: str, n: int) -> None:
-        return None
+    def ngettext(self, msgid1: str, msgid2: str, n: int) -> str:
+        return msgid1 if n == 1 else msgid2
 
-    def pgettext(self, context: str, message: str) -> None:
-        return None
+    def pgettext(self, context: str, message: str) -> str:
+        return message
 
-    def npgettext(self, context: str, msgid1: str, msgid2: str, n: int) -> None:
-        return None
+    def npgettext(self, context: str, msgid1: str, msgid2: str, n: int) -> str:
+        return msgid1 if n == 1 else msgid2
 
 
 class GettextTranslator(app_commands.Translator):
@@ -98,11 +98,8 @@ class GettextTranslator(app_commands.Translator):
         else:
             translated = t.gettext(string.message)
 
-        if context.location is app_commands.TranslationContextLocation.other and isinstance(context.data, dict):
+        if context.location is TranslationContextLocation.other and isinstance(context.data, dict):
             translated = translated.format(**context.data)
-
-        if translated is None and context.location is TranslationContextLocation.other:
-            return str(string)
 
         return translated
 

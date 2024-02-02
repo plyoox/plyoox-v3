@@ -106,9 +106,11 @@ class Leveling(commands.Cog):
             xp,
         )
 
-    async def _update_member_data(self, id: int, xp: int) -> None:
+    async def _update_member_data(self, user_id: int, guild_id: int, xp: int) -> None:
         """Adds a specific amount of xp to the user in the database."""
-        await self.bot.db.execute("UPDATE level_user SET xp = xp + $1 WHERE id = $2", xp, id)
+        await self.bot.db.execute(
+            "UPDATE level_user SET xp = xp + $1 WHERE user_id = $2 AND guild_id = $3", xp, user_id, guild_id
+        )
 
     async def cog_unload(self) -> None:
         self.bot.tree.remove_command(self.ctx_menu.name, type=self.ctx_menu.type)
@@ -155,7 +157,7 @@ class Leveling(commands.Cog):
         )
 
         if user_data is None:
-            interaction.response.send_translated(
+            await interaction.response.send_translated(
                 _("This user has never written anything or is excluded."),
                 ephemeral=True,
             )
@@ -271,7 +273,7 @@ class Leveling(commands.Cog):
             await self._create_member_data(member, message_xp)
             return
 
-        await self._update_member_data(member_data["id"], message_xp)
+        await self._update_member_data(member.id, guild.id, message_xp)
 
         before_level = get_level_from_xp(member_data["xp"])[0]  # level with the current xp
         after_level = get_level_from_xp(member_data["xp"] + message_xp)[0]  # level with the added xp

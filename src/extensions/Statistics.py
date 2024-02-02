@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import io
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 import discord
 from discord import app_commands
@@ -9,16 +9,16 @@ from discord.ext import commands, tasks
 
 if TYPE_CHECKING:
     import datetime
-    from typing import TypedDict, Union
+    from typing import TypedDict, Union, NotRequired
 
     from main import Plyoox
 
     class CommandStatistic(TypedDict):
-        name: str
+        command: str
         guild_id: int
-        author_id: int
-        used_at: datetime.datetime
-        failed: bool
+        user_id: int
+        executed_at: datetime.datetime
+        usage: NotRequired[int]
 
 
 class Statistics(commands.Cog):
@@ -32,20 +32,18 @@ class Statistics(commands.Cog):
 
     @tasks.loop(seconds=60)
     async def _insert_command_statistics(self):
+        def map_values(val: CommandStatistic) -> tuple:
+            return val["command"], val["guild_id"], val["user_id"], val["executed_at"]
+
         if not self._command_statistics:
             return
 
-        values = list(
-            map(
-                lambda s: (s["name"], s["guild_id"], s["author_id"], s["failed"], s["used_at"]),
-                self._command_statistics,
-            )
-        )
+        values = list(map(map_values, self._command_statistics))
 
         self._command_statistics.clear()
 
         await self.bot.db.executemany(
-            "INSERT INTO command_statistics (name, guild_id, author_id, failed, used_at) VALUES ($1, $2, $3, $4, $5)",
+            "INSERT INTO command_statistics (command, guild_id, user_id, executed_at) VALUES ($1, $2, $3, $4)",
             values,
         )
 
@@ -54,12 +52,13 @@ class Statistics(commands.Cog):
         self, interaction: discord.Interaction, command: Union[app_commands.Command, app_commands.ContextMenu]
     ):
         statistics: CommandStatistic = {
-            "name": command.name,
+            "command": command.qualified_name,
             "guild_id": interaction.guild_id,  # type: ignore
-            "used_at": discord.utils.utcnow(),
-            "author_id": interaction.user.id,
-            "failed": interaction.command_failed,
+            "executed_at": discord.utils.utcnow().replace(tzinfo=None),
+            "user_id": interaction.user.id,
         }
+
+        print(statistics)
 
         self._command_statistics.append(statistics)
 
@@ -70,13 +69,13 @@ class Statistics(commands.Cog):
 
     @stats.command(name="all")
     @commands.is_owner()
-    async def stats_all(self, ctx: commands.Context, days: Optional[int]):
+    async def stats_all(self, ctx: commands.Context, days: int | None):
         if days is None:
-            command_stats: list = await self.bot.db.fetch(
-                "SELECT name, count(*) as usage FROM command_statistics GROUP BY name ORDER BY usage DESC"
+            command_stats: list[CommandStatistic] = await self.bot.db.fetch(
+                "SELECT command, count(*) as usage FROM command_statistics GROUP BY command ORDER BY usage DESC"
             )
         else:
-            command_stats: list = await self.bot.db.fetch(
+            command_stats: list[CommandStatistic] = await self.bot.db.fetch(
                 "SELECT name, count(*) as usage FROM command_statistics WHERE "
                 f"used_at > (CURRENT_TIMESTAMP - INTERVAL '{days} days') GROUP BY name ORDER BY usage DESC",
             )
@@ -84,7 +83,7 @@ class Statistics(commands.Cog):
         embed = discord.Embed(title="Command stats", description="")
 
         for stat in command_stats:
-            embed.description += f"{stat['name']}: {stat['usage']}\n"
+            embed.description += f"{stat['command']}: {stat['usage']}\n"
 
             if len(embed.description) >= 4000:
                 break
@@ -96,14 +95,14 @@ class Statistics(commands.Cog):
 
     @stats.command(name="guild")
     @commands.is_owner()
-    async def statistics_guild(self, ctx: commands.Context, days: Optional[int]):
+    async def statistics_guild(self, ctx: commands.Context, days: int | None):
         if days is None:
             command_stats: list = await self.bot.db.fetch(
-                "SELECT name, count(*) as usage FROM command_statistics WHERE guild_id = $1 GROUP BY name ORDER BY usage DESC",
+                "SELECT command, count(*) as usage FROM command_statistics WHERE guild_id = $1 GROUP BY command ORDER BY usage DESC",
                 ctx.guild.id,
             )
         else:
-            command_stats: list = await self.bot.db.fetch(
+            command_stats: list[CommandStatistic] = await self.bot.db.fetch(
                 "SELECT name, count(*) as usage FROM command_statistics WHERE guild_id = $1 AND used_at"
                 f" > (CURRENT_TIMESTAMP - INTERVAL '{days} days') GROUP BY name ORDER BY usage DESC",
                 ctx.guild.id,
@@ -112,7 +111,7 @@ class Statistics(commands.Cog):
         embed = discord.Embed(title="Command stats", description="")
 
         for stat in command_stats:
-            embed.description += f"{stat['name']}: {stat['usage']}\n"
+            embed.description += f"{stat['command']}: {stat['usage']}\n"
 
             if len(embed.description) >= 4000:
                 break
@@ -126,7 +125,7 @@ class Statistics(commands.Cog):
     @commands.is_owner()
     async def servers(self, ctx: commands.Context):
         count = 0
-        msg = f"Count,Id,Members,Bots,Name,Owner,Chunked\n"
+        msg = "Count,Id,Members,Bots,Name,Owner,Chunked\n"
 
         guilds = [guild for guild in self.bot.guilds]
         guilds.sort(key=lambda g: g.member_count, reverse=True)

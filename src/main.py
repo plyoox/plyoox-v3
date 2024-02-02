@@ -36,6 +36,7 @@ plugins = [
     "extensions.Anilist",
     "extensions.DataHandler",
     "extensions.Notification",
+    "extensions.Statistics",
 ]
 
 

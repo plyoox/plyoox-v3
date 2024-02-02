@@ -164,7 +164,7 @@ class Notification(commands.Cog):
             await self._delete_guild_notification(data["stream_id"], data["guild_id"])
             return
 
-        if channel.permissions_for(guild.me).send_messages:
+        if channel.permissions_for(guild.me).send_messages and notification["message_id"] is not None:
             embed = self._get_offline_embed(
                 login=notification["login"],
                 image_url=notification["profile_image_url"],
@@ -174,7 +174,7 @@ class Notification(commands.Cog):
             )
 
             message = await channel.fetch_message(notification["message_id"])
-            if message:
+            if message is not None:
                 await message.edit(embed=embed, content=None, view=None)
 
         await self._delete_guild_notification(data["stream_id"], data["guild_id"])

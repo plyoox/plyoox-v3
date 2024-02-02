@@ -29,7 +29,7 @@ class AutoModerationCheckKind(enum.StrEnum):
 
 
 class TimerEnum(enum.StrEnum):
-    tempban = "tempban"
+    temp_ban = "temp_ban"
 
 
 class LoggingKind(enum.StrEnum):

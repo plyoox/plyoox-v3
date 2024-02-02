@@ -150,7 +150,7 @@ class Moderation(commands.Cog):
             await interaction.response.send_translated(_("The provided duration is invalid."), ephemeral=True)
             return
 
-        if (banned_until - discord.utils.utcnow()).total_seconds() > 31_536_000:
+        if (banned_until - discord.utils.utcnow()).total_seconds() > 31_536_000:  # 365 days
             await interaction.response.send_translated(_("The provided duration is too long."), ephemeral=True)
             return
 
@@ -162,7 +162,7 @@ class Moderation(commands.Cog):
         await _logging_helper.log_simple_punish_command(
             interaction, target=member, until=banned_until, reason=reason, kind=ModerationCommandKind.tempban
         )
-        await self.bot.timer.create_timer(member.id, guild.id, kind=TimerEnum.tempban, expires=banned_until)
+        await self.bot.timer.create_timer(member.id, guild.id, kind=TimerEnum.temp_ban, expires=banned_until)
         await guild.ban(member, reason=reason, delete_message_days=1)
 
         await interaction.followup.send(

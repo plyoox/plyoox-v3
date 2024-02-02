@@ -104,7 +104,7 @@ class TimerModel(RecordClass):
     id: int
     guild_id: int
     target_id: int
-    type: TimerEnum
+    kind: TimerEnum
     expires: datetime
     data: dict[str, Any] | None
 

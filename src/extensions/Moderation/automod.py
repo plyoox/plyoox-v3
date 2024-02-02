@@ -325,7 +325,7 @@ class Automod(commands.Cog):
                     await timers.create_timer(
                         guild.id,
                         member.id,
-                        TimerEnum.tempban,
+                        TimerEnum.temp_ban,
                         banned_until,
                     )
                     await guild.ban(member, reason=translate(_("Maximum number of points reached")))
@@ -379,7 +379,7 @@ class Automod(commands.Cog):
 
                 timers = self.bot.timer
                 if timers is not None:
-                    await timers.create_timer(guild.id, member.id, TimerEnum.tempban, banned_until)
+                    await timers.create_timer(guild.id, member.id, TimerEnum.temp_ban, banned_until)
                     await _logging.automod_log(self.bot, data)
                     await guild.ban(member, reason=data.trigger_reason)
                 else:
@@ -482,7 +482,7 @@ class Automod(commands.Cog):
             "INSERT INTO automoderation_user (guild_id, user_id, expires_at, points, reason) VALUES ($1, $2, $3, $4, $5)",
             guild.id,
             member.id,
-            expires_at,
+            expires_at.replace(tzinfo=None),
             points,
             reason,
         )

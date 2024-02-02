@@ -83,14 +83,14 @@ async def log_simple_punish_command(
     if cache is None or not cache.active:
         return
 
-    translate = interaction.translate
+    translate = interaction.translate  # type: ignore
 
     notified_user = None
     if cache.notify_user and isinstance(target, discord.Member):
         reason = reason or f"*{translate(_('No reason'))}*"
-        until = discord.utils.format_dt(until) if until else None
+        until_fmt = discord.utils.format_dt(until) if until else None
         message = _get_dynamic_log_user_message(
-            interaction.translate, kind=kind, reason=reason, timestamp=until, guild=interaction.guild
+            interaction.translate, kind=kind, reason=reason, timestamp=until_fmt, guild=interaction.guild
         )
 
         try:
@@ -215,12 +215,12 @@ async def automod_final_log(
 
     notified_user = None
     if cache.notify_user:
-        until = discord.utils.format_dt(until) if until is not None else None
+        until_fmt = discord.utils.format_dt(until) if until is not None else None
         message = _get_dynamic_log_user_message(
             translate,
             guild=guild,
             reason=translate(_("Maximum amount of points reached")),
-            timestamp=until,
+            timestamp=until_fmt,
             kind=action,
         )
 

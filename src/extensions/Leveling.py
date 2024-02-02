@@ -163,6 +163,8 @@ class Leveling(commands.Cog):
             )
             return
 
+        await interaction.response.defer(thinking=True, ephemeral=ephemeral)
+
         current_level, remaining_xp = get_level_from_xp(user_data["xp"])
         required_xp = get_level_xp(current_level)
 
@@ -183,9 +185,8 @@ class Leveling(commands.Cog):
                     text = await res.text()
                     _log.warning(f"Received status code {res.status} and data `{text}` while fetching level card.")
 
-                    await interaction.response.send_translated(
-                        _("The required infrastructure is currently not available."),
-                        ephemeral=True,
+                    await interaction.followup.send(
+                        interaction.translate(_("The required infrastructure is currently not available.")),
                     )
 
                     return
@@ -193,13 +194,12 @@ class Leveling(commands.Cog):
                 fp = io.BytesIO(await res.read())
                 image = discord.File(fp, filename="level_card.png")
 
-                await interaction.response.send_message(file=image, ephemeral=ephemeral)
+                await interaction.followup.send(file=image, ephemeral=ephemeral)
         except aiohttp.ClientConnectionError as err:
             _log.error("Could not fetch level card", err)
 
-            await interaction.response.send_translated(
-                _("The required infrastructure is currently not available."),
-                ephemeral=True,
+            await interaction.followup.send(
+                interaction.translate(_("The required infrastructure is currently not available.")),
             )
             return
 

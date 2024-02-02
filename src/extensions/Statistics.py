@@ -58,8 +58,6 @@ class Statistics(commands.Cog):
             "user_id": interaction.user.id,
         }
 
-        print(statistics)
-
         self._command_statistics.append(statistics)
 
     @commands.group(name="stats")

@@ -160,7 +160,7 @@ class CacheManager:
 
         result = await self._pool.fetchrow(
             "SELECT m.*, w.id as mwh_id, w.token as mwh_token, w.webhook_channel as mwh_webhook_channel, "
-            "w.guild_id as mwh_guild_id FROM moderation_config m INNER JOIN public.maybe_webhook w "
+            "w.guild_id as mwh_guild_id FROM moderation_config m LEFT JOIN public.maybe_webhook w "
             "ON w.id = m.logging_channel WHERE m.id = $1",
             id,
         )
@@ -226,7 +226,7 @@ class CacheManager:
 
         settings_query = await self._pool.fetch(
             "SELECT l.*, w.id as mwh_id, w.token as mwh_token, w.webhook_channel as mwh_webhook_channel, "
-            " w.guild_id as mwh_guild_id FROM logging_settings l INNER JOIN maybe_webhook w ON w.id = l.channel "
+            " w.guild_id as mwh_guild_id FROM logging_settings l LEFT JOIN maybe_webhook w ON w.id = l.channel "
             "WHERE l.guild_id = $1 AND active = true",
             id,
         )

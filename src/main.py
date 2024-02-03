@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import os
 import sys
@@ -70,6 +71,7 @@ class Plyoox(commands.AutoShardedBot):
             compress=compress,
         )
 
+        self.presence_task = None
         self.imager_url = os.getenv("IMAGER_URL")
         if self.imager_url is None:
             plugins.remove("extensions.Leveling")
@@ -84,6 +86,8 @@ class Plyoox(commands.AutoShardedBot):
             await self.load_extension(plugin)
 
         logger.info("Plugins loaded")
+
+        self.presence_task = self.loop.create_task(self._update_status_task())
 
     async def on_ready(self) -> None:
         logger.info("Ready")
@@ -120,3 +124,10 @@ class Plyoox(commands.AutoShardedBot):
     @property
     def anilist(self) -> Anilist | None:
         return self.get_cog("Anilist")
+
+    async def _update_status_task(self):
+        await asyncio.sleep(30)
+
+        while not self.is_closed():
+            await self.change_presence(activity=discord.CustomActivity(name="plyoox.net"))
+            await asyncio.sleep(43200)

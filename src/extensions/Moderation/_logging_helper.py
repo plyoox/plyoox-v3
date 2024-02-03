@@ -83,7 +83,7 @@ async def log_simple_punish_command(
     if cache is None or not cache.active:
         return
 
-    translate = interaction.translate  # type: ignore
+    translate = interaction.translate
 
     notified_user = None
     if cache.notify_user and isinstance(target, discord.Member):
@@ -115,6 +115,36 @@ async def log_simple_punish_command(
 
     if notified_user is not None:
         embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+
+    await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed])
+
+
+async def log_clear_command(interaction: discord.Interaction, *, reason: str | None, total: int, deleted: int) -> None:
+    cache = await interaction.client.cache.get_moderation(interaction.guild.id)
+    if cache is None or not cache.active:
+        return
+
+    translate = interaction.translate
+
+    webhook = await _get_log_channel(interaction.client, cache, interaction.guild)
+    if webhook is None:
+        return
+
+    embed = extensions.Embed(
+        description=translate(
+            _("{deleted_count} messages have been deleted from {channel} by {moderator.mention} ({moderator})."),
+            data={"deleted_count": deleted, "channel": interaction.channel.mention, "moderator": interaction.user},
+        ),
+        color=colors.COMMAND_LOG_COLOR,
+    )
+    embed.set_author(name=translate(_("Messages cleared")), icon_url=interaction.user.display_avatar)
+    embed.set_footer(text=f"{translate(_('Channel Id'))}: {interaction.channel_id}")
+
+    embed.add_field(name=translate(_("Deleted Messages")), value=f"> {deleted}/{total}")
+    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
+
+    if reason is not None:
+        embed.insert_field_at(0, name=translate(_("Reason")), value=f"> {reason}")
 
     await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed])
 

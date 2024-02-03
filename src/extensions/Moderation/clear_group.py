@@ -9,6 +9,7 @@ from discord.ext import commands
 from discord.app_commands import locale_str as _
 
 from lib import extensions
+from . import _logging_helper
 
 LINK_REGEX = re.compile(r"https?://(?:[-\w.]|%[\da-fA-F]{2})+", re.IGNORECASE)
 
@@ -81,11 +82,16 @@ class ClearGroup(app_commands.Group):
         return ret
 
     async def do_removal(
-        self, interaction: discord.Interaction, limit: int, *, reason: str, predicate: Callable[[discord.Message], bool]
+        self,
+        interaction: discord.Interaction,
+        limit: int,
+        *,
+        reason: str | None,
+        predicate: Callable[[discord.Message], bool],
     ):
         """This function is a helper to clear messages in an interaction channel.
         predicate must be a function (lambda) to specify the messages the bot should remove"""
-        channel: discord.TextChannel = interaction.channel
+        channel = interaction.channel
 
         # delete the messages
         deleted_messages = await self._purge_helper(channel, limit=limit, check=predicate, reason=reason)
@@ -98,19 +104,22 @@ class ClearGroup(app_commands.Group):
             return
 
         affected_users = set(m.author.id for m in deleted_messages)  # list of affected users
-        reason = reason or f"*{interaction.translate(_('No reason'))}*"
 
         embed = extensions.Embed(title=interaction.translate(_("Messages deleted")))
 
         embed.add_field(name=interaction.translate(_("Messages deleted")), value=f"> {deleted_count}/{limit}")
         embed.add_field(name=interaction.translate(_("Affected users")), value=f"> {len(affected_users)}")
-        embed.add_field(name=interaction.translate(_("Reason")), value=f"> {reason}")
+
+        if reason is not None:
+            embed.add_field(name=interaction.translate(_("Reason")), value=f"> {reason}")
 
         # Send the information to the user. The response has been deferred, so this uses followup
         await interaction.followup.send(
             interaction.translate(_("{message_count} Messages have been deleted."), data={"message_count": deleted_count}),
             embed=embed,
         )
+
+        await _logging_helper.log_clear_command(interaction, reason=reason, deleted=deleted_count, total=limit)
 
     @app_commands.command(name="all", description=_("Clear all messages in a channel."))
     @app_commands.describe(

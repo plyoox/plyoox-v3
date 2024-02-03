@@ -100,21 +100,23 @@ async def log_simple_punish_command(
             notified_user = False
 
     webhook = await _get_log_channel(interaction.client, cache, interaction.guild)
-    if webhook is not None:
-        title, description = _get_dynamic_log_description(translate, moderator=interaction.user, target=target, kind=kind)
+    if webhook is None:
+        return
 
-        embed = extensions.Embed(description=description, color=colors.COMMAND_LOG_COLOR)
-        embed.set_author(name=title, icon_url=target.display_avatar)
-        embed.add_field(name=translate(_("Reason")), value="> " + (reason or translate(_("No reason"))))
-        embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
-        embed.set_footer(text=f"{translate(_('User Id'))}: {target.id}")
-        if until is not None:
-            embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
+    title, description = _get_dynamic_log_description(translate, moderator=interaction.user, target=target, kind=kind)
 
-        if notified_user is not None:
-            embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+    embed = extensions.Embed(description=description, color=colors.COMMAND_LOG_COLOR)
+    embed.set_author(name=title, icon_url=target.display_avatar)
+    embed.add_field(name=translate(_("Reason")), value="> " + (reason or translate(_("No reason"))))
+    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
+    embed.set_footer(text=f"{translate(_('User Id'))}: {target.id}")
+    if until is not None:
+        embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
 
-        await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed])
+    if notified_user is not None:
+        embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+
+    await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed])
 
 
 async def automod_log(
@@ -148,53 +150,55 @@ async def automod_log(
             notified_user = False
 
     webhook = await _get_log_channel(bot, cache, guild)
-    if webhook is not None:
-        if data.moderator:
-            title, description = _get_dynamic_log_description(
-                translate, moderator=data.moderator, target=member, kind=data.trigger_action.punishment.kind
-            )
+    if webhook is None:
+        return
+
+    if data.moderator:
+        title, description = _get_dynamic_log_description(
+            translate, moderator=data.moderator, target=member, kind=data.trigger_action.punishment.kind
+        )
+    else:
+        (title, description) = _get_dynamic_auto_moderation_description(
+            translate, kind=data.trigger_action.punishment.kind, target=member
+        )
+
+    embeds = []
+
+    embed = extensions.Embed(description=description)
+    embed.set_author(name=title, icon_url=member.display_avatar)
+    embed.add_field(name=translate(_("Reason")), value=f"> {data.trigger_reason}")
+    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
+    embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
+
+    # data.moderator is only set when executed by the punishment command
+    if data.moderator:
+        embed.title = translate(_("Punishment executed"))
+        embed.color = colors.PUNISHMENT_COLOR
+    else:
+        embed.color = colors.AUTOMOD_COLOR
+
+    if until is not None:
+        embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
+    elif points is not None:
+        embed.add_field(name=translate(_("Points added")), value="> " + points)
+
+    if notified_user is not None:
+        embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+
+    embeds.append(embed)
+
+    if data.trigger_content:
+        if len(data.trigger_content) <= 1024:
+            embed.add_field(name=translate(_("Message")), value=data.trigger_content)
         else:
-            (title, description) = _get_dynamic_auto_moderation_description(
-                translate, kind=data.trigger_action.punishment.kind, target=member
+            message_embed = extensions.Embed(
+                title=translate(_("Message")),
+                description=data.trigger_content,
+                color=colors.AUTOMOD_COLOR,  # punishment never has any content attached
             )
+            embeds.append(message_embed)
 
-        embeds = []
-
-        embed = extensions.Embed(description=description)
-        embed.set_author(name=title, icon_url=member.display_avatar)
-        embed.add_field(name=translate(_("Reason")), value=f"> {data.trigger_reason}")
-        embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
-        embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
-
-        # data.moderator is only set when executed by the punishment command
-        if data.moderator:
-            embed.title = translate(_("Punishment executed"))
-            embed.color = colors.PUNISHMENT_COLOR
-        else:
-            embed.color = colors.AUTOMOD_COLOR
-
-        if until is not None:
-            embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
-        elif points is not None:
-            embed.add_field(name=translate(_("Points added")), value="> " + points)
-
-        if notified_user is not None:
-            embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
-
-        embeds.append(embed)
-
-        if data.trigger_content:
-            if len(data.trigger_content) <= 1024:
-                embed.add_field(name=translate(_("Message")), value=data.trigger_content)
-            else:
-                message_embed = extensions.Embed(
-                    title=translate(_("Message")),
-                    description=data.trigger_content,
-                    color=colors.AUTOMOD_COLOR,  # punishment never has any content attached
-                )
-                embeds.append(message_embed)
-
-        await _send_webhook(bot, guild.id, webhook, embeds=embeds)
+    await _send_webhook(bot, guild.id, webhook, embeds=embeds)
 
 
 async def automod_final_log(
@@ -231,26 +235,28 @@ async def automod_final_log(
             notified_user = False
 
     webhook = await _get_log_channel(bot, cache, guild)
-    if webhook is not None:
-        (title,) = _get_dynamic_auto_moderation_description(translate, kind=action, target=member)
+    if webhook is None:
+        return
 
-        embed = extensions.Embed(
-            description=translate(
-                _("The user {target.mention} ({target}) has reached the maximum number of points.")
-            ).format(target=member)
+    (title,) = _get_dynamic_auto_moderation_description(translate, kind=action, target=member)
+
+    embed = extensions.Embed(
+        description=translate(_("The user {target.mention} ({target}) has reached the maximum number of points.")).format(
+            target=member
         )
-        embed.set_author(name=translate(_("Automod: Maximum points reached")), icon_url=member.display_avatar)
-        embed.add_field(name=translate(_("Action")), value=f"> {title}")
-        embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
-        embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
+    )
+    embed.set_author(name=translate(_("Automod: Maximum points reached")), icon_url=member.display_avatar)
+    embed.add_field(name=translate(_("Action")), value=f"> {title}")
+    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
+    embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
-        if until is not None:
-            embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
+    if until is not None:
+        embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
 
-        if notified_user is not None:
-            embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+    if notified_user is not None:
+        embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
 
-        await _send_webhook(bot, guild.id, webhook, embeds=[embed])
+    await _send_webhook(bot, guild.id, webhook, embeds=[embed])
 
 
 async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Member, reason: str, points: str) -> None:
@@ -276,23 +282,26 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
             notified_user = False
 
     webhook = await _get_log_channel(bot, cache, guild)
-    if webhook is not None:
-        embed = extensions.Embed(
-            description=translate(_("The user {target} ({target.id}) has been warned by {moderator}.")).format(
-                target=member, moderator=moderator
-            )
-        )
-        embed.set_author(name=translate(_("User has been warned")), icon_url=member.display_avatar)
-        embed.add_field(name=translate(_("Reason")), value=f"> {reason}")
-        embed.add_field(name=translate(_("Moderator")), value=f"> {moderator} ({moderator.id})")
-        embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
-        embed.add_field(name=translate(_("Points added")), value=f"> {points}")
-        embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
+    if webhook is None:
+        return
 
-        if notified_user is not None:
-            embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+    embed = extensions.Embed(
+        description=translate(_("The user {target} ({target.id}) has been warned by {moderator}.")).format(
+            target=member, moderator=moderator
+        ),
+        color=colors.POINT_COLOR,
+    )
+    embed.set_author(name=translate(_("User has been warned")), icon_url=member.display_avatar)
+    embed.add_field(name=translate(_("Reason")), value=f"> {reason}")
+    embed.add_field(name=translate(_("Moderator")), value=f"> {moderator} ({moderator.id})")
+    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
+    embed.add_field(name=translate(_("Points added")), value=f"> {points}")
+    embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
-        await _send_webhook(bot, guild.id, webhook, embeds=[embed])
+    if notified_user is not None:
+        embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+
+    await _send_webhook(bot, guild.id, webhook, embeds=[embed])
 
 
 def _get_dynamic_log_description(

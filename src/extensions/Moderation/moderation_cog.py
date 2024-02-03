@@ -552,9 +552,7 @@ class Moderation(commands.Cog):
 
         cache = await self.bot.cache.get_moderation(interaction.guild_id)
         if cache is None:
-            await interaction.translate.send_translated(
-                _("This has not been set up. Please visit https://plyoox.net"), ephemeral=True
-            )
+            await interaction.send_translated(_("This has not been set up. Please visit https://plyoox.net"), ephemeral=True)
             return
 
         if not cache.active:

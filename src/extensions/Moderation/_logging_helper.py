@@ -114,7 +114,7 @@ async def log_simple_punish_command(
         embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
 
     if notified_user is not None:
-        embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+        embed.add_field(name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No")))
 
     await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed])
 
@@ -213,7 +213,7 @@ async def automod_log(
         embed.add_field(name=translate(_("Points added")), value="> " + points)
 
     if notified_user is not None:
-        embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+        embed.add_field(name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No")))
 
     embeds.append(embed)
 
@@ -284,7 +284,7 @@ async def automod_final_log(
         embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
 
     if notified_user is not None:
-        embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+        embed.add_field(name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No")))
 
     await _send_webhook(bot, guild.id, webhook, embeds=[embed])
 
@@ -329,7 +329,7 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
     embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
     if notified_user is not None:
-        embed.add_field(name=translate(_("Received DM")), value=translate(_("Yes") if notified_user else _("No")))
+        embed.add_field(name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No")))
 
     await _send_webhook(bot, guild.id, webhook, embeds=[embed])
 

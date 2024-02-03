@@ -107,7 +107,7 @@ class LoggingEvents(commands.Cog):
             name=translate(_("Account created at")),
             value=helper.embed_timestamp_format(member.created_at),
         )
-        embed.set_footer(text=f"{translate(_('User id'))}: {member.id}")
+        embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
         await self._send_message(guild, cache, embeds=[embed])
 
@@ -136,7 +136,7 @@ class LoggingEvents(commands.Cog):
         embed.add_field(name=translate(_("Roles")), value=f"> {roles}" if roles else translate(_("No roles")))
 
         embed.add_field(name=translate(_("Joined at")), value=helper.embed_timestamp_format(member.joined_at))
-        embed.set_footer(text=f"{translate(_('User id'))}: {member.id}")
+        embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
         await self._send_message(member.guild, cache, embeds=[embed])
 
@@ -154,7 +154,7 @@ class LoggingEvents(commands.Cog):
 
         embed = extensions.Embed(color=ERROR_COLOR)
         embed.add_field(name=translate(_("Account created at")), value=helper.embed_timestamp_format(user.created_at))
-        embed.set_footer(text=f"{global_translate(_('User id'), self.bot, guild.preferred_locale)}: {user.id}")
+        embed.set_footer(text=f"{global_translate(_('User Id'), self.bot, guild.preferred_locale)}: {user.id}")
 
         if isinstance(user, discord.Member):
             embed.set_author(name=translate(_("User banned")), icon_url=user.display_avatar)
@@ -179,7 +179,7 @@ class LoggingEvents(commands.Cog):
 
         embed = extensions.Embed(color=WARN_COLOR)
         embed.set_author(name=translate(_("Member unbanned")), icon_url=user.display_avatar)
-        embed.set_footer(text=f"{translate(_('User id'))}: {user.id}")
+        embed.set_footer(text=f"{translate(_('User Id'))}: {user.id}")
         embed.add_field(name=translate(_("Account created at")), value=helper.embed_timestamp_format(user.created_at))
 
         await self._send_message(guild, cache, embeds=[embed])
@@ -201,7 +201,7 @@ class LoggingEvents(commands.Cog):
 
             embed = extensions.Embed(color=INFO_COLOR)
             embed.set_author(name=translate(_("Member roles changed")), icon_url=before.display_avatar)
-            embed.set_footer(text=f"{translate(_('User id'))}: {before.id}")
+            embed.set_footer(text=f"{translate(_('User Id'))}: {before.id}")
 
             new_roles = helper.format_roles(after.roles)
             embed.add_field(
@@ -224,7 +224,7 @@ class LoggingEvents(commands.Cog):
 
             embed = extensions.Embed(color=INFO_COLOR)
             embed.set_author(name=translate(_("Member renamed")), icon_url=after.display_avatar)
-            embed.set_footer(text=f"{translate(_('User id'))}: {before.id}")
+            embed.set_footer(text=f"{translate(_('User Id'))}: {before.id}")
 
             embed.add_field(
                 name=translate(_("Previous name")),
@@ -307,7 +307,7 @@ class LoggingEvents(commands.Cog):
             member=edit_member, channel=edit_channel, message=jump_to_url
         )
         log_embed.set_author(name=translate(_("Message edited")), icon_url=avatar)
-        log_embed.set_footer(text=f"{translate(_('User id'))}: {edit_member_id}")
+        log_embed.set_footer(text=f"{translate(_('User Id'))}: {edit_member_id}")
 
         content = payload.data.get("content") or translate(_("No content"))
 
@@ -368,7 +368,7 @@ class LoggingEvents(commands.Cog):
             log_embed.description = translate(_("A message from **{member}** was deleted from {channel.mention}.")).format(
                 member=member, channel=message.channel
             )
-            log_embed.set_footer(text=f"{translate(_('User id'))}: {member.id}")
+            log_embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
             # messages longer than 1024 characters receive their own embed
             if len(message.content) <= 1024:

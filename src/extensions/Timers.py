@@ -46,7 +46,7 @@ class Timer(commands.Cog):
     async def call_timer(self, timer: TimerModel) -> None:
         await self.bot.db.execute("DELETE FROM timer WHERE id = $1", timer.id)
 
-        func = getattr(self, f"on_{timer.type.replace("_", "")}_expire", None)
+        func = getattr(self, f"on_{timer.kind.replace('_', '')}_expire", None)
         if func is not None:
             await func(timer)
         else:

@@ -6,7 +6,7 @@ from recordclass import RecordClass
 
 if TYPE_CHECKING:
     from datetime import datetime
-    from lib.enums import AutoModerationPunishmentKind, AutoModerationCheckKind, TimerEnum
+    from lib.enums import AutoModerationPunishmentKind, AutoModerationFinalPunishmentKind, AutoModerationCheckKind, TimerEnum
 
 
 class LevelRole(RecordClass):
@@ -65,8 +65,13 @@ class AutoModerationCheck(RecordClass):
 
 
 class AutoModerationPunishment(RecordClass):
-    kind: AutoModerationPunishmentKind
+    kind: AutoModerationPunishmentKind | AutoModerationFinalPunishmentKind
     duration: int | None
+    points: ModerationPoints | None
+    expires_in: int | None
+
+
+class ModerationPoints(RecordClass):
     points: int | None
     expires_in: int | None
 

@@ -169,12 +169,17 @@ async def automod_log(
     notified_user = None
     if cache.notify_user:
         timestamp = utils.format_dt(until) if until is not None else None
-        user_message = _get_dynamic_log_user_message(
-            translate, guild=guild, reason=data.trigger_reason, timestamp=timestamp, kind=data.trigger_action.punishment.kind
+        embed = _get_dynamic_log_user_message(
+            translate,
+            guild=guild,
+            reason=data.trigger_reason,
+            timestamp=timestamp,
+            kind=data.trigger_action.punishment.kind,
+            points=points,
         )
 
         try:
-            await member.send(user_message)
+            await member.send(embed=embed)
             notified_user = True
         except discord.Forbidden:
             notified_user = False
@@ -249,17 +254,16 @@ async def automod_final_log(
 
     notified_user = None
     if cache.notify_user:
-        until_fmt = discord.utils.format_dt(until) if until is not None else None
-        message = _get_dynamic_log_user_message(
+        embed = _get_dynamic_log_user_message(
             translate,
             guild=guild,
             reason=translate(_("Maximum amount of points reached")),
-            timestamp=until_fmt,
+            timestamp=discord.utils.format_dt(until) if until else None,
             kind=action,
         )
 
         try:
-            await member.send(message)
+            await member.send(embeds=[embed])
             notified_user = True
         except discord.Forbidden:
             notified_user = False
@@ -268,12 +272,13 @@ async def automod_final_log(
     if webhook is None:
         return
 
-    (title,) = _get_dynamic_auto_moderation_description(translate, kind=action, target=member)
+    (title, _description) = _get_dynamic_auto_moderation_description(translate, kind=action, target=member)
 
     embed = extensions.Embed(
         description=translate(_("The user {target.mention} ({target}) has reached the maximum number of points.")).format(
             target=member
-        )
+        ),
+        color=colors.AUTOMOD_COLOR,
     )
     embed.set_author(name=translate(_("Automod: Maximum points reached")), icon_url=member.display_avatar)
     embed.add_field(name=translate(_("Action")), value=f"> {title}")
@@ -302,10 +307,17 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
     notified_user = None
     if cache.notify_user:
         try:
+            embed = _get_dynamic_log_user_message(
+                translate,
+                guild=guild,
+                reason=reason,
+                kind=AutoModerationPunishmentKind.points,
+                points=points,
+                timestamp=None,
+            )
+
             await member.send(
-                translate(
-                    _("You have been warned in `{guild.name}` for **{reason}** and now have `{points}` points.")
-                ).format(reason=reason, guild=guild, points=points)
+                embed=embed,
             )
             notified_user = True
         except discord.Forbidden:
@@ -469,37 +481,54 @@ def _get_dynamic_log_user_message(
     kind: ModerationCommandKind | AutoModerationFinalPunishmentKind | AutoModerationPunishmentKind,
     reason: str,
     timestamp: str | None,
-) -> str:
+    points: str | None = None,
+) -> discord.Embed:
+    embed = extensions.Embed()
+    embed.set_author(icon_url=guild.icon.url, name=guild.name)
+    embed.set_footer(text=f"{translate(_('Guild Id'))} {guild.id}")
+
+    if reason:
+        embed.add_field(name=translate(_("Reason")), value=f"> {reason}")
+
     match kind:
         case "tempban":
-            return translate(_("You have been banned from **{guild.name}** until {timestamp} for `{reason}`.")).format(
-                guild=guild, reason=reason, timestamp=timestamp
-            )
+            embed.title = translate(_("Temporary Ban"))
+            embed.description = translate(_("You have been temporarily banned."))
+
+            embed.insert_field_at(0, name=translate(_("Punished until")), value=f"> {timestamp}")
+
+            return embed
         case "ban":
-            return translate(_("You have been banned from **{guild.name}** for `{reason}`.")).format(
-                guild=guild, reason=reason
-            )
+            embed.title = translate(_("Permanent Ban"))
+            embed.description = translate(_("You have been permanently banned."))
+
+            return embed
         case "tempmute":
-            return translate(_("You have been muted from **{guild.name}** until {timestamp} for `{reason}`.")).format(
-                guild=guild, reason=reason, timestamp=timestamp
-            )
-        case "kick":
-            return translate(_("You have been kicked from **{guild.name}** for `{reason}`.")).format(
-                guild=guild, reason=reason
-            )
-        case "softban":
-            return translate(_("You have been kicked from **{guild.name}** for `{reason}`.")).format(
-                guild=guild, reason=reason
-            )
+            embed.title = translate(_("Temporary Mute"))
+            embed.description = translate(_("You have been temporarily muted."))
+
+            embed.insert_field_at(0, name=translate(_("Punished until")), value=f"> {timestamp}")
+
+            return embed
+        case "kick" | "softban":
+            embed.title = translate(_("Temporary Mute"))
+            embed.description = translate(_("You have been temporarily muted."))
+
+            return embed
         case "unmute":
-            return translate(_("You have been unmuted from **{guild.name}** for `{reason}`.")).format(
-                guild=guild, reason=reason
-            )
+            embed.title = translate(_("Unmute"))
+            embed.description = translate(_("You have been unmuted."))
+
+            return embed
         case "delete":
-            return translate(_("Your message in **{guild.name}** has been deleted for `{reason}`.")).format(
-                guild=guild, reason=reason
-            )
+            embed.title = translate(_("Message deleted"))
+            embed.description = translate(_("A message has been deleted."))
+
+            return embed
         case "points":
-            return translate(_("You have received points in **{guild.name}** for `{reason}`.")).format(
-                guild=guild, reason=reason
-            )
+            embed.title = translate(_("Points received"))
+            embed.description = translate(_("You have received points for your actions."))
+
+            embed.insert_field_at(0, name=translate(_("Points")), value=f"> `{points}`")
+
+            return embed

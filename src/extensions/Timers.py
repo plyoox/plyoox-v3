@@ -91,7 +91,7 @@ class Timer(commands.Cog):
             expires=expires,
             guild_id=guild_id,
             target_id=target_id,
-            type=kind,
+            kind=kind,
             data=data,
         )
 

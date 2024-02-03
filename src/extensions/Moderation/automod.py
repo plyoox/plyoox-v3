@@ -7,9 +7,10 @@ import re
 from typing import TYPE_CHECKING
 
 import discord
-from discord.ext import commands
 from discord.app_commands import locale_str as _
+from discord.ext import commands
 
+from cache.models import ModerationModel, AutoModerationAction, ModerationPoints
 from lib import utils
 from lib.enums import (
     AutoModerationPunishmentKind,
@@ -23,7 +24,6 @@ from . import _logging_helper as _logging
 
 if TYPE_CHECKING:
     from main import Plyoox
-    from cache.models import ModerationModel, AutoModerationAction
 
 _log = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ class Automod(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
         self.invite_cache: dict[str, discord.Invite | None] = utils.ExpiringCache(seconds=600)
-        self.punished_members: dict[tuple[int, int], bool] = utils.ExpiringCache(seconds=5)
+        self.punished_members: dict[tuple[int, int], bool] = utils.ExpiringCache(seconds=3)
         self._invite_requests: dict[str, asyncio.Event] = {}
 
     @commands.Cog.listener()
@@ -168,11 +168,11 @@ class Automod(commands.Cog):
         if author.guild_permissions.administrator:
             return
 
-        if found_invites := DISCORD_INVITE.findall(message.content):
-            cache = await self.bot.cache.get_moderation(guild.id)
-            if cache is None:
-                return
+        cache = await self.bot.cache.get_moderation(guild.id)
+        if cache is None or not cache.active:
+            return
 
+        if found_invites := DISCORD_INVITE.findall(message.content):
             if not self._is_affected(message, cache, AutoModerationExecutionKind.invite):
                 return
 
@@ -192,10 +192,6 @@ class Automod(commands.Cog):
                     break
 
         if found_links := LINK_REGEX.findall(message.content):
-            cache = await self.bot.cache.get_moderation(guild.id)
-            if cache is None:
-                return
-
             if not self._is_affected(message, cache, AutoModerationExecutionKind.link):
                 return
 
@@ -220,10 +216,6 @@ class Automod(commands.Cog):
 
             # Only check for messages with more than 70% capital letters
             if percent < 0.7:
-                return
-
-            cache = await self.bot.cache.get_moderation(guild.id)
-            if cache is None:
                 return
 
             if not self._is_affected(message, cache, AutoModerationExecutionKind.caps):
@@ -307,18 +299,18 @@ class Automod(commands.Cog):
         else:
             self.punished_members[(member.id, member.guild.id)] = True
 
-        if action.action == AutomodFinalActionEnum.kick:
+        if action.punishment.kind == AutomodFinalActionEnum.kick:
             if guild.me.guild_permissions.kick_members:
-                await _logging.automod_final_log(self.bot, member, action.action)
+                await _logging.automod_final_log(self.bot, member, action.punishment.kind)
                 await guild.kick(member, reason=translate(_("Maximum number of points reached")))
-        elif action.action == AutomodFinalActionEnum.ban:
-            await _logging.automod_final_log(self.bot, member, action.action)
+        elif action.punishment.kind == AutomodFinalActionEnum.ban:
             if guild.me.guild_permissions.ban_members:
+                await _logging.automod_final_log(self.bot, member, action.punishment.kind)
                 await guild.ban(member, reason=translate(_("Maximum number of points reached")))
-        elif action.action == AutomodFinalActionEnum.tempban:
+        elif action.punishment.kind == AutomodFinalActionEnum.tempban:
             if guild.me.guild_permissions.ban_members:
-                banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
-                await _logging.automod_final_log(self.bot, member, action.action, until=banned_until)
+                banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.punishment.duration)
+                await _logging.automod_final_log(self.bot, member, action.punishment.kind, until=banned_until)
 
                 timers = self.bot.timer
                 if timers is not None:
@@ -331,10 +323,10 @@ class Automod(commands.Cog):
                     await guild.ban(member, reason=translate(_("Maximum number of points reached")))
                 else:
                     _log.warning("Timer Plugin is not initialized")
-        elif action.action == AutoModerationPunishmentKind.tempmute:
+        elif action.punishment.kind == AutoModerationPunishmentKind.tempmute:
             if guild.me.guild_permissions.mute_members:
-                muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
-                await _logging.automod_final_log(self.bot, member, action.action, until=muted_until)
+                muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.punishment.duration)
+                await _logging.automod_final_log(self.bot, member, action.punishment.kind, until=muted_until)
 
                 await member.timeout(muted_until)
 
@@ -406,9 +398,6 @@ class Automod(commands.Cog):
         roles = message.author._roles
         channel = message.channel
 
-        if not cache.active:
-            return False
-
         if not getattr(cache, f"{kind}_active") or not getattr(cache, f"{kind}_actions"):
             return False
 
@@ -430,9 +419,8 @@ class Automod(commands.Cog):
 
         points = await self.__add_points(
             member=data.member,
-            points=data.trigger_action.points,
+            points=data.trigger_action.punishment.points,
             reason=data.trigger_reason,
-            expires_after=data.trigger_action.duration,
         )
 
         if points is None:
@@ -458,7 +446,9 @@ class Automod(commands.Cog):
     async def add_warn_points(self, member: discord.Member, moderator: discord.Member, add_points: int, reason: str):
         guild = member.guild
 
-        points = await self.__add_points(member=member, points=add_points, reason=reason)
+        points = await self.__add_points(
+            member=member, points=ModerationPoints(points=add_points, expires_in=None), reason=reason
+        )
         if points is None:
             _log.warning(f"{member.id} has no points in {guild.id}...")
             return
@@ -467,23 +457,26 @@ class Automod(commands.Cog):
 
         if points >= 10:
             cache = await self.bot.cache.get_moderation(guild.id)
-            if cache is None:
+            if cache is None or not cache.active:
                 return
 
             await self._handle_final_action(member, cache.point_actions)
 
-    async def __add_points(self, *, member: discord.Member, points: int, reason: str, expires_after: int = 1209600) -> int:
+    async def __add_points(self, *, member: discord.Member, points: ModerationPoints, reason: str) -> int:
         """Add points to a member and returns the currently active points."""
 
         guild = member.guild
-        expires_at = discord.utils.utcnow() + datetime.timedelta(seconds=expires_after)  # default is 2 weeks
+        expires_at = None
+
+        if points.expires_in:
+            expires_at = discord.utils.utcnow().replace(tzinfo=None) + datetime.timedelta(seconds=points.expires_in)
 
         await self.bot.db.execute(
             "INSERT INTO automoderation_user (guild_id, user_id, expires_at, points, reason) VALUES ($1, $2, $3, $4, $5)",
             guild.id,
             member.id,
-            expires_at.replace(tzinfo=None),
-            points,
+            expires_at,
+            points.points,
             reason,
         )
 

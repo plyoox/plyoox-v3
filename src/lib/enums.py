@@ -66,3 +66,7 @@ class AutoModerationExecutionKind(enum.StrEnum):
     caps = "caps"
     points = "points"
     discord_rule = "discord_rule"
+
+
+class BotError(enum.Enum):
+    missing_permission = enum.auto()

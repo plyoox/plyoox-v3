@@ -21,6 +21,7 @@ from .models import (
     LoggingModel,
     ModerationModel,
     Punishment,
+    ModerationPoints,
 )
 
 
@@ -60,19 +61,21 @@ class CacheManager:
 
         for action in actions:
             punishment_key = action["punishment"]
-            points = None
-            expires_in = None
             duration = None
+            points = None
 
             if isinstance(punishment_key, dict):
                 punishment_key = tuple(punishment_key.keys())[0]
-                points = action["punishment"][punishment_key].get("points")
-                expires_in = action["punishment"][punishment_key].get("expires_in")
                 duration = action["punishment"][punishment_key].get("duration")
+                has_points = action["punishment"][punishment_key].get("points")
 
-            punishment = AutoModerationPunishment(
-                kind=punishment_key, points=points, expires_in=expires_in, duration=duration
-            )
+                if has_points is not None:
+                    points = ModerationPoints(
+                        points=has_points,
+                        expires_in=action["punishment"][punishment_key].get("expires_in"),
+                    )
+
+            punishment = AutoModerationPunishment(kind=punishment_key, points=points, duration=duration)
 
             check = action.get("check")
             if check is not None:

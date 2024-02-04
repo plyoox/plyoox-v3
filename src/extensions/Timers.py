@@ -29,11 +29,17 @@ class Timer(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
         self._current_timer: TimerModel | None = None
-        self._has_data = asyncio.Event()
-        self._task = bot.loop.create_task(self.dispatch_timers())
+        self._task = None
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        if self._task is None:
+            self._task = self.bot.loop.create_task(self.dispatch_timers())
 
     async def cog_unload(self) -> None:
         self._task.cancel()
+        self._task = None
+        self._current_timer = None
 
     async def get_timer(self, *, days: int = 7) -> TimerModel | None:
         record = await self.bot.db.fetchrow(
@@ -100,10 +106,11 @@ class Timer(commands.Cog):
             self._task.cancel()
             self._task = self.bot.loop.create_task(self.dispatch_timers())
 
-    async def on_temp_ban_expire(self, timer: TimerModel):
+    async def on_tempban_expire(self, timer: TimerModel):
         guild = self.bot.get_guild(timer.guild_id)
 
         if guild is None:
+            _log.debug("Cannot unban user, guild not found")
             return
 
         try:
@@ -112,7 +119,7 @@ class Timer(commands.Cog):
                 reason=translate(_("Temporary ban expired"), self.bot, guild.preferred_locale),
             )
         except discord.NotFound:
-            pass
+            _log.debug("Cannot unban user, ban not found")
 
 
 async def setup(bot: Plyoox):

@@ -229,7 +229,7 @@ async def automod_log(
             message_embed = extensions.Embed(
                 title=translate(_("Message")),
                 description=data.trigger_content,
-                color=colors.AUTOMOD_COLOR,  # punishment never has any content attached
+                color=colors.AUTOMOD_COLOR,
             )
             embeds.append(message_embed)
 

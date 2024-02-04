@@ -89,12 +89,12 @@ async def log_simple_punish_command(
     if cache.notify_user and isinstance(target, discord.Member):
         reason = reason or f"*{translate(_('No reason'))}*"
         until_fmt = discord.utils.format_dt(until) if until else None
-        message = _get_dynamic_log_user_message(
+        embed = _get_dynamic_log_user_message(
             interaction.translate, kind=kind, reason=reason, timestamp=until_fmt, guild=interaction.guild
         )
 
         try:
-            await target.send(message)
+            await target.send(embeds=[embed])
             notified_user = True
         except discord.Forbidden:
             notified_user = False

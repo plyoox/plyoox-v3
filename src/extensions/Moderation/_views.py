@@ -31,7 +31,7 @@ class MemberView(extensions.PaginatedEphemeralView):
         embed.set_footer(text=f"{translate(_('Page'))}: {self.current_page + 1}/{self.last_page + 1}")
 
         members = self.members[
-          self.current_page * MemberView.MEMBERS_PER_PAGE: MemberView.MEMBERS_PER_PAGE * (self.current_page + 1)
+            self.current_page * MemberView.MEMBERS_PER_PAGE : MemberView.MEMBERS_PER_PAGE * (self.current_page + 1)
         ]
 
         embed.description = "\n".join(f"{m} ({m.id})" for m in members)
@@ -143,9 +143,7 @@ class WarnView(extensions.PaginatedEphemeralView):
         else:
             query = "SELECT * from automoderation_user WHERE user_id = $1 AND guild_id = $2 AND expires_at > now() OFFSET $3 LIMIT 10"
 
-        infractions: Infractions = await self.bot.db.fetch(
-            query, self.user.id, self._last_interaction.guild_id, page * 10
-        )
+        infractions: Infractions = await self.bot.db.fetch(query, self.user.id, self._last_interaction.guild_id, page * 10)
 
         if len(infractions) == 0:
             return extensions.Embed(description=translate(_("This user has no warnings.")))
@@ -170,7 +168,6 @@ class WarnView(extensions.PaginatedEphemeralView):
                     f"**{translate(_('Created at'))}:** {created_at}\n"
                     f"**{translate(_('Reason'))}:** {infraction['reason']}"
                 ),
-                inline=True,
             )
 
         return embed

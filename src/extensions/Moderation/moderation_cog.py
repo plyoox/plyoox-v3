@@ -102,6 +102,12 @@ class Moderation(commands.Cog):
 
         await interaction.response.send_message(embeds=[embed], ephemeral=ephemeral)
 
+    @commands.Cog.listener()
+    async def on_member_unban(self, member: discord.Member):
+        await self.bot.db.execute(
+            "DELETE FROM timer WHERE target_id = $1 AND guild_id = $2 AND kind = 'temp_ban'", member.id, member.guild.id
+        )
+
     @app_commands.command(name="ban", description=_("Bans an user from the guild."))
     @app_commands.describe(member=_("The member that should be banned."), reason=_("Why the member should be banned."))
     @app_commands.checks.bot_has_permissions(ban_members=True)
@@ -261,10 +267,6 @@ class Moderation(commands.Cog):
         await interaction.response.defer(ephemeral=True)
         await _logging_helper.log_simple_punish_command(
             interaction, target=user, reason=reason, kind=ModerationCommandKind.unban
-        )
-
-        await self.bot.db.execute(
-            "DELETE FROM timer WHERE target_id = $1 AND guild_id = $2 AND kind = 'tempban'", user.id, guild.id
         )
 
         await interaction.followup.send(interaction.translate(_("The user has been unbanned.")), ephemeral=True)

@@ -9,6 +9,7 @@ from discord import utils
 from discord.app_commands import locale_str as _
 
 from lib import helper, extensions, types, colors
+from lib.helper import italic
 from translation.translator import translate as global_translate
 
 if TYPE_CHECKING:
@@ -106,9 +107,10 @@ async def log_simple_punish_command(
 
     embed = extensions.Embed(description=description, color=colors.COMMAND_LOG_COLOR)
     embed.set_author(name=title, icon_url=target.display_avatar)
-    embed.add_field(name=translate(_("Reason")), value="> " + (reason or translate(_("No reason"))))
+    embed.add_field(name=translate(_("Reason")), value=f"> {reason}" if reason else italic(translate(_("No reason"))))
     embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()), inline=True)
     embed.set_footer(text=f"{translate(_('User Id'))}: {target.id}")
+
     if until is not None:
         embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until), inline=True)
 

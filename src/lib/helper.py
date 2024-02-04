@@ -96,3 +96,7 @@ def format_timedelta(delta: datetime.timedelta) -> str:
     if seconds > 0:
         parts.append("{}s".format(seconds))
     return " ".join(parts)
+
+
+def italic(string: str) -> str:
+    return f"*{string}*"

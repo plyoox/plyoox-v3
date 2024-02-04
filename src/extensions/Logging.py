@@ -11,6 +11,7 @@ from discord.app_commands import locale_str as _
 
 from lib import helper, extensions
 from lib.enums import LoggingKind
+from lib.helper import italic
 from translation.translator import translate as global_translate
 
 if TYPE_CHECKING:
@@ -133,7 +134,7 @@ class LoggingEvents(commands.Cog):
         embed.add_field(name=translate(_("Account created at")), value=helper.embed_timestamp_format(member.created_at))
 
         roles = helper.format_roles(member.roles)
-        embed.add_field(name=translate(_("Roles")), value=f"> {roles}" if roles else translate(_("No roles")))
+        embed.add_field(name=translate(_("Roles")), value=f"> {roles}" if roles else italic(translate(_("No roles"))))
 
         embed.add_field(name=translate(_("Joined at")), value=helper.embed_timestamp_format(member.joined_at))
         embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
@@ -161,7 +162,7 @@ class LoggingEvents(commands.Cog):
             embed.add_field(name=translate(_("Joined at")), value=helper.embed_timestamp_format(user.joined_at))
 
             roles = helper.format_roles(user.roles)
-            embed.add_field(name=translate(_("Roles")), value=f"> {roles}" if roles else translate(_("No roles")))
+            embed.add_field(name=translate(_("Roles")), value=f"> {roles}" if roles else italic(translate(_("No roles"))))
 
         else:
             embed.set_author(name=translate(_("User banned")), icon_url=user.display_avatar)
@@ -205,12 +206,13 @@ class LoggingEvents(commands.Cog):
 
             new_roles = helper.format_roles(after.roles)
             embed.add_field(
-                name=translate(_("New roles")), value=f"> {new_roles}" if new_roles else translate(_("No roles"))
+                name=translate(_("New roles")), value=f"> {new_roles}" if new_roles else italic(translate(_("No roles")))
             )
 
             old_roles = helper.format_roles(before.roles)
             embed.add_field(
-                name=translate(_("Old roles")), value=f"> {old_roles}" if old_roles else translate(_("No roles"))
+                name=translate(_("Old roles")),
+                value=f"> {old_roles}" if old_roles else italic(translate(_("No roles"))),
             )
 
             await self._send_message(guild, cache, embeds=[embed])
@@ -282,7 +284,7 @@ class LoggingEvents(commands.Cog):
             # messages longer than 1024 characters receive their own embed
             if len(message.content) <= 1024:
                 log_embed.add_field(
-                    name=translate(_("Old message content")), value=message.content or translate(_("No content"))
+                    name=translate(_("Old message content")), value=message.content or italic(translate(_("No content")))
                 )
             else:
                 old_message_embed = extensions.Embed(description=message.content, color=WARN_COLOR)
@@ -309,7 +311,7 @@ class LoggingEvents(commands.Cog):
         log_embed.set_author(name=translate(_("Message edited")), icon_url=avatar)
         log_embed.set_footer(text=f"{translate(_('User Id'))}: {edit_member_id}")
 
-        content = payload.data.get("content") or translate(_("No content"))
+        content = payload.data.get("content") or italic(translate(_("No content")))
 
         # messages longer than 1024 characters receive their own embed
         if len(content) <= 1024:
@@ -374,7 +376,7 @@ class LoggingEvents(commands.Cog):
             if len(message.content) <= 1024:
                 log_embed.add_field(
                     name=translate(_("Message content")),
-                    value=message.content or translate(_("No content")),
+                    value=message.content or italic(translate(_("No content"))),
                 )
             else:
                 content_embed = extensions.Embed(description=message.content, color=ERROR_COLOR)

@@ -113,6 +113,9 @@ class Timer(commands.Cog):
             _log.debug("Cannot unban user, guild not found")
             return
 
+        if not guild.me.guild_permissions.ban_members:
+            return
+
         try:
             await guild.unban(
                 discord.Object(id=timer.target_id),

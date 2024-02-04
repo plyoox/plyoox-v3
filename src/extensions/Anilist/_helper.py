@@ -40,6 +40,8 @@ def to_description(description: str):
         description.replace("<br>", "")
         .replace("<i>", "*")
         .replace("</i>", "*")
+        .replace("<b>", "**")
+        .replace("</b>", "**")
         .replace("<strong>", "**")
         .replace("</strong>", "**")
     )

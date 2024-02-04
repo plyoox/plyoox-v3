@@ -87,7 +87,6 @@ async def log_simple_punish_command(
 
     notified_user = None
     if cache.notify_user and isinstance(target, discord.Member):
-        reason = reason or f"*{translate(_('No reason'))}*"
         until_fmt = discord.utils.format_dt(until) if until else None
         embed = _get_dynamic_log_user_message(
             interaction.translate, kind=kind, reason=reason, timestamp=until_fmt, guild=interaction.guild

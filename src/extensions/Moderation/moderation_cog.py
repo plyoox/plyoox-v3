@@ -150,8 +150,13 @@ class Moderation(commands.Cog):
             await interaction.response.send_translated(_("The provided duration is invalid."), ephemeral=True)
             return
 
-        if (banned_until - discord.utils.utcnow()).total_seconds() > 31_536_000:  # 365 days
+        ban_duration = (banned_until - discord.utils.utcnow()).total_seconds()
+        if ban_duration > 31_536_000:  # 365 days
             await interaction.response.send_translated(_("The provided duration is too long."), ephemeral=True)
+            return
+
+        if ban_duration < 60:
+            await interaction.response.send_translated(_("The minimum duration is 60 seconds."), ephemeral=True)
             return
 
         if not await Moderation._can_execute_on(interaction, member):
@@ -654,6 +659,9 @@ class Moderation(commands.Cog):
     @tempban.autocomplete("duration")
     async def autocomplete_duration(self, interaction: discord.Interaction, current: str):
         times = [
+            {"label": f"5 {interaction.translate(_('minutes'))}", "value": "5min"},
+            {"label": f"10 {interaction.translate(_('minutes'))}", "value": "10min"},
+            {"label": f"15 {interaction.translate(_('minutes'))}", "value": "15min"},
             {"label": f"30 {interaction.translate(_('minutes'))}", "value": "30min"},
             {"label": f"1 {interaction.translate(_('hours'))}", "value": "1h"},
             {"label": f"3 {interaction.translate(_('hours'))}", "value": "3h"},

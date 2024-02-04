@@ -92,7 +92,7 @@ class Leveling(commands.Cog):
     async def _fetch_member_data(self, member: discord.Member) -> LevelUserData:
         """Fetches the leveling data of a member."""
         return await self.bot.db.fetchrow(
-            "SELECT * FROM level_user WHERE guild_id = $1 AND user_id = $2",
+            "SELECT user_id, guild_id, xp FROM level_user WHERE guild_id = $1 AND user_id = $2",
             member.guild.id,
             member.id,
         )
@@ -100,7 +100,7 @@ class Leveling(commands.Cog):
     async def _create_member_data(self, member: discord.Member, xp: int) -> None:
         """Creates a database entry for the member."""
         await self.bot.db.execute(
-            "INSERT INTO level_user (guild_id, user_id, xp) VALUES ($1, $2, $3)",
+            "INSERT INTO level_user (guild_id, user_id, xp, message_count) VALUES ($1, $2, $3, 1)",
             member.guild.id,
             member.id,
             xp,
@@ -109,7 +109,10 @@ class Leveling(commands.Cog):
     async def _update_member_data(self, user_id: int, guild_id: int, xp: int) -> None:
         """Adds a specific amount of xp to the user in the database."""
         await self.bot.db.execute(
-            "UPDATE level_user SET xp = xp + $1 WHERE user_id = $2 AND guild_id = $3", xp, user_id, guild_id
+            "UPDATE level_user SET xp = xp + $1, message_count = message_count + 1 WHERE user_id = $2 AND guild_id = $3",
+            xp,
+            user_id,
+            guild_id,
         )
 
     async def cog_unload(self) -> None:

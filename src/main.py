@@ -51,7 +51,7 @@ class Plyoox(commands.AutoShardedBot):
 
     def __init__(self, compress: bool = True):
         intents = discord.Intents(
-            bans=True,
+            moderation=True,
             message_content=True,
             guild_messages=True,
             guilds=True,

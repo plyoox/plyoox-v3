@@ -41,7 +41,7 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description=_("Comm
                     await self.bot.loop.create_task(self.__reset_limit(int(retry_after)))
                     raise errors.AnilistQueryError("Rate limit exceeded")
 
-                if resp.status != 200:
+                if not resp.ok:
                     raise errors.AnilistQueryError(f"Anilist returned status code {resp.status}")
 
                 data = await resp.json()
@@ -60,9 +60,7 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description=_("Comm
         title: Literal["Romaji", "Native", "English"] = "Romaji",
     ):
         if not self.limiter.has_capacity() and not self.limit_lock:
-            await interaction.response.send_translated(
-                _("The limit of the API has been reached. Please try again later.")
-            )
+            await interaction.response.send_translated(_("The limit of the API has been reached. Please try again later."))
             return
 
         await interaction.response.defer()
@@ -90,9 +88,7 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description=_("Comm
     @app_commands.describe(query=_("The query to search for."))
     async def info_anilist(self, interaction: discord.Interaction, query: str):
         if not self.limiter.has_capacity() and not self.limit_lock:
-            await interaction.response.send_translated(
-                _("The limit of the API has been reached. Please try again later.")
-            )
+            await interaction.response.send_translated(_("The limit of the API has been reached. Please try again later."))
             return
 
         await interaction.response.defer()

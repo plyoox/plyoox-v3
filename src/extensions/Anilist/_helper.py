@@ -5,7 +5,7 @@ from typing import Literal, TYPE_CHECKING
 import discord
 from discord.app_commands import locale_str as _
 
-from lib import extensions
+from lib import extensions, errors
 from . import queries
 
 if TYPE_CHECKING:
@@ -78,7 +78,13 @@ async def paginate_search(interaction: discord.Interaction, view: _views.Anilist
     bot: Plyoox = interaction.client
     await interaction.response.defer()
 
-    data = await bot.anilist._fetch_query(query=queries.SEARCH_QUERY, page=view.current_page, search=view.query)
+    try:
+        data = await bot.anilist._fetch_query(query=queries.SEARCH_QUERY, page=view.current_page, search=view.query)
+    except errors.AnilistQueryError as e:
+        embed = extensions.Embed(title=translate(_("Anilist API Error")), description=str(e), color=discord.Color.red())
+
+        await interaction.followup.send(embed=embed, ephemeral=True)
+        return
 
     if not data:
         await interaction.followup.send(translate(_("No results found.")), ephemeral=True)

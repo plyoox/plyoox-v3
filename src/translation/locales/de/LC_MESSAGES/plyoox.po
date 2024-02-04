@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-03 21:19+0100\n"
+"POT-Creation-Date: 2024-02-04 18:11+0100\n"
 "PO-Revision-Date: 2024-01-03 12:36+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -18,59 +18,63 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.4.2\n"
 
-#: src/extensions/Anilist/_helper.py:61
+#: src/extensions/Anilist/_helper.py:63
 msgid "Results for {query}"
 msgstr "Ergebnisse für {query}"
 
-#: src/extensions/Anilist/_helper.py:82
-#: src/extensions/Anilist/anilist_cog.py:73
-#: src/extensions/Anilist/anilist_cog.py:103
+#: src/extensions/Anilist/_helper.py:84
+msgid "Anilist API Error"
+msgstr ""
+
+#: src/extensions/Anilist/_helper.py:90
+#: src/extensions/Anilist/anilist_cog.py:71
+#: src/extensions/Anilist/anilist_cog.py:99
 msgid "No results found."
 msgstr "Keine Ergebnisse gefunden."
 
-#: src/extensions/Anilist/_helper.py:106
+#: src/extensions/Anilist/_helper.py:114
 #: src/extensions/Moderation/moderation_cog.py:75
 msgid "Information"
 msgstr "Informationen"
 
-#: src/extensions/Anilist/_helper.py:107
+#: src/extensions/Anilist/_helper.py:115
 msgid "Status"
 msgstr "Status"
 
-#: src/extensions/Anilist/_helper.py:109
+#: src/extensions/Anilist/_helper.py:117
 msgid "Episodes"
 msgstr "Episoden"
 
-#: src/extensions/Anilist/_helper.py:109
+#: src/extensions/Anilist/_helper.py:117
 #: src/extensions/Moderation/moderation_cog.py:657
 msgid "minutes"
 msgstr "Minuten"
 
-#: src/extensions/Anilist/_helper.py:111
+#: src/extensions/Anilist/_helper.py:119
 msgid "Season"
 msgstr "Saison"
 
-#: src/extensions/Anilist/_helper.py:112
+#: src/extensions/Anilist/_helper.py:120
 msgid "Year"
 msgstr "Jahr"
 
-#: src/extensions/Anilist/_helper.py:113
+#: src/extensions/Anilist/_helper.py:121
 msgid "Country"
 msgstr "Land"
 
-#: src/extensions/Anilist/_helper.py:114
+#: src/extensions/Anilist/_helper.py:122
 msgid "Score"
 msgstr "Bewertung"
 
-#: src/extensions/Anilist/_helper.py:116
+#: src/extensions/Anilist/_helper.py:124
 msgid "Description"
 msgstr "Beschreibung"
 
-#: src/extensions/Anilist/_helper.py:119
+#: src/extensions/Anilist/_helper.py:127
 msgid "Genres"
 msgstr "Genre"
 
-#: src/extensions/Anilist/_helper.py:123
+#: src/extensions/Anilist/_helper.py:131
 msgid "Related to"
 msgstr "Verwandt mit"
 
@@ -91,8 +95,8 @@ msgid "Show rating"
 msgstr "Bewertung anzeigen"
 
 #: src/extensions/Anilist/_views.py:126 src/extensions/Anilist/_views.py:137
-#: src/extensions/Leveling.py:145 src/extensions/Leveling.py:189
-#: src/extensions/Leveling.py:202
+#: src/extensions/Leveling.py:148 src/extensions/Leveling.py:192
+#: src/extensions/Leveling.py:205
 msgid "The required infrastructure is currently not available."
 msgstr "Die erforderliche Infrastruktur ist derzeit nicht verfügbar."
 
@@ -117,7 +121,7 @@ msgid "Search for an anime on Anilist."
 msgstr "Suche nach einem Anime auf Anilist."
 
 #: src/extensions/Anilist/anilist_cog.py:53
-#: src/extensions/Anilist/anilist_cog.py:90
+#: src/extensions/Anilist/anilist_cog.py:88
 msgid "The query to search for."
 msgstr "Die Abfrage zum Suchen."
 
@@ -126,13 +130,13 @@ msgid "In which language the titles should be displayed (default original)."
 msgstr ""
 "In welcher Sprache die Titel angezeigt werden sollen (Standard: Original)."
 
-#: src/extensions/Anilist/anilist_cog.py:64
-#: src/extensions/Anilist/anilist_cog.py:94
+#: src/extensions/Anilist/anilist_cog.py:63
+#: src/extensions/Anilist/anilist_cog.py:91
 msgid "The limit of the API has been reached. Please try again later."
 msgstr ""
 "Das Limit der API wurde erreicht. Bitte versuchen Sie es später erneut."
 
-#: src/extensions/Anilist/anilist_cog.py:89
+#: src/extensions/Anilist/anilist_cog.py:87
 msgid "Get information about an anime on Anilist."
 msgstr "Informationen über einen Anime auf Anilist abrufen."
 
@@ -268,7 +272,7 @@ msgid "Owner"
 msgstr "Besitzer"
 
 #: src/extensions/Infos/guild_group.py:40 src/extensions/Infos/user_group.py:61
-#: src/extensions/Moderation/_views.py:170
+#: src/extensions/Moderation/_views.py:168
 #: src/extensions/Moderation/moderation_cog.py:78
 msgid "Created at"
 msgstr "Erstellt am"
@@ -412,7 +416,7 @@ msgstr "Bot"
 
 #: src/extensions/Infos/user_group.py:62 src/extensions/Infos/user_group.py:77
 #: src/extensions/Infos/user_group.py:84 src/extensions/Infos/user_group.py:89
-#: src/extensions/Leveling.py:393
+#: src/extensions/Leveling.py:396
 #: src/extensions/Moderation/_logging_helper.py:117
 #: src/extensions/Moderation/_logging_helper.py:221
 #: src/extensions/Moderation/_logging_helper.py:292
@@ -421,7 +425,7 @@ msgid "No"
 msgstr "Nein"
 
 #: src/extensions/Infos/user_group.py:62 src/extensions/Infos/user_group.py:77
-#: src/extensions/Infos/user_group.py:84 src/extensions/Leveling.py:393
+#: src/extensions/Infos/user_group.py:84 src/extensions/Leveling.py:396
 #: src/extensions/Moderation/_logging_helper.py:117
 #: src/extensions/Moderation/_logging_helper.py:221
 #: src/extensions/Moderation/_logging_helper.py:292
@@ -528,7 +532,7 @@ msgstr "Rang anzeigen"
 msgid "Commands that are needed to interact with the level-system."
 msgstr "Befehle, die für die Interaktion mit dem Level-System benötigt werden."
 
-#: src/extensions/Leveling.py:123
+#: src/extensions/Leveling.py:126
 msgid ""
 "The level system has not been enabled. Go to the [Dashboard](https://plyoox."
 "net) to enabled it."
@@ -536,78 +540,78 @@ msgstr ""
 "Das Levelsystem ist derzeit nicht aktiviert. Aktiviere es auf dem [Dashboard]"
 "(https://plyoox.net)."
 
-#: src/extensions/Leveling.py:128
+#: src/extensions/Leveling.py:131
 msgid "This module is currently disabled."
 msgstr "Das Modul ist derzeit deaktiviert."
 
-#: src/extensions/Leveling.py:161
+#: src/extensions/Leveling.py:164
 msgid "This user has never written anything or is excluded."
 msgstr ""
 "Dieser Benutzer hat noch nie etwas geschrieben oder ist ausgeschlossen."
 
-#: src/extensions/Leveling.py:363
+#: src/extensions/Leveling.py:366
 msgid "Shows information about the current rank of a member."
 msgstr "Zeigt Informationen über den aktuellen Rang eines Benutzers an."
 
-#: src/extensions/Leveling.py:365
+#: src/extensions/Leveling.py:368
 msgid "The member from whom you want the rank."
 msgstr "Der Benutzer, dessen Rang angezeigt werden soll."
 
-#: src/extensions/Leveling.py:372
+#: src/extensions/Leveling.py:375
 msgid "Shows the available level roles."
 msgstr "Zeigt die verfügbaren Level Rollen an."
 
-#: src/extensions/Leveling.py:383
+#: src/extensions/Leveling.py:386
 msgid "The server has no level roles configured."
 msgstr "Der Server hat keine Level Rollen konfiguriert."
 
-#: src/extensions/Leveling.py:395
+#: src/extensions/Leveling.py:398
 msgid "Available level roles"
 msgstr "Verfügbare Level Rollen"
 
-#: src/extensions/Leveling.py:397
+#: src/extensions/Leveling.py:400
 msgid "**Remove previous roles:** {remove_roles}"
 msgstr "**Vorherige Rollen entfernen:** {remove_roles}"
 
-#: src/extensions/Leveling.py:406
+#: src/extensions/Leveling.py:409
 msgid "Lists the top 10 users with the highest level on this guild."
 msgstr "Liste der Top 10 Benutzer mit dem höchsten Level auf dem Server."
 
-#: src/extensions/Leveling.py:452
+#: src/extensions/Leveling.py:455
 msgid "There is no user tracked by the level system."
 msgstr "Es wird kein Benutzer vom Levelsystem verfolgt."
 
-#: src/extensions/Leveling.py:458
+#: src/extensions/Leveling.py:461
 msgid "Top 10 users with the highest level"
 msgstr "Top 10 der Benutzer mit dem höchsten Level"
 
-#: src/extensions/Leveling.py:464
+#: src/extensions/Leveling.py:467
 msgid "Level"
 msgstr "Level"
 
-#: src/extensions/Leveling.py:465
+#: src/extensions/Leveling.py:468
 msgid "XP"
 msgstr "XP"
 
-#: src/extensions/Leveling.py:473
+#: src/extensions/Leveling.py:476
 msgid "Resets the level of a member. This action cannot be undone."
 msgstr ""
 "Setzt das Level eines Benutzers zurück. Diese Aktion kann nicht rückgängig "
 "gemacht werden."
 
-#: src/extensions/Leveling.py:475
+#: src/extensions/Leveling.py:478
 msgid "The member from whom you want to reset rank."
 msgstr "Der Benutzer, dessen Level zurücksetzt werden soll."
 
-#: src/extensions/Leveling.py:497
+#: src/extensions/Leveling.py:500
 msgid "The level progress of this user was reset."
 msgstr "Der Level-Fortschritt des Users wurde zurückgesetzt."
 
-#: src/extensions/Leveling.py:500
+#: src/extensions/Leveling.py:503
 msgid "The levels of this user were successfully reset."
 msgstr "Das Level des Users wurde zurückgesetzt."
 
-#: src/extensions/Leveling.py:505
+#: src/extensions/Leveling.py:508
 msgid ""
 "Resets the levels of all members in the guild. This action cannot be undone."
 msgstr ""
@@ -738,7 +742,7 @@ msgstr "Kein Grund angegeben"
 #: src/extensions/Moderation/_logging_helper.py:204
 #: src/extensions/Moderation/_logging_helper.py:337
 #: src/extensions/Moderation/_logging_helper.py:491
-#: src/extensions/Moderation/_views.py:171
+#: src/extensions/Moderation/_views.py:169
 #: src/extensions/Moderation/clear_group.py:114
 msgid "Reason"
 msgstr "Grund"
@@ -1000,7 +1004,6 @@ msgid "You have been permanently banned."
 msgstr "Du wurdest permanent gebannt."
 
 #: src/extensions/Moderation/_logging_helper.py:507
-#: src/extensions/Moderation/_logging_helper.py:514
 msgid "Temporary Mute"
 msgstr "Temporäre Sperre"
 
@@ -1008,6 +1011,10 @@ msgstr "Temporäre Sperre"
 #: src/extensions/Moderation/_logging_helper.py:515
 msgid "You have been temporarily muted."
 msgstr "Benutzer wurde temporär gesperrt."
+
+#: src/extensions/Moderation/_logging_helper.py:514
+msgid "Kick"
+msgstr "Kick"
 
 #: src/extensions/Moderation/_logging_helper.py:519
 msgid "Unmute"
@@ -1030,7 +1037,7 @@ msgid "You have received points for your actions."
 msgstr "Du hast Punkte für deine Aktionen bekommen."
 
 #: src/extensions/Moderation/_logging_helper.py:532
-#: src/extensions/Moderation/_views.py:168
+#: src/extensions/Moderation/_views.py:166
 msgid "Points"
 msgstr "Punkte"
 
@@ -1039,7 +1046,7 @@ msgid "List of members"
 msgstr "Liste der Mitglieder"
 
 #: src/extensions/Moderation/_views.py:31
-#: src/extensions/Moderation/_views.py:155
+#: src/extensions/Moderation/_views.py:153
 msgid "Page"
 msgstr "Seite"
 
@@ -1076,32 +1083,32 @@ msgid "Successfully banned {user_count} users."
 msgstr "{user_count} Benutzer wurden erfolgreich gebannt."
 
 #: src/extensions/Moderation/_views.py:126
-#: src/extensions/Moderation/_views.py:203
+#: src/extensions/Moderation/_views.py:200
 msgid "Expired Infractions"
 msgstr "Abgelaufene Warnungen"
 
-#: src/extensions/Moderation/_views.py:151
+#: src/extensions/Moderation/_views.py:149
 msgid "This user has no warnings."
 msgstr "Der Benutzer hat keine Warnungen."
 
-#: src/extensions/Moderation/_views.py:153
+#: src/extensions/Moderation/_views.py:151
 msgid "Infractions"
 msgstr "Warnungen"
 
-#: src/extensions/Moderation/_views.py:162
+#: src/extensions/Moderation/_views.py:160
 msgid "Never"
 msgstr "Nie"
 
-#: src/extensions/Moderation/_views.py:166
+#: src/extensions/Moderation/_views.py:164
 msgid "Infraction"
 msgstr "Warnung"
 
-#: src/extensions/Moderation/_views.py:169
+#: src/extensions/Moderation/_views.py:167
 #: src/extensions/Moderation/moderation_cog.py:79
 msgid "Expires at"
 msgstr "Läuft ab am"
 
-#: src/extensions/Moderation/_views.py:203
+#: src/extensions/Moderation/_views.py:200
 msgid "Active Infractions"
 msgstr "Aktive Warnungen"
 
@@ -1666,7 +1673,7 @@ msgstr "Dauer"
 msgid "Go to Twitch"
 msgstr "Zu Twitch"
 
-#: src/extensions/Timers.py:112
+#: src/extensions/Timers.py:119
 msgid "Temporary ban expired"
 msgstr "Temporärer Ban abgelaufen"
 
@@ -1700,10 +1707,3 @@ msgstr ""
 #: src/lib/extensions/view.py:16
 msgid "Only the creator can use this action."
 msgstr "Nur der Ersteller kann diese Aktion nutzen."
-
-#~ msgid ""
-#~ "You have been warned in `{guild.name}` for **{reason}** and now have "
-#~ "`{points}` points."
-#~ msgstr ""
-#~ "Du wurdest in `{guild.name}` für **{reason}** gewarnt und hast nun "
-#~ "`{points}` Punkte."

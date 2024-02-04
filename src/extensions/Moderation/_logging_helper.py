@@ -108,10 +108,10 @@ async def log_simple_punish_command(
     embed = extensions.Embed(description=description, color=colors.COMMAND_LOG_COLOR)
     embed.set_author(name=title, icon_url=target.display_avatar)
     embed.add_field(name=translate(_("Reason")), value="> " + (reason or translate(_("No reason"))))
-    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
+    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()), inline=True)
     embed.set_footer(text=f"{translate(_('User Id'))}: {target.id}")
     if until is not None:
-        embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
+        embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until), inline=True)
 
     if notified_user is not None:
         embed.add_field(name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No")))
@@ -202,7 +202,7 @@ async def automod_log(
     embed = extensions.Embed(description=description)
     embed.set_author(name=title, icon_url=member.display_avatar)
     embed.add_field(name=translate(_("Reason")), value=f"> {data.trigger_reason}")
-    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
+    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()), inline=True)
     embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
     # data.moderator is only set when executed by the punishment command
@@ -213,7 +213,7 @@ async def automod_log(
         embed.color = colors.AUTOMOD_COLOR
 
     if until is not None:
-        embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
+        embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until), inline=True)
     elif points is not None:
         embed.add_field(name=translate(_("Points added")), value="> " + points)
 
@@ -282,11 +282,11 @@ async def automod_final_log(
     )
     embed.set_author(name=translate(_("Automod: Maximum points reached")), icon_url=member.display_avatar)
     embed.add_field(name=translate(_("Action")), value=f"> {title}")
-    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
+    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()), inline=True)
     embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
     if until is not None:
-        embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until))
+        embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until), inline=True)
 
     if notified_user is not None:
         embed.add_field(name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No")))

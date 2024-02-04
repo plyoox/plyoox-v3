@@ -486,7 +486,7 @@ def _get_dynamic_log_user_message(
 ) -> discord.Embed:
     embed = extensions.Embed()
     embed.set_author(icon_url=guild.icon.url, name=guild.name)
-    embed.set_footer(text=f"{translate(_('Guild Id'))} {guild.id}")
+    embed.set_footer(text=f"{translate(_('Guild Id'))}: {guild.id}")
 
     if reason:
         embed.add_field(name=translate(_("Reason")), value=f"> {reason}")

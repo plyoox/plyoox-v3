@@ -583,7 +583,7 @@ class Moderation(commands.Cog):
 
     @warn_group.command(name="remove", description=_("Removes a warning from a user."))
     @app_commands.describe(member=_("The user to remove a warning from."), id=_("The ID of the warning to remove."))
-    async def warn_remove(self, interaction: discord.Interaction, member: discord.Member, id: app_commands.Range[int, 0]):
+    async def warn_remove(self, interaction: discord.Interaction, member: discord.User, id: app_commands.Range[int, 0]):
         if member.bot:
             await interaction.response.send_translated(_("Bots cannot be punished."), ephemeral=True)
             return
@@ -606,7 +606,7 @@ class Moderation(commands.Cog):
 
     @warn_group.command(name="remove-all", description=_("Removes all warnings from a user."))
     @app_commands.describe(member=_("The user to remove all warnings from."))
-    async def warn_remove_all(self, interaction: discord.Interaction, member: discord.Member):
+    async def warn_remove_all(self, interaction: discord.Interaction, member: discord.User):
         if member.bot:
             await interaction.response.send_translated(_("Bots cannot be punished."), ephemeral=True)
             return

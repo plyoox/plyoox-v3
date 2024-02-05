@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-02-05 13:57+0100\n"
+"POT-Creation-Date: 2024-02-05 15:32+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -323,19 +323,19 @@ msgstr ""
 msgid "No features"
 msgstr ""
 
-#: src/extensions/Infos/guild_group.py:63
-msgid "Shows how many members joined in the last 24 hours."
+#: src/extensions/Infos/guild_group.py:64
+msgid "Counts the members who have joined the guild in the last 24 hours."
 msgstr ""
 
-#: src/extensions/Infos/guild_group.py:81
-msgid "In the last 24 hours {member_count} members joined on the guild."
+#: src/extensions/Infos/guild_group.py:83
+msgid "member_count} users of the server have joined in the last 24 hours."
 msgstr ""
 
-#: src/extensions/Infos/guild_group.py:85
+#: src/extensions/Infos/guild_group.py:87
 msgid "Shows how many members are currently in the guild."
 msgstr ""
 
-#: src/extensions/Infos/guild_group.py:89
+#: src/extensions/Infos/guild_group.py:91
 msgid "This guild has {member_count} member."
 msgstr ""
 

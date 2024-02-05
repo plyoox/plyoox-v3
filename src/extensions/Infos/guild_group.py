@@ -60,7 +60,9 @@ class GuildGroup(app_commands.Group):
 
         await interaction.response.send_message(embeds=[embed])
 
-    @app_commands.command(name="today-joined", description=_("Shows how many members joined in the last 24 hours."))
+    @app_commands.command(
+        name="today-joined", description=_("Counts the members who have joined the guild in the last 24 hours.")
+    )
     async def today_joined(self, interaction: discord.Interaction):
         """Shows the amount of members that have joined in the last 24 hours. This does
         not include members that already left. This means, that this number does not represent
@@ -78,7 +80,7 @@ class GuildGroup(app_commands.Group):
                 joined += 1
 
         await interaction.response.send_translated(
-            _("In the last 24 hours {member_count} members joined on the guild."),
+            _("member_count} users of the server have joined in the last 24 hours."),
             translation_data={"member_count": joined},
         )
 

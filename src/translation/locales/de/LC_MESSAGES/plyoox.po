@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-05 13:57+0100\n"
+"POT-Creation-Date: 2024-02-05 15:32+0100\n"
 "PO-Revision-Date: 2024-01-03 12:36+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -328,19 +328,23 @@ msgstr "Besonderheiten"
 msgid "No features"
 msgstr "Keine Besonderheiten"
 
-#: src/extensions/Infos/guild_group.py:63
-msgid "Shows how many members joined in the last 24 hours."
-msgstr "Anzahl der Mitglieder, die in den letzten 24 Stunden beigetreten sind."
+#: src/extensions/Infos/guild_group.py:64
+msgid "Counts the members who have joined the guild in the last 24 hours."
+msgstr ""
+"Zählt die Mitglieder, die dem Server in den letzten 24 Stunden beigetreten "
+"sind."
 
-#: src/extensions/Infos/guild_group.py:81
-msgid "In the last 24 hours {member_count} members joined on the guild."
-msgstr "In den letzten 24 Stunden sind {member_count} Benutzer beigetreten."
+#: src/extensions/Infos/guild_group.py:83
+msgid "member_count} users of the server have joined in the last 24 hours."
+msgstr ""
+"{member_count} Benutzer des Servers sind in den letzten 24 Stunden "
+"beigetreten."
 
-#: src/extensions/Infos/guild_group.py:85
+#: src/extensions/Infos/guild_group.py:87
 msgid "Shows how many members are currently in the guild."
 msgstr "Anzahl der Mitglieder, die derzeit auf dem Server sind."
 
-#: src/extensions/Infos/guild_group.py:89
+#: src/extensions/Infos/guild_group.py:91
 msgid "This guild has {member_count} member."
 msgstr "Der Server hat {member_count} Mitglieder."
 

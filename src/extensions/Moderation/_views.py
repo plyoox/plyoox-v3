@@ -117,33 +117,35 @@ class MassbanView(extensions.EphemeralView):
 
 class WarnView(extensions.PaginatedEphemeralView):
     def __init__(self, original_interaction: discord.Interaction, user: discord.User, last_page: int = None):
-        super().__init__(original_interaction, last_page=last_page)
-
+        self.view_expired = False
         self.bot: Plyoox = original_interaction.client
         self.user = user
-        self.view_expired = False
+
+        super().__init__(original_interaction, last_page=last_page)
 
         self.view_expired_button.label = original_interaction.translate(_("Expired Infractions"))
 
     async def get_page_count(self) -> int:
+        if not self.view_expired:
+            return 0
+
         if self.view_expired:
-            query = "SELECT count(*) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND expires_at < now()"
-        else:
-            query = "SELECT count(*) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND expires_at > now()"
+            query = "SELECT count(*) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND (expires_at IS NULL OR expires_at < now())"
+            infraction_count = await self.bot.db.fetchval(query, self.user.id, self._last_interaction.guild_id)
 
-        infraction_count = await self.bot.db.fetchval(query, self.user.id, self._last_interaction.guild_id)
-
-        return infraction_count // 10
+            return infraction_count // 10
 
     async def generate_embed(self, page: int) -> discord.Embed:
         translate = self._last_interaction.translate
 
         if self.view_expired:
             query = "SELECT * from automoderation_user WHERE user_id = $1 AND guild_id = $2 AND expires_at < now() OFFSET $3 LIMIT 10"
+            infractions: Infractions = await self.bot.db.fetch(
+                query, self.user.id, self._last_interaction.guild_id, page * 10
+            )
         else:
-            query = "SELECT * from automoderation_user WHERE user_id = $1 AND guild_id = $2 AND expires_at > now() OFFSET $3 LIMIT 10"
-
-        infractions: Infractions = await self.bot.db.fetch(query, self.user.id, self._last_interaction.guild_id, page * 10)
+            query = "SELECT * from automoderation_user WHERE user_id = $1 AND guild_id = $2 AND (expires_at IS NULL OR expires_at > now())"
+            infractions: Infractions = await self.bot.db.fetch(query, self.user.id, self._last_interaction.guild_id)
 
         if len(infractions) == 0:
             return extensions.Embed(description=translate(_("This user has no warnings.")))
@@ -152,7 +154,7 @@ class WarnView(extensions.PaginatedEphemeralView):
         embed.set_author(name=str(self.user), icon_url=self.user.display_avatar.url)
         embed.set_footer(text=f'{translate(_("Page"))} {self.current_page + 1}/{self.last_page + 1}')
 
-        for infraction in infractions:
+        for index, infraction in enumerate(infractions):
             infraction = dict(infraction)
 
             created_at = discord.utils.format_dt(infraction["created_at"])
@@ -161,7 +163,7 @@ class WarnView(extensions.PaginatedEphemeralView):
             )
 
             embed.add_field(
-                name=f'{translate(_("Infraction"))} #{infraction["id"]}',
+                name=f'`{index + 1}.` {translate(_("Infraction"))} #{infraction["id"]}',
                 value=(
                     f"**{translate(_('Points'))}:** {infraction['points']}\n"
                     f"**{translate(_('Expires at'))}:** {expires_at}\n"
@@ -171,6 +173,26 @@ class WarnView(extensions.PaginatedEphemeralView):
             )
 
         return embed
+
+    def update_button_state(self):
+        super().update_button_state()
+
+        self.clear_items()
+
+        if not self.view_expired:
+            self.view_expired_button.row = 0
+
+            self.add_item(self.view_expired_button)
+        else:
+
+            self.add_item(self.back_button)  # type: ignore
+            self.add_item(self.next_button)  # type: ignore
+
+            self.view_expired_button.row = 1
+
+            self.add_item(self.view_expired_button)
+
+        self.add_item(self.stop_button)  # type: ignore
 
     async def initialize(self) -> discord.Embed:
         if self.last_page is None:
@@ -192,7 +214,7 @@ class WarnView(extensions.PaginatedEphemeralView):
         embed = await self.generate_embed(self.current_page)
         await interaction.edit_original_response(embed=embed, view=self)
 
-    @ui.button(custom_id="change_expired", style=discord.ButtonStyle.blurple, row=1)
+    @ui.button(custom_id="change_expired", style=discord.ButtonStyle.blurple)
     async def view_expired_button(self, interaction: discord.Interaction, button: ui.Button):
         self.current_page = 0
         self.view_expired = not self.view_expired

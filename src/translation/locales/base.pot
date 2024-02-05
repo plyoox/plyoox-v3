@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-02-04 18:11+0100\n"
+"POT-Creation-Date: 2024-02-05 13:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,7 +43,10 @@ msgid "Episodes"
 msgstr ""
 
 #: src/extensions/Anilist/_helper.py:117
-#: src/extensions/Moderation/moderation_cog.py:657
+#: src/extensions/Moderation/moderation_cog.py:664
+#: src/extensions/Moderation/moderation_cog.py:665
+#: src/extensions/Moderation/moderation_cog.py:666
+#: src/extensions/Moderation/moderation_cog.py:667
 msgid "minutes"
 msgstr ""
 
@@ -275,15 +278,15 @@ msgid "Members"
 msgstr ""
 
 #: src/extensions/Infos/guild_group.py:46
-#: src/extensions/Infos/user_group.py:95 src/extensions/Logging.py:136
-#: src/extensions/Logging.py:164
+#: src/extensions/Infos/user_group.py:95 src/extensions/Logging.py:137
+#: src/extensions/Logging.py:165
 msgid "Roles"
 msgstr ""
 
 #: src/extensions/Infos/guild_group.py:47
-#: src/extensions/Infos/user_group.py:96 src/extensions/Logging.py:136
-#: src/extensions/Logging.py:164 src/extensions/Logging.py:208
-#: src/extensions/Logging.py:213
+#: src/extensions/Infos/user_group.py:96 src/extensions/Logging.py:137
+#: src/extensions/Logging.py:165 src/extensions/Logging.py:209
+#: src/extensions/Logging.py:215
 msgid "No roles"
 msgstr ""
 
@@ -393,7 +396,7 @@ msgid "Days since joined"
 msgstr ""
 
 #: src/extensions/Infos/user_group.py:38 src/extensions/Infos/user_group.py:82
-#: src/extensions/Logging.py:138 src/extensions/Logging.py:161
+#: src/extensions/Logging.py:139 src/extensions/Logging.py:162
 msgid "Joined at"
 msgstr ""
 
@@ -412,19 +415,19 @@ msgstr ""
 #: src/extensions/Infos/user_group.py:62 src/extensions/Infos/user_group.py:77
 #: src/extensions/Infos/user_group.py:84 src/extensions/Infos/user_group.py:89
 #: src/extensions/Leveling.py:396
-#: src/extensions/Moderation/_logging_helper.py:117
-#: src/extensions/Moderation/_logging_helper.py:221
-#: src/extensions/Moderation/_logging_helper.py:292
-#: src/extensions/Moderation/_logging_helper.py:344
+#: src/extensions/Moderation/_logging_helper.py:118
+#: src/extensions/Moderation/_logging_helper.py:222
+#: src/extensions/Moderation/_logging_helper.py:293
+#: src/extensions/Moderation/_logging_helper.py:345
 msgid "No"
 msgstr ""
 
 #: src/extensions/Infos/user_group.py:62 src/extensions/Infos/user_group.py:77
 #: src/extensions/Infos/user_group.py:84 src/extensions/Leveling.py:396
-#: src/extensions/Moderation/_logging_helper.py:117
-#: src/extensions/Moderation/_logging_helper.py:221
-#: src/extensions/Moderation/_logging_helper.py:292
-#: src/extensions/Moderation/_logging_helper.py:344
+#: src/extensions/Moderation/_logging_helper.py:118
+#: src/extensions/Moderation/_logging_helper.py:222
+#: src/extensions/Moderation/_logging_helper.py:293
+#: src/extensions/Moderation/_logging_helper.py:345
 msgid "Yes"
 msgstr ""
 
@@ -602,366 +605,365 @@ msgstr ""
 msgid "Resets the levels of all members in the guild. This action cannot be undone."
 msgstr ""
 
-#: src/extensions/Logging.py:102
+#: src/extensions/Logging.py:103
 msgid "The user {member.name} joined the guild."
 msgstr ""
 
-#: src/extensions/Logging.py:105
+#: src/extensions/Logging.py:106
 msgid "User joined"
 msgstr ""
 
-#: src/extensions/Logging.py:107 src/extensions/Logging.py:133
-#: src/extensions/Logging.py:156 src/extensions/Logging.py:183
+#: src/extensions/Logging.py:108 src/extensions/Logging.py:134
+#: src/extensions/Logging.py:157 src/extensions/Logging.py:184
 msgid "Account created at"
 msgstr ""
 
-#: src/extensions/Logging.py:110 src/extensions/Logging.py:139
-#: src/extensions/Logging.py:157 src/extensions/Logging.py:182
-#: src/extensions/Logging.py:204 src/extensions/Logging.py:227
-#: src/extensions/Logging.py:310 src/extensions/Logging.py:371
+#: src/extensions/Logging.py:111 src/extensions/Logging.py:140
+#: src/extensions/Logging.py:158 src/extensions/Logging.py:183
+#: src/extensions/Logging.py:205 src/extensions/Logging.py:229
+#: src/extensions/Logging.py:312 src/extensions/Logging.py:373
 #: src/extensions/Moderation/_logging_helper.py:112
-#: src/extensions/Moderation/_logging_helper.py:206
-#: src/extensions/Moderation/_logging_helper.py:286
-#: src/extensions/Moderation/_logging_helper.py:341
+#: src/extensions/Moderation/_logging_helper.py:207
+#: src/extensions/Moderation/_logging_helper.py:287
+#: src/extensions/Moderation/_logging_helper.py:342
 msgid "User Id"
 msgstr ""
 
-#: src/extensions/Logging.py:129
+#: src/extensions/Logging.py:130
 msgid "The user {member.name} left the guild."
 msgstr ""
 
-#: src/extensions/Logging.py:132
+#: src/extensions/Logging.py:133
 msgid "Member left"
 msgstr ""
 
-#: src/extensions/Logging.py:160 src/extensions/Logging.py:167
+#: src/extensions/Logging.py:161 src/extensions/Logging.py:168
 msgid "User banned"
 msgstr ""
 
-#: src/extensions/Logging.py:181
+#: src/extensions/Logging.py:182
 msgid "Member unbanned"
 msgstr ""
 
-#: src/extensions/Logging.py:203
+#: src/extensions/Logging.py:204
 msgid "Member roles changed"
 msgstr ""
 
-#: src/extensions/Logging.py:208
+#: src/extensions/Logging.py:209
 msgid "New roles"
 msgstr ""
 
-#: src/extensions/Logging.py:213
+#: src/extensions/Logging.py:214
 msgid "Old roles"
 msgstr ""
 
-#: src/extensions/Logging.py:226
+#: src/extensions/Logging.py:228
 msgid "Member renamed"
 msgstr ""
 
-#: src/extensions/Logging.py:230
+#: src/extensions/Logging.py:232
 msgid "Previous name"
 msgstr ""
 
-#: src/extensions/Logging.py:235
+#: src/extensions/Logging.py:237
 msgid "New name"
 msgstr ""
 
-#: src/extensions/Logging.py:285
+#: src/extensions/Logging.py:287
 msgid "Old message content"
 msgstr ""
 
-#: src/extensions/Logging.py:285 src/extensions/Logging.py:312
-#: src/extensions/Logging.py:377
+#: src/extensions/Logging.py:287 src/extensions/Logging.py:314
+#: src/extensions/Logging.py:379
 msgid "No content"
 msgstr ""
 
-#: src/extensions/Logging.py:306
+#: src/extensions/Logging.py:308
 msgid "**{member}** edited a [message]({message}) in {channel}."
 msgstr ""
 
-#: src/extensions/Logging.py:309
+#: src/extensions/Logging.py:311
 msgid "Message edited"
 msgstr ""
 
-#: src/extensions/Logging.py:316
+#: src/extensions/Logging.py:318
 msgid "New message content"
 msgstr ""
 
-#: src/extensions/Logging.py:361
-#: src/extensions/Moderation/_logging_helper.py:524
+#: src/extensions/Logging.py:363
+#: src/extensions/Moderation/_logging_helper.py:525
 msgid "Message deleted"
 msgstr ""
 
-#: src/extensions/Logging.py:368
+#: src/extensions/Logging.py:370
 msgid "A message from **{member}** was deleted from {channel.mention}."
 msgstr ""
 
-#: src/extensions/Logging.py:376
+#: src/extensions/Logging.py:378
 msgid "Message content"
 msgstr ""
 
-#: src/extensions/Logging.py:385
+#: src/extensions/Logging.py:387
 msgid "Attachments"
 msgstr ""
 
-#: src/extensions/Logging.py:389
+#: src/extensions/Logging.py:391
 msgid "A message from {channel} has been deleted."
 msgstr ""
 
-#: src/extensions/Logging.py:430
+#: src/extensions/Logging.py:432
 msgid "Bulk message delete"
 msgstr ""
 
-#: src/extensions/Logging.py:432
+#: src/extensions/Logging.py:434
 msgid "{count} messages have been deleted from {channel}."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:90
 #: src/extensions/Moderation/_logging_helper.py:110
 msgid "No reason"
 msgstr ""
 
 #: src/extensions/Moderation/_logging_helper.py:110
-#: src/extensions/Moderation/_logging_helper.py:147
-#: src/extensions/Moderation/_logging_helper.py:204
-#: src/extensions/Moderation/_logging_helper.py:337
-#: src/extensions/Moderation/_logging_helper.py:491
+#: src/extensions/Moderation/_logging_helper.py:148
+#: src/extensions/Moderation/_logging_helper.py:205
+#: src/extensions/Moderation/_logging_helper.py:338
+#: src/extensions/Moderation/_logging_helper.py:492
 #: src/extensions/Moderation/_views.py:169
 #: src/extensions/Moderation/clear_group.py:114
 msgid "Reason"
 msgstr ""
 
 #: src/extensions/Moderation/_logging_helper.py:111
-#: src/extensions/Moderation/_logging_helper.py:144
-#: src/extensions/Moderation/_logging_helper.py:205
-#: src/extensions/Moderation/_logging_helper.py:285
-#: src/extensions/Moderation/_logging_helper.py:339
+#: src/extensions/Moderation/_logging_helper.py:145
+#: src/extensions/Moderation/_logging_helper.py:206
+#: src/extensions/Moderation/_logging_helper.py:286
+#: src/extensions/Moderation/_logging_helper.py:340
 msgid "Executed at"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:114
-#: src/extensions/Moderation/_logging_helper.py:216
-#: src/extensions/Moderation/_logging_helper.py:289
-#: src/extensions/Moderation/_logging_helper.py:498
-#: src/extensions/Moderation/_logging_helper.py:510
+#: src/extensions/Moderation/_logging_helper.py:115
+#: src/extensions/Moderation/_logging_helper.py:217
+#: src/extensions/Moderation/_logging_helper.py:290
+#: src/extensions/Moderation/_logging_helper.py:499
+#: src/extensions/Moderation/_logging_helper.py:511
 msgid "Punished until"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:117
-#: src/extensions/Moderation/_logging_helper.py:221
-#: src/extensions/Moderation/_logging_helper.py:292
-#: src/extensions/Moderation/_logging_helper.py:344
+#: src/extensions/Moderation/_logging_helper.py:118
+#: src/extensions/Moderation/_logging_helper.py:222
+#: src/extensions/Moderation/_logging_helper.py:293
+#: src/extensions/Moderation/_logging_helper.py:345
 msgid "Received DM"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:135
+#: src/extensions/Moderation/_logging_helper.py:136
 msgid "{deleted_count} messages have been deleted from {channel} by {moderator.mention} ({moderator})."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:140
+#: src/extensions/Moderation/_logging_helper.py:141
 msgid "Messages cleared"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:141
+#: src/extensions/Moderation/_logging_helper.py:142
 msgid "Channel Id"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:143
+#: src/extensions/Moderation/_logging_helper.py:144
 msgid "Deleted Messages"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:210
+#: src/extensions/Moderation/_logging_helper.py:211
 msgid "Punishment executed"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:218
-#: src/extensions/Moderation/_logging_helper.py:340
+#: src/extensions/Moderation/_logging_helper.py:219
+#: src/extensions/Moderation/_logging_helper.py:341
 msgid "Points added"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:227
-#: src/extensions/Moderation/_logging_helper.py:230
+#: src/extensions/Moderation/_logging_helper.py:228
+#: src/extensions/Moderation/_logging_helper.py:231
 msgid "Message"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:260
+#: src/extensions/Moderation/_logging_helper.py:261
 msgid "Maximum amount of points reached"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:278
-#: src/extensions/Moderation/_logging_helper.py:360
-#: src/extensions/Moderation/_logging_helper.py:436
+#: src/extensions/Moderation/_logging_helper.py:279
+#: src/extensions/Moderation/_logging_helper.py:361
+#: src/extensions/Moderation/_logging_helper.py:437
 msgid "The user {target.mention} ({target}) has reached the maximum number of points."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:283
+#: src/extensions/Moderation/_logging_helper.py:284
 msgid "Automod: Maximum points reached"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:284
+#: src/extensions/Moderation/_logging_helper.py:285
 msgid "Action"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:331
+#: src/extensions/Moderation/_logging_helper.py:332
 msgid "The user {target} ({target.id}) has been warned by {moderator}."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:336
+#: src/extensions/Moderation/_logging_helper.py:337
 msgid "User has been warned"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:338
+#: src/extensions/Moderation/_logging_helper.py:339
 msgid "Moderator"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:359
-#: src/extensions/Moderation/_logging_helper.py:435
+#: src/extensions/Moderation/_logging_helper.py:360
+#: src/extensions/Moderation/_logging_helper.py:436
 msgid "User has reached the maximum number of points"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:366
-#: src/extensions/Moderation/_logging_helper.py:442
+#: src/extensions/Moderation/_logging_helper.py:367
+#: src/extensions/Moderation/_logging_helper.py:443
 msgid "Message has been deleted"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:368
+#: src/extensions/Moderation/_logging_helper.py:369
 msgid "The message from {target.mention} ({target}) has been deleted by {moderator.mention} ({moderator})."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:373
-#: src/extensions/Moderation/_logging_helper.py:449
+#: src/extensions/Moderation/_logging_helper.py:374
+#: src/extensions/Moderation/_logging_helper.py:450
 msgid "User has been temporary banned"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:375
+#: src/extensions/Moderation/_logging_helper.py:376
 msgid "The user {target.mention} ({target}) has been temporarily banned by {moderator.mention} ({moderator})."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:382
-#: src/extensions/Moderation/_logging_helper.py:456
+#: src/extensions/Moderation/_logging_helper.py:383
+#: src/extensions/Moderation/_logging_helper.py:457
 msgid "User has been banned"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:384
+#: src/extensions/Moderation/_logging_helper.py:385
 msgid "The user {target.mention} ({target}) has been banned by {moderator.mention} ({moderator})."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:389
-#: src/extensions/Moderation/_logging_helper.py:463
+#: src/extensions/Moderation/_logging_helper.py:390
+#: src/extensions/Moderation/_logging_helper.py:464
 msgid "User has been temporary muted"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:391
+#: src/extensions/Moderation/_logging_helper.py:392
 msgid "The user {target.mention} ({target}) has been temporarily muted by {moderator.mention} ({moderator})."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:398
-#: src/extensions/Moderation/_logging_helper.py:470
+#: src/extensions/Moderation/_logging_helper.py:399
+#: src/extensions/Moderation/_logging_helper.py:471
 msgid "User has been kicked"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:400
+#: src/extensions/Moderation/_logging_helper.py:401
 msgid "The user {target.mention} ({target}) has been kicked by {moderator.mention} ({moderator})."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:405
+#: src/extensions/Moderation/_logging_helper.py:406
 msgid "User has been unbanned"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:407
+#: src/extensions/Moderation/_logging_helper.py:408
 msgid "The user {target.mention} ({target}) has been unbanned by {moderator.mention} ({moderator})."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:412
+#: src/extensions/Moderation/_logging_helper.py:413
 msgid "User has been softbanned"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:414
+#: src/extensions/Moderation/_logging_helper.py:415
 msgid "The user {target.mention} ({target}) has been softbanned by {moderator.mention} ({moderator})."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:419
+#: src/extensions/Moderation/_logging_helper.py:420
 msgid "User has been unmuted"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:421
+#: src/extensions/Moderation/_logging_helper.py:422
 msgid "The user {target.mention} ({target}) has been unmuted by {moderator.mention} ({moderator})."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:444
+#: src/extensions/Moderation/_logging_helper.py:445
 msgid "The message from {target.mention} ({target}) has been deleted by the automoderation system."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:451
+#: src/extensions/Moderation/_logging_helper.py:452
 msgid "The user {target.mention} ({target}) has been temporarily banned by the automoderation system."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:457
+#: src/extensions/Moderation/_logging_helper.py:458
 msgid "The user {target.mention} ({target}) has been banned by the automoderation system."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:465
+#: src/extensions/Moderation/_logging_helper.py:466
 msgid "The user {target.mention} ({target}) has been temporarily muted the automoderation system."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:471
+#: src/extensions/Moderation/_logging_helper.py:472
 msgid "The user {target.mention} ({target}) has been kicked by the automoderation system."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:488
+#: src/extensions/Moderation/_logging_helper.py:489
 msgid "Guild Id"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:495
+#: src/extensions/Moderation/_logging_helper.py:496
 msgid "Temporary Ban"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:496
+#: src/extensions/Moderation/_logging_helper.py:497
 msgid "You have been temporarily banned."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:502
+#: src/extensions/Moderation/_logging_helper.py:503
 msgid "Permanent Ban"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:503
+#: src/extensions/Moderation/_logging_helper.py:504
 msgid "You have been permanently banned."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:507
+#: src/extensions/Moderation/_logging_helper.py:508
 msgid "Temporary Mute"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:508
-#: src/extensions/Moderation/_logging_helper.py:515
+#: src/extensions/Moderation/_logging_helper.py:509
+#: src/extensions/Moderation/_logging_helper.py:516
 msgid "You have been temporarily muted."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:514
+#: src/extensions/Moderation/_logging_helper.py:515
 msgid "Kick"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:519
+#: src/extensions/Moderation/_logging_helper.py:520
 msgid "Unmute"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:520
+#: src/extensions/Moderation/_logging_helper.py:521
 msgid "You have been unmuted."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:525
+#: src/extensions/Moderation/_logging_helper.py:526
 msgid "A message has been deleted."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:529
+#: src/extensions/Moderation/_logging_helper.py:530
 msgid "Points received"
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:530
+#: src/extensions/Moderation/_logging_helper.py:531
 msgid "You have received points for your actions."
 msgstr ""
 
-#: src/extensions/Moderation/_logging_helper.py:532
+#: src/extensions/Moderation/_logging_helper.py:533
 #: src/extensions/Moderation/_views.py:166
 msgid "Points"
 msgstr ""
@@ -1190,373 +1192,377 @@ msgstr ""
 msgid "Creator"
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:105
+#: src/extensions/Moderation/moderation_cog.py:111
 msgid "Bans an user from the guild."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:106
-#: src/extensions/Moderation/moderation_cog.py:132
+#: src/extensions/Moderation/moderation_cog.py:112
+#: src/extensions/Moderation/moderation_cog.py:138
 msgid "The member that should be banned."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:106
-#: src/extensions/Moderation/moderation_cog.py:133
+#: src/extensions/Moderation/moderation_cog.py:112
+#: src/extensions/Moderation/moderation_cog.py:139
 msgid "Why the member should be banned."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:128
+#: src/extensions/Moderation/moderation_cog.py:134
 msgid "The user has been permanently banned."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:130
+#: src/extensions/Moderation/moderation_cog.py:136
 msgid "Bans an user from the guild for a specific time."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:134
+#: src/extensions/Moderation/moderation_cog.py:140
 msgid "How long the member should be banned."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:150
-#: src/extensions/Moderation/moderation_cog.py:217
+#: src/extensions/Moderation/moderation_cog.py:156
+#: src/extensions/Moderation/moderation_cog.py:228
 msgid "The provided duration is invalid."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:154
-#: src/extensions/Moderation/moderation_cog.py:221
+#: src/extensions/Moderation/moderation_cog.py:161
+#: src/extensions/Moderation/moderation_cog.py:232
 msgid "The provided duration is too long."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:169
+#: src/extensions/Moderation/moderation_cog.py:165
+msgid "The minimum duration is 60 seconds."
+msgstr ""
+
+#: src/extensions/Moderation/moderation_cog.py:180
 msgid "The user has been banned until {timestamp}."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:175
+#: src/extensions/Moderation/moderation_cog.py:186
 msgid "Kicks an user from the guild."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:176
-#: src/extensions/Moderation/moderation_cog.py:268
+#: src/extensions/Moderation/moderation_cog.py:187
+#: src/extensions/Moderation/moderation_cog.py:275
 msgid "The member that should be kicked."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:176
-#: src/extensions/Moderation/moderation_cog.py:268
+#: src/extensions/Moderation/moderation_cog.py:187
+#: src/extensions/Moderation/moderation_cog.py:275
 msgid "Why the member should be kicked."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:197
-#: src/extensions/Moderation/moderation_cog.py:291
+#: src/extensions/Moderation/moderation_cog.py:208
+#: src/extensions/Moderation/moderation_cog.py:298
 msgid "The user has been kicked."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:199
+#: src/extensions/Moderation/moderation_cog.py:210
 msgid "Mutes a member for a specific time."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:201
+#: src/extensions/Moderation/moderation_cog.py:212
 msgid "The member that should be muted."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:202
+#: src/extensions/Moderation/moderation_cog.py:213
 msgid "Why the member should be muted."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:203
+#: src/extensions/Moderation/moderation_cog.py:214
 msgid "How long the member should be muted (max 28 days)."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:234
+#: src/extensions/Moderation/moderation_cog.py:245
 msgid "The member has been muted until {timestamp}."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:240
+#: src/extensions/Moderation/moderation_cog.py:251
 msgid "Unbans an user from the guild."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:241
+#: src/extensions/Moderation/moderation_cog.py:252
 msgid "The user that should be unbanned."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:241
+#: src/extensions/Moderation/moderation_cog.py:252
 msgid "Why the user should be unbanned."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:253
+#: src/extensions/Moderation/moderation_cog.py:264
 msgid "The user is not banned on this server."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:265
+#: src/extensions/Moderation/moderation_cog.py:272
 msgid "The user has been unbanned."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:267
+#: src/extensions/Moderation/moderation_cog.py:274
 msgid "Kicks a member from the guild and deletes their messages."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:293
+#: src/extensions/Moderation/moderation_cog.py:300
 msgid "Sets the slowmode of the current channel."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:294
+#: src/extensions/Moderation/moderation_cog.py:301
 msgid "How long the slowmode should be (max 6hrs)."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:302
+#: src/extensions/Moderation/moderation_cog.py:309
 msgid "The slowmode has been disabled."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:305
+#: src/extensions/Moderation/moderation_cog.py:312
 msgid "The slowmode has been enabled."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:307
+#: src/extensions/Moderation/moderation_cog.py:314
 msgid "Unmutes a member."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:308
+#: src/extensions/Moderation/moderation_cog.py:315
 msgid "The member that should be unmuted."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:308
+#: src/extensions/Moderation/moderation_cog.py:315
 msgid "Why the member should be unmuted."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:328
+#: src/extensions/Moderation/moderation_cog.py:335
 msgid "The member has been unmuted."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:330
+#: src/extensions/Moderation/moderation_cog.py:337
 msgid "Shows information about a invite."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:331
+#: src/extensions/Moderation/moderation_cog.py:338
 msgid "The invite you want to get information about."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:337
+#: src/extensions/Moderation/moderation_cog.py:344
 msgid "The input is not a valid invite."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:343
-#: src/extensions/Moderation/moderation_cog.py:360
+#: src/extensions/Moderation/moderation_cog.py:350
+#: src/extensions/Moderation/moderation_cog.py:367
 msgid "The invite does not exist."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:354
+#: src/extensions/Moderation/moderation_cog.py:361
 msgid "This message does not contain an invite."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:365
+#: src/extensions/Moderation/moderation_cog.py:372
 msgid "Bans users based on a multiple factors."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:367
+#: src/extensions/Moderation/moderation_cog.py:374
 msgid "The channel to search through. If not specified, the current channel is used."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:368
+#: src/extensions/Moderation/moderation_cog.py:375
 msgid "The amount of messages to search through (100)."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:369
+#: src/extensions/Moderation/moderation_cog.py:376
 msgid "The reason for the massban."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:370
+#: src/extensions/Moderation/moderation_cog.py:377
 msgid "Must be contained in a message."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:371
+#: src/extensions/Moderation/moderation_cog.py:378
 msgid "Must be at the start of a message."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:372
+#: src/extensions/Moderation/moderation_cog.py:379
 msgid "Must be at the end of a message."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:373
+#: src/extensions/Moderation/moderation_cog.py:380
 msgid "If the message contains an embed."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:374
+#: src/extensions/Moderation/moderation_cog.py:381
 msgid "If the message contains a attachment."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:375
+#: src/extensions/Moderation/moderation_cog.py:382
 msgid "Only users that joined after this."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:376
+#: src/extensions/Moderation/moderation_cog.py:383
 msgid "Only users that joined before this."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:377
+#: src/extensions/Moderation/moderation_cog.py:384
 msgid "If users have a role or not."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:378
+#: src/extensions/Moderation/moderation_cog.py:385
 msgid "If users have an avatar or not."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:379
+#: src/extensions/Moderation/moderation_cog.py:386
 msgid "Regex that must be matched in the username."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:380
+#: src/extensions/Moderation/moderation_cog.py:387
 msgid "Only messages sent after this (id)."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:381
+#: src/extensions/Moderation/moderation_cog.py:388
 msgid "Only messages sent before this (id)."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:382
+#: src/extensions/Moderation/moderation_cog.py:389
 msgid "Only users that are younger than this (in days)."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:383
+#: src/extensions/Moderation/moderation_cog.py:390
 msgid "Only users that joined before this (in days)."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:458
+#: src/extensions/Moderation/moderation_cog.py:465
 msgid "The provided regex is invalid."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:508
+#: src/extensions/Moderation/moderation_cog.py:515
 msgid "There are no users that meets this criteria."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:512
+#: src/extensions/Moderation/moderation_cog.py:519
 msgid "Confirm the selection of users scheduled for ban."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:515
+#: src/extensions/Moderation/moderation_cog.py:522
 msgid "Lists current warnings for a user."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:516
+#: src/extensions/Moderation/moderation_cog.py:523
 msgid "The user to list warnings for."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:519
-#: src/extensions/Moderation/moderation_cog.py:541
-#: src/extensions/Moderation/moderation_cog.py:581
-#: src/extensions/Moderation/moderation_cog.py:604
+#: src/extensions/Moderation/moderation_cog.py:526
+#: src/extensions/Moderation/moderation_cog.py:548
+#: src/extensions/Moderation/moderation_cog.py:588
+#: src/extensions/Moderation/moderation_cog.py:611
 msgid "Bots cannot be punished."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:527
+#: src/extensions/Moderation/moderation_cog.py:534
 msgid "Adds a warning to a user."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:529
+#: src/extensions/Moderation/moderation_cog.py:536
 msgid "The user to add a warning to."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:530
+#: src/extensions/Moderation/moderation_cog.py:537
 msgid "The amount of points to add."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:531
+#: src/extensions/Moderation/moderation_cog.py:538
 msgid "The reason for the warning."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:547
-#: src/extensions/Moderation/moderation_cog.py:627
+#: src/extensions/Moderation/moderation_cog.py:554
+#: src/extensions/Moderation/moderation_cog.py:634
 msgid "The required module is not loaded."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:556
+#: src/extensions/Moderation/moderation_cog.py:563
 msgid "This has not been set up. Please visit https://plyoox.net"
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:562
+#: src/extensions/Moderation/moderation_cog.py:569
 msgid "The module is currently disabled. Enabled it on the [Dashboard](https://plyoox.net)."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:568
+#: src/extensions/Moderation/moderation_cog.py:575
 msgid "There are no point actions configured."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:574
+#: src/extensions/Moderation/moderation_cog.py:581
 msgid "{user.mention} has been warned."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:577
+#: src/extensions/Moderation/moderation_cog.py:584
 msgid "Removes a warning from a user."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:578
+#: src/extensions/Moderation/moderation_cog.py:585
 msgid "The ID of the warning to remove."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:578
+#: src/extensions/Moderation/moderation_cog.py:585
 msgid "The user to remove a warning from."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:592
+#: src/extensions/Moderation/moderation_cog.py:599
 msgid "The warning has been removed."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:595
+#: src/extensions/Moderation/moderation_cog.py:602
 msgid "There is no warning with the id `{id}`"
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:600
+#: src/extensions/Moderation/moderation_cog.py:607
 msgid "Removes all warnings from a user."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:601
+#: src/extensions/Moderation/moderation_cog.py:608
 msgid "The user to remove all warnings from."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:614
+#: src/extensions/Moderation/moderation_cog.py:621
 msgid "All warnings have been removed."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:617
+#: src/extensions/Moderation/moderation_cog.py:624
 msgid "{member} has no warnings"
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:620
+#: src/extensions/Moderation/moderation_cog.py:627
 msgid "Punish a user with predefined templates."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:621
+#: src/extensions/Moderation/moderation_cog.py:628
 msgid "The user to punish."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:632
+#: src/extensions/Moderation/moderation_cog.py:639
 msgid "There are no punishments configured."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:637
+#: src/extensions/Moderation/moderation_cog.py:644
 msgid "The provided template does not exist."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:651
+#: src/extensions/Moderation/moderation_cog.py:658
 msgid "The user has been punished."
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:658
-#: src/extensions/Moderation/moderation_cog.py:659
-#: src/extensions/Moderation/moderation_cog.py:660
-#: src/extensions/Moderation/moderation_cog.py:661
+#: src/extensions/Moderation/moderation_cog.py:668
+#: src/extensions/Moderation/moderation_cog.py:669
+#: src/extensions/Moderation/moderation_cog.py:670
+#: src/extensions/Moderation/moderation_cog.py:671
 msgid "hours"
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:662
+#: src/extensions/Moderation/moderation_cog.py:672
 msgid "day"
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:663
-#: src/extensions/Moderation/moderation_cog.py:664
-#: src/extensions/Moderation/moderation_cog.py:665
-#: src/extensions/Moderation/moderation_cog.py:666
+#: src/extensions/Moderation/moderation_cog.py:673
+#: src/extensions/Moderation/moderation_cog.py:674
+#: src/extensions/Moderation/moderation_cog.py:675
+#: src/extensions/Moderation/moderation_cog.py:676
 msgid "days"
 msgstr ""
 
-#: src/extensions/Moderation/moderation_cog.py:666
+#: src/extensions/Moderation/moderation_cog.py:676
 msgid "month"
 msgstr ""
 
@@ -1588,7 +1594,7 @@ msgstr ""
 msgid "Go to Twitch"
 msgstr ""
 
-#: src/extensions/Timers.py:119
+#: src/extensions/Timers.py:122
 msgid "Temporary ban expired"
 msgstr ""
 

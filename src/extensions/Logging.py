@@ -150,7 +150,7 @@ class LoggingEvents(commands.Cog):
         if cache is None:
             return
 
-        if any(role in cache.exempt_roles for role in user.roles):
+        if isinstance(user, discord.Member) and any(role in cache.exempt_roles for role in user.roles):
             return
 
         embed = extensions.Embed(color=ERROR_COLOR)

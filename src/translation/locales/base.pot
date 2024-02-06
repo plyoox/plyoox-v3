@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-02-05 15:32+0100\n"
+"POT-Creation-Date: 2024-02-06 17:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -268,7 +268,7 @@ msgstr ""
 
 #: src/extensions/Infos/guild_group.py:40
 #: src/extensions/Infos/user_group.py:61
-#: src/extensions/Moderation/_views.py:168
+#: src/extensions/Moderation/_views.py:170
 #: src/extensions/Moderation/moderation_cog.py:78
 msgid "Created at"
 msgstr ""
@@ -279,14 +279,14 @@ msgstr ""
 
 #: src/extensions/Infos/guild_group.py:46
 #: src/extensions/Infos/user_group.py:95 src/extensions/Logging.py:137
-#: src/extensions/Logging.py:165
+#: src/extensions/Logging.py:166
 msgid "Roles"
 msgstr ""
 
 #: src/extensions/Infos/guild_group.py:47
 #: src/extensions/Infos/user_group.py:96 src/extensions/Logging.py:137
-#: src/extensions/Logging.py:165 src/extensions/Logging.py:209
-#: src/extensions/Logging.py:215
+#: src/extensions/Logging.py:166 src/extensions/Logging.py:212
+#: src/extensions/Logging.py:218
 msgid "No roles"
 msgstr ""
 
@@ -614,14 +614,14 @@ msgid "User joined"
 msgstr ""
 
 #: src/extensions/Logging.py:108 src/extensions/Logging.py:134
-#: src/extensions/Logging.py:157 src/extensions/Logging.py:184
+#: src/extensions/Logging.py:157 src/extensions/Logging.py:186
 msgid "Account created at"
 msgstr ""
 
 #: src/extensions/Logging.py:111 src/extensions/Logging.py:140
-#: src/extensions/Logging.py:158 src/extensions/Logging.py:183
-#: src/extensions/Logging.py:205 src/extensions/Logging.py:229
-#: src/extensions/Logging.py:312 src/extensions/Logging.py:373
+#: src/extensions/Logging.py:158 src/extensions/Logging.py:185
+#: src/extensions/Logging.py:207 src/extensions/Logging.py:232
+#: src/extensions/Logging.py:316 src/extensions/Logging.py:378
 #: src/extensions/Moderation/_logging_helper.py:112
 #: src/extensions/Moderation/_logging_helper.py:207
 #: src/extensions/Moderation/_logging_helper.py:287
@@ -637,85 +637,85 @@ msgstr ""
 msgid "Member left"
 msgstr ""
 
-#: src/extensions/Logging.py:161 src/extensions/Logging.py:168
+#: src/extensions/Logging.py:161 src/extensions/Logging.py:170
 msgid "User banned"
 msgstr ""
 
-#: src/extensions/Logging.py:182
+#: src/extensions/Logging.py:184
 msgid "Member unbanned"
 msgstr ""
 
-#: src/extensions/Logging.py:204
+#: src/extensions/Logging.py:206
 msgid "Member roles changed"
 msgstr ""
 
-#: src/extensions/Logging.py:209
+#: src/extensions/Logging.py:211
 msgid "New roles"
 msgstr ""
 
-#: src/extensions/Logging.py:214
+#: src/extensions/Logging.py:217
 msgid "Old roles"
 msgstr ""
 
-#: src/extensions/Logging.py:228
+#: src/extensions/Logging.py:231
 msgid "Member renamed"
 msgstr ""
 
-#: src/extensions/Logging.py:232
+#: src/extensions/Logging.py:235
 msgid "Previous name"
 msgstr ""
 
-#: src/extensions/Logging.py:237
+#: src/extensions/Logging.py:240
 msgid "New name"
 msgstr ""
 
-#: src/extensions/Logging.py:287
+#: src/extensions/Logging.py:290
 msgid "Old message content"
 msgstr ""
 
-#: src/extensions/Logging.py:287 src/extensions/Logging.py:314
-#: src/extensions/Logging.py:379
+#: src/extensions/Logging.py:291 src/extensions/Logging.py:318
+#: src/extensions/Logging.py:384
 msgid "No content"
 msgstr ""
 
-#: src/extensions/Logging.py:308
+#: src/extensions/Logging.py:312
 msgid "**{member}** edited a [message]({message}) in {channel}."
 msgstr ""
 
-#: src/extensions/Logging.py:311
+#: src/extensions/Logging.py:315
 msgid "Message edited"
 msgstr ""
 
-#: src/extensions/Logging.py:318
+#: src/extensions/Logging.py:322
 msgid "New message content"
 msgstr ""
 
-#: src/extensions/Logging.py:363
+#: src/extensions/Logging.py:367
 #: src/extensions/Moderation/_logging_helper.py:525
 msgid "Message deleted"
 msgstr ""
 
-#: src/extensions/Logging.py:370
+#: src/extensions/Logging.py:375
 msgid "A message from **{member}** was deleted from {channel.mention}."
 msgstr ""
 
-#: src/extensions/Logging.py:378
+#: src/extensions/Logging.py:383
 msgid "Message content"
 msgstr ""
 
-#: src/extensions/Logging.py:387
+#: src/extensions/Logging.py:392
 msgid "Attachments"
 msgstr ""
 
-#: src/extensions/Logging.py:391
+#: src/extensions/Logging.py:396
 msgid "A message from {channel} has been deleted."
 msgstr ""
 
-#: src/extensions/Logging.py:432
+#: src/extensions/Logging.py:437
 msgid "Bulk message delete"
 msgstr ""
 
-#: src/extensions/Logging.py:434
+#: src/extensions/Logging.py:439
 msgid "{count} messages have been deleted from {channel}."
 msgstr ""
 
@@ -728,7 +728,7 @@ msgstr ""
 #: src/extensions/Moderation/_logging_helper.py:205
 #: src/extensions/Moderation/_logging_helper.py:338
 #: src/extensions/Moderation/_logging_helper.py:492
-#: src/extensions/Moderation/_views.py:169
+#: src/extensions/Moderation/_views.py:171
 #: src/extensions/Moderation/clear_group.py:114
 msgid "Reason"
 msgstr ""
@@ -964,7 +964,7 @@ msgid "You have received points for your actions."
 msgstr ""
 
 #: src/extensions/Moderation/_logging_helper.py:533
-#: src/extensions/Moderation/_views.py:166
+#: src/extensions/Moderation/_views.py:168
 msgid "Points"
 msgstr ""
 
@@ -973,7 +973,7 @@ msgid "List of members"
 msgstr ""
 
 #: src/extensions/Moderation/_views.py:31
-#: src/extensions/Moderation/_views.py:153
+#: src/extensions/Moderation/_views.py:155
 msgid "Page"
 msgstr ""
 
@@ -1006,32 +1006,32 @@ msgid "Successfully banned {user_count} users."
 msgstr ""
 
 #: src/extensions/Moderation/_views.py:126
-#: src/extensions/Moderation/_views.py:200
+#: src/extensions/Moderation/_views.py:222
 msgid "Expired Infractions"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:149
+#: src/extensions/Moderation/_views.py:151
 msgid "This user has no warnings."
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:151
+#: src/extensions/Moderation/_views.py:153
 msgid "Infractions"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:160
+#: src/extensions/Moderation/_views.py:162
 msgid "Never"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:164
+#: src/extensions/Moderation/_views.py:166
 msgid "Infraction"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:167
+#: src/extensions/Moderation/_views.py:169
 #: src/extensions/Moderation/moderation_cog.py:79
 msgid "Expires at"
 msgstr ""
 
-#: src/extensions/Moderation/_views.py:200
+#: src/extensions/Moderation/_views.py:222
 msgid "Active Infractions"
 msgstr ""
 

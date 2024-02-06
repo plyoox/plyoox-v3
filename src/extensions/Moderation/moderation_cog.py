@@ -103,9 +103,9 @@ class Moderation(commands.Cog):
         await interaction.response.send_message(embeds=[embed], ephemeral=ephemeral)
 
     @commands.Cog.listener()
-    async def on_member_unban(self, member: discord.Member):
+    async def on_member_unban(self, guild: discord.Guild, user: discord.User):
         await self.bot.db.execute(
-            "DELETE FROM timer WHERE target_id = $1 AND guild_id = $2 AND kind = 'temp_ban'", member.id, member.guild.id
+            "DELETE FROM timer WHERE target_id = $1 AND guild_id = $2 AND kind = 'temp_ban'", user.id, guild.id
         )
 
     @app_commands.command(name="ban", description=_("Bans an user from the guild."))

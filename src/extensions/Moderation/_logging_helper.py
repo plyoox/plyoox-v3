@@ -115,7 +115,9 @@ async def log_simple_punish_command(
         embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until), inline=True)
 
     if notified_user is not None:
-        embed.add_field(name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No")))
+        embed.add_field(
+            name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No"))
+        )
 
     await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed])
 
@@ -219,7 +221,9 @@ async def automod_log(
         embed.add_field(name=translate(_("Points added")), value="> " + points)
 
     if notified_user is not None:
-        embed.add_field(name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No")))
+        embed.add_field(
+            name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No"))
+        )
 
     embeds.append(embed)
 
@@ -276,9 +280,9 @@ async def automod_final_log(
     (title, _description) = _get_dynamic_auto_moderation_description(translate, kind=action, target=member)
 
     embed = extensions.Embed(
-        description=translate(_("The user {target.mention} ({target}) has reached the maximum number of points.")).format(
-            target=member
-        ),
+        description=translate(
+            _("The user {target.mention} ({target}) has reached the maximum number of points.")
+        ).format(target=member),
         color=colors.AUTOMOD_COLOR,
     )
     embed.set_author(name=translate(_("Automod: Maximum points reached")), icon_url=member.display_avatar)
@@ -290,7 +294,9 @@ async def automod_final_log(
         embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until), inline=True)
 
     if notified_user is not None:
-        embed.add_field(name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No")))
+        embed.add_field(
+            name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No"))
+        )
 
     await _send_webhook(bot, guild.id, webhook, embeds=[embed])
 
@@ -342,7 +348,9 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
     embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
     if notified_user is not None:
-        embed.add_field(name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No")))
+        embed.add_field(
+            name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No"))
+        )
 
     await _send_webhook(bot, guild.id, webhook, embeds=[embed])
 
@@ -366,7 +374,9 @@ def _get_dynamic_log_description(
             return (
                 translate(_("Message has been deleted")),
                 translate(
-                    _("The message from {target.mention} ({target}) has been deleted by {moderator.mention} ({moderator}).")
+                    _(
+                        "The message from {target.mention} ({target}) has been deleted by {moderator.mention} ({moderator})."
+                    )
                 ).format(target=target, moderator=moderator),
             )
         case "tempban":
@@ -455,9 +465,9 @@ def _get_dynamic_auto_moderation_description(
         case "ban":
             return (
                 translate(_("User has been banned")),
-                translate(_("The user {target.mention} ({target}) has been banned by the automoderation system.")).format(
-                    target=target
-                ),
+                translate(
+                    _("The user {target.mention} ({target}) has been banned by the automoderation system.")
+                ).format(target=target),
             )
         case "tempmute":
             return (
@@ -469,9 +479,9 @@ def _get_dynamic_auto_moderation_description(
         case "kick":
             return (
                 translate(_("User has been kicked")),
-                translate(_("The user {target.mention} ({target}) has been kicked by the automoderation system.")).format(
-                    target=target
-                ),
+                translate(
+                    _("The user {target.mention} ({target}) has been kicked by the automoderation system.")
+                ).format(target=target),
             )
 
 

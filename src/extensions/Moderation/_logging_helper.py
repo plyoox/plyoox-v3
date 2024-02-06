@@ -312,7 +312,7 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
                 translate,
                 guild=guild,
                 reason=reason,
-                kind=AutoModerationPunishmentKind.points,
+                kind=AutoModerationPunishmentKind.point,
                 points=points,
                 timestamp=None,
             )
@@ -355,7 +355,7 @@ def _get_dynamic_log_description(
     kind: ModerationCommandKind | AutoModerationPunishmentKind,
 ) -> (str, str):
     match kind:
-        case "points":
+        case "point":
             return (
                 translate(_("User has reached the maximum number of points")),
                 translate(_("The user {target.mention} ({target}) has reached the maximum number of points.")).format(
@@ -431,7 +431,7 @@ def _get_dynamic_auto_moderation_description(
     kind: AutoModerationFinalPunishmentKind | AutoModerationPunishmentKind,
 ) -> (str, str):
     match kind:
-        case "points":
+        case "point":
             return (
                 translate(_("User has reached the maximum number of points")),
                 translate(_("The user {target.mention} ({target}) has reached the maximum number of points.")).format(
@@ -526,7 +526,7 @@ def _get_dynamic_log_user_message(
             embed.description = translate(_("A message has been deleted."))
 
             return embed
-        case "points":
+        case "point":
             embed.title = translate(_("Points received"))
             embed.description = translate(_("You have received points for your actions."))
 

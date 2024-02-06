@@ -84,7 +84,7 @@ class AutoModerationActionData(object):
             return global_translate(_("External link"), bot, locale)
         elif reason == "caps":
             return global_translate(_("Caps spam"), bot, locale)
-        elif reason == "points":
+        elif reason == "point":
             return global_translate(_("Maximum number of points reached"), bot, locale)
         elif reason == "discord_rule":
             return global_translate(_("Violating a Discord moderation rule"), bot, locale)
@@ -341,7 +341,7 @@ class Automod(commands.Cog):
             if punishment_kind in [
                 AutoModerationPunishmentKind.kick,
                 AutoModerationPunishmentKind.tempmute,
-                AutoModerationPunishmentKind.points,
+                AutoModerationPunishmentKind.point,
                 AutoModerationPunishmentKind.delete,
             ]:
                 if message.channel.permissions_for(guild.me).manage_messages:
@@ -352,7 +352,7 @@ class Automod(commands.Cog):
             if self.punished_members.get((member.id, member.guild.id)):
                 return
             else:
-                if punishment_kind != AutoModerationPunishmentKind.points:
+                if punishment_kind != AutoModerationPunishmentKind.point:
                     self.punished_members[(member.id, member.guild.id)] = True
 
         if punishment_kind == AutoModerationPunishmentKind.ban:
@@ -382,7 +382,7 @@ class Automod(commands.Cog):
 
                 await member.timeout(muted_until)
                 await _logging.automod_log(self.bot, data, until=muted_until)
-        elif punishment_kind == AutoModerationPunishmentKind.points:
+        elif punishment_kind == AutoModerationPunishmentKind.point:
             await self._handle_points(data)
 
     @staticmethod
@@ -427,8 +427,9 @@ class Automod(commands.Cog):
             _log.warning(f"{member.id} has no points in {guild.id}...")
             return
 
-        if points - data.trigger_action.points < 10:
-            await _logging.automod_log(self.bot, data, points=f"{points}/10 [+{data.trigger_action.points}]")
+        new_points = data.trigger_action.punishment.points.points
+        if points - new_points < 10:
+            await _logging.automod_log(self.bot, data, points=f"{points}/10 [+{new_points}]")
 
         if points >= 10:
             cache = await self.bot.cache.get_moderation(guild.id)
@@ -458,6 +459,7 @@ class Automod(commands.Cog):
         if points >= 10:
             cache = await self.bot.cache.get_moderation(guild.id)
             if cache is None or not cache.active:
+                _log.warning(f"{guild.id} has no moderation cache")
                 return
 
             await self._handle_final_action(member, cache.point_actions)
@@ -481,7 +483,7 @@ class Automod(commands.Cog):
         )
 
         return await self.bot.db.fetchval(
-            "SELECT SUM(points) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND now() < expires_at",
+            "SELECT SUM(points) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND (expires_at IS NULL OR now() < expires_at)",
             member.id,
             guild.id,
         )

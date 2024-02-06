@@ -11,7 +11,7 @@ class AutoModerationPunishmentKind(enum.StrEnum):
     ban = "ban"
     tempban = "tempban"
     tempmute = "tempmute"
-    points = "points"
+    point = "point"
 
 
 class AutomodFinalActionEnum(enum.StrEnum):
@@ -64,7 +64,7 @@ class AutoModerationExecutionKind(enum.StrEnum):
     link = "link"
     invite = "invite"
     caps = "caps"
-    points = "points"
+    point = "point"
     discord_rule = "discord_rule"
 
 

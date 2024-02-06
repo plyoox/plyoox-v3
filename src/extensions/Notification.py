@@ -64,7 +64,9 @@ class Notification(commands.Cog):
 
         embed.add_field(name=translate(_("Started at")), value=f"> {utils.format_dt(started_at)}", inline=True)
         embed.add_field(name=translate(_("Ended at")), value=f"> {utils.format_dt(now)}", inline=True)
-        embed.add_field(name=translate(_("Duration")), value=f"> {helper.format_timedelta(now - started_at)}", inline=True)
+        embed.add_field(
+            name=translate(_("Duration")), value=f"> {helper.format_timedelta(now - started_at)}", inline=True
+        )
 
         embed.set_author(
             name=display_name, icon_url=f"https://static-cdn.jtvnw.net/{image_url}", url=f"https://twitch.tv/{login}"
@@ -147,7 +149,9 @@ class Notification(commands.Cog):
 
         if notification is None:
             # This *should* never happen
-            await self.bot.db.execute("DELETE FROM twitch.live_stream WHERE stream_id = $1 AND guild_id", data["guild_id"])
+            await self.bot.db.execute(
+                "DELETE FROM twitch.live_stream WHERE stream_id = $1 AND guild_id", data["guild_id"]
+            )
             return
 
         if notification is None:

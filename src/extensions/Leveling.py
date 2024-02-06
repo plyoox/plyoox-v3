@@ -123,7 +123,9 @@ class Leveling(commands.Cog):
         if not cache:
             if interaction.user.guild_permissions.administrator:
                 await interaction.response.send_translated(
-                    _("The level system has not been enabled. Go to the [Dashboard](https://plyoox.net) to enabled it."),
+                    _(
+                        "The level system has not been enabled. Go to the [Dashboard](https://plyoox.net) to enabled it."
+                    ),
                     ephemeral=True,
                 )
                 return False
@@ -500,7 +502,9 @@ class Leveling(commands.Cog):
                     reason=interaction.translate(_("The level progress of this user was reset.")),
                 )
 
-        embed = extensions.Embed(description=interaction.translate(_("The levels of this user were successfully reset.")))
+        embed = extensions.Embed(
+            description=interaction.translate(_("The levels of this user were successfully reset."))
+        )
         await interaction.response.send_message(embeds=[embed], ephemeral=True)
 
     @app_commands.command(

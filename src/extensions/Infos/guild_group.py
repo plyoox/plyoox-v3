@@ -55,7 +55,9 @@ class GuildGroup(app_commands.Group):
         )
         embed.add_field(
             name=interaction.translate(_("Features")),
-            value=f"> {', '.join(f'`{feature}`' for feature in guild.features)}" if guild.features else _("No features"),
+            value=f"> {', '.join(f'`{feature}`' for feature in guild.features)}"
+            if guild.features
+            else _("No features"),
         )
 
         await interaction.response.send_message(embeds=[embed])

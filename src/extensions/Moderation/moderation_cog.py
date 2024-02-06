@@ -22,8 +22,12 @@ if TYPE_CHECKING:
 _log = logging.getLogger(__name__)
 
 
-DISCORD_INVITE_SINGLE = re.compile(r"^(https?://)?discord(?:(app)?\.com/invite?|\.gg)/([a-zA-Z0-9-]{2,32})$", re.IGNORECASE)
-DISCORD_INVITE_MULTI = re.compile(r"\b(https?://)?discord(?:(app)?\.com/invite?|\.gg)/([a-zA-Z0-9-]{2,32})\b", re.IGNORECASE)
+DISCORD_INVITE_SINGLE = re.compile(
+    r"^(https?://)?discord(?:(app)?\.com/invite?|\.gg)/([a-zA-Z0-9-]{2,32})$", re.IGNORECASE
+)
+DISCORD_INVITE_MULTI = re.compile(
+    r"\b(https?://)?discord(?:(app)?\.com/invite?|\.gg)/([a-zA-Z0-9-]{2,32})\b", re.IGNORECASE
+)
 
 
 def can_execute_action(interaction: discord.Interaction, user: discord.Member, target: discord.Member):
@@ -52,11 +56,15 @@ class Moderation(commands.Cog):
     @staticmethod
     async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
         if interaction.user.top_role <= target.top_role and interaction.user.id != interaction.guild.owner_id:
-            await interaction.response.send_translated(_("The user must be below you in the hierarchy."), ephemeral=True)
+            await interaction.response.send_translated(
+                _("The user must be below you in the hierarchy."), ephemeral=True
+            )
             return False
 
         if target.top_role >= interaction.guild.me.top_role:
-            await interaction.response.send_translated(_("The user must be below the bot in the hierarchy."), ephemeral=True)
+            await interaction.response.send_translated(
+                _("The user must be below the bot in the hierarchy."), ephemeral=True
+            )
             return False
 
         return True
@@ -69,8 +77,12 @@ class Moderation(commands.Cog):
         )
         embed.set_thumbnail(url=invite.guild.icon)
 
-        created_at = discord.utils.format_dt(invite.created_at) if invite.created_at else interaction.translate(_("No date"))
-        expires_at = discord.utils.format_dt(invite.expires_at) if invite.expires_at else interaction.translate(_("No date"))
+        created_at = (
+            discord.utils.format_dt(invite.created_at) if invite.created_at else interaction.translate(_("No date"))
+        )
+        expires_at = (
+            discord.utils.format_dt(invite.expires_at) if invite.expires_at else interaction.translate(_("No date"))
+        )
         embed.add_field(
             name=interaction.translate(_("Information")),
             value=f"> __{interaction.translate(_('Url'))}:__ {invite.url}\n"
@@ -131,7 +143,9 @@ class Moderation(commands.Cog):
             interaction, target=member, reason=reason, kind=ModerationCommandKind.ban
         )
         await guild.ban(member, reason=reason, delete_message_days=1)
-        await interaction.followup.send(interaction.translate(_("The user has been permanently banned.")), ephemeral=True)
+        await interaction.followup.send(
+            interaction.translate(_("The user has been permanently banned.")), ephemeral=True
+        )
 
     @app_commands.command(name="tempban", description=_("Bans an user from the guild for a specific time."))
     @app_commands.describe(
@@ -312,7 +326,9 @@ class Moderation(commands.Cog):
             await interaction.response.send_translated(_("The slowmode has been enabled."), ephemeral=True)
 
     @app_commands.command(name="unmute", description=_("Unmutes a member."))
-    @app_commands.describe(member=_("The member that should be unmuted."), reason=_("Why the member should be unmuted."))
+    @app_commands.describe(
+        member=_("The member that should be unmuted."), reason=_("Why the member should be unmuted.")
+    )
     @app_commands.checks.bot_has_permissions(mute_members=True)
     @app_commands.default_permissions(mute_members=True)
     @app_commands.guild_only
@@ -462,7 +478,9 @@ class Moderation(commands.Cog):
             try:
                 _regex = re.compile(username_regex)
             except re.error as e:
-                await interaction.followup.send(interaction.translate(_("The provided regex is invalid.")) + f"\n```{e}```")
+                await interaction.followup.send(
+                    interaction.translate(_("The provided regex is invalid.")) + f"\n```{e}```"
+                )
                 return
             else:
                 predicates.append(lambda m, x=_regex: x.match(m.name))
@@ -516,7 +534,9 @@ class Moderation(commands.Cog):
             )
             return
 
-        embed = extensions.Embed(description=interaction.translate(_("Confirm the selection of users scheduled for ban.")))
+        embed = extensions.Embed(
+            description=interaction.translate(_("Confirm the selection of users scheduled for ban."))
+        )
         await interaction.followup.send(embed=embed, view=views.MassbanView(interaction, list(members), reason))
 
     @warn_group.command(name="list", description=_("Lists current warnings for a user."))

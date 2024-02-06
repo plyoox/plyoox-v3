@@ -60,7 +60,9 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description=_("Comm
         title: Literal["Romaji", "Native", "English"] = "Romaji",
     ):
         if not self.limiter.has_capacity() and not self.limit_lock:
-            await interaction.response.send_translated(_("The limit of the API has been reached. Please try again later."))
+            await interaction.response.send_translated(
+                _("The limit of the API has been reached. Please try again later.")
+            )
             return
 
         await interaction.response.defer()
@@ -88,7 +90,9 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description=_("Comm
     @app_commands.describe(query=_("The query to search for."))
     async def info_anilist(self, interaction: discord.Interaction, query: str):
         if not self.limiter.has_capacity() and not self.limit_lock:
-            await interaction.response.send_translated(_("The limit of the API has been reached. Please try again later."))
+            await interaction.response.send_translated(
+                _("The limit of the API has been reached. Please try again later.")
+            )
             return
 
         await interaction.response.defer()

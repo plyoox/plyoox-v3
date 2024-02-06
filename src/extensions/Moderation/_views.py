@@ -184,7 +184,6 @@ class WarnView(extensions.PaginatedEphemeralView):
 
             self.add_item(self.view_expired_button)
         else:
-
             self.add_item(self.back_button)  # type: ignore
             self.add_item(self.next_button)  # type: ignore
 

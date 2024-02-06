@@ -35,7 +35,9 @@ class UserGroup(app_commands.Group):
             name=interaction.translate(_("Days since joined")),
             value=f"> {(datetime.datetime.now(tz=datetime.timezone.utc) - member.joined_at).days}",
         )
-        embed.add_field(name=interaction.translate(_("Joined at")), value=helper.embed_timestamp_format(member.joined_at))
+        embed.add_field(
+            name=interaction.translate(_("Joined at")), value=helper.embed_timestamp_format(member.joined_at)
+        )
 
         if interaction.extras.get("deferred"):
             await interaction.followup.send(embed=embed)
@@ -64,7 +66,7 @@ class UserGroup(app_commands.Group):
 
         embed.add_field(
             name=f"{interaction.translate(_('Public Badges'))} ({len(public_flags)})",
-            value=f"> {''.join(public_flags)}" if len(public_flags) else interaction.translate(_('No public badges')),
+            value=f"> {''.join(public_flags)}" if len(public_flags) else interaction.translate(_("No public badges")),
         )
 
         if isinstance(member, discord.Member):
@@ -93,7 +95,7 @@ class UserGroup(app_commands.Group):
             embed.insert_field_at(
                 3,
                 name=f"{interaction.translate(_('Roles'))} ({len(roles) - 1})",
-                value=f"> {formatted_roles}" if formatted_roles else interaction.translate(_('No roles')),
+                value=f"> {formatted_roles}" if formatted_roles else interaction.translate(_("No roles")),
             )
 
         await interaction.response.send_message(embeds=[embed], ephemeral=ephemeral)

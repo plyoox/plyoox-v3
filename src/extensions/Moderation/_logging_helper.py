@@ -523,7 +523,7 @@ def _get_dynamic_log_user_message(
             return embed
         case "kick" | "softban":
             embed.title = translate(_("Kick"))
-            embed.description = translate(_("You have been temporarily muted."))
+            embed.description = translate(_("You have been kicked."))
 
             return embed
         case "unmute":

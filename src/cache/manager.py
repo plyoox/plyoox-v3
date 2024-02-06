@@ -69,11 +69,11 @@ class CacheManager:
             if isinstance(punishment_key, dict):
                 punishment_key = tuple(punishment_key.keys())[0]
                 duration = action["punishment"][punishment_key].get("duration")
-                has_points = action["punishment"][punishment_key].get("points")
+                amount = action["punishment"][punishment_key].get("points")
 
-                if has_points is not None:
+                if amount is not None:
                     points = ModerationPoints(
-                        points=has_points,
+                        amount=amount,
                         expires_in=action["punishment"][punishment_key].get("expires_in"),
                     )
 
@@ -87,7 +87,7 @@ class CacheManager:
                     check = tuple(check.keys())[0]
                     check_time = action["check"][check].get("time")
 
-                check = AutoModerationCheck(check=check, time=check_time)
+                check = AutoModerationCheck(kind=check, time=check_time)
 
             formatted_actions.append(AutoModerationAction(punishment=punishment, check=check))
 

@@ -275,7 +275,10 @@ class Automod(commands.Cog):
 
     @staticmethod
     def _handle_checks(member: discord.Member, action: AutoModerationAction) -> bool:
-        check = action.check
+        if action.check is None:
+            return True
+
+        check = action.check.kind
 
         if check is None:
             return True
@@ -427,7 +430,7 @@ class Automod(commands.Cog):
             _log.warning(f"{member.id} has no points in {guild.id}...")
             return
 
-        new_points = data.trigger_action.punishment.points.points
+        new_points = data.trigger_action.punishment.points.amount
         if points - new_points < 10:
             await _logging.automod_log(self.bot, data, points=f"{points}/10 [+{new_points}]")
 
@@ -439,7 +442,7 @@ class Automod(commands.Cog):
 
             await self._handle_final_action(member, cache.point_actions)
             await self.bot.db.execute(
-                "UPDATE automoderation_user SET expires_at = now() WHERE user_id = $1 AND guild_id = $2 AND expires_at > now()",
+                "UPDATE automoderation_user SET expires_at = now() WHERE user_id = $1 AND guild_id = $2 AND (expires_at IS NULL OR expires_at > now())",
                 member.id,
                 guild.id,
             )
@@ -478,7 +481,7 @@ class Automod(commands.Cog):
             guild.id,
             member.id,
             expires_at,
-            points.points,
+            points.amount,
             reason,
         )
 

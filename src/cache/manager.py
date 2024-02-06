@@ -46,11 +46,13 @@ class CacheManager:
 
         self._leveling = LRU(cache_size)
         self._welcome = LRU(cache_size)
-        self._moderation = LRU(cache_size)
-        self._logging = LRU(cache_size)
         self._automoderation = LRU(cache_size * 10)
         self._punishment_cache = LRU(cache_size)
         self._automoderation_queue: dict[int, asyncio.Event] = dict()
+
+        # Those caches are larger, because they are used for message caching
+        self._logging = LRU(cache_size * 2)
+        self._moderation = LRU(cache_size * 2)
 
     @staticmethod
     def __to_moderation_actions(actions: list[dict] | None):
@@ -280,7 +282,10 @@ class CacheManager:
                 continue
 
             punishment = Punishment(
-                id=row["id"], actions=self.__to_moderation_actions(row["actions"]), name=row["name"], reason=row["reason"]
+                id=row["id"],
+                actions=self.__to_moderation_actions(row["actions"]),
+                name=row["name"],
+                reason=row["reason"],
             )
 
             punishments[row["id"]] = punishment

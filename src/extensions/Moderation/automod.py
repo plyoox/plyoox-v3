@@ -102,7 +102,7 @@ class Automod(commands.Cog):
         await self._run_automod(message)
 
     @commands.Cog.listener()
-    async def on_message_edit(self, before: discord.Message, after: discord.Message):
+    async def on_custom_message_edit(self, before: discord.Message, after: discord.Message):
         if after.content and after.content != before.content:
             await self._run_automod(after)
 

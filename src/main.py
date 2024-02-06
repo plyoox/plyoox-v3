@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import logging
 import os
 import sys
@@ -17,6 +18,7 @@ from discord.ext import commands
 import translation
 from cache import CacheManager
 from lib import database, extensions
+from lib.message_cache import MessageCache
 
 if TYPE_CHECKING:
     from extensions.Timers import Timer
@@ -63,7 +65,7 @@ class Plyoox(commands.AutoShardedBot):
         super().__init__(
             intents=intents,
             allowed_mentions=allowed_mentions,
-            max_messages=2000,
+            max_messages=None,
             command_prefix=commands.when_mentioned,
             tree_cls=extensions.CommandTree,
             chunk_guilds_at_startup=False,
@@ -71,8 +73,10 @@ class Plyoox(commands.AutoShardedBot):
             compress=compress,
         )
 
+        self.messages = MessageCache[discord.Message](max_length=2500)
         self.presence_task = None
         self.imager_url = os.getenv("IMAGER_URL")
+
         if self.imager_url is None:
             plugins.remove("extensions.Leveling")
             plugins.remove("extensions.Anilist")
@@ -131,3 +135,51 @@ class Plyoox(commands.AutoShardedBot):
         while not self.is_closed():
             await self.change_presence(activity=discord.CustomActivity(name="plyoox.net"))
             await asyncio.sleep(43200)
+
+    # Message cache events
+
+    async def on_message(self, message: discord.Message):
+        await self.process_commands(message)
+
+        # Only cache messages of guilds when the moderation or the logging
+        # module is enabled.
+        if await self.cache.get_logging(message.guild.id):
+            self.messages.add_item(message)
+            return
+
+        mod_cache = await self.cache.get_moderation(message.guild.id)
+        if mod_cache is not None and mod_cache.active:
+            self.messages.add_item(message)
+
+    async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent):
+        message = self.messages.get_item(payload.message_id)
+
+        if message is not None:
+            before_message = copy.copy(message)
+            payload.cached_message = before_message
+
+            message._update(payload.data)
+
+            self.dispatch("custom_message_edit", before_message, message)
+
+        self.dispatch("custom_raw_message_edit", payload)
+
+    async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent):
+        message = self.messages.remove_item(payload.message_id)
+
+        if message is not None:
+            payload.cached_message = message
+
+        self.dispatch("custom_raw_message_delete", payload)
+
+    async def on_raw_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent):
+        messages = []
+
+        for message_id in payload.message_ids:
+            deleted_message = self.messages.remove_item(message_id)
+            if deleted_message:
+                messages.append(deleted_message)
+
+        payload.cached_messages = messages
+
+        self.dispatch("custom_raw_bulk_message_delete", payload)

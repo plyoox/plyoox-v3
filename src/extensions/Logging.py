@@ -162,7 +162,9 @@ class LoggingEvents(commands.Cog):
             embed.add_field(name=translate(_("Joined at")), value=helper.embed_timestamp_format(user.joined_at))
 
             roles = helper.format_roles(user.roles)
-            embed.add_field(name=translate(_("Roles")), value=f"> {roles}" if roles else italic(translate(_("No roles"))))
+            embed.add_field(
+                name=translate(_("Roles")), value=f"> {roles}" if roles else italic(translate(_("No roles")))
+            )
 
         else:
             embed.set_author(name=translate(_("User banned")), icon_url=user.display_avatar)
@@ -206,7 +208,8 @@ class LoggingEvents(commands.Cog):
 
             new_roles = helper.format_roles(after.roles)
             embed.add_field(
-                name=translate(_("New roles")), value=f"> {new_roles}" if new_roles else italic(translate(_("No roles")))
+                name=translate(_("New roles")),
+                value=f"> {new_roles}" if new_roles else italic(translate(_("No roles"))),
             )
 
             old_roles = helper.format_roles(before.roles)
@@ -241,7 +244,7 @@ class LoggingEvents(commands.Cog):
             await self._send_message(guild, cache, embeds=[embed])
 
     @commands.Cog.listener()
-    async def on_raw_message_edit(self, payload: discord.RawMessageUpdateEvent):
+    async def on_custom_raw_message_edit(self, payload: discord.RawMessageUpdateEvent):
         def translate(string: _):
             return global_translate(string, self.bot, guild.preferred_locale)
 
@@ -284,7 +287,8 @@ class LoggingEvents(commands.Cog):
             # messages longer than 1024 characters receive their own embed
             if len(message.content) <= 1024:
                 log_embed.add_field(
-                    name=translate(_("Old message content")), value=message.content or italic(translate(_("No content")))
+                    name=translate(_("Old message content")),
+                    value=message.content or italic(translate(_("No content"))),
                 )
             else:
                 old_message_embed = extensions.Embed(description=message.content, color=WARN_COLOR)
@@ -323,7 +327,7 @@ class LoggingEvents(commands.Cog):
         await self._send_message(guild, cache, embeds=embeds)
 
     @commands.Cog.listener()
-    async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent):
+    async def on_custom_raw_message_delete(self, payload: discord.RawMessageDeleteEvent):
         def translate(string: _):
             return global_translate(string, self.bot, guild.preferred_locale)
 
@@ -367,9 +371,10 @@ class LoggingEvents(commands.Cog):
             if not message.content and not message.attachments:
                 return
 
-            log_embed.description = translate(_("A message from **{member}** was deleted from {channel.mention}.")).format(
-                member=member, channel=message.channel
-            )
+            log_embed.description = translate(
+                _("A message from **{member}** was deleted from {channel.mention}.")
+            ).format(member=member, channel=message.channel)
+
             log_embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
             # messages longer than 1024 characters receive their own embed
@@ -395,7 +400,7 @@ class LoggingEvents(commands.Cog):
         await self._send_message(guild, cache, embeds=embeds)
 
     @commands.Cog.listener()
-    async def on_raw_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent):
+    async def on_custom_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent):
         def translate(string: _):
             return global_translate(string, self.bot, guild.preferred_locale)
 

@@ -100,7 +100,9 @@ class LoggingEvents(commands.Cog):
             return
 
         embed = extensions.Embed(
-            description=translate(_("The user {member.name} joined the guild.")).format(member=member),
+            description=translate(_("The user {member.display_name} ({member}) has joined the guild.")).format(
+                member=member
+            ),
             color=SUCCESS_COLOR,
         )
         embed.set_author(name=translate(_("User joined")), icon_url=member.display_avatar)
@@ -127,7 +129,9 @@ class LoggingEvents(commands.Cog):
             return
 
         embed = extensions.Embed(
-            description=translate(_("The user {member.name} left the guild.")).format(member=member),
+            description=translate(_("The user {member.display_name} ({member}) has left the guild.")).format(
+                member=member
+            ),
             color=ERROR_COLOR,
         )
         embed.set_author(name=translate(_("Member left")), icon_url=member.display_avatar)
@@ -153,7 +157,9 @@ class LoggingEvents(commands.Cog):
         if isinstance(user, discord.Member) and any(role in cache.exempt_roles for role in user.roles):
             return
 
-        embed = extensions.Embed(color=ERROR_COLOR)
+        embed = extensions.Embed(
+            color=ERROR_COLOR, description=translate(_("The user {member.display_name} ({member}) has been banned."))
+        )
         embed.add_field(name=translate(_("Account created at")), value=helper.embed_timestamp_format(user.created_at))
         embed.set_footer(text=f"{global_translate(_('User Id'), self.bot, guild.preferred_locale)}: {user.id}")
 
@@ -180,7 +186,10 @@ class LoggingEvents(commands.Cog):
         if cache is None:
             return
 
-        embed = extensions.Embed(color=WARN_COLOR)
+        embed = extensions.Embed(
+            color=WARN_COLOR,
+            description=translate(_("The user {user.display_name} ({user}) has been unbanned.")).format(user=user),
+        )
         embed.set_author(name=translate(_("Member unbanned")), icon_url=user.display_avatar)
         embed.set_footer(text=f"{translate(_('User Id'))}: {user.id}")
         embed.add_field(name=translate(_("Account created at")), value=helper.embed_timestamp_format(user.created_at))
@@ -202,7 +211,12 @@ class LoggingEvents(commands.Cog):
             if any(role in cache.exempt_roles for role in after.roles):
                 return
 
-            embed = extensions.Embed(color=INFO_COLOR)
+            embed = extensions.Embed(
+                color=INFO_COLOR,
+                description=translate(_("The user {member.display_name} ({member}) has updated their roles.")).format(
+                    member=after
+                ),
+            )
             embed.set_author(name=translate(_("Member roles changed")), icon_url=before.display_avatar)
             embed.set_footer(text=f"{translate(_('User Id'))}: {before.id}")
 
@@ -227,7 +241,12 @@ class LoggingEvents(commands.Cog):
             if any(role in cache.exempt_roles for role in after.roles):
                 return
 
-            embed = extensions.Embed(color=INFO_COLOR)
+            embed = extensions.Embed(
+                color=INFO_COLOR,
+                description=translate(_("The user {member.display_name} ({member}) has updated their name.")).format(
+                    member=after
+                ),
+            )
             embed.set_author(name=translate(_("Member renamed")), icon_url=after.display_avatar)
             embed.set_footer(text=f"{translate(_('User Id'))}: {before.id}")
 

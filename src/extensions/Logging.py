@@ -419,7 +419,7 @@ class LoggingEvents(commands.Cog):
         await self._send_message(guild, cache, embeds=embeds)
 
     @commands.Cog.listener()
-    async def on_custom_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent):
+    async def on_custom_raw_bulk_message_delete(self, payload: discord.RawBulkMessageDeleteEvent):
         def translate(string: _):
             return global_translate(string, self.bot, guild.preferred_locale)
 

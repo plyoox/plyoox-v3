@@ -1015,7 +1015,7 @@ msgstr "Temporäre Sperre"
 
 #: src/extensions/Moderation/_logging_helper.py:519
 msgid "You have been temporarily muted."
-msgstr "Benutzer wurde temporär gesperrt."
+msgstr "Du wurdest temporär gesperrt."
 
 #: src/extensions/Moderation/_logging_helper.py:525
 msgid "Kick"
@@ -1031,7 +1031,7 @@ msgstr "Entsperrung"
 
 #: src/extensions/Moderation/_logging_helper.py:531
 msgid "You have been unmuted."
-msgstr "Benutzer wurde entsperrt."
+msgstr "Du wurdest entsperrt."
 
 #: src/extensions/Moderation/_logging_helper.py:536
 msgid "A message has been deleted."

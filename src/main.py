@@ -102,10 +102,12 @@ class Plyoox(commands.AutoShardedBot):
         try:
             self.db = await asyncpg.create_pool(os.getenv("POSTGRES_DSN"), init=database._init_db_connection)
             self.cache = CacheManager(self.db)
-
         except asyncpg.ConnectionDoesNotExistError:
             logger.critical(f"Could not connect to the database: {traceback.format_exc()}")
-            sys.exit(1)
+            sys.exit(-1)
+        except ConnectionRefusedError:
+            logger.critical("Remote computer refused the connection")
+            sys.exit(-2)
 
     async def _create_http_client(self) -> None:
         self.session = aiohttp.ClientSession()

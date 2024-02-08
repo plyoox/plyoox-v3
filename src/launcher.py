@@ -26,13 +26,16 @@ async def main():
 
     from main import Plyoox
 
+    compress = True
     if gateway_url := os.getenv("GATEWAY_URL"):
         from discord.gateway import DiscordWebSocket
 
         logger.info(f"Using own gateway url: {gateway_url}")
         DiscordWebSocket.DEFAULT_GATEWAY = yarl.URL(gateway_url)
 
-    bot = Plyoox()
+        compress = False
+
+    bot = Plyoox(compress)
 
     await bot._create_db_pool()
     await bot._create_http_client()

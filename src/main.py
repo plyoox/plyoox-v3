@@ -59,6 +59,7 @@ class Plyoox(commands.AutoShardedBot):
             guilds=True,
             members=True,
             auto_moderation_execution=True,
+            webhooks=True,
         )
         allowed_mentions = discord.AllowedMentions(everyone=False, users=False, roles=False, replied_user=True)
 

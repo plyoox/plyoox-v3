@@ -37,8 +37,10 @@ class Timer(commands.Cog):
             self._task = self.bot.loop.create_task(self.dispatch_timers())
 
     async def cog_unload(self) -> None:
-        self._task.cancel()
-        self._task = None
+        if self._task:
+            self._task.cancel()
+            self._task = None
+
         self._current_timer = None
 
     async def get_timer(self, *, days: int = 7) -> TimerModel | None:

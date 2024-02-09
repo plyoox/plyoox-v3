@@ -133,9 +133,8 @@ class Moderation(commands.Cog):
     ):
         guild = interaction.guild
 
-        if isinstance(member, discord.Member):
-            if not await Moderation._can_execute_on(interaction, member):
-                return
+        if isinstance(member, discord.Member) and not await Moderation._can_execute_on(interaction, member):
+            return
 
         await interaction.response.defer(ephemeral=True)
 

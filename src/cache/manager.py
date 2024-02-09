@@ -46,7 +46,7 @@ class CacheManager:
 
         self._leveling = LRU(cache_size)
         self._welcome = LRU(cache_size)
-        self._automoderation = LRU(cache_size * 10)
+        self._automoderation = LRU(cache_size * 4)
         self._punishment_cache = LRU(cache_size)
         self._automoderation_queue: dict[int, asyncio.Event] = dict()
 

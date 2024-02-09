@@ -15,20 +15,6 @@ if TYPE_CHECKING:
     from lib.types import Translate
 
 
-SCORE_COLORS = {
-    10: "#d2482d",
-    20: "#d2642d",
-    30: "#d2802d",
-    40: "#d29b2d",
-    50: "#d2b72d",
-    60: "#d2d22d",
-    70: "#b7d22d",
-    80: "#9bd22d",
-    90: "#80d22d",
-    100: "#64d22d",
-}
-
-
 def get_title(title: _AnilistTitle, language: Literal["romaji", "english", "native"]) -> str:
     """Returns the title of an Anilist title"""
     return title[language] if title[language] else title["romaji"]

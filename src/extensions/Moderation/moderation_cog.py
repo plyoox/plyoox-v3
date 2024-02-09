@@ -667,6 +667,8 @@ class Moderation(commands.Cog):
         if not await self._can_execute_on(interaction, member):
             return
 
+        await interaction.response.defer(ephemeral=True)
+
         for action in punishment.actions:
             if automod._handle_checks(member, action):
                 data = AutoModerationActionData(
@@ -675,7 +677,7 @@ class Moderation(commands.Cog):
 
                 await automod._execute_action(data)
 
-        await interaction.response.send_translated(_("The user has been punished."), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been punished.")), ephemeral=True)
 
     @tempmute.autocomplete("duration")
     @tempban.autocomplete("duration")

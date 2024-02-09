@@ -53,7 +53,7 @@ class Notification(commands.Cog):
     def _get_offline_embed(
         *, login: str, display_name: str, image_url: str, started_at: datetime.datetime, translate: Translate
     ) -> discord.Embed:
-        now = datetime.datetime.now(tz=datetime.timezone.utc)
+        now = discord.utils.utcnow()
 
         embed = extensions.Embed(
             color=0x6441A5,
@@ -65,7 +65,9 @@ class Notification(commands.Cog):
         embed.add_field(name=translate(_("Started at")), value=f"> {utils.format_dt(started_at)}", inline=True)
         embed.add_field(name=translate(_("Ended at")), value=f"> {utils.format_dt(now)}", inline=True)
         embed.add_field(
-            name=translate(_("Duration")), value=f"> {helper.format_timedelta(now - started_at)}", inline=True
+            name=translate(_("Duration")),
+            value=f"> {helper.format_timedelta(now.replace(tzinfo=None) - started_at)}",
+            inline=True,
         )
 
         embed.set_author(

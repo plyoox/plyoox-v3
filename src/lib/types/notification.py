@@ -17,4 +17,3 @@ class TwitchLiveNotification(TypedDict):
 class TwitchOfflineNotification(TypedDict):
     guild_id: int
     stream_id: int
-    user_id: int

@@ -99,8 +99,6 @@ class Notification(commands.Cog):
             return
 
         channel = guild.get_channel(notification["channel"])
-        if channel is None:
-            return
 
         if channel.permissions_for(guild.me).send_messages:
             message_content = notification["message"]

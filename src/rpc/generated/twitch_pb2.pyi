@@ -27,22 +27,22 @@ class TwitchLiveNotification(_message.Message):
     def __init__(self, guild_id: _Optional[int] = ..., stream_id: _Optional[int] = ..., user_id: _Optional[int] = ..., viewer_count: _Optional[int] = ..., name: _Optional[str] = ..., title: _Optional[str] = ..., thumbnail_url: _Optional[str] = ..., game: _Optional[str] = ..., started_at: _Optional[int] = ...) -> None: ...
 
 class TwitchOfflineNotification(_message.Message):
-    __slots__ = ("stream_id", "guild_id", "user_id")
+    __slots__ = ("stream_id", "guild_id")
     STREAM_ID_FIELD_NUMBER: _ClassVar[int]
     GUILD_ID_FIELD_NUMBER: _ClassVar[int]
-    USER_ID_FIELD_NUMBER: _ClassVar[int]
     stream_id: int
     guild_id: int
-    user_id: int
-    def __init__(self, stream_id: _Optional[int] = ..., guild_id: _Optional[int] = ..., user_id: _Optional[int] = ...) -> None: ...
+    def __init__(self, stream_id: _Optional[int] = ..., guild_id: _Optional[int] = ...) -> None: ...
 
 class AddTwitchNotification(_message.Message):
-    __slots__ = ("guild_id", "name")
+    __slots__ = ("guild_id", "name", "channel_id")
     GUILD_ID_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    CHANNEL_ID_FIELD_NUMBER: _ClassVar[int]
     guild_id: int
     name: str
-    def __init__(self, guild_id: _Optional[int] = ..., name: _Optional[str] = ...) -> None: ...
+    channel_id: int
+    def __init__(self, guild_id: _Optional[int] = ..., name: _Optional[str] = ..., channel_id: _Optional[int] = ...) -> None: ...
 
 class RemoveTwitchNotification(_message.Message):
     __slots__ = ("user_id", "guild_id")
@@ -51,16 +51,6 @@ class RemoveTwitchNotification(_message.Message):
     user_id: int
     guild_id: int
     def __init__(self, user_id: _Optional[int] = ..., guild_id: _Optional[int] = ...) -> None: ...
-
-class EditTwitchNotification(_message.Message):
-    __slots__ = ("user_id", "guild_id", "channel_id")
-    USER_ID_FIELD_NUMBER: _ClassVar[int]
-    GUILD_ID_FIELD_NUMBER: _ClassVar[int]
-    CHANNEL_ID_FIELD_NUMBER: _ClassVar[int]
-    user_id: int
-    guild_id: int
-    channel_id: int
-    def __init__(self, user_id: _Optional[int] = ..., guild_id: _Optional[int] = ..., channel_id: _Optional[int] = ...) -> None: ...
 
 class OAuthCode(_message.Message):
     __slots__ = ("code", "redirect_uri")

@@ -158,7 +158,8 @@ class LoggingEvents(commands.Cog):
             return
 
         embed = extensions.Embed(
-            color=ERROR_COLOR, description=translate(_("The user {member.display_name} ({member}) has been banned."))
+            color=ERROR_COLOR,
+            description=translate(_("The user {member.display_name} ({member}) has been banned.")).format(member=user),
         )
         embed.add_field(name=translate(_("Account created at")), value=helper.embed_timestamp_format(user.created_at))
         embed.set_footer(text=f"{global_translate(_('User Id'), self.bot, guild.preferred_locale)}: {user.id}")

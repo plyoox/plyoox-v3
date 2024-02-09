@@ -67,7 +67,7 @@ class Moderation(commands.Cog):
             )
             return False
 
-        return True
+        return not target.guild_permissions.administrator
 
     @staticmethod
     async def _view_invite_info(interaction: discord.Interaction, *, invite: discord.Invite, ephemeral: bool = False):

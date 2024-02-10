@@ -51,7 +51,7 @@ class Plyoox(commands.AutoShardedBot):
     imager_url: str
     notificator_url: str
 
-    def __init__(self, compress: bool = True):
+    def __init__(self, compress: bool = True, shard_count: int | None = None):
         intents = discord.Intents(
             moderation=True,
             message_content=True,
@@ -72,6 +72,7 @@ class Plyoox(commands.AutoShardedBot):
             chunk_guilds_at_startup=False,
             help_command=None,
             compress=compress,
+            shard_count=shard_count,
         )
 
         self.messages = MessageCache[discord.Message](max_length=2500)

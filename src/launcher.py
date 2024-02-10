@@ -27,15 +27,26 @@ async def main():
     from main import Plyoox
 
     compress = True
-    if gateway_url := os.getenv("GATEWAY_URL"):
+    shard_count = None
+    if gateway_host := os.getenv("GATEWAY_HOST"):
+        import aiohttp
         from discord.gateway import DiscordWebSocket
 
-        logger.info(f"Using own gateway url: {gateway_url}")
-        DiscordWebSocket.DEFAULT_GATEWAY = yarl.URL(gateway_url)
+        logger.info(f"Using own gateway: {gateway_host}")
+        DiscordWebSocket.DEFAULT_GATEWAY = yarl.URL(f"ws://{gateway_host}")
 
         compress = False
 
-    bot = Plyoox(compress)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"http://{gateway_host}/shard-count") as response:
+                if not response.ok:
+                    raise Exception("Failed getting shard count")
+
+                response_text = await response.text()
+
+                shard_count = int(response_text)
+
+    bot = Plyoox(compress, shard_count=shard_count)
 
     await bot._create_db_pool()
     await bot._create_http_client()

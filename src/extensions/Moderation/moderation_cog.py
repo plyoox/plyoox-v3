@@ -55,7 +55,7 @@ class Moderation(commands.Cog):
 
     @staticmethod
     async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
-        if interaction.user.top_role <= target.top_role and interaction.user.id != interaction.guild.owner_id:
+        if interaction.user.top_role <= target.top_role or interaction.user.id != interaction.guild.owner_id:
             await interaction.response.send_translated(
                 _("The user must be below you in the hierarchy."), ephemeral=True
             )
@@ -67,7 +67,11 @@ class Moderation(commands.Cog):
             )
             return False
 
-        return not target.guild_permissions.administrator
+        if target.guild_permissions.administrator:
+            await interaction.response.send_translated(_("You cannot punish administrators."), ephemeral=True)
+            return False
+
+        return True
 
     @staticmethod
     async def _view_invite_info(interaction: discord.Interaction, *, invite: discord.Invite, ephemeral: bool = False):
@@ -249,6 +253,7 @@ class Moderation(commands.Cog):
             return
 
         await interaction.response.defer(ephemeral=True)
+
         await member.timeout(muted_until, reason=reason)
         await _logging_helper.log_simple_punish_command(
             interaction, target=member, until=muted_until, reason=reason, kind=ModerationCommandKind.tempmute

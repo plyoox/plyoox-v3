@@ -45,7 +45,6 @@ class TwitchService(TwitchNotificationServicer):
         data: TwitchOfflineNotificationType = {
             "guild_id": request.guild_id,
             "stream_id": request.stream_id,
-            "user_id": request.user_id,
         }
 
         await notification.twitch_offline_edit(data)

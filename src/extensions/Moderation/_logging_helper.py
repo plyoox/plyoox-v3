@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import io
 import logging
 from typing import TYPE_CHECKING
 
@@ -55,10 +56,10 @@ async def _send_webhook(
     guild_id: int,
     webhook: discord.Webhook,
     embeds: list[discord.Embed] = utils.MISSING,
+    files: list[discord.File] = utils.MISSING,
 ) -> None:
     try:
-        await webhook.send(embeds=embeds)
-        return
+        await webhook.send(embeds=embeds, files=files)
     except discord.NotFound:
         _log.info(f"Log channel {webhook.id} not found, deleting...")
         await bot.db.execute("DELETE FROM maybe_webhook WHERE id = $1 AND guild_id = $2", webhook.id, guild_id)
@@ -122,7 +123,9 @@ async def log_simple_punish_command(
     await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed])
 
 
-async def log_clear_command(interaction: discord.Interaction, *, reason: str | None, total: int, deleted: int) -> None:
+async def log_clear_command(
+    interaction: discord.Interaction, *, reason: str | None, total: int, deleted_messages: list[discord.Message]
+) -> None:
     cache = await interaction.client.cache.get_moderation(interaction.guild.id)
     if cache is None or not cache.active:
         return
@@ -133,23 +136,40 @@ async def log_clear_command(interaction: discord.Interaction, *, reason: str | N
     if webhook is None:
         return
 
+    deleted_count = len(deleted_messages)
+
     embed = extensions.Embed(
         description=translate(
             _("{deleted_count} messages have been deleted from {channel} by {moderator.mention} ({moderator})."),
-            data={"deleted_count": deleted, "channel": interaction.channel.mention, "moderator": interaction.user},
+            data={
+                "deleted_count": deleted_count,
+                "channel": interaction.channel.mention,
+                "moderator": interaction.user,
+            },
         ),
         color=colors.COMMAND_LOG_COLOR,
     )
     embed.set_author(name=translate(_("Messages cleared")), icon_url=interaction.user.display_avatar)
     embed.set_footer(text=f"{translate(_('Channel Id'))}: {interaction.channel_id}")
 
-    embed.add_field(name=translate(_("Deleted Messages")), value=f"> {deleted}/{total}")
+    embed.add_field(name=translate(_("Deleted Messages")), value=f"> {deleted_count}/{total}")
     embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()))
 
     if reason is not None:
         embed.insert_field_at(0, name=translate(_("Reason")), value=f"> {reason}")
 
-    await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed])
+    file = None
+    if len(deleted_messages):
+        messages = [f"{msg.author} ({msg.author.id}):\t{msg.content}" for msg in deleted_messages if msg.content]
+
+        if len(messages) > 0:
+            _file = io.BytesIO()
+            _file.write("\n".join([msg for msg in messages]).encode("utf-8"))
+            _file.seek(0)
+
+            file = discord.File(_file, filename="cleared_messages.txt")
+
+    await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed], files=[file])
 
 
 async def automod_log(

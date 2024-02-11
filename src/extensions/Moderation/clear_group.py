@@ -121,7 +121,9 @@ class ClearGroup(app_commands.Group):
             embed=embed,
         )
 
-        await _logging_helper.log_clear_command(interaction, reason=reason, deleted=deleted_count, total=limit)
+        await _logging_helper.log_clear_command(
+            interaction, reason=reason, deleted_messages=deleted_messages, total=limit
+        )
 
     @app_commands.command(name="all", description=_("Clear all messages in a channel."))
     @app_commands.describe(

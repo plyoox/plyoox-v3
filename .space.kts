@@ -53,23 +53,4 @@ job("Run Bot Job") {
             }
         }
     }
-
-    container("Run deploy script", image = "gradle:7.6-jdk11") {
-        resources {
-            cpu = 2.cpu
-            memory = 2.gb
-        }
-
-        kotlinScript { api ->
-            if (api.parameters["channel"] == "stable") {
-                api.space().projects.automation.deployments.schedule(
-                        project = api.projectIdentifier(),
-                        targetIdentifier = TargetIdentifier.Key("bot"),
-                        version = api.parameters["version"],
-                        scheduledStart = null,
-                        commitRefs = listOf(DeploymentCommitReference(branch = "main", repositoryName = api.gitRepositoryName(), commit = api.gitRevision())),
-                )
-            }
-        }
-    }
 }

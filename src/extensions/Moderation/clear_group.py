@@ -90,7 +90,7 @@ class ClearGroup(app_commands.Group):
         predicate: Callable[[discord.Message], bool],
     ):
         """This function is a helper to clear messages in an interaction channel.
-        predicate must be a function (lambda) to specify the messages the bot should remove"""
+        Predicate must be a function (lambda) to specify the messages the bot should remove"""
         channel = interaction.channel
 
         # delete the messages
@@ -131,7 +131,7 @@ class ClearGroup(app_commands.Group):
     async def clear_all(
         self, interaction: discord.Interaction, amount: app_commands.Range[int, 1, 500], reason: Optional[str]
     ):
-        # first thing is to defer the response due to delay when deleting
+        # The first thing is to defer the response due to delay when deleting
         # lots of messages and sending logging information.
         await interaction.response.defer(ephemeral=True)
 

@@ -7,20 +7,17 @@ import aiolimiter
 import discord
 from discord import app_commands
 from discord.ext import commands
+from discord.app_commands import locale_str as _
 
 from lib import errors
-from translation import _
 from . import queries, _views, _helper
 
 if TYPE_CHECKING:
     from main import Plyoox
 
 
-_T = app_commands.locale_str
-
-
 @app_commands.guild_only
-class Anilist(commands.GroupCog, group_name="anilist", group_description="Commands for querying the Anilist site."):
+class Anilist(commands.GroupCog, group_name="anilist", group_description=_("Commands for querying the Anilist site.")):
     def __init__(self, bot: Plyoox):
         self.bot = bot
         self.url = "https://graphql.anilist.co"
@@ -41,19 +38,20 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
             async with self.bot.session.post(self.url, json=data) as resp:
                 if retry_after := resp.headers.get("Retry-After"):
                     self.limit_lock = True
-                    self.bot.loop.create_task(self.__reset_limit(int(retry_after)))
+                    await self.bot.loop.create_task(self.__reset_limit(int(retry_after)))
                     raise errors.AnilistQueryError("Rate limit exceeded")
 
-                if resp.status != 200:
+                if not resp.ok:
                     raise errors.AnilistQueryError(f"Anilist returned status code {resp.status}")
 
                 data = await resp.json()
 
                 return data["data"]["Page"]
 
-    @app_commands.command(name="search", description="Search for an anime on Anilist.")
+    @app_commands.command(name="search", description=_("Search for an anime on Anilist."))
     @app_commands.describe(
-        query="The query to search for.", title="If which language the titles should be shown (default original)."
+        query=_("The query to search for."),
+        title=_("In which language the titles should be displayed (default original)."),
     )
     async def search_anilist(
         self,
@@ -62,7 +60,9 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
         title: Literal["Romaji", "Native", "English"] = "Romaji",
     ):
         if not self.limiter.has_capacity() and not self.limit_lock:
-            await interaction.response.send(_(interaction.locale, "anilist.rate_limit"))
+            await interaction.response.send_translated(
+                _("The limit of the API has been reached. Please try again later.")
+            )
             return
 
         await interaction.response.defer()
@@ -70,7 +70,7 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
         data = response["media"]
 
         if not data:
-            await interaction.followup.send(_(interaction.locale, "anilist.search.no_result"), ephemeral=True)
+            await interaction.followup.send(interaction.translate(_("No results found.")), ephemeral=True)
             return
 
         view = _views.AnilistSearchView(interaction, query, title.lower())
@@ -79,18 +79,20 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
         await interaction.followup.send(
             view=view,
             embed=_helper.generate_search_embed(
+                interaction.translate,
                 query=query,
                 data=data,
-                locale=interaction.locale,
                 title=title.lower(),  # type: ignore
             ),
         )
 
-    @app_commands.command(name="info", description="Get information about an anime on Anilist.")
-    @app_commands.describe(query=_T("The query to search for.", key="anilist.search.query"))
+    @app_commands.command(name="info", description=_("Get information about an anime on Anilist."))
+    @app_commands.describe(query=_("The query to search for."))
     async def info_anilist(self, interaction: discord.Interaction, query: str):
         if not self.limiter.has_capacity() and not self.limit_lock:
-            await interaction.response.send(_(interaction.locale, "anilist.rate_limit"))
+            await interaction.response.send_translated(
+                _("The limit of the API has been reached. Please try again later.")
+            )
             return
 
         await interaction.response.defer()
@@ -98,10 +100,10 @@ class Anilist(commands.GroupCog, group_name="anilist", group_description="Comman
         data = response["media"]
 
         if not data:
-            await interaction.followup.send(_(interaction.locale, "anilist.search.no_result"))
+            await interaction.followup.send(interaction.translate(_("No results found.")), ephemeral=True)
             return
 
-        embed = _helper.generate_info_embed(lc=interaction.locale, data=data[0])
+        embed = _helper.generate_info_embed(data=data[0], translate=interaction.translate)
 
         if data[0]["trailer"] is not None:
             view = _views.AnilistInfoView(data[0], interaction)

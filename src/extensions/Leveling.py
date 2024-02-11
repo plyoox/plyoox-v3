@@ -8,24 +8,23 @@ from typing import TYPE_CHECKING, Optional
 import aiohttp
 import discord
 from discord import app_commands, ui
+from discord.app_commands import locale_str as _
 from discord.ext import commands
 
 from lib import formatting, helper, extensions
-from translation import _
 
 if TYPE_CHECKING:
     from main import Plyoox
     from lib.types import LevelUserData
 
-_T = app_commands.locale_str
 _log = logging.getLogger(__name__)
 
 
 def get_xp_from_lvl(lvl: int):
     """Calculates the overall needed xp to gain this level."""
     xp = 100
-    for _ in range(1, lvl + 1):
-        xp += get_level_xp(_)
+    for i in range(1, lvl + 1):
+        xp += get_level_xp(i)
     return xp
 
 
@@ -43,29 +42,33 @@ def get_level_from_xp(xp: int) -> tuple[int, int]:
     return level, xp
 
 
+RESET_LEVEL_CONFIRMATION_TEXT = "Yes, reset all levels"
+
+
 class ResetGuildModal(ui.Modal):
     def __init__(self, interaction: discord.Interaction):
-        locale = interaction.locale
+        super().__init__(title=interaction.translate(_("Reset server levels")))
 
-        super().__init__(title=_(locale, "level.reset_guild_level.modal_title"))
-
-        self.bot: Plyoox = interaction.client  # type: ignore
+        self.bot: Plyoox = interaction.client
         self.question = ui.TextInput(
-            label=_(locale, "level.reset_guild_level.question"),
-            placeholder=_(locale, "level.reset_guild_level.placeholder"),
+            label=interaction.translate(_("Are you sure you want to reset all levels?")),
+            placeholder=f"{interaction.translate(_('Repeat:'))} {RESET_LEVEL_CONFIRMATION_TEXT}",
             required=True,
         )
         self.add_item(self.question)
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
-        lc = interaction.locale
-        if self.question.value.lower() != _(lc, "level.reset_guild_level.reset_text").lower():
-            await interaction.response.send_message(_(lc, "level.reset_guild_level.wrong_answer"), ephemeral=True)
+        if self.question.value.lower() != RESET_LEVEL_CONFIRMATION_TEXT.lower():
+            await interaction.response.send_translated(_("Wrong answer provided, aborting."), ephemeral=True)
             return
 
         await interaction.response.defer(ephemeral=True)
-        await self.bot.db.execute("DELETE FROM leveling_users WHERE guild_id = $1", interaction.guild_id)
-        await interaction.followup.send(_(lc, "level.reset_guild_level.success"), ephemeral=True)
+        await self.bot.db.execute("DELETE FROM level_user WHERE guild_id = $1", interaction.guild_id)
+
+        await interaction.followup.send(
+            interaction.translate(_("The level of all guild members has been successfully reset.")),
+            ephemeral=True,
+        )
 
 
 class Leveling(commands.Cog):
@@ -74,7 +77,7 @@ class Leveling(commands.Cog):
         self._cooldown_by_user = commands.CooldownMapping.from_cooldown(1, 60, commands.BucketType.member)
 
         self.ctx_menu = app_commands.ContextMenu(
-            name=_T("View rank", key="view-rank"),
+            name=_("View rank"),
             callback=self.rank_context_menu,
         )
 
@@ -82,14 +85,14 @@ class Leveling(commands.Cog):
 
     level_group = app_commands.Group(
         name="level",
-        description="Commands that are needed to interact with the level-system.",
+        description=_("Commands that are needed to interact with the level-system."),
         guild_only=True,
     )
 
     async def _fetch_member_data(self, member: discord.Member) -> LevelUserData:
         """Fetches the leveling data of a member."""
         return await self.bot.db.fetchrow(
-            "SELECT * FROM leveling_users WHERE guild_id = $1 AND user_id = $2",
+            "SELECT user_id, guild_id, xp FROM level_user WHERE guild_id = $1 AND user_id = $2",
             member.guild.id,
             member.id,
         )
@@ -97,50 +100,75 @@ class Leveling(commands.Cog):
     async def _create_member_data(self, member: discord.Member, xp: int) -> None:
         """Creates a database entry for the member."""
         await self.bot.db.execute(
-            "INSERT INTO leveling_users (guild_id, user_id, xp) VALUES ($1, $2, $3)",
+            "INSERT INTO level_user (guild_id, user_id, xp, message_count) VALUES ($1, $2, $3, 1)",
             member.guild.id,
             member.id,
             xp,
         )
 
-    async def _update_member_data(self, id: int, xp: int) -> None:
+    async def _update_member_data(self, user_id: int, guild_id: int, xp: int) -> None:
         """Adds a specific amount of xp to the user in the database."""
-        await self.bot.db.execute("UPDATE leveling_users SET xp = xp + $1 WHERE id = $2", xp, id)
+        await self.bot.db.execute(
+            "UPDATE level_user SET xp = xp + $1, message_count = message_count + 1 WHERE user_id = $2 AND guild_id = $3",
+            xp,
+            user_id,
+            guild_id,
+        )
 
     async def cog_unload(self) -> None:
         self.bot.tree.remove_command(self.ctx_menu.name, type=self.ctx_menu.type)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
         cache = await self.bot.cache.get_leveling(interaction.guild_id)
-        if cache is None or not cache.active:
-            await interaction.response.send_message(_(interaction.locale, "level.disabled"), ephemeral=True)
+        if not cache:
+            if interaction.user.guild_permissions.administrator:
+                await interaction.response.send_translated(
+                    _(
+                        "The level system has not been enabled. Go to the [Dashboard](https://plyoox.net) to enabled it."
+                    ),
+                    ephemeral=True,
+                )
+                return False
+
+            await interaction.response.send_translated(_("This module is currently disabled."), ephemeral=True)
+
             return False
 
         return True
 
     async def _view_rank(
-        self, interaction: discord.Interaction, *, member: discord.Member = None, ephemeral: bool = False
+        self,
+        interaction: discord.Interaction,
+        *,
+        member: discord.Member = None,
+        ephemeral: bool = False,
     ):
         if self.bot.imager_url is None:
             _log.warning("No imager url given set, aborting...")
 
-            await interaction.response.send_message(
-                _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
+            await interaction.response.send_translated(
+                _("The required infrastructure is currently not available."),
+                ephemeral=True,
             )
             return
 
         guild = interaction.guild
-        bot: Plyoox = interaction.client  # type: ignore
+        bot: Plyoox = interaction.client
 
         user_data: LevelUserData = await self.bot.db.fetchrow(
-            "WITH users AS (SELECT xp, user_id, row_number() OVER (ORDER BY xp DESC) AS rank FROM leveling_users WHERE guild_id = $1) SELECT xp, rank FROM users WHERE user_id = $2",
+            "WITH users AS (SELECT xp, user_id, row_number() OVER (ORDER BY xp DESC) AS rank FROM level_user WHERE guild_id = $1) SELECT xp, rank FROM users WHERE user_id = $2",
             guild.id,
             member.id,
         )
 
         if user_data is None:
-            await helper.interaction_send(interaction, "level.rank.no_data")
+            await interaction.response.send_translated(
+                _("This user has never written anything or is excluded."),
+                ephemeral=True,
+            )
             return
+
+        await interaction.response.defer(thinking=True, ephemeral=ephemeral)
 
         current_level, remaining_xp = get_level_from_xp(user_data["xp"])
         required_xp = get_level_xp(current_level)
@@ -162,20 +190,21 @@ class Leveling(commands.Cog):
                     text = await res.text()
                     _log.warning(f"Received status code {res.status} and data `{text}` while fetching level card.")
 
-                    await interaction.response.send_message(
-                        _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
+                    await interaction.followup.send(
+                        interaction.translate(_("The required infrastructure is currently not available.")),
                     )
+
                     return
 
                 fp = io.BytesIO(await res.read())
                 image = discord.File(fp, filename="level_card.png")
 
-                await interaction.response.send_message(file=image, ephemeral=ephemeral)
+                await interaction.followup.send(file=image, ephemeral=ephemeral)
         except aiohttp.ClientConnectionError as err:
             _log.error("Could not fetch level card", err)
 
-            await interaction.response.send_message(
-                _(interaction.locale, "level.infrastructure_offline"), ephemeral=True
+            await interaction.followup.send(
+                interaction.translate(_("The required infrastructure is currently not available.")),
             )
             return
 
@@ -186,7 +215,7 @@ class Leveling(commands.Cog):
             return
 
         cache = await self.bot.cache.get_leveling(guild.id)
-        if cache is None or not cache.active or not cache.roles:
+        if not cache or not cache.roles:
             return
 
         user_data = await self._fetch_member_data(member)
@@ -227,29 +256,29 @@ class Leveling(commands.Cog):
         cache = await self.bot.cache.get_leveling(guild.id)
 
         # leveling is deactivated on this guild
-        if cache is None or not cache.active:
+        if not cache:
             return
 
         # ignore no xp channels
-        if channel.id in cache.no_xp_channels:
+        if channel.id in cache.exempt_channels or channel.category_id in cache.exempt_channels:
             return
 
         # ignore members with the no xp role
-        if cache.no_xp_role in member._roles:
+        if cache.exempt_role in member._roles:
             return
 
         message_xp = random.randint(15, 25)  # generate a random amount of xp between 15 and 25
         member_data = await self._fetch_member_data(member)
 
-        if member.premium_since is not None and cache.booster_xp_multiplicator is not None:
-            message_xp *= cache.booster_xp_multiplicator
+        if member.premium_since is not None and cache.booster_xp_multiplier is not None:
+            message_xp *= cache.booster_xp_multiplier
 
         # member has no data saved
         if member_data is None:
             await self._create_member_data(member, message_xp)
             return
 
-        await self._update_member_data(member_data["id"], message_xp)
+        await self._update_member_data(member.id, guild.id, message_xp)
 
         before_level = get_level_from_xp(member_data["xp"])[0]  # level with the current xp
         after_level = get_level_from_xp(member_data["xp"] + message_xp)[0]  # level with the added xp
@@ -334,24 +363,29 @@ class Leveling(commands.Cog):
         """Shows the current ranking information about a member. This can is context menu command."""
         await self._view_rank(interaction, member=member, ephemeral=True)
 
-    @level_group.command(name="rank", description="Shows information about the current rank of a member.")
-    @app_commands.describe(member=_T("The member from whom you want the rank.", key="level.rank.member"))
+    @level_group.command(
+        name="rank",
+        description=_("Shows information about the current rank of a member."),
+    )
+    @app_commands.describe(member=_("The member from whom you want the rank."))
     async def rank(self, interaction: discord.Interaction, member: Optional[discord.Member]):
         """Shows the current ranking information about a member. If no member is provided, the user that executed
         the command will be used.
         """
         await self._view_rank(interaction, member=member or interaction.user)
 
-    @level_group.command(name="show-roles", description="Shows the available level roles.")
+    @level_group.command(name="show-roles", description=_("Shows the available level roles."))
     async def show_roles(self, interaction: discord.Interaction):
         """Shows the roles that are gain able through the level system"""
-        lc = interaction.locale
         guild = interaction.guild
-        bot: Plyoox = interaction.client  # type: ignore
+        bot: Plyoox = interaction.client
 
-        level_roles: list[list[int, int]] = await bot.db.fetchval("SELECT roles FROM leveling WHERE id = $1", guild.id)
-        if not level_roles:
-            await helper.interaction_send(interaction, "level.level_roles.no_roles")
+        # Result must be defined, because the command can only be invoked if the level system is enabled.
+        pg_result = await bot.db.fetchrow("SELECT roles, remove_roles FROM level_config WHERE id = $1", guild.id)
+
+        level_roles = [[role["role"], role["level"]] for role in (pg_result["roles"] or [])]
+        if len(level_roles) == 0:
+            await interaction.response.send_translated(_("The server has no level roles configured."), ephemeral=True)
             return
 
         roles: list[str] = []
@@ -361,16 +395,24 @@ class Leveling(commands.Cog):
             if role is not None:
                 roles.append(f"{level} - {role.mention}")
 
-        embed = extensions.Embed(title=_(lc, "level.level_roles.title"))
-        embed.description = "\n".join(roles)
+        remove_roles_str = interaction.translate(_("Yes") if pg_result["remove_roles"] else _("No"))
 
-        await interaction.response.send_message(embed=embed)
+        embed = extensions.Embed(title=interaction.translate(_("Available level roles")))
+        embed.description = (
+            interaction.translate(_("**Remove previous roles:** {remove_roles}")).format(remove_roles=remove_roles_str)
+            + "\n"
+        )
+        embed.description += "\n".join(roles)
 
-    @level_group.command(name="top", description="Lists the top 10 users with the highest level on this guild.")
+        await interaction.response.send_message(embeds=[embed])
+
+    @level_group.command(
+        name="top",
+        description=_("Lists the top 10 users with the highest level on this guild."),
+    )
     async def top(self, interaction: discord.Interaction):
-        lc = interaction.locale
         guild = interaction.guild
-        bot: Plyoox = interaction.client  # type: ignore
+        bot: Plyoox = interaction.client
 
         await interaction.response.defer(ephemeral=True)
 
@@ -382,7 +424,7 @@ class Leveling(commands.Cog):
 
         while len(top_users) < 10:
             level_users = await bot.db.fetch(
-                "SELECT user_id, xp FROM leveling_users WHERE guild_id = $1 ORDER BY xp DESC LIMIT 25 OFFSET $2",
+                "SELECT user_id, xp FROM level_user WHERE guild_id = $1 ORDER BY xp DESC LIMIT 25 OFFSET $2",
                 guild.id,
                 offset,
             )
@@ -397,7 +439,11 @@ class Leveling(commands.Cog):
                     required_xp = get_level_xp(current_level)
 
                     top_users.append(
-                        {"member": member, "level": current_level, "xp_progress": f"{current_xp}/{required_xp}"}
+                        {
+                            "member": member,
+                            "level": current_level,
+                            "xp_progress": f"{current_xp}/{required_xp}",
+                        }
                     )
 
                     if len(top_users) >= 10:
@@ -407,52 +453,63 @@ class Leveling(commands.Cog):
                 break
 
         if len(top_users) == 0:
-            await interaction.followup.send(_(lc, "level.top.no_users"))
+            await interaction.followup.send(
+                interaction.translate(_("There is no user tracked by the level system.")),
+                ephemeral=True,
+            )
             return
 
         embed = extensions.Embed(
-            title=_(lc, "level.top.title"),
+            title=interaction.translate(_("Top 10 users with the highest level")),
         )
 
         for index, top_user in enumerate(top_users, start=1):
             embed.add_field(
                 name=f"{index}. {top_user['member'].display_name}",
-                value=f"> {_(lc, 'level.top.level')} {top_user['level']}\n"
-                f"> {top_user['xp_progress']} {_(lc, 'level.top.xp')}",
+                value=f"> {interaction.translate(_('Level'))} {top_user['level']}\n"
+                f"> {top_user['xp_progress']} {interaction.translate(_('XP'))}",
                 inline=True,
             )
 
         await interaction.followup.send(embed=embed)
 
-    @app_commands.command(name="reset-level", description="Resets the level of a member. This action cannot be undone.")
-    @app_commands.describe(member="The member from whom you want to reset rank.")
+    @app_commands.command(
+        name="reset-level",
+        description=_("Resets the level of a member. This action cannot be undone."),
+    )
+    @app_commands.describe(member=_("The member from whom you want to reset rank."))
     @app_commands.default_permissions(administrator=True)
     @app_commands.guild_only
     async def reset_level(self, interaction: discord.Interaction, member: discord.Member):
-        lc = interaction.locale
         guild = interaction.guild
 
         await self.bot.db.execute(
-            "DELETE FROM leveling_users WHERE user_id = $1 AND guild_id = $2", member.id, guild.id
+            "DELETE FROM level_user WHERE user_id = $1 AND guild_id = $2",
+            member.id,
+            guild.id,
         )
 
         if guild.me.guild_permissions.manage_roles:
             leveling_cache = await self.bot.cache.get_leveling(guild.id)
-            if leveling_cache is not None:
-                if leveling_cache.roles:
-                    roles_to_remove = []
-                    for [role_id, __] in leveling_cache.roles:
-                        if role_id in member._roles:
-                            roles_to_remove.append(discord.Object(id=role_id))
+            if leveling_cache and leveling_cache.roles:
+                roles_to_remove = []
+                for [role_id, __] in leveling_cache.roles:
+                    if role_id in member._roles:
+                        roles_to_remove.append(discord.Object(id=role_id))
 
-                    await member.remove_roles(*roles_to_remove, reason=_(lc, "level.reset_level.reset_reason"))
+                await member.remove_roles(
+                    *roles_to_remove,
+                    reason=interaction.translate(_("The level progress of this user was reset.")),
+                )
 
-        embed = extensions.Embed(description=_(lc, "level.reset_level.success"))
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        embed = extensions.Embed(
+            description=interaction.translate(_("The levels of this user were successfully reset."))
+        )
+        await interaction.response.send_message(embeds=[embed], ephemeral=True)
 
     @app_commands.command(
         name="reset-guild-levels",
-        description="Resets the levels of all members in the guild. This action cannot be undone.",
+        description=_("Resets the levels of all members in the guild. This action cannot be undone."),
     )
     @app_commands.default_permissions(administrator=True)
     @app_commands.guild_only

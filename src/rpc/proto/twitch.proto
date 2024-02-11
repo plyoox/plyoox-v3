@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package Twitch;
+
+service TwitchNotification {
+    rpc LiveNotification (TwitchLiveNotification) returns (Empty) {}
+    rpc OfflineNotification (TwitchOfflineNotification) returns (Empty) {}
+    rpc OAuthAuthorization (OAuthCode) returns (TwitchUser) {}
+    rpc OAuthBaseUrl (CreateOAuthUrl) returns (OAuthUrlResponse) {}
+    rpc RemoveGuildAccount (RemoveAccount) returns (Empty) {}
+
+    rpc AddNotification (AddTwitchNotification) returns (TwitchUser) {}
+    rpc RemoveNotification (RemoveTwitchNotification) returns (Empty) {}
+}
+
+message TwitchLiveNotification {
+    int64 guild_id = 1;
+    int64 stream_id = 2;
+    int32 user_id = 3;
+    int32 viewer_count = 4;
+    string name = 5;
+    string title = 6;
+    string thumbnail_url = 7;
+    string game = 8;
+    uint64 started_at = 9;
+}
+
+message TwitchOfflineNotification {
+    int64 stream_id = 1;
+    int64 guild_id = 2;
+}
+
+message AddTwitchNotification {
+    int64 guild_id = 1;
+    string name = 2;
+    int64 channel_id = 3;
+}
+
+message RemoveTwitchNotification {
+    int32 user_id = 1;
+    int64 guild_id = 2;
+}
+
+message OAuthCode {
+    string code = 2;
+    string redirect_uri = 4;
+}
+
+message TwitchUser {
+    int32 id = 1;
+    string login = 2;
+    string display_name = 3;
+    string profile_image_url = 4;
+}
+
+message OAuthUrlResponse {
+    string url = 1;
+}
+
+message CreateOAuthUrl {
+    string state = 1;
+    string redirect_uri = 2;
+}
+
+message RemoveAccount {
+    int64 guild_id = 1;
+    int32 user_id = 2;
+}
+
+message Empty {}

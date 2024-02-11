@@ -19,9 +19,8 @@ job("Run Bot Job") {
         kotlinScript { api ->
             val ref = api.gitBranch()
 
-            if (ref.matches(Regex("""refs/tags/rc/v\d\.\d\.\d-\d"""))) {
+            if (ref.matches(Regex("""refs/tags/rc/v\d+\.\d+\.\d+-\d+"""))) {
                 val currentVersion = ref.replace("refs/tags/rc/v", "").split("-")
-
                 api.parameters["version"] = "${currentVersion[0]}-rc.${currentVersion[1]}"
                 api.parameters["channel"] = "release-candidate"
             } else if (ref.matches(Regex("""refs/tags/release/v\d\.\d\.\d"""))) {
@@ -62,11 +61,13 @@ job("Run Bot Job") {
         }
 
         kotlinScript { api ->
-           if (api.parameters["channel"] == "stable") {
+            if (api.parameters["channel"] == "stable") {
                 api.space().projects.automation.deployments.schedule(
-                    project = api.projectIdentifier(),
-                    targetIdentifier = TargetIdentifier.Key("bot"),
-                    version = api.parameters["version"],
+                        project = api.projectIdentifier(),
+                        targetIdentifier = TargetIdentifier.Key("bot"),
+                        version = api.parameters["version"],
+                        scheduledStart = null,
+                        commitRefs = listOf(DeploymentCommitReference(branch = "main", repositoryName = api.gitRepositoryName(), commit = api.gitRevision())),
                 )
             }
         }

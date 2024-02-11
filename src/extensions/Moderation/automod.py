@@ -7,17 +7,23 @@ import re
 from typing import TYPE_CHECKING
 
 import discord
+from discord.app_commands import locale_str as _
 from discord.ext import commands
 
+from cache.models import ModerationModel, AutoModerationAction, ModerationPoints
 from lib import utils
-from lib.enums import AutomodActionEnum, AutomodChecksEnum, TimerEnum, AutomodFinalActionEnum
-from translation import _
+from lib.enums import (
+    AutoModerationPunishmentKind,
+    AutoModerationCheckKind,
+    TimerEnum,
+    AutomodFinalActionEnum,
+    AutoModerationExecutionKind,
+)
+from translation import translate as global_translate
 from . import _logging_helper as _logging
 
 if TYPE_CHECKING:
     from main import Plyoox
-    from cache.models import AutomodExecutionModel, ModerationModel
-    from lib.types import AutomodExecutionReason
 
 _log = logging.getLogger(__name__)
 
@@ -26,42 +32,69 @@ EVERYONE_MENTION = re.compile("@(here|everyone)")
 LINK_REGEX = re.compile(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]", re.IGNORECASE)
 
 
-class AutomodActionData(object):
+class AutoModerationActionData(object):
     member: discord.Member
-    trigger_content: str
-    trigger_reason: AutomodExecutionReason
-    trigger_action: AutomodExecutionModel
+    trigger_content: str | None
+    trigger_reason: str
+    trigger_action: AutoModerationAction
+    moderator: discord.Member | None
 
-    __slots__ = ("trigger_content", "member", "trigger_reason", "trigger_action")
+    __slots__ = ("trigger_content", "member", "trigger_reason", "trigger_action", "moderator")
 
     def __init__(
-        self, member: discord.Member, content: str, reason: AutomodExecutionReason, action: AutomodExecutionModel
+        self,
+        member: discord.Member,
+        reason: str,
+        action: AutoModerationAction,
+        content: str | None = None,
+        moderator: discord.Member | None = None,
     ):
         self.member = member
         self.trigger_action = action
         self.trigger_content = content
         self.trigger_reason = reason
+        self.moderator = moderator
 
     def __repr__(self) -> str:
         name = self.__class__.__name__
-        return f"<{name} member={self.member} trigger_action={self.trigger_action!r} trigger_content={self.trigger_content!r} trigger_reason={self.trigger_reason!r}>"
+        return f"<{name} member={self.member} trigger_action={self.trigger_action!r} trigger_content={self.trigger_content!r} trigger_reason={self.trigger_reason!r} moderator={self.moderator!r}>"
 
     @classmethod
     def _from_message(
-        cls, *, message: discord.Message, action_taken: AutomodExecutionModel, reason: AutomodExecutionReason
+        cls,
+        *,
+        bot: Plyoox,
+        message: discord.Message,
+        action_taken: AutoModerationAction,
+        reason: AutoModerationExecutionKind,
     ):
-        return cls(member=message.author, action=action_taken, content=message.content, reason=reason)
+        translated_reason = cls._translate_reason(bot, reason, message.guild.preferred_locale)
+
+        return cls(member=message.author, action=action_taken, content=message.content, reason=translated_reason)
 
     @property
     def guild(self):
         return self.member.guild
 
+    @staticmethod
+    def _translate_reason(bot: Plyoox, reason: AutoModerationExecutionKind, locale: discord.Locale) -> str:
+        if reason == "invite":
+            return global_translate(_("Discord invite"), bot, locale)
+        elif reason == "link":
+            return global_translate(_("External link"), bot, locale)
+        elif reason == "caps":
+            return global_translate(_("Caps spam"), bot, locale)
+        elif reason == "point":
+            return global_translate(_("Maximum number of points reached"), bot, locale)
+        elif reason == "discord_rule":
+            return global_translate(_("Violating a Discord moderation rule"), bot, locale)
+
 
 class Automod(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
-        self.invite_cache: dict[str, discord.Invite] = utils.ExpiringCache(seconds=600)
-        self.punished_members: dict[tuple[int, int], bool] = utils.ExpiringCache(seconds=5)
+        self.invite_cache: dict[str, discord.Invite | None] = utils.ExpiringCache(seconds=600)
+        self.punished_members: dict[tuple[int, int], bool] = utils.ExpiringCache(seconds=3)
         self._invite_requests: dict[str, asyncio.Event] = {}
 
     @commands.Cog.listener()
@@ -69,75 +102,55 @@ class Automod(commands.Cog):
         await self._run_automod(message)
 
     @commands.Cog.listener()
-    async def on_message_edit(self, before: discord.Message, after: discord.Message):
+    async def on_custom_message_edit(self, before: discord.Message, after: discord.Message):
         if after.content and after.content != before.content:
             await self._run_automod(after)
 
     @commands.Cog.listener()
     async def on_automod_rule_delete(self, rule: discord.AutoModRule) -> None:
-        guild_id = rule.guild.id
+        await self.bot.db.execute("DELETE FROM automoderation_rule WHERE rule_id = $1", rule.id)
 
-        rules: list = await self.bot.db.fetchval("SELECT blacklist_actions FROM moderation WHERE id = $1", guild_id)
-        if not rules:
-            return
-
-        changed = False
-        for _rule in rules:
-            if _rule["r"] == rule.id:
-                changed = True
-                rules.remove(_rule)
-
-        if changed:
-            await self.bot.db.execute(
-                "UPDATE moderation SET blacklist_actions = $1 WHERE id = $1", rules or None, guild_id
-            )
-            self.bot.cache.remove_cache(guild_id, "mod")
+        self.bot.cache.remove_cache(rule.id, "automod")
 
     @commands.Cog.listener()
     async def on_automod_action(self, execution: discord.AutoModAction):
         guild = execution.guild
 
+        # Only accept block message actions
         if execution.action.type != discord.AutoModRuleActionType.block_message:
             return
 
-        cache = await self.bot.cache.get_moderation(guild.id)
-        if cache is None or not cache.active:
+        # Currently only support keyword rules and the mention spam rule
+        if (
+            execution.rule_trigger_type != discord.AutoModRuleTriggerType.keyword
+            and execution.rule_trigger_type != discord.AutoModRuleTriggerType.mention_spam
+        ):
             return
 
-        if execution.rule_trigger_type == discord.AutoModRuleTriggerType.keyword:
-            automod_type: AutomodExecutionReason = "blacklist"
-        elif execution.rule_trigger_type == discord.AutoModRuleTriggerType.mention_spam:
-            automod_type: AutomodExecutionReason = "mention"
-        else:
-            return
-
-        if not getattr(cache, automod_type + "_active"):
+        cache = await self.bot.cache.get_moderation_rule(execution.rule_id)
+        if not cache:  # Not configured or no actions
             return
 
         if not guild.chunked:
-            await guild.chunk(cache=True)
+            await guild.chunk()
 
-        member = guild.get_member(execution.user_id)
+        member = execution.member
         if member is None:
+            _log.warning(f"Member {execution.user_id} not found in guild {guild.id}")
             return
 
-        if any(role in cache.mod_roles + cache.ignored_roles for role in member._roles):
-            return
-
-        automod_actions = getattr(cache, automod_type + "_actions")
-        if not automod_actions:
-            return
-
-        if execution.rule_trigger_type == discord.AutoModRuleTriggerType.keyword:
-            automod_actions = list(filter(lambda a: a.rule_id == execution.rule_id, automod_actions))
-            if not automod_actions:
-                return
-
-        for action in automod_actions:
+        for action in cache.actions:
             if Automod._handle_checks(member, action):
-                await self._execute_discord_automod(
-                    data=AutomodActionData(
-                        action=action, member=member, reason=automod_type, content=execution.matched_content
+                reason = cache.reason or global_translate(
+                    _("Violating a Discord moderation rule"), self.bot, guild.preferred_locale
+                )
+
+                await self._execute_action(
+                    data=AutoModerationActionData(
+                        action=action,
+                        member=member,
+                        reason=reason,
+                        content=execution.matched_content,
                     )
                 )
                 return
@@ -155,36 +168,31 @@ class Automod(commands.Cog):
         if author.guild_permissions.administrator:
             return
 
-        if found_invites := DISCORD_INVITE.findall(message.content):
-            cache = await self.bot.cache.get_moderation(guild.id)
-            if cache is None:
-                return
+        cache = await self.bot.cache.get_moderation(guild.id)
+        if cache is None or not cache.active:
+            return
 
-            if not self._is_affected(message, cache, "invite"):
+        if found_invites := DISCORD_INVITE.findall(message.content):
+            if not self._is_affected(message, cache, AutoModerationExecutionKind.invite):
                 return
 
             invites: set[str] = set([invite[1] for invite in found_invites])
-
             for invite in invites:
                 try:
                     fetched_invite = await self._fetch_invite(invite)
 
-                    if fetched_invite is not False and (
-                        fetched_invite.guild.id == guild.id or fetched_invite.guild.id in cache.invite_allowed
+                    if fetched_invite and (
+                        fetched_invite.guild.id == guild.id or fetched_invite.guild.id in cache.invite_exempt_guilds
                     ):
                         continue
 
-                    await self._handle_action(message, cache.invite_actions, "invite")
+                    await self._handle_action(message, cache.invite_actions, AutoModerationExecutionKind.invite)
                     return
                 except discord.HTTPException:
                     break
 
         if found_links := LINK_REGEX.findall(message.content):
-            cache = await self.bot.cache.get_moderation(guild.id)
-            if cache is None:
-                return
-
-            if not self._is_affected(message, cache, "link"):
+            if not self._is_affected(message, cache, AutoModerationExecutionKind.link):
                 return
 
             links = set([link for link in found_links])
@@ -199,7 +207,7 @@ class Automod(commands.Cog):
                     if link not in cache.link_list:
                         continue
 
-                await self._handle_action(message, cache.link_actions, "link")
+                await self._handle_action(message, cache.link_actions, AutoModerationExecutionKind.link)
                 return
 
         if len(message.content) > 15 and not message.content.islower():
@@ -210,18 +218,14 @@ class Automod(commands.Cog):
             if percent < 0.7:
                 return
 
-            cache = await self.bot.cache.get_moderation(guild.id)
-            if cache is None:
+            if not self._is_affected(message, cache, AutoModerationExecutionKind.caps):
                 return
 
-            if not self._is_affected(message, cache, "caps"):
-                return
-
-            await self._handle_action(message, cache.caps_actions, "caps")
+            await self._handle_action(message, cache.caps_actions, AutoModerationExecutionKind.caps)
             return
 
-    async def _fetch_invite(self, code: str) -> discord.Invite | False:
-        if (invite := self.invite_cache.get(code)) is not None:
+    async def _fetch_invite(self, code: str) -> discord.Invite | None:
+        if (invite := self.invite_cache.get(code, False)) is not False:
             return invite
 
         if (request := self._invite_requests.get(code)) is not None:
@@ -230,10 +234,12 @@ class Automod(commands.Cog):
 
         self._invite_requests[code] = event = asyncio.Event()
 
+        invite = None
         try:
             invite = await self.bot.fetch_invite(code, with_counts=False, with_expiration=False)
+            self.invite_cache[code] = invite
         except discord.NotFound:
-            invite = False
+            self.invite_cache[code] = None
         except discord.HTTPException as exc:
             _log.error("Could not fetch invite", exc)
 
@@ -241,7 +247,6 @@ class Automod(commands.Cog):
             self._invite_requests.pop(code)
             raise exc
 
-        self.invite_cache[code] = invite
         event.set()
         self._invite_requests.pop(code)
 
@@ -250,136 +255,141 @@ class Automod(commands.Cog):
     async def _handle_action(
         self,
         message: discord.Message,
-        actions: list[AutomodExecutionModel],
-        reason: AutomodExecutionReason,
+        actions: list[AutoModerationAction],
+        reason: AutoModerationExecutionKind,
     ):
-
         for action in actions:
             if Automod._handle_checks(message.author, action):
-                data = AutomodActionData._from_message(message=message, reason=reason, action_taken=action)
-                await self._execute_discord_automod(data, message=message)
+                data = AutoModerationActionData._from_message(
+                    message=message, reason=reason, action_taken=action, bot=self.bot
+                )
+
+                await self._execute_action(data, message=message)
                 break
 
-    async def _handle_final_action(self, member: discord.Member, actions: list[AutomodExecutionModel]):
+    async def _handle_final_action(self, member: discord.Member, actions: list[AutoModerationAction]):
         for action in actions:
             if Automod._handle_checks(member, action):
                 await self._execute_final_action(member, action)
                 break
 
     @staticmethod
-    def _handle_checks(member: discord.Member, action: AutomodExecutionModel) -> bool:
-        check = action.check
+    def _handle_checks(member: discord.Member, action: AutoModerationAction) -> bool:
+        if action.check is None:
+            return True
+
+        check = action.check.kind
 
         if check is None:
             return True
-        elif check == AutomodChecksEnum.no_role:
+        elif check == AutoModerationCheckKind.no_role:
             return not member._roles
-        elif check == AutomodChecksEnum.no_avatar:
+        elif check == AutoModerationCheckKind.no_avatar:
             return member.avatar is None
-        elif check == AutomodChecksEnum.join_date:
-            days = action.days
+        elif check == AutoModerationCheckKind.join_date:
+            return (discord.utils.utcnow() - member.joined_at).days <= action.days
+        elif check == AutoModerationCheckKind.account_age:
+            return (discord.utils.utcnow() - member.created_at).days <= action.days
 
-            return (discord.utils.utcnow() - member.joined_at).days <= days
-        elif check == AutomodChecksEnum.account_age:
-            days = action.days
+    async def _execute_final_action(self, member: discord.Member, action: AutoModerationAction):
+        def translate(string: _) -> str:
+            return global_translate(string, self.bot, member.guild.preferred_locale)
 
-            return (discord.utils.utcnow() - member.created_at).days <= days
-
-    async def _execute_final_action(self, member: discord.Member, action: AutomodExecutionModel):
         guild = member.guild
-        lc = guild.preferred_locale
 
         if self.punished_members.get((member.id, member.guild.id)):
             return
         else:
             self.punished_members[(member.id, member.guild.id)] = True
 
-        if action.action == AutomodFinalActionEnum.kick:
+        if action.punishment.kind == AutomodFinalActionEnum.kick:
             if guild.me.guild_permissions.kick_members:
-                await _logging.automod_final_log(self.bot, member, action.action)  # type: ignore
-                await guild.kick(member, reason=_(lc, "automod.final.reason"))
-        elif action.action == AutomodFinalActionEnum.ban:
-            await _logging.automod_final_log(self.bot, member, action.action)  # type: ignore
+                await _logging.automod_final_log(self.bot, member, action.punishment.kind)
+                await guild.kick(member, reason=translate(_("Maximum number of points reached")))
+        elif action.punishment.kind == AutomodFinalActionEnum.ban:
             if guild.me.guild_permissions.ban_members:
-                await guild.ban(member, reason=_(lc, "automod.final.reason"))
-        elif action.action == AutomodFinalActionEnum.tempban:
+                await _logging.automod_final_log(self.bot, member, action.punishment.kind)
+                await guild.ban(member, reason=translate(_("Maximum number of points reached")))
+        elif action.punishment.kind == AutomodFinalActionEnum.tempban:
             if guild.me.guild_permissions.ban_members:
-                banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
-                await _logging.automod_final_log(self.bot, member, action.action, until=banned_until)  # type: ignore
+                banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.punishment.duration)
+                await _logging.automod_final_log(self.bot, member, action.punishment.kind, until=banned_until)
 
                 timers = self.bot.timer
                 if timers is not None:
                     await timers.create_timer(
                         guild.id,
                         member.id,
-                        TimerEnum.tempban,
+                        TimerEnum.temp_ban,
                         banned_until,
                     )
-                    await guild.ban(member, reason=_(lc, "automod.final.reason"))
+                    await guild.ban(member, reason=translate(_("Maximum number of points reached")))
                 else:
                     _log.warning("Timer Plugin is not initialized")
-        elif action.action == AutomodActionEnum.tempmute:
+        elif action.punishment.kind == AutoModerationPunishmentKind.tempmute:
             if guild.me.guild_permissions.mute_members:
-                muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.duration)
-                await _logging.automod_final_log(self.bot, member, action.action, until=muted_until)  # type: ignore
+                muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=action.punishment.duration)
+                await _logging.automod_final_log(self.bot, member, action.punishment.kind, until=muted_until)
 
                 await member.timeout(muted_until)
 
-    async def _execute_discord_automod(self, data: AutomodActionData, message: discord.Message = None) -> None:
+    async def _execute_action(self, data: AutoModerationActionData, message: discord.Message = None) -> None:
         guild = data.guild
         member = data.member
-        lc = guild.preferred_locale
         automod_action = data.trigger_action
 
+        punishment_kind = automod_action.punishment.kind
+
         if message is not None:
-            if automod_action.action in [
-                AutomodActionEnum.kick,
-                AutomodActionEnum.tempmute,
-                AutomodActionEnum.points,
-                AutomodActionEnum.delete,
+            if punishment_kind in [
+                AutoModerationPunishmentKind.kick,
+                AutoModerationPunishmentKind.tempmute,
+                AutoModerationPunishmentKind.point,
+                AutoModerationPunishmentKind.delete,
             ]:
                 if message.channel.permissions_for(guild.me).manage_messages:
                     await message.delete()
 
-        if automod_action.action != AutomodActionEnum.delete:
+        if punishment_kind != AutoModerationPunishmentKind.delete:
+            # Check if the member is already punished
             if self.punished_members.get((member.id, member.guild.id)):
                 return
             else:
-                if automod_action.action != AutomodActionEnum.points:
+                if punishment_kind != AutoModerationPunishmentKind.point:
                     self.punished_members[(member.id, member.guild.id)] = True
 
-        if automod_action.action == AutomodActionEnum.ban:
+        if punishment_kind == AutoModerationPunishmentKind.ban:
             if guild.me.guild_permissions.ban_members:
-                await guild.ban(member, reason=_(lc, f"automod.reason.{data.trigger_reason}"))
+                await guild.ban(member, reason=data.trigger_reason)
                 await _logging.automod_log(self.bot, data)
-        elif automod_action.action == AutomodActionEnum.kick:
+        elif punishment_kind == AutoModerationPunishmentKind.kick:
             if guild.me.guild_permissions.kick_members:
-                await guild.kick(member, reason=_(lc, f"automod.reason.{data.trigger_reason}"))
+                await guild.kick(member, reason=data.trigger_reason)
                 await _logging.automod_log(self.bot, data)
-        elif automod_action.action == AutomodActionEnum.delete:
+        elif punishment_kind == AutoModerationPunishmentKind.delete:
             await _logging.automod_log(self.bot, data)
-        elif automod_action.action == AutomodActionEnum.tempban:
+        elif punishment_kind == AutoModerationPunishmentKind.tempban:
             if guild.me.guild_permissions.ban_members:
-                banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
+                banned_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.punishment.duration)
 
                 timers = self.bot.timer
                 if timers is not None:
-                    await timers.create_timer(guild.id, member.id, TimerEnum.tempban, banned_until)
+                    await timers.create_timer(guild.id, member.id, TimerEnum.temp_ban, banned_until)
                     await _logging.automod_log(self.bot, data)
-                    await guild.ban(member, reason=_(lc, f"automod.reason.{automod_action}"))
+                    await guild.ban(member, reason=data.trigger_reason)
                 else:
                     _log.warning("Timer Plugin is not initialized")
-        elif automod_action.action == AutomodActionEnum.tempmute:
+        elif punishment_kind == AutoModerationPunishmentKind.tempmute:
             if guild.me.guild_permissions.mute_members:
-                muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.duration)
+                muted_until = discord.utils.utcnow() + datetime.timedelta(seconds=automod_action.punishment.duration)
 
                 await member.timeout(muted_until)
                 await _logging.automod_log(self.bot, data, until=muted_until)
-        elif automod_action.action == AutomodActionEnum.points:
+        elif punishment_kind == AutoModerationPunishmentKind.point:
             await self._handle_points(data)
 
     @staticmethod
-    def _is_affected(message: discord.Message, cache: ModerationModel, reason: AutomodExecutionReason) -> bool:
+    def _is_affected(message: discord.Message, cache: ModerationModel, kind: AutoModerationExecutionKind) -> bool:
         """This function checks if the automod should be executed on the message.
         It checks for:
          - Automod and check enabled
@@ -391,52 +401,58 @@ class Automod(commands.Cog):
         roles = message.author._roles
         channel = message.channel
 
-        if not cache.active:
+        if not getattr(cache, f"{kind}_active") or not getattr(cache, f"{kind}_actions"):
             return False
 
-        if not getattr(cache, f"{reason}_active") or not getattr(cache, f"{reason}_actions"):
+        if any(role in cache.moderation_roles + cache.ignored_roles for role in roles):
             return False
 
-        if any(role in cache.mod_roles + cache.ignored_roles for role in roles):
+        if any(role in getattr(cache, f"{kind}_exempt_roles") for role in roles):
             return False
 
-        if channel.id in getattr(cache, f"{reason}_whitelist_channels"):
-            return False
-
-        if any(role in getattr(cache, f"{reason}_whitelist_roles") for role in roles):
+        exempt_channels = getattr(cache, f"{kind}_exempt_channels")
+        if channel.id in exempt_channels or channel.category_id in exempt_channels:
             return False
 
         return True
 
-    async def _handle_points(self, data: AutomodActionData) -> None:
+    async def _handle_points(self, data: AutoModerationActionData) -> None:
         guild = data.guild
         member = data.member
 
         points = await self.__add_points(
-            data.member, data.trigger_action.points, _(guild.preferred_locale, f"automod.reason.{data.trigger_reason}")
+            member=data.member,
+            points=data.trigger_action.punishment.points,
+            reason=data.trigger_reason,
         )
 
         if points is None:
             _log.warning(f"{member.id} has no points in {guild.id}...")
             return
 
-        if points - data.trigger_action.points < 10:
-            await _logging.automod_log(self.bot, data, points=f"{points}/10 [+{data.trigger_action.points}]")
+        new_points = data.trigger_action.punishment.points.amount
+        if points - new_points < 10:
+            await _logging.automod_log(self.bot, data, points=f"{points}/10 [+{new_points}]")
 
         if points >= 10:
             cache = await self.bot.cache.get_moderation(guild.id)
             if cache is None:
+                _log.warning(f"Adding points to {member.id}, but no cache for guild {guild.id}")
                 return
 
-            await self._handle_final_action(member, cache.automod_actions)
+            await self._handle_final_action(member, cache.point_actions)
             await self.bot.db.execute(
-                "DELETE FROM automod_users WHERE user_id = $1 AND guild_id = $2", member.id, guild.id
+                "UPDATE automoderation_user SET expires_at = now() WHERE user_id = $1 AND guild_id = $2 AND (expires_at IS NULL OR expires_at > now())",
+                member.id,
+                guild.id,
             )
 
     async def add_warn_points(self, member: discord.Member, moderator: discord.Member, add_points: int, reason: str):
         guild = member.guild
 
-        points = await self.__add_points(member, add_points, reason)
+        points = await self.__add_points(
+            member=member, points=ModerationPoints(points=add_points, expires_in=None), reason=reason
+        )
         if points is None:
             _log.warning(f"{member.id} has no points in {guild.id}...")
             return
@@ -445,28 +461,32 @@ class Automod(commands.Cog):
 
         if points >= 10:
             cache = await self.bot.cache.get_moderation(guild.id)
-            if cache is None:
+            if cache is None or not cache.active:
+                _log.warning(f"{guild.id} has no moderation cache")
                 return
 
-            await self._handle_final_action(member, cache.automod_actions)
-            await self.bot.db.execute(
-                "DELETE FROM automod_users WHERE user_id = $1 AND guild_id = $2", member.id, guild.id
-            )
+            await self._handle_final_action(member, cache.point_actions)
 
-    async def __add_points(self, member: discord.Member, points: int, reason: str) -> int:
+    async def __add_points(self, *, member: discord.Member, points: ModerationPoints, reason: str) -> int:
+        """Add points to a member and returns the currently active points."""
+
         guild = member.guild
+        expires_at = None
+
+        if points.expires_in:
+            expires_at = discord.utils.utcnow().replace(tzinfo=None) + datetime.timedelta(seconds=points.expires_in)
 
         await self.bot.db.execute(
-            "INSERT INTO automod_users (guild_id, user_id, timestamp, points, reason) VALUES ($1, $2, $3, $4, $5)",
+            "INSERT INTO automoderation_user (guild_id, user_id, expires_at, points, reason) VALUES ($1, $2, $3, $4, $5)",
             guild.id,
             member.id,
-            discord.utils.utcnow(),
-            points,
+            expires_at,
+            points.amount,
             reason,
         )
 
-        points = await self.bot.db.fetchval(
-            "SELECT SUM(points) FROM automod_users WHERE user_id = $1 AND guild_id = $2", member.id, guild.id
+        return await self.bot.db.fetchval(
+            "SELECT SUM(points) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND (expires_at IS NULL OR now() < expires_at)",
+            member.id,
+            guild.id,
         )
-
-        return points

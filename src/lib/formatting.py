@@ -57,18 +57,3 @@ def format_leveling_message(message: str, member: discord.Member, level: LevelFo
         .replace("{level}", str(level))
         .replace("{level.role}", getattr(level.role, "mention", ""))
     )
-
-
-def resolve_channels(message: str, guild: discord.Guild) -> str:
-    resolved_channels: list[str] = CHANNEL_REGEX.findall(message)
-
-    for channel in set(resolved_channels):
-        if channel.count("#") != 1:
-            continue
-
-        guild_channel: discord.TextChannel = discord.utils.get(guild.text_channels, name=channel[1:])
-
-        if guild_channel is not None:
-            message = message.replace(channel, guild_channel.mention)
-
-    return message

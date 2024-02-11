@@ -1,11 +1,11 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+import datetime
 
 import discord
 
 from lib import emojis
-from translation import _
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -64,14 +64,6 @@ def get_badges(flags: discord.PublicUserFlags) -> list[str]:
     return flag_list
 
 
-async def interaction_send(interaction: discord.Interaction, key: str, /, ephemeral=True, **kwargs) -> None:
-    """Responds to an interaction with a locale string as ephemeral. This is mostly used to respond to errors."""
-    if interaction.extras.get("deferred"):
-        await interaction.followup.send(_(interaction.locale, key, **kwargs), ephemeral=ephemeral)
-    else:
-        await interaction.response.send_message(_(interaction.locale, key, **kwargs), ephemeral=ephemeral)
-
-
 async def permission_check(
     channel: discord.TextChannel | discord.VoiceChannel | discord.Thread,
     content: str = None,
@@ -87,3 +79,24 @@ async def permission_check(
 
 def embed_timestamp_format(timestamp: datetime) -> str:
     return f"> {discord.utils.format_dt(timestamp)}\n> {discord.utils.format_dt(timestamp, 'R')}"
+
+
+def format_timedelta(delta: datetime.timedelta) -> str:
+    parts = []
+    if delta.days > 0:
+        parts.append("{}d".format(delta.days))
+
+    hours, remainder = divmod(delta.seconds, 3600)
+    if hours > 0:
+        parts.append("{}h".format(hours))
+
+    minutes, seconds = divmod(remainder, 60)
+    if minutes > 0:
+        parts.append("{}m".format(minutes))
+    if seconds > 0:
+        parts.append("{}s".format(seconds))
+    return " ".join(parts)
+
+
+def italic(string: str) -> str:
+    return f"*{string}*"

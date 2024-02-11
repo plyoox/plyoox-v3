@@ -1,9 +1,16 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import discord
 from discord.ext import commands
 
-from cache import WelcomeModel
 from lib import formatting
-from main import Plyoox
+
+if TYPE_CHECKING:
+    from main import Plyoox
+
+    from cache import WelcomeModel
 
 
 class Welcome(commands.Cog):
@@ -15,11 +22,7 @@ class Welcome(commands.Cog):
         guild = member.guild
         cache = await self.bot.cache.get_welcome(guild.id)
 
-        if cache is None:
-            return
-
-        # check if the settings have been disabled
-        if not cache.active or not cache.join_active:
+        if not cache or not cache.join_active:
             return
 
         # format message and send it
@@ -46,11 +49,7 @@ class Welcome(commands.Cog):
         guild = member.guild
         cache = await self.bot.cache.get_welcome(guild.id)
 
-        if cache is None:
-            return
-
-        # check if the settings have been disabled
-        if not cache.active or not cache.leave_active:
+        if not cache or not cache.leave_active:
             return
 
         # format message and send it

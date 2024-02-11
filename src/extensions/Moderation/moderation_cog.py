@@ -1,23 +1,27 @@
 from __future__ import annotations
 
 import datetime
+import logging
 import re
 from typing import TYPE_CHECKING, Optional, Union
 
 import discord
-from discord import app_commands
+from discord import app_commands, utils
 from discord.ext import commands
+from discord.app_commands import locale_str as _
 
+from cache import Punishment
 from lib import parsers, extensions
-from lib.enums import TimerEnum
-from translation import _
-from . import _views, _logging_helper, clear_group, automod
+from lib.enums import TimerEnum, ModerationCommandKind
+from . import _views as views, _logging_helper, clear_group, automod
+from .automod import Automod, AutoModerationActionData
 
 if TYPE_CHECKING:
     from main import Plyoox
 
+_log = logging.getLogger(__name__)
 
-_T = app_commands.locale_str
+
 DISCORD_INVITE_SINGLE = re.compile(
     r"^(https?://)?discord(?:(app)?\.com/invite?|\.gg)/([a-zA-Z0-9-]{2,32})$", re.IGNORECASE
 )
@@ -35,7 +39,7 @@ class Moderation(commands.Cog):
         self.bot = bot
 
         self.ctx_menu = app_commands.ContextMenu(
-            name=_T("Invite info", key="view-invite-info"),
+            name=_("Invite info"),
             callback=self.invite_info_context_menu,
         )
 
@@ -44,70 +48,88 @@ class Moderation(commands.Cog):
     clear_group = clear_group.ClearGroup()
     warn_group = app_commands.Group(
         name="warn",
-        description="Commands to manage warnings on a user.",
+        description=_("Commands to manage warnings on a user."),
         guild_only=True,
         default_permissions=discord.Permissions(manage_messages=True),
     )
 
     @staticmethod
     async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
-        if interaction.user.top_role <= target.top_role:
-            await interaction.response.send_message(
-                _(interaction.locale, "moderation.hierarchy_not_permitted"), ephemeral=True
+        if interaction.user.top_role <= target.top_role or interaction.user.id != interaction.guild.owner_id:
+            await interaction.response.send_translated(
+                _("The user must be below you in the hierarchy."), ephemeral=True
             )
             return False
 
         if target.top_role >= interaction.guild.me.top_role:
-            await interaction.response.send_message(
-                _(interaction.locale, "moderation.bot_cannot_punish"), ephemeral=True
+            await interaction.response.send_translated(
+                _("The user must be below the bot in the hierarchy."), ephemeral=True
             )
+            return False
+
+        if target.guild_permissions.administrator:
+            await interaction.response.send_translated(_("You cannot punish administrators."), ephemeral=True)
+            return False
+
+        if target.bot:
+            await interaction.response.send_translated(_("You cannot punish bots."), ephemeral=True)
             return False
 
         return True
 
     @staticmethod
     async def _view_invite_info(interaction: discord.Interaction, *, invite: discord.Invite, ephemeral: bool = False):
-        lc = interaction.locale
-
         embed = extensions.Embed(
-            description=_(lc, "moderation.invite_info.description", code=invite.code),
-            title=_(lc, "moderation.invite_info.title"),
+            description=interaction.translate(_("Information about the invite `{invite}`")).format(invite=invite.code),
+            title=interaction.translate(_("Invite information")),
         )
         embed.set_thumbnail(url=invite.guild.icon)
 
+        created_at = (
+            discord.utils.format_dt(invite.created_at) if invite.created_at else interaction.translate(_("No date"))
+        )
+        expires_at = (
+            discord.utils.format_dt(invite.expires_at) if invite.expires_at else interaction.translate(_("No date"))
+        )
         embed.add_field(
-            name=_(lc, "moderation.invite_info.info"),
-            value=f"> __{_(lc, 'moderation.invite_info.url')}:__ {invite.url}\n"
-            f"> __{_(lc, 'moderation.invite_info.uses')}:__ {invite.uses or 0}/{invite.max_uses or '∞'}\n"
-            f"> __{_(lc, 'created_at')}:__ {discord.utils.format_dt(invite.created_at) if invite.created_at else _(lc, 'moderation.invite_info.no_date')}\n"
-            f"> __{_(lc, 'moderation.invite_info.expires_at')}:__ {discord.utils.format_dt(invite.expires_at) if invite.expires_at else _(lc, 'moderation.invite_info.no_date')}",
+            name=interaction.translate(_("Information")),
+            value=f"> __{interaction.translate(_('Url'))}:__ {invite.url}\n"
+            f"> __{interaction.translate(_('Uses'))}:__ {invite.uses or 0}/{invite.max_uses or '∞'}\n"
+            f"> __{interaction.translate(_('Created at'))}:__ {created_at}\n"
+            f"> __{interaction.translate(_('Expires at'))}:__ {expires_at}",
         )
 
         if invite.inviter is not None:
-            embed.add_field(
-                name=_(lc, "moderation.invite_info.creator"),
-                value=f"> __{_(lc, 'id')}:__ {invite.inviter.id}\n"
-                f"> __{_(lc, 'name')}:__ {invite.inviter}\n"
-                f"> __{_(lc, 'moderation.invite_info.mention')}:__{invite.inviter.mention}",
+            value = (
+                f"> __{interaction.translate(_('Id'))}:__ {invite.inviter.id}\n"
+                f"> __{interaction.translate(_('Name'))}:__ {invite.inviter}\n"
+                f"> __{interaction.translate(_('Mention'))}:__{invite.inviter.mention}",
             )
         else:
-            embed.add_field(
-                name=_(lc, "moderation.invite_info.creator"),
-                value=_(lc, "moderation.invite_info.no_creator"),
-            )
-
+            value = interaction.translate(_("No creator"))
         embed.add_field(
-            name=_(lc, "guild"),
-            value=f"> __{_(lc, 'name')}:__ {invite.guild.name}\n"
-            f"> __{_(lc, 'id')}:__ {invite.guild.id}\n"
-            f"> __{_(lc, 'guild_info.about.vanity_url')}:__ {invite.guild.vanity_url or _(lc, 'guild_info.about.no_vanity_url')}\n"
-            f"> __{_(lc, 'moderation.invite_info.member_count')}:__ {invite.approximate_member_count}",
+            name=interaction.translate(_("Creator")),
+            value=value,
         )
 
-        await interaction.response.send_message(embed=embed, ephemeral=ephemeral)
+        embed.add_field(
+            name=interaction.translate(_("Guild")),
+            value=f"> __{interaction.translate(_('Name'))}:__ {invite.guild.name}\n"
+            f"> __{interaction.translate(_('Id'))}:__ {invite.guild.id}\n"
+            f"> __{interaction.translate('Vanity Url')}:__ {invite.guild.vanity_url or interaction.translate(_('No vanity url'))}\n"
+            f"> __{interaction.translate('Member count')}:__ {invite.approximate_member_count}",
+        )
 
-    @app_commands.command(name="ban", description="Bans an user from the guild.")
-    @app_commands.describe(member="The member that should be banned.", reason="Why the member should be banned.")
+        await interaction.response.send_message(embeds=[embed], ephemeral=ephemeral)
+
+    @commands.Cog.listener()
+    async def on_member_unban(self, guild: discord.Guild, user: discord.User):
+        await self.bot.db.execute(
+            "DELETE FROM timer WHERE target_id = $1 AND guild_id = $2 AND kind = 'temp_ban'", user.id, guild.id
+        )
+
+    @app_commands.command(name="ban", description=_("Bans an user from the guild."))
+    @app_commands.describe(member=_("The member that should be banned."), reason=_("Why the member should be banned."))
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
@@ -117,24 +139,26 @@ class Moderation(commands.Cog):
         member: Union[discord.Member, discord.User],
         reason: Optional[app_commands.Range[str, None, 512]],
     ):
-        lc = interaction.locale
         guild = interaction.guild
 
-        if isinstance(member, discord.Member):
-            if not await Moderation._can_execute_on(interaction, member):
-                return
+        if isinstance(member, discord.Member) and not await Moderation._can_execute_on(interaction, member):
+            return
 
         await interaction.response.defer(ephemeral=True)
 
-        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="ban")
+        await _logging_helper.log_simple_punish_command(
+            interaction, target=member, reason=reason, kind=ModerationCommandKind.ban
+        )
         await guild.ban(member, reason=reason, delete_message_days=1)
-        await interaction.followup.send(_(lc, "moderation.ban.successfully_banned"), ephemeral=True)
+        await interaction.followup.send(
+            interaction.translate(_("The user has been permanently banned.")), ephemeral=True
+        )
 
-    @app_commands.command(name="tempban", description="Bans an user from the guild for a specific time.")
+    @app_commands.command(name="tempban", description=_("Bans an user from the guild for a specific time."))
     @app_commands.describe(
-        member=_T("The member that should be banned.", key="ban.member"),
-        reason=_T("Why the member should be banned.", key="ban.reason"),
-        duration="How long the member should be banned.",
+        member=_("The member that should be banned."),
+        reason=_("Why the member should be banned."),
+        duration=_("How long the member should be banned."),
     )
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
@@ -146,16 +170,20 @@ class Moderation(commands.Cog):
         duration: str,
         reason: Optional[app_commands.Range[str, None, 512]],
     ):
-        lc = interaction.locale
         guild = interaction.guild
 
         banned_until = parsers.parse_datetime_from_string(duration)
         if banned_until is None:
-            await interaction.response.send_message(_(lc, "moderation.invalid_duration"), ephemeral=True)
+            await interaction.response.send_translated(_("The provided duration is invalid."), ephemeral=True)
             return
 
-        if (banned_until - discord.utils.utcnow()).total_seconds() > 31_536_000:
-            await interaction.response.send_message(_(lc, "moderation.tempban.too_long"), ephemeral=True)
+        ban_duration = (banned_until - discord.utils.utcnow()).total_seconds()
+        if ban_duration > 31_536_000:  # 365 days
+            await interaction.response.send_translated(_("The provided duration is too long."), ephemeral=True)
+            return
+
+        if ban_duration < 60:
+            await interaction.response.send_translated(_("The minimum duration is 60 seconds."), ephemeral=True)
             return
 
         if not await Moderation._can_execute_on(interaction, member):
@@ -164,15 +192,20 @@ class Moderation(commands.Cog):
         await interaction.response.defer(ephemeral=True)
 
         await _logging_helper.log_simple_punish_command(
-            interaction, target=member, until=banned_until, reason=reason, type="tempban"
+            interaction, target=member, until=banned_until, reason=reason, kind=ModerationCommandKind.tempban
         )
-        await self.bot.timer.create_timer(member.id, guild.id, type=TimerEnum.tempban, expires=banned_until)
+        await self.bot.timer.create_timer(member.id, guild.id, kind=TimerEnum.temp_ban, expires=banned_until)
         await guild.ban(member, reason=reason, delete_message_days=1)
 
-        await interaction.followup.send(_(lc, "moderation.tempban.successfully_banned"), ephemeral=True)
+        await interaction.followup.send(
+            interaction.translate(_("The user has been banned until {timestamp}.")).format(
+                timestamp=utils.format_dt(banned_until)
+            ),
+            ephemeral=True,
+        )
 
-    @app_commands.command(name="kick", description="Kicks an user from the guild.")
-    @app_commands.describe(member="The member that should be kicked.", reason="Why the member should be kicked.")
+    @app_commands.command(name="kick", description=_("Kicks an user from the guild."))
+    @app_commands.describe(member=_("The member that should be kicked."), reason=_("Why the member should be kicked."))
     @app_commands.checks.bot_has_permissions(kick_members=True)
     @app_commands.default_permissions(kick_members=True)
     @app_commands.guild_only
@@ -182,23 +215,24 @@ class Moderation(commands.Cog):
         member: discord.Member,
         reason: Optional[app_commands.Range[str, None, 512]],
     ):
-        lc = interaction.locale
         guild = interaction.guild
 
         if not await Moderation._can_execute_on(interaction, member):
             return
 
         await interaction.response.defer(ephemeral=True)
-        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="kick")
+        await _logging_helper.log_simple_punish_command(
+            interaction, target=member, reason=reason, kind=ModerationCommandKind.kick
+        )
         await guild.kick(member, reason=reason)
 
-        await interaction.followup.send(_(lc, "moderation.kick.successfully_kicked"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been kicked.")), ephemeral=True)
 
-    @app_commands.command(name="tempmute", description="Mutes an user for a specific time.")
+    @app_commands.command(name="tempmute", description=_("Mutes a member for a specific time."))
     @app_commands.describe(
-        member="The member that should be muted.",
-        reason="Why the member should be muted.",
-        duration="How long the member should be muted (max 28 days).",
+        member=_("The member that should be muted."),
+        reason=_("Why the member should be muted."),
+        duration=_("How long the member should be muted (max 28 days)."),
     )
     @app_commands.checks.bot_has_permissions(moderate_members=True)
     @app_commands.default_permissions(mute_members=True)
@@ -210,59 +244,57 @@ class Moderation(commands.Cog):
         duration: str,
         reason: Optional[app_commands.Range[str, None, 512]],
     ):
-        lc = interaction.locale
-
-        banned_until = parsers.parse_datetime_from_string(duration)
-        if banned_until is None:
-            await interaction.response.send_message(_(lc, "moderation.invalid_duration"), ephemeral=True)
+        muted_until = parsers.parse_datetime_from_string(duration)
+        if muted_until is None:
+            await interaction.response.send_translated(_("The provided duration is invalid."), ephemeral=True)
             return
 
-        if (banned_until - discord.utils.utcnow()).total_seconds() > 86400 * 28:
-            await interaction.response.send_message(_(lc, "moderation.tempmute.too_long"), ephemeral=True)
+        if (muted_until - discord.utils.utcnow()).total_seconds() > 86400 * 28:
+            await interaction.response.send_translated(_("The provided duration is too long."), ephemeral=True)
             return
 
         if not await Moderation._can_execute_on(interaction, member):
             return
 
         await interaction.response.defer(ephemeral=True)
-        await member.timeout(banned_until, reason=reason)
+
+        await member.timeout(muted_until, reason=reason)
         await _logging_helper.log_simple_punish_command(
-            interaction, target=member, until=banned_until, reason=reason, type="tempmute"
+            interaction, target=member, until=muted_until, reason=reason, kind=ModerationCommandKind.tempmute
         )
 
-        await interaction.followup.send(_(lc, "moderation.tempmute.successfully_muted"), ephemeral=True)
+        await interaction.followup.send(
+            interaction.translate(_("The member has been muted until {timestamp}.")).format(
+                timestamp=utils.format_dt(muted_until)
+            ),
+            ephemeral=True,
+        )
 
-    @app_commands.command(name="unban", description="Unbans an user from the guild.")
-    @app_commands.describe(user="The member that should be unbanned.", reason="Why the member has been unbanned.")
+    @app_commands.command(name="unban", description=_("Unbans an user from the guild."))
+    @app_commands.describe(user=_("The user that should be unbanned."), reason=_("Why the user should be unbanned."))
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
     async def unban(
         self, interaction: discord.Interaction, user: discord.User, reason: Optional[app_commands.Range[str, None, 512]]
     ):
-        lc = interaction.locale
         guild = interaction.guild
 
         try:
             await guild.unban(user, reason=reason)
         except discord.NotFound:
-            await interaction.response.send_message(_(lc, "moderation.unban.not_banned"), ephemeral=True)
+            await interaction.response.send_translated(_("The user is not banned on this server."), ephemeral=True)
             return
 
         await interaction.response.defer(ephemeral=True)
-        await _logging_helper.log_simple_punish_command(interaction, target=user, reason=reason, type="unban")
-
-        await self.bot.db.execute(
-            "DELETE FROM timers WHERE target_id = $1 AND guild_id = $2 AND type = 'tempban'", user.id, guild.id
+        await _logging_helper.log_simple_punish_command(
+            interaction, target=user, reason=reason, kind=ModerationCommandKind.unban
         )
 
-        await interaction.followup.send(_(lc, "moderation.unban.successfully_unbanned"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been unbanned.")), ephemeral=True)
 
-    @app_commands.command(name="softban", description="Kicks an user from the guild and deletes their messages.")
-    @app_commands.describe(
-        member=_T("The member that should be kicked.", key="kick.member"),
-        reason=_T("Why the member should be kicked.", key="kick.reason"),
-    )
+    @app_commands.command(name="softban", description=_("Kicks a member from the guild and deletes their messages."))
+    @app_commands.describe(member=_("The member that should be kicked."), reason=_("Why the member should be kicked."))
     @app_commands.checks.bot_has_permissions(ban_members=True)
     @app_commands.default_permissions(ban_members=True)
     @app_commands.guild_only
@@ -272,7 +304,6 @@ class Moderation(commands.Cog):
         member: discord.Member,
         reason: Optional[app_commands.Range[str, None, 512]],
     ):
-        lc = interaction.locale
         guild = interaction.guild
 
         if not await Moderation._can_execute_on(interaction, member):
@@ -280,30 +311,32 @@ class Moderation(commands.Cog):
 
         await interaction.response.defer(ephemeral=True)
 
-        await _logging_helper.log_simple_punish_command(interaction, target=member, reason=reason, type="softban")
+        await _logging_helper.log_simple_punish_command(
+            interaction, target=member, reason=reason, kind=ModerationCommandKind.softban
+        )
         await guild.ban(member, reason=reason, delete_message_days=1)
         await guild.unban(member, reason=reason)
 
-        await interaction.followup.send(_(lc, "moderation.softban.successfully_kicked"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been kicked.")), ephemeral=True)
 
-    @app_commands.command(name="slowmode", description="Sets the slowmode of the current channel.")
-    @app_commands.describe(duration="How long the slowmode should be (max 6hrs).")
+    @app_commands.command(name="slowmode", description=_("Sets the slowmode of the current channel."))
+    @app_commands.describe(duration=_("How long the slowmode should be (max 6hrs)."))
     @app_commands.checks.cooldown(2, 10, key=lambda i: i.channel_id)
     @app_commands.checks.bot_has_permissions(manage_channels=True)
     @app_commands.default_permissions(manage_messages=True)
     @app_commands.guild_only
     async def slowmode(self, interaction: discord.Interaction, duration: Optional[app_commands.Range[int, 1, 21600]]):
-        lc = interaction.locale
-
         if duration is None:
             await interaction.channel.edit(slowmode_delay=0)
-            await interaction.response.send_message(_(lc, "moderation.slowmode.disabled"), ephemeral=True)
+            await interaction.response.send_translated(_("The slowmode has been disabled."), ephemeral=True)
         else:
             await interaction.channel.edit(slowmode_delay=duration)
-            await interaction.response.send_message(_(lc, "moderation.slowmode.enabled"), ephemeral=True)
+            await interaction.response.send_translated(_("The slowmode has been enabled."), ephemeral=True)
 
-    @app_commands.command(name="unmute", description="Unmutes an user.")
-    @app_commands.describe(member="The member that should be unmuted.", reason="Why the member should be unmuted.")
+    @app_commands.command(name="unmute", description=_("Unmutes a member."))
+    @app_commands.describe(
+        member=_("The member that should be unmuted."), reason=_("Why the member should be unmuted.")
+    )
     @app_commands.checks.bot_has_permissions(mute_members=True)
     @app_commands.default_permissions(mute_members=True)
     @app_commands.guild_only
@@ -313,34 +346,32 @@ class Moderation(commands.Cog):
         member: discord.Member,
         reason: Optional[app_commands.Range[str, None, 512]],
     ):
-        lc = interaction.locale
-
         if not await Moderation._can_execute_on(interaction, member):
             return
 
         await interaction.response.defer(ephemeral=True)
 
-        await member.timeout(None, reason=_(lc, "moderation.unmute.reason"))
-        await _logging_helper.log_simple_punish_command(interaction, target=member, type="unmute", reason=reason)
+        await member.timeout(None, reason=reason)
+        await _logging_helper.log_simple_punish_command(
+            interaction, target=member, kind=ModerationCommandKind.unmute, reason=reason
+        )
 
-        await interaction.followup.send(_(lc, "moderation.unmute.successfully_unmuted"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The member has been unmuted.")), ephemeral=True)
 
-    @app_commands.command(name="invite-info", description="Shows information about a invite.")
-    @app_commands.describe(invite="The invite you want to get information about.")
+    @app_commands.command(name="invite-info", description=_("Shows information about a invite."))
+    @app_commands.describe(invite=_("The invite you want to get information about."))
     @app_commands.checks.cooldown(2, 30, key=lambda i: (i.guild.id, i.user.id))
     @app_commands.default_permissions(manage_messages=True)
     @app_commands.guild_only
     async def invite_info(self, interaction: discord.Interaction, invite: str):
-        lc = interaction.locale
-
         if not DISCORD_INVITE_SINGLE.match(invite):
-            await interaction.response.send_message(_(lc, "moderation.invite_info.invalid_invite"), ephemeral=True)
+            await interaction.response.send_translated(_("The input is not a valid invite."), ephemeral=True)
             return
 
         try:
             invite = await self.bot.fetch_invite(invite, with_counts=True, with_expiration=True)
         except discord.NotFound:
-            await interaction.response.send_message(_(lc, "moderation.invite_info.not_found"), ephemeral=True)
+            await interaction.response.send_translated(_("The invite does not exist."), ephemeral=True)
             return
 
         await self._view_invite_info(interaction, invite=invite)
@@ -348,43 +379,39 @@ class Moderation(commands.Cog):
     @app_commands.guild_only
     @app_commands.default_permissions(manage_messages=True)
     async def invite_info_context_menu(self, interaction: discord.Interaction, message: discord.Message):
-        lc = interaction.locale
-
         invites = DISCORD_INVITE_MULTI.findall(message.content)
 
         if not invites:
-            await interaction.response.send_message(
-                _(lc, "moderation.invite_info.invalid_invite_message"), ephemeral=True
-            )
+            await interaction.response.send_translated(_("This message does not contain an invite."), ephemeral=True)
             return
 
         try:
             invite = await self.bot.fetch_invite(invites[0][-1], with_expiration=True, with_counts=True)
         except discord.NotFound:
-            await interaction.response.send_message(_(lc, "moderation.invite_info.not_found"), ephemeral=True)
+            await interaction.response.send_translated(_("The invite does not exist."), ephemeral=True)
             return
 
         await self._view_invite_info(interaction, invite=invite, ephemeral=True)
 
-    @app_commands.command(name="massban", description="Bans users based on a multiple factors.")
+    @app_commands.command(name="massban", description=_("Bans users based on a multiple factors."))
     @app_commands.describe(
-        channel="The channel to search through. If not specified, the current channel is used.",
-        amount="The amount of messages to search through (100).",
-        reason="The reason for the massban.",
-        message_contains="Must be contained in a message.",
-        message_starts="Must be at the start of a message.",
-        message_ends="Must be at the end of a message",
-        has_embed="If the message contains an embed.",
-        has_attachment="If the message contains a attachment.",
-        joined_after="Only users that joined after this.",
-        joined_before="Only users that joined before this.",
-        has_role="If users have a role or not.",
-        has_avatar="If users have an avatar or not.",
-        username_regex="Regex that must be matched in the username.",
-        sent_after="Only messages sent after this (id).",
-        sent_before="Only messages sent before this (id).",
-        account_younger_days="Only users that are younger than this (days).",
-        joined_before_days="Only users that joined before this (days).",
+        channel=_("The channel to search through. If not specified, the current channel is used."),
+        amount=_("The amount of messages to search through (100)."),
+        reason=_("The reason for the massban."),
+        message_contains=_("Must be contained in a message."),
+        message_starts=_("Must be at the start of a message."),
+        message_ends=_("Must be at the end of a message."),
+        has_embed=_("If the message contains an embed."),
+        has_attachment=_("If the message contains a attachment."),
+        joined_after=_("Only users that joined after this."),
+        joined_before=_("Only users that joined before this."),
+        has_role=_("If users have a role or not."),
+        has_avatar=_("If users have an avatar or not."),
+        username_regex=_("Regex that must be matched in the username."),
+        sent_after=_("Only messages sent after this (id)."),
+        sent_before=_("Only messages sent before this (id)."),
+        account_younger_days=_("Only users that are younger than this (in days)."),
+        joined_before_days=_("Only users that joined before this (in days)."),
     )
     @app_commands.guild_only
     @app_commands.checks.bot_has_permissions(read_messages=True)
@@ -411,7 +438,6 @@ class Moderation(commands.Cog):
         account_younger_days: app_commands.Range[int, 0, 30] = None,
         joined_before_days: app_commands.Range[int, 0, 30] = None,
     ):
-        lc = interaction.locale
         await interaction.response.defer(ephemeral=True)
 
         members = []
@@ -460,7 +486,9 @@ class Moderation(commands.Cog):
             try:
                 _regex = re.compile(username_regex)
             except re.error as e:
-                await interaction.followup.send(_(lc, "moderation.massban.invalid_regex") + f"\n```{e}```")
+                await interaction.followup.send(
+                    interaction.translate(_("The provided regex is invalid.")) + f"\n```{e}```"
+                )
                 return
             else:
                 predicates.append(lambda m, x=_regex: x.match(m.name))
@@ -509,45 +537,33 @@ class Moderation(commands.Cog):
 
         members = {m for m in members if all(p(m) for p in predicates)}
         if len(members) == 0:
-            await interaction.followup.send(_(lc, "moderation.massban.no_users_found"))
+            await interaction.followup.send(
+                interaction.translate(_("There are no users that meets this criteria.")), ephemeral=True
+            )
             return
 
-        embed = extensions.Embed(description=_(lc, "moderation.massban.overview_description"))
-        await interaction.followup.send(embed=embed, view=_views.MassbanView(interaction, list(members), reason))
-
-    @warn_group.command(name="list", description="Lists current warnings for a user.")
-    @app_commands.describe(member="The user to list warnings for.")
-    async def warn_list(self, interaction: discord.Interaction, member: discord.Member):
-        lc = interaction.locale
-        if member.bot:
-            await interaction.response.send_message(_(lc, "moderation.warn.no_bots"), ephemeral=True)
-            return
-
-        await interaction.response.defer(ephemeral=True)
-
-        warnings = await self.bot.db.fetch(
-            "SELECT id, points, reason, timestamp FROM automod_users WHERE user_id = $1 AND guild_id = $2",
-            member.id,
-            interaction.guild_id,
+        embed = extensions.Embed(
+            description=interaction.translate(_("Confirm the selection of users scheduled for ban."))
         )
+        await interaction.followup.send(embed=embed, view=views.MassbanView(interaction, list(members), reason))
 
-        if not warnings:
-            await interaction.followup.send(_(lc, "moderation.warn.no_warnings"), ephemeral=True)
+    @warn_group.command(name="list", description=_("Lists current warnings for a user."))
+    @app_commands.describe(user=_("The user to list warnings for."))
+    async def warn_list(self, interaction: discord.Interaction, user: discord.User):
+        if user.bot:
+            await interaction.response.send_translated(_("Bots cannot be punished."), ephemeral=True)
             return
 
-        embed = extensions.Embed(title=_(lc, "moderation.warn.list_title"))
-        embed.description = ""
+        warn_view = views.WarnView(interaction, user)
 
-        for warning in warnings:
-            embed.description += f"`{warning['id']}`. {warning['points']} {_(lc, f'moderation.warn.point' + ('s' if warning['points'] != 1 else ''))} - {warning['reason']} - {discord.utils.format_dt(warning['timestamp'])}\n"
+        embed = await warn_view.initialize()
+        await interaction.response.send_message(view=warn_view, embed=embed, ephemeral=True)
 
-        await interaction.followup.send(embed=embed, ephemeral=True)
-
-    @warn_group.command(name="add", description="Adds a warning to a user.")
+    @warn_group.command(name="add", description=_("Adds a warning to a user."))
     @app_commands.describe(
-        member="The user to add a warning to.",
-        points="The amount of points to add.",
-        reason="The reason for the warning.",
+        member=_("The user to add a warning to."),
+        points=_("The amount of points to add."),
+        reason=_("The reason for the warning."),
     )
     async def warn_add(
         self,
@@ -556,14 +572,104 @@ class Moderation(commands.Cog):
         points: app_commands.Range[int, 1, 20],
         reason: app_commands.Range[str, 1, 128],
     ):
-        lc = interaction.locale
         if member.bot:
-            await interaction.response.send_message(_(lc, "moderation.warn.no_bots"), ephemeral=True)
+            await interaction.response.send_translated(_("Bots cannot be punished."), ephemeral=True)
             return
 
         automod_cog: automod.Automod | None = self.bot.get_cog("Automod")
         if automod_cog is None:
-            await interaction.followup.send(_(interaction.locale, "moderation.warn.automod_not_loaded"), ephemeral=True)
+            _log.warning("Automod cog is not loaded.")
+            await interaction.response.send_translated(_("The required module is not loaded."), ephemeral=True)
+            return
+
+        if not await self._can_execute_on(interaction, member):
+            return
+
+        cache = await self.bot.cache.get_moderation(interaction.guild_id)
+        if cache is None:
+            await interaction.response.send_translated(
+                _("This has not been set up. Please visit https://plyoox.net"), ephemeral=True
+            )
+            return
+
+        if not cache.active:
+            await interaction.response.send_translated(
+                _("The module is currently disabled. Enabled it on the [Dashboard](https://plyoox.net)."),
+                ephemeral=True,
+            )
+            return
+
+        if not cache.point_actions:
+            await interaction.response.send_translated(_("There are no point actions configured."), ephemeral=True)
+            return
+
+        await automod_cog.add_warn_points(member, interaction.user, points, reason)
+
+        await interaction.response.send_translated(
+            _("{user.mention} has been warned."), ephemeral=True, translation_data={"user": member}
+        )
+
+    @warn_group.command(name="remove", description=_("Removes a warning from a user."))
+    @app_commands.describe(member=_("The user to remove a warning from."), id=_("The ID of the warning to remove."))
+    async def warn_remove(self, interaction: discord.Interaction, member: discord.User, id: app_commands.Range[int, 0]):
+        if member.bot:
+            await interaction.response.send_translated(_("Bots cannot be punished."), ephemeral=True)
+            return
+
+        query_response = await self.bot.db.execute(
+            "DELETE FROM automoderation_user WHERE id = $1 and guild_id = $2 AND user_id = $3",
+            id,
+            interaction.guild_id,
+            member.id,
+        )
+
+        if query_response == "DELETE 1":
+            await interaction.response.send_translated(_("The warning has been removed."), ephemeral=True)
+        else:
+            await interaction.response.send_translated(
+                _("There is no warning with the id `{id}`"),
+                ephemeral=True,
+                translation_data={"id": id},
+            )
+
+    @warn_group.command(name="remove-all", description=_("Removes all warnings from a user."))
+    @app_commands.describe(member=_("The user to remove all warnings from."))
+    async def warn_remove_all(self, interaction: discord.Interaction, member: discord.User):
+        if member.bot:
+            await interaction.response.send_translated(_("Bots cannot be punished."), ephemeral=True)
+            return
+
+        query_response = await self.bot.db.execute(
+            "DELETE FROM automoderation_user WHERE guild_id = $1 AND user_id = $2",
+            interaction.guild_id,
+            member.id,
+        )
+
+        if int(query_response.split(" ")[1]) >= 1:
+            await interaction.response.send_translated(_("All warnings have been removed."), ephemeral=True)
+        else:
+            await interaction.response.send_translated(
+                _("{member} has no warnings"), ephemeral=True, translation_data={"member": str(member)}
+            )
+
+    @app_commands.command(name="punish", description=_("Punish a user with predefined templates."))
+    @app_commands.describe(member=_("The user to punish."))
+    @app_commands.default_permissions(ban_members=True)
+    async def punish(self, interaction: discord.Interaction, member: discord.Member, template: int):
+        automod: Automod = self.bot.get_cog("Automod")  # type: ignore
+        if automod is None:
+            _log.warning("Automod cog is not loaded.")
+            await interaction.response.send_translated(_("The required module is not loaded."), ephemeral=True)
+            return
+
+        cache = await self.bot.cache.get_punishments(interaction.guild_id)
+        if cache is None:
+            await interaction.response.send_translated(_("There are no punishments configured."), ephemeral=True)
+            return
+
+        punishment = cache.get(template)
+        if punishment is None:
+            await interaction.response.send_translated(_("The provided template does not exist."), ephemeral=True)
             return
 
         if not await self._can_execute_on(interaction, member):
@@ -571,80 +677,33 @@ class Moderation(commands.Cog):
 
         await interaction.response.defer(ephemeral=True)
 
-        cache = await self.bot.cache.get_moderation(interaction.guild_id)
-        if cache is None:
-            await interaction.followup.send(_(lc, "moderation.warn.no_settings"), ephemeral=True)
-            return
+        for action in punishment.actions:
+            if automod._handle_checks(member, action):
+                data = AutoModerationActionData(
+                    action=action, member=member, reason=punishment.reason, moderator=interaction.user
+                )
 
-        if not cache.active:
-            await interaction.followup.send(_(lc, "moderation.warn.disabled"), ephemeral=True)
-            return
+                await automod._execute_action(data)
 
-        if not cache.automod_actions:
-            await interaction.followup.send(_(lc, "moderation.warn.no_actions"), ephemeral=True)
-            return
-
-        await automod_cog.add_warn_points(member, interaction.user, points, reason)
-
-        await interaction.followup.send(_(lc, "moderation.warn.success"))
-
-    @warn_group.command(name="remove", description="Removes a warning from a user.")
-    @app_commands.describe(member="The user to remove a warning from.", id="The ID of the warning to remove.")
-    async def warn_remove(
-        self, interaction: discord.Interaction, member: discord.Member, id: app_commands.Range[int, 0]
-    ):
-        lc = interaction.locale
-        if member.bot:
-            await interaction.response.send_message(_(lc, "moderation.warn.no_bots"), ephemeral=True)
-            return
-
-        query_response = await self.bot.db.execute(
-            "DELETE FROM automod_users WHERE id = $1 and guild_id = $2 AND user_id = $3",
-            id,
-            interaction.guild_id,
-            member.id,
-        )
-
-        if query_response == "DELETE 1":
-            await interaction.response.send_message(_(lc, "moderation.warn.successfully_removed"), ephemeral=True)
-        else:
-            await interaction.followup.send_message(_(lc, "moderation.warn.not_found"), ephemeral=True)
-
-    @warn_group.command(name="remove-all", description="Removes all warnings from a user.")
-    @app_commands.describe(member="The user to remove all warnings from.")
-    async def warn_remove_all(self, interaction: discord.Interaction, member: discord.Member):
-        lc = interaction.locale
-        if member.bot:
-            await interaction.response.send_message(_(lc, "moderation.warn.no_bots"), ephemeral=True)
-            return
-
-        query_response = await self.bot.db.execute(
-            "DELETE FROM automod_users WHERE guild_id = $1 AND user_id = $2",
-            interaction.guild_id,
-            member.id,
-        )
-
-        if int(query_response.split(" ")[1]) >= 1:
-            await interaction.response.send_message(_(lc, "moderation.warn.successfully_removed_all"), ephemeral=True)
-        else:
-            await interaction.response.send_message(_(lc, "moderation.warn.no_warnings_found"), ephemeral=True)
+        await interaction.followup.send(interaction.translate(_("The user has been punished.")), ephemeral=True)
 
     @tempmute.autocomplete("duration")
     @tempban.autocomplete("duration")
     async def autocomplete_duration(self, interaction: discord.Interaction, current: str):
-        lc = interaction.locale
-
         times = [
-            {"label": f"30 {_(lc, 'times.minutes')}", "value": "30min"},
-            {"label": f"1 {_(lc, 'times.hour')}", "value": "1h"},
-            {"label": f"3 {_(lc, 'times.hours')}", "value": "3h"},
-            {"label": f"6 {_(lc, 'times.hours')}", "value": "6h"},
-            {"label": f"12 {_(lc, 'times.hours')}", "value": "12h"},
-            {"label": f"1 {_(lc, 'times.day')}", "value": "1d"},
-            {"label": f"3 {_(lc, 'times.days')}", "value": "3d"},
-            {"label": f"7 {_(lc, 'times.days')}", "value": "7d"},
-            {"label": f"14 {_(lc, 'times.days')}", "value": "14d"},
-            {"label": f"1 {_(lc, 'times.month')} (28 {_(lc, 'times.days')})", "value": "28d"},
+            {"label": f"5 {interaction.translate(_('minutes'))}", "value": "5min"},
+            {"label": f"10 {interaction.translate(_('minutes'))}", "value": "10min"},
+            {"label": f"15 {interaction.translate(_('minutes'))}", "value": "15min"},
+            {"label": f"30 {interaction.translate(_('minutes'))}", "value": "30min"},
+            {"label": f"1 {interaction.translate(_('hours'))}", "value": "1h"},
+            {"label": f"3 {interaction.translate(_('hours'))}", "value": "3h"},
+            {"label": f"6 {interaction.translate(_('hours'))}", "value": "6h"},
+            {"label": f"12 {interaction.translate(_('hours'))}", "value": "12h"},
+            {"label": f"1 {interaction.translate(_('day'))}", "value": "1d"},
+            {"label": f"3 {interaction.translate(_('days'))}", "value": "3d"},
+            {"label": f"7 {interaction.translate(_('days'))}", "value": "7d"},
+            {"label": f"14 {interaction.translate(_('days'))}", "value": "14d"},
+            {"label": f"1 {interaction.translate(_('month'))} (28 {interaction.translate(_('days'))})", "value": "28d"},
         ]
 
         if not current:
@@ -655,3 +714,20 @@ class Moderation(commands.Cog):
             for time in times
             if current.lower() in time["label"].lower()
         ]
+
+    @punish.autocomplete("template")
+    async def autocomplete_template(self, interaction: discord.Interaction, search: str):
+        def sort(value: Punishment):
+            return search in value.name.lower()
+
+        cache = await self.bot.cache.get_punishments(interaction.guild_id)
+        if cache is None:
+            return []
+
+        punishment_list = list(cache.values())
+
+        if len(punishment_list) <= 25:
+            return [app_commands.Choice(name=value.name, value=value.id) for value in punishment_list]
+
+        punishment_list.sort(key=sort)
+        return [app_commands.Choice(name=value.name, value=value.id) for value in punishment_list[:25]]

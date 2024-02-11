@@ -3,19 +3,23 @@ from __future__ import annotations
 import asyncio
 import datetime
 import logging
-from typing import TYPE_CHECKING, Optional, Any
+from typing import TYPE_CHECKING, Any
 
 import asyncpg
 import discord
 from discord import utils
 from discord.ext import commands
+from discord.app_commands import locale_str as _
 
 from cache.models import TimerModel
-from lib.enums import TimerEnum
-from translation import _
+
+
+from translation import translate
 
 if TYPE_CHECKING:
     from main import Plyoox
+
+    from lib.enums import TimerEnum
 
 
 _log = logging.getLogger("Timer")
@@ -24,24 +28,33 @@ _log = logging.getLogger("Timer")
 class Timer(commands.Cog):
     def __init__(self, bot: Plyoox):
         self.bot = bot
-        self._current_timer: Optional[TimerModel] = None
-        self._task = bot.loop.create_task(self.dispatch_timers())
+        self._current_timer: TimerModel | None = None
+        self._task = None
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        if self._task is None:
+            self._task = self.bot.loop.create_task(self.dispatch_timers())
 
     async def cog_unload(self) -> None:
-        self._task.cancel()
+        if self._task:
+            self._task.cancel()
+            self._task = None
 
-    async def get_active_timer(self, *, days: int = 7) -> Optional[TimerModel]:
+        self._current_timer = None
+
+    async def get_timer(self, *, days: int = 7) -> TimerModel | None:
         record = await self.bot.db.fetchrow(
-            "SELECT * FROM timers WHERE timers.expires < (CURRENT_DATE + $1::interval) ORDER BY expires LIMIT 1",
+            "SELECT * FROM timer WHERE expires < (CURRENT_DATE + $1::interval) ORDER BY expires LIMIT 1",
             datetime.timedelta(days=days),
         )
 
         return TimerModel(**record) if record else None
 
     async def call_timer(self, timer: TimerModel) -> None:
-        await self.bot.db.execute("DELETE FROM timers WHERE id = $1", timer.id)
+        await self.bot.db.execute("DELETE FROM timer WHERE id = $1", timer.id)
 
-        func = getattr(self, f"on_{timer.type}_expire", None)
+        func = getattr(self, f"on_{timer.kind.replace('_', '')}_expire", None)
         if func is not None:
             await func(timer)
         else:
@@ -50,13 +63,13 @@ class Timer(commands.Cog):
     async def dispatch_timers(self) -> None:
         try:
             while not self.bot.is_closed():
-                timer = await self.get_active_timer(days=7)
+                timer = await self.get_timer(days=1)
 
                 if timer is None:
                     await asyncio.sleep(30)
                     continue
 
-                now = utils.utcnow()
+                now = utils.utcnow().replace(tzinfo=None)
 
                 if timer.expires >= now:
                     to_sleep = (timer.expires - now).total_seconds()
@@ -70,14 +83,14 @@ class Timer(commands.Cog):
             self._task = self.bot.loop.create_task(self.dispatch_timers())
 
     async def create_timer(
-        self, target_id: int, guild_id: int, type: TimerEnum, expires: datetime.datetime, data: dict[str, Any] = None
+        self, target_id: int, guild_id: int, kind: TimerEnum, expires: datetime.datetime, data: dict[str, Any] = None
     ) -> None:
         timer_id = await self.bot.db.fetchval(
-            "INSERT INTO timers (target_id, guild_id, type, expires, data) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+            "INSERT INTO timer (target_id, guild_id, kind, expires, data) VALUES ($1, $2, $3, $4, $5) RETURNING id",
             target_id,
             guild_id,
-            type,
-            expires,
+            kind,
+            expires.replace(tzinfo=None),
             data,
         )
 
@@ -86,27 +99,32 @@ class Timer(commands.Cog):
             expires=expires,
             guild_id=guild_id,
             target_id=target_id,
-            type=type,
+            kind=kind,
             data=data,
         )
 
         if self._current_timer and self._current_timer.expires < timer.expires:
             self._current_timer = None
             self._task.cancel()
-            self.bot.loop.create_task(self.dispatch_timers())
+            self._task = self.bot.loop.create_task(self.dispatch_timers())
 
     async def on_tempban_expire(self, timer: TimerModel):
         guild = self.bot.get_guild(timer.guild_id)
 
         if guild is None:
+            _log.debug("Cannot unban user, guild not found")
+            return
+
+        if not guild.me.guild_permissions.ban_members:
             return
 
         try:
             await guild.unban(
-                discord.Object(id=timer.target_id), reason=_(guild.preferred_locale, "moderation.tempban_expired")
+                discord.Object(id=timer.target_id),
+                reason=translate(_("Temporary ban expired"), self.bot, guild.preferred_locale),
             )
         except discord.NotFound:
-            pass
+            _log.debug("Cannot unban user, ban not found")
 
 
 async def setup(bot: Plyoox):

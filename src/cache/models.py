@@ -6,11 +6,20 @@ from recordclass import RecordClass
 
 if TYPE_CHECKING:
     from datetime import datetime
-    from lib.enums import AutomodActionEnum, AutomodChecksEnum, TimerEnum
+    from lib.enums import (
+        AutoModerationPunishmentKind,
+        AutoModerationFinalPunishmentKind,
+        AutoModerationCheckKind,
+        TimerEnum,
+    )
+
+
+class LevelRole(RecordClass):
+    role: int
+    level: int
 
 
 class WelcomeModel(RecordClass):
-    active: bool
     join_active: bool
     join_channel: int | None
     join_roles: list[int] | None
@@ -22,82 +31,96 @@ class WelcomeModel(RecordClass):
 
 
 class LevelingModel(RecordClass):
-    active: bool
     message: str | None
     channel: int | None
-    roles: list[list[int]] | None
-    no_xp_role: int | None
+    roles: list[LevelRole]
     remove_roles: bool
-    no_xp_channels: list[int] | None
-    booster_xp_multiplicator: int | None
+    exempt_role: int | None
+    exempt_channels: list[int]
+    booster_xp_multiplier: int | None
+
+
+class MaybeWebhook(RecordClass):
+    id: int
+    token: str | None
+    webhook_channel: int | None
+    guild_id: int
+
+
+class LoggingSettings(RecordClass):
+    channel: MaybeWebhook | None
+    kind: str
+    exempt_channels: list[int] | None
+    exempt_roles: list[int] | None
 
 
 class LoggingModel(RecordClass):
-    active: bool
-    webhook_id: int | None
-    webhook_channel: int | None
-    webhook_token: str | None
-    member_join: bool
-    member_leave: bool
-    member_ban: bool
-    member_unban: bool
-    member_rename: bool
-    member_role_change: bool
-    message_edit: bool
-    message_delete: bool
+    settings: dict[str, LoggingSettings]
 
 
-class AutomodExecutionModel(RecordClass):
-    action: AutomodActionEnum
-    check: AutomodChecksEnum
-    days: int
-    points: int
-    duration: int
+class ModerationRule(RecordClass):
+    guild_id: int
+    reason: str
+    actions: list[AutoModerationAction]
 
 
-class AutomodDiscordExecutionModel(RecordClass):
-    rule_id: int
-    action: AutomodActionEnum
-    check: AutomodChecksEnum
-    days: int
-    points: int
-    duration: int
+class AutoModerationCheck(RecordClass):
+    kind: AutoModerationCheckKind
+    time: int | None
+
+
+class AutoModerationPunishment(RecordClass):
+    kind: AutoModerationPunishmentKind | AutoModerationFinalPunishmentKind
+    duration: int | None
+    points: ModerationPoints | None
+    expires_in: int | None
+
+
+class ModerationPoints(RecordClass):
+    amount: int | None
+    expires_in: int | None
+
+
+class AutoModerationAction(RecordClass):
+    punishment: AutoModerationPunishment
+    check: AutoModerationCheck | None
 
 
 class ModerationModel(RecordClass):
     active: bool
-    mod_roles: list[int] | None
+    moderation_roles: list[int]
     ignored_roles: list[int] | None
-    log_id: int | None
-    log_channel: int | None
-    log_token: str | None
-    automod_actions: list[AutomodExecutionModel] | None
+    logging_channel: MaybeWebhook | None
+    point_actions: list[AutoModerationAction] | None
     notify_user: bool
     invite_active: bool
-    invite_actions: list[AutomodExecutionModel] | None
-    invite_whitelist_channels: list[int] | None
-    invite_whitelist_roles: list[int] | None
-    invite_allowed: list[str] | None
+    invite_actions: list[AutoModerationAction] | None
+    invite_exempt_channels: list[int]
+    invite_exempt_roles: list[int]
+    invite_exempt_guilds: list[str]
     link_active: bool
-    link_actions: list[AutomodExecutionModel] | None
-    link_whitelist_channels: list[int] | None
-    link_whitelist_roles: list[int] | None
-    link_list: list[str] | None
+    link_actions: list[AutoModerationAction] | None
+    link_exempt_channels: list[int] | None
+    link_exempt_roles: list[int] | None
+    link_allow_list: list[str] | None
     link_is_whitelist: bool
-    mention_active: bool
-    mention_actions: list[AutomodExecutionModel] | None
     caps_active: bool
-    caps_actions: list[AutomodExecutionModel] | None
-    caps_whitelist_channels: list[int] | None
-    caps_whitelist_roles: list[int] | None
-    blacklist_active: bool
-    blacklist_actions: list[AutomodDiscordExecutionModel]
+    caps_actions: list[AutoModerationAction] | None
+    caps_exempt_channels: list[int] | None
+    caps_exempt_roles: list[int] | None
 
 
 class TimerModel(RecordClass):
     id: int
     guild_id: int
     target_id: int
-    type: TimerEnum
+    kind: TimerEnum
     expires: datetime
     data: dict[str, Any] | None
+
+
+class Punishment(RecordClass):
+    id: int
+    name: str
+    reason: str | None
+    actions: list[AutoModerationAction]

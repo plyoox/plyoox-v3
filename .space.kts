@@ -23,7 +23,7 @@ job("Run Bot Job") {
                 val currentVersion = ref.replace("refs/tags/rc/v", "").split("-")
                 api.parameters["version"] = "${currentVersion[0]}-rc.${currentVersion[1]}"
                 api.parameters["channel"] = "release-candidate"
-            } else if (ref.matches(Regex("""refs/tags/release/v\d\.\d\.\d"""))) {
+            } else if (ref.matches(Regex("""refs/tags/release/v\d+\.\d+\.\d+"""))) {
                 api.parameters["version"] = ref.replace("refs/tags/release/v", "")
                 api.parameters["channel"] = "stable"
             } else {

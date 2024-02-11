@@ -71,6 +71,10 @@ class Moderation(commands.Cog):
             await interaction.response.send_translated(_("You cannot punish administrators."), ephemeral=True)
             return False
 
+        if target.bot:
+            await interaction.response.send_translated(_("You cannot punish bots."), ephemeral=True)
+            return False
+
         return True
 
     @staticmethod

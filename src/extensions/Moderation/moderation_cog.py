@@ -653,7 +653,7 @@ class Moderation(commands.Cog):
             )
 
     @app_commands.command(name="punish", description=_("Punish a user with predefined templates."))
-    @app_commands.describe(member=_("The user to punish."))
+    @app_commands.describe(member=_("The user to punish."), template=_("Template for punishing the user."))
     @app_commands.default_permissions(ban_members=True)
     async def punish(self, interaction: discord.Interaction, member: discord.Member, template: int):
         automod: Automod = self.bot.get_cog("Automod")  # type: ignore

@@ -56,10 +56,10 @@ async def _send_webhook(
     guild_id: int,
     webhook: discord.Webhook,
     embeds: list[discord.Embed] = utils.MISSING,
-    files: list[discord.File] = utils.MISSING,
+    file: discord.File = utils.MISSING,
 ) -> None:
     try:
-        await webhook.send(embeds=embeds, files=files)
+        await webhook.send(embeds=embeds, file=file)
     except discord.NotFound:
         _log.info(f"Log channel {webhook.id} not found, deleting...")
         await bot.db.execute("DELETE FROM maybe_webhook WHERE id = $1 AND guild_id = $2", webhook.id, guild_id)
@@ -158,7 +158,7 @@ async def log_clear_command(
     if reason is not None:
         embed.insert_field_at(0, name=translate(_("Reason")), value=f"> {reason}")
 
-    file = None
+    file = utils.MISSING
     if len(deleted_messages):
         messages = [f"{msg.author} ({msg.author.id}):\t{msg.content}" for msg in deleted_messages if msg.content]
 
@@ -169,7 +169,7 @@ async def log_clear_command(
 
             file = discord.File(_file, filename="cleared_messages.txt")
 
-    await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed], files=[file])
+    await _send_webhook(interaction.client, interaction.guild.id, webhook, embeds=[embed], file=file)
 
 
 async def automod_log(

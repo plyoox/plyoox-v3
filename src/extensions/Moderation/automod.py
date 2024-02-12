@@ -287,9 +287,9 @@ class Automod(commands.Cog):
         elif check == AutoModerationCheckKind.no_avatar:
             return member.avatar is None
         elif check == AutoModerationCheckKind.join_date:
-            return (discord.utils.utcnow() - member.joined_at).days <= action.days
+            return (discord.utils.utcnow() - member.joined_at).total_seconds() <= action.check.time
         elif check == AutoModerationCheckKind.account_age:
-            return (discord.utils.utcnow() - member.created_at).days <= action.days
+            return (discord.utils.utcnow() - member.created_at).total_seconds() <= action.check.time
 
     async def _execute_final_action(self, member: discord.Member, action: AutoModerationAction):
         def translate(string: _) -> str:
@@ -392,11 +392,11 @@ class Automod(commands.Cog):
     def _is_affected(message: discord.Message, cache: ModerationModel, kind: AutoModerationExecutionKind) -> bool:
         """This function checks if the automod should be executed on the message.
         It checks for:
-         - Automod and check enabled
-         - Relevant information is set
-         - Ignored roles
+         - Check enabled
+         - If relevant information is set
+         - Exempt roles
          - Moderator roles
-         - Whitelisted roles and channels
+         - Exempt roles and channels
         """
         roles = message.author._roles
         channel = message.channel
@@ -486,7 +486,7 @@ class Automod(commands.Cog):
         )
 
         return await self.bot.db.fetchval(
-            "SELECT SUM(points) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND (expires_at IS NULL OR now() < expires_at)",
+            "SELECT SUM(points) FROM automoderation_user WHERE user_id = $1 AND guild_id = $2 AND (expires_at IS NULL OR (now() AT TIME ZONE 'utc') < expires_at)",
             member.id,
             guild.id,
         )

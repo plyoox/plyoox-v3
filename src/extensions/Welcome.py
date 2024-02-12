@@ -70,10 +70,7 @@ class Welcome(commands.Cog):
             return
 
         cache = await self.bot.cache.get_welcome(before.guild.id)
-        if cache is None:
-            return
-
-        if not cache.active or not cache.join_active:
+        if not cache or not cache.join_active:
             return
 
         await self._add_join_roles(cache, after)

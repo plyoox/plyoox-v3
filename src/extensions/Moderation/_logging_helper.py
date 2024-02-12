@@ -223,17 +223,21 @@ async def automod_log(
     embeds = []
 
     embed = extensions.Embed(description=description)
-    embed.set_author(name=title, icon_url=member.display_avatar)
     embed.add_field(name=translate(_("Reason")), value=f"> {data.trigger_reason}")
     embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()), inline=True)
     embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
     # data.moderator is only set when executed by the punishment command
     if data.moderator:
+        # Change title of the embed
+        title = translate(_("User has been punished"))
         embed.title = translate(_("Punishment executed"))
         embed.color = colors.PUNISHMENT_COLOR
+
     else:
         embed.color = colors.AUTOMOD_COLOR
+
+    embed.set_author(name=title, icon_url=member.display_avatar)
 
     if until is not None:
         embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until), inline=True)

@@ -97,7 +97,7 @@ async def log_simple_punish_command(
         try:
             await target.send(embeds=[embed])
             notified_user = True
-        except discord.Forbidden:
+        except discord.HTTPException:
             notified_user = False
 
     webhook = await _get_log_channel(interaction.client, cache, interaction.guild)
@@ -204,7 +204,7 @@ async def automod_log(
         try:
             await member.send(embed=embed)
             notified_user = True
-        except discord.Forbidden:
+        except discord.HTTPException:
             notified_user = False
 
     webhook = await _get_log_channel(bot, cache, guild)
@@ -294,7 +294,7 @@ async def automod_final_log(
         try:
             await member.send(embeds=[embed])
             notified_user = True
-        except discord.Forbidden:
+        except discord.HTTPException:
             notified_user = False
 
     webhook = await _get_log_channel(bot, cache, guild)
@@ -351,7 +351,7 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
                 embed=embed,
             )
             notified_user = True
-        except discord.Forbidden:
+        except discord.HTTPException:
             notified_user = False
 
     webhook = await _get_log_channel(bot, cache, guild)

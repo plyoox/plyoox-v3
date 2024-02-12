@@ -55,7 +55,7 @@ class Moderation(commands.Cog):
 
     @staticmethod
     async def _can_execute_on(interaction: discord.Interaction, target: discord.Member) -> bool:
-        if interaction.user.top_role <= target.top_role or interaction.user.id != interaction.guild.owner_id:
+        if interaction.user.top_role <= target.top_role or interaction.user.id == interaction.guild.owner_id:
             await interaction.response.send_translated(
                 _("The user must be below you in the hierarchy."), ephemeral=True
             )

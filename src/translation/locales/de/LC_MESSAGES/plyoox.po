@@ -792,7 +792,7 @@ msgstr "Bestraft bis"
 #: src/extensions/Moderation/_logging_helper.py:323
 #: src/extensions/Moderation/_logging_helper.py:377
 msgid "Received DM"
-msgstr "PM erhalten"
+msgstr "DM erhalten"
 
 #: src/extensions/Moderation/_logging_helper.py:143
 msgid ""

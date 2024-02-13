@@ -53,7 +53,7 @@ class LoggingEvents(commands.Cog):
         embeds: list[discord.Embed] = utils.MISSING,
     ):
         # Normally all logging channels should be webhook channels,
-        # but just in case (e.g. manual insertion)
+        # but just in case (e.g., manual insertion)
         if cache.channel.token is None:
             channel = guild.get_channel(cache.channel.id)  # channel is a text channel
             if channel is None or not channel.permissions_for(guild.me).send_messages:
@@ -81,7 +81,7 @@ class LoggingEvents(commands.Cog):
 
                 await self.bot.db.execute("DELETE FROM maybe_webhook WHERE id = $1", cache.channel.id)
 
-                self.bot.cache.edit_cache(guild.id, "log", webhook_token=None, webhook_id=None)
+                self.bot.cache.remove_cache(guild.id, "log")
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):

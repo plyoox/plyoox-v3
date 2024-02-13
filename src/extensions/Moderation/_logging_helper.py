@@ -11,13 +11,13 @@ from discord.app_commands import locale_str as _
 
 from lib import helper, extensions, types, colors
 from lib.helper import italic
+from lib.enums import ModerationCommandKind, AutoModerationFinalPunishmentKind, AutoModerationPunishmentKind
 from translation.translator import translate as global_translate
 
 if TYPE_CHECKING:
     from main import Plyoox
     from cache.models import ModerationModel
     from .automod import AutoModerationActionData
-    from lib.enums import ModerationCommandKind, AutoModerationFinalPunishmentKind, AutoModerationPunishmentKind
 
 _log = logging.getLogger(__name__)
 
@@ -230,8 +230,6 @@ async def automod_log(
     # data.moderator is only set when executed by the punishment command
     if data.moderator:
         # Change title of the embed
-        title = translate(_("User has been punished"))
-        embed.title = translate(_("Punishment executed"))
         embed.color = colors.PUNISHMENT_COLOR
 
     else:
@@ -359,9 +357,9 @@ async def warn_log(bot: Plyoox, member: discord.Member, moderator: discord.Membe
         return
 
     embed = extensions.Embed(
-        description=translate(_("The user {target} ({target.id}) has been warned by {moderator}.")).format(
-            target=member, moderator=moderator
-        ),
+        description=translate(
+            _("The user {target.mention} ({target}) has been warned by {moderator.mention} ({moderator}).")
+        ).format(target=member, moderator=moderator),
         color=colors.POINT_COLOR,
     )
     embed.set_author(name=translate(_("User has been warned")), icon_url=member.display_avatar)
@@ -389,10 +387,10 @@ def _get_dynamic_log_description(
     match kind:
         case "point":
             return (
-                translate(_("User has reached the maximum number of points")),
-                translate(_("The user {target.mention} ({target}) has reached the maximum number of points.")).format(
-                    target=target
-                ),
+                translate(_("User has been punished")),
+                translate(
+                    _("The user {target.mention} ({target}) has been punished by {moderator.mention} ({moderator})")
+                ).format(target=target, moderator=moderator),
             )
         case "delete":
             return (

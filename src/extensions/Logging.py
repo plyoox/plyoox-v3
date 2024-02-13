@@ -94,7 +94,7 @@ class LoggingEvents(commands.Cog):
         if cache is None:
             return
 
-        # Members that join *can* have a role, for example the twitch integration role
+        # Members that join *can* have a role - for example, the twitch integration role
         # is added before the member joins the guild.
         if any(role in cache.exempt_roles for role in member.roles):
             return

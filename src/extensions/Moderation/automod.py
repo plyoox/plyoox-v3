@@ -451,7 +451,7 @@ class Automod(commands.Cog):
         guild = member.guild
 
         points = await self.__add_points(
-            member=member, points=ModerationPoints(points=add_points, expires_in=None), reason=reason
+            member=member, points=ModerationPoints(amount=add_points, expires_in=None), reason=reason
         )
         if points is None:
             _log.warning(f"{member.id} has no points in {guild.id}...")

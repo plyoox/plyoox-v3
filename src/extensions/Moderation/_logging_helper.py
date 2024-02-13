@@ -211,31 +211,34 @@ async def automod_log(
     if webhook is None:
         return
 
+    embed = extensions.Embed()
+
+    # data.moderator is only set when using the punishment command
     if data.moderator:
-        title, description = _get_dynamic_log_description(
+        action, _description = _get_dynamic_log_description(
             translate, moderator=data.moderator, target=member, kind=data.trigger_action.punishment.kind
         )
+
+        title = translate(_("User has been punished"))
+
+        embed.description = translate(
+            _("The user {target.mention} ({target}) has been punished by {moderator.mention} ({moderator})")
+        ).format(target=member, moderator=data.moderator)
+        embed.color = colors.PUNISHMENT_COLOR
+
+        embed.add_field(name=translate(_("Action")), value=f"> {action}")
     else:
-        (title, description) = _get_dynamic_auto_moderation_description(
+        title, description = _get_dynamic_auto_moderation_description(
             translate, kind=data.trigger_action.punishment.kind, target=member
         )
 
-    embeds = []
-
-    embed = extensions.Embed(description=description)
-    embed.add_field(name=translate(_("Reason")), value=f"> {data.trigger_reason}")
-    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()), inline=True)
-    embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
-
-    # data.moderator is only set when executed by the punishment command
-    if data.moderator:
-        # Change title of the embed
-        embed.color = colors.PUNISHMENT_COLOR
-
-    else:
+        embed.description = description
         embed.color = colors.AUTOMOD_COLOR
 
     embed.set_author(name=title, icon_url=member.display_avatar)
+    embed.add_field(name=translate(_("Reason")), value=f"> {data.trigger_reason}")
+    embed.add_field(name=translate(_("Executed at")), value="> " + utils.format_dt(utils.utcnow()), inline=True)
+    embed.set_footer(text=f"{translate(_('User Id'))}: {member.id}")
 
     if until is not None:
         embed.add_field(name=translate(_("Punished until")), value=helper.embed_timestamp_format(until), inline=True)
@@ -247,7 +250,7 @@ async def automod_log(
             name=translate(_("Received DM")), value="> " + translate(_("Yes") if notified_user else _("No"))
         )
 
-    embeds.append(embed)
+    embeds = [embed]
 
     if data.trigger_content:
         if len(data.trigger_content) <= 1024:
@@ -387,10 +390,8 @@ def _get_dynamic_log_description(
     match kind:
         case "point":
             return (
-                translate(_("User has been punished")),
-                translate(
-                    _("The user {target.mention} ({target}) has been punished by {moderator.mention} ({moderator})")
-                ).format(target=target, moderator=moderator),
+                translate(_("User has received points")),
+                "",
             )
         case "delete":
             return (

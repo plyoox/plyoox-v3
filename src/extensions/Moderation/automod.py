@@ -434,6 +434,8 @@ class Automod(commands.Cog):
             _log.warning(f"{member.id} has no points in {guild.id}...")
             return
 
+        # This is a check that if the user has not been punished (but should have been),
+        # the bot will not spam the logs.
         new_points = data.trigger_action.punishment.points.amount
         if points - new_points < 10:
             await _logging.automod_log(self.bot, data, points=f"{points}/10 [+{new_points}]")

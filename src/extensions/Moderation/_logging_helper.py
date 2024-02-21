@@ -302,7 +302,7 @@ async def automod_final_log(
     if webhook is None:
         return
 
-    (title, _description) = _get_dynamic_auto_moderation_description(translate, kind=action, target=member)
+    (title, _description) = _get_dynamic_auto_moderation_description(translate, kind=action, target=member, final=True)
 
     embed = extensions.Embed(
         description=translate(
@@ -462,15 +462,24 @@ def _get_dynamic_auto_moderation_description(
     *,
     target: discord.User | discord.Member,
     kind: AutoModerationFinalPunishmentKind | AutoModerationPunishmentKind,
+    final: bool = False,
 ) -> (str, str):
     match kind:
         case "point":
-            return (
-                translate(_("User has reached the maximum number of points")),
-                translate(_("The user {target.mention} ({target}) has reached the maximum number of points.")).format(
-                    target=target
-                ),
-            )
+            if final:
+                return (
+                    translate(_("User has reached the maximum number of points")),
+                    translate(
+                        _("The user {target.mention} ({target}) has reached the maximum number of points.")
+                    ).format(target=target),
+                )
+            else:
+                return (
+                    translate(_("User has received points")),
+                    translate(_("The user {target.mention} ({target}) has received points for their actions.")).format(
+                        target=target
+                    ),
+                )
         case "delete":
             return (
                 translate(_("Message has been deleted")),

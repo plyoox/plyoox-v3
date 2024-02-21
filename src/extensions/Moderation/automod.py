@@ -127,6 +127,10 @@ class Automod(commands.Cog):
         ):
             return
 
+        moderation_cache = await self.bot.cache.get_moderation(guild.id)
+        if not moderation_cache or not moderation_cache.active:
+            return
+
         cache = await self.bot.cache.get_moderation_rule(execution.rule_id)
         if not cache:  # Not configured or no actions
             return

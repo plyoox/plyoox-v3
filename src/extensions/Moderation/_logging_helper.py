@@ -81,17 +81,18 @@ async def log_simple_punish_command(
     kind: ModerationCommandKind,
     until: datetime.datetime | None = None,
 ) -> None:
+    def translate(string: _):
+        return global_translate(string, interaction.client, interaction.guild.preferred_locale)
+
     cache: ModerationModel = await interaction.client.cache.get_moderation(interaction.guild.id)
     if cache is None or not cache.active:
         return
-
-    translate = interaction.translate
 
     notified_user = None
     if cache.notify_user and isinstance(target, discord.Member):
         until_fmt = discord.utils.format_dt(until) if until else None
         embed = _get_dynamic_log_user_message(
-            interaction.translate, kind=kind, reason=reason, timestamp=until_fmt, guild=interaction.guild
+            translate, kind=kind, reason=reason, timestamp=until_fmt, guild=interaction.guild
         )
 
         try:

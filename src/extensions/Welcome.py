@@ -56,7 +56,7 @@ class Welcome(commands.Cog):
         if cache.leave_message:
             channel = guild.get_channel(cache.leave_channel)
 
-            if channel.permissions_for(guild.me).send_messages:
+            if channel and channel.permissions_for(guild.me).send_messages:
                 message = formatting.format_welcome_message(cache.leave_message, member)
 
                 # send message and handle permission check

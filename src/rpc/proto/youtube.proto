@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package Youtube;
+
+service Youtube {
+    rpc VideoPublish (YoutubeNotification) returns (Empty) {}
+
+    rpc AddNotification (AddYoutubeNotification) returns (YouTubeUser) {}
+    rpc RemoveNotification (RemoveYoutubeNotification) returns (Empty) {}
+}
+
+message YoutubeNotification {
+    string user_id = 1;
+    string video_id = 2;
+}
+
+message AddYoutubeNotification {
+    string youtube_url = 1;
+    int64 guild_id = 2;
+    int64 channel_id = 3;
+}
+
+message RemoveYoutubeNotification {
+    string youtube_id = 1;
+    int64 guild_id = 2;
+}
+
+message YouTubeUser {
+    string id = 1;
+    string name = 2;
+    string profile_image_url = 3;
+}
+
+
+message Empty {}

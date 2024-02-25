@@ -14,7 +14,7 @@ from translation import translate as global_translate
 
 if TYPE_CHECKING:
     from main import Plyoox
-    from lib.types import TwitchLiveNotification, Translate, TwitchOfflineNotification
+    from lib.types import TwitchLiveNotification, Translate, TwitchOfflineNotification, YoutubeVideoNotification
 
 _log = logging.getLogger(__name__)
 
@@ -182,6 +182,37 @@ class Notification(commands.Cog):
                 await message.edit(embed=embed, content=None, view=None)
 
         await self._delete_guild_notification(data["stream_id"], data["guild_id"])
+
+    async def send_youtube_notification(self, data: YoutubeVideoNotification):
+        notifications = await self.bot.db.fetch(
+            "SELECT guild_id, channel, message FROM youtube.youtube_notification WHERE youtube_channel = $1",
+            data["user_id"],
+        )
+
+        if not notifications:
+            return
+
+        for notification in notifications:
+            guild = self.bot.get_guild(notification["guild_id"])
+            if guild is None:
+                continue
+
+            channel = guild.get_channel(notification["channel"])
+            if channel is None:
+                continue
+
+            if channel.permissions_for(guild.me).send_messages:
+                message_content = notification["message"]
+
+                if message_content:
+                    message = f"{message_content} https://youtu.be/{data['video_id']}"
+                else:
+                    message = f"https://youtu.be/{data['video_id']}"
+
+                await channel.send(
+                    message,
+                    allowed_mentions=discord.AllowedMentions(everyone=True, roles=True, users=True),
+                )
 
 
 async def setup(bot: Plyoox):

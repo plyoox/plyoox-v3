@@ -17,3 +17,8 @@ class TwitchLiveNotification(TypedDict):
 class TwitchOfflineNotification(TypedDict):
     guild_id: int
     stream_id: int
+
+
+class YoutubeVideoNotification(TypedDict):
+    user_id: str
+    video_id: str

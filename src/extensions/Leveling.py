@@ -182,6 +182,7 @@ class Leveling(commands.Cog):
             "avatar": member.display_avatar.with_size(512).with_format("png").url,
             "discriminator": member.discriminator,
             "rank": user_data["rank"],
+            "id": member.id,
         }
 
         try:

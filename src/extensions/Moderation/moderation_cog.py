@@ -603,10 +603,12 @@ class Moderation(commands.Cog):
             await interaction.response.send_translated(_("There are no point actions configured."), ephemeral=True)
             return
 
+        await interaction.response.defer(ephemeral=True)
+
         await automod_cog.add_warn_points(member, interaction.user, points, reason)
 
-        await interaction.response.send_translated(
-            _("{user.mention} has been warned."), ephemeral=True, translation_data={"user": member}
+        await interaction.followup.send(
+            interaction.translate(_("{user.mention} has been warned.")).format(user=member), ephemeral=True
         )
 
     @warn_group.command(name="remove", description=_("Removes a warning from a user."))

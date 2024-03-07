@@ -205,10 +205,10 @@ class Automod(commands.Cog):
                     continue
 
                 if cache.link_is_whitelist:
-                    if link in cache.link_list:
+                    if link in cache.link_allow_list:
                         continue
                 else:
-                    if link not in cache.link_list:
+                    if link not in cache.link_allow_list:
                         continue
 
                 await self._handle_action(message, cache.link_actions, AutoModerationExecutionKind.link)

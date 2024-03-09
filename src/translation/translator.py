@@ -143,4 +143,4 @@ def translate(
         context=context,
     )
 
-    return translated or f"~~{str(message)}~~"
+    return translated

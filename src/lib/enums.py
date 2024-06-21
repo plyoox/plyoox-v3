@@ -28,6 +28,12 @@ class AutoModerationCheckKind(enum.StrEnum):
     join_date = "join_date"
 
 
+class MarkdownLinkEnum(enum.StrEnum):
+    disallow_all = "disallow_all"
+    disallow_different_domain = "disallow_different_domain"
+    only_same_domain = "only_same_domain"
+
+
 class TimerEnum(enum.StrEnum):
     temp_ban = "temp_ban"
 

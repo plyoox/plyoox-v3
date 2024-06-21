@@ -18,6 +18,7 @@ from lib.enums import (
     TimerEnum,
     AutomodFinalActionEnum,
     AutoModerationExecutionKind,
+    MarkdownLinkEnum,
 )
 from translation import translate as global_translate
 from . import _logging_helper as _logging
@@ -30,6 +31,10 @@ _log = logging.getLogger(__name__)
 DISCORD_INVITE = re.compile(r"\bdiscord(?:(app)?\.com/invite?|\.gg)/([a-zA-Z0-9-]{2,32})\b", re.IGNORECASE)
 EVERYONE_MENTION = re.compile("@(here|everyone)")
 LINK_REGEX = re.compile(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]", re.IGNORECASE)
+SINGLE_URL_REGEX = re.compile(r"(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,6}")
+MARKDOWN_LINK_REGEX = re.compile(
+    r"\[(.*)]\((?:http|https)://((?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9])(?:/.*)?\)"
+)
 
 
 class AutoModerationActionData(object):
@@ -176,57 +181,16 @@ class Automod(commands.Cog):
         if cache is None or not cache.active:
             return
 
-        if found_invites := DISCORD_INVITE.findall(message.content):
-            if not self._is_affected(message, cache, AutoModerationExecutionKind.invite):
-                return
+        if await self._handle_invites(cache, message):
+            return
 
-            invites: set[str] = set([invite[1] for invite in found_invites])
-            for invite in invites:
-                try:
-                    fetched_invite = await self._fetch_invite(invite)
+        print("handle links")
 
-                    if fetched_invite and (
-                        fetched_invite.guild.id == guild.id or fetched_invite.guild.id in cache.invite_exempt_guilds
-                    ):
-                        continue
-
-                    await self._handle_action(message, cache.invite_actions, AutoModerationExecutionKind.invite)
-                    return
-                except discord.HTTPException:
-                    break
-
-        if found_links := LINK_REGEX.findall(message.content):
-            if not self._is_affected(message, cache, AutoModerationExecutionKind.link):
-                return
-
-            links = set([link for link in found_links])
-            for link in links:
-                if link in ["discord.gg", "discord.com"]:
-                    continue
-
-                if cache.link_is_whitelist:
-                    if link in cache.link_allow_list:
-                        continue
-                else:
-                    if link not in cache.link_allow_list:
-                        continue
-
-                await self._handle_action(message, cache.link_actions, AutoModerationExecutionKind.link)
-                return
+        if await self._handle_links(cache, message):
+            return
 
         if len(message.content) > 15 and not message.content.islower():
-            len_caps = len(re.findall(r"[A-ZÄÖÜ]", message.content))
-            percent = len_caps / len(message.content)
-
-            # Only check for messages with more than 70% capital letters
-            if percent < 0.7:
-                return
-
-            if not self._is_affected(message, cache, AutoModerationExecutionKind.caps):
-                return
-
-            await self._handle_action(message, cache.caps_actions, AutoModerationExecutionKind.caps)
-            return
+            await self._handle_caps(cache, message)
 
     async def _fetch_invite(self, code: str) -> discord.Invite | None:
         if (invite := self.invite_cache.get(code, False)) is not False:
@@ -261,7 +225,10 @@ class Automod(commands.Cog):
         message: discord.Message,
         actions: list[AutoModerationAction],
         reason: AutoModerationExecutionKind,
-    ):
+    ) -> bool:
+        """
+        Returns True if an action has been executed, otherwise False.
+        """
         for action in actions:
             if Automod._handle_checks(message.author, action):
                 data = AutoModerationActionData._from_message(
@@ -269,7 +236,9 @@ class Automod(commands.Cog):
                 )
 
                 await self._execute_action(data, message=message)
-                break
+                return True
+
+        return False
 
     async def _handle_final_action(self, member: discord.Member, actions: list[AutoModerationAction]):
         for action in actions:
@@ -496,3 +465,76 @@ class Automod(commands.Cog):
             member.id,
             guild.id,
         )
+
+    async def _handle_invites(self, cache: ModerationModel, message: discord.Message) -> bool:
+        if not self._is_affected(message, cache, AutoModerationExecutionKind.invite):
+            return False
+
+        found_invites = DISCORD_INVITE.findall(message.content)
+        if not found_invites:
+            return False
+
+        if found_invites := DISCORD_INVITE.findall(message.content):
+            invites: set[str] = set([invite[1] for invite in found_invites])
+            for invite in invites:
+                try:
+                    fetched_invite = await self._fetch_invite(invite)
+
+                    if fetched_invite and (
+                        fetched_invite.guild.id == message.guild.id
+                        or fetched_invite.guild.id in cache.invite_exempt_guilds
+                    ):
+                        continue
+
+                    return await self._handle_action(message, cache.invite_actions, AutoModerationExecutionKind.invite)
+                except discord.HTTPException:
+                    return False
+
+    async def _handle_links(self, cache: ModerationModel, message: discord.Message) -> bool:
+        if not self._is_affected(message, cache, AutoModerationExecutionKind.link):
+            return False
+
+        if cache.link_markdown_action is not None:
+            if found_markdown_links := MARKDOWN_LINK_REGEX.findall(message.content):
+                if cache.link_markdown_action == MarkdownLinkEnum.disallow_all:
+                    return await self._handle_action(message, cache.link_actions, AutoModerationExecutionKind.link)
+
+                for markdown_link in found_markdown_links:
+                    visible_domain = SINGLE_URL_REGEX.findall(markdown_link[0])
+
+                    # When no domain is found and only the same domain is allowed, punish the user
+                    if len(visible_domain) == 0 and cache.link_markdown_action == MarkdownLinkEnum.only_same_domain:
+                        return await self._handle_action(message, cache.link_actions, AutoModerationExecutionKind.link)
+
+                    if visible_domain[0] != markdown_link[1]:
+                        return await self._handle_action(message, cache.link_actions, AutoModerationExecutionKind.link)
+
+        if found_links := LINK_REGEX.findall(message.content):
+            links = set([link for link in found_links])
+            for link in links:
+                if link in ["discord.gg", "discord.com"]:
+                    continue
+
+                if cache.link_is_whitelist:
+                    if link in cache.link_allow_list:
+                        continue
+                else:
+                    if link not in cache.link_allow_list:
+                        continue
+
+                return await self._handle_action(message, cache.link_actions, AutoModerationExecutionKind.link)
+
+        return False
+
+    async def _handle_caps(self, cache: ModerationModel, message: discord.Message) -> bool:
+        len_caps = len(re.findall(r"[A-ZÄÖÜ]", message.content))
+        percent = len_caps / len(message.content)
+
+        # Only check for messages with more than 70% capital letters
+        if percent < 0.7:
+            return True
+
+        if not self._is_affected(message, cache, AutoModerationExecutionKind.caps):
+            return False
+
+        return await self._handle_action(message, cache.caps_actions, AutoModerationExecutionKind.caps)

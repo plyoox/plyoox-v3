@@ -200,6 +200,7 @@ class CacheManager:
             link_active=result["link_active"],
             link_exempt_channels=result["link_exempt_channels"] or [],
             link_exempt_roles=result["link_exempt_roles"] or [],
+            link_markdown_action=result["link_markdown_action"],
             link_actions=self.__to_moderation_actions(result["link_actions"]),
             moderation_roles=result["moderation_roles"] or [],
             notify_user=result["notify_user"],

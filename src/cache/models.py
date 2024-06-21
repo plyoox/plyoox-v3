@@ -10,6 +10,7 @@ if TYPE_CHECKING:
         AutoModerationPunishmentKind,
         AutoModerationFinalPunishmentKind,
         AutoModerationCheckKind,
+        MarkdownLinkEnum,
         TimerEnum,
     )
 
@@ -104,6 +105,7 @@ class ModerationModel(RecordClass):
     link_exempt_roles: list[int] | None
     link_allow_list: list[str] | None
     link_is_whitelist: bool
+    link_markdown_action: MarkdownLinkEnum | None
     caps_active: bool
     caps_actions: list[AutoModerationAction] | None
     caps_exempt_channels: list[int] | None
